@@ -1,0 +1,9 @@
+Plugin ameletHDFReader compilation
+1)get Paraview sources
+2)copy ameletHDFReader in Paraview3/Plugins
+3)edit Paraview3/Plugins/CMakeLists.txt and add the following line:
+paraview_build_optional_plugin(ameletHDFReader "ameletHDFReader" ameletHDFReader OFF)
+
+The follow the paraview compilation instruction, and put plugin ameletHDFReader to ON
+
+

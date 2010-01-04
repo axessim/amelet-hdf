@@ -1,0 +1,7 @@
+<ParaViewReaders>
+  <Reader name="vtkAmeletHDFReader"
+          extensions="h5a h5"
+          file_description="AmeletHDFReader Files">
+  </Reader>
+</ParaViewReaders>
+
