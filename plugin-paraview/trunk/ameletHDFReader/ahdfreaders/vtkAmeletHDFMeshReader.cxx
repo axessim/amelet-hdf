@@ -46,11 +46,16 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     //this->UpdateProgress(this->GetProgress()+0.125);
     elttypes_t umeshelttypes;
     eltnodes_t umesheltnodes;
+    umeshelttypes.nbelttypes=0;
+    umesheltnodes.nbeltnodes=0;
+    if (H5Lexists(loc_id,"elementNodes",H5P_DEFAULT)!=FALSE)
+    {
+    	eltnode_id = H5Dopen1(loc_id,"elementNodes");
+        eltype_id = H5Dopen1(loc_id,"elementTypes");
+        umeshelttypes = readElementTypes(eltype_id);
+        umesheltnodes = readElementNodes(eltnode_id);
+    }
 
-    eltnode_id = H5Dopen1(loc_id,"elementNodes");
-    eltype_id = H5Dopen1(loc_id,"elementTypes");
-    umeshelttypes = readElementTypes(eltype_id);
-    umesheltnodes = readElementNodes(eltnode_id);
     int idnode=0;
     for(int i=0; i<umeshelttypes.nbelttypes;i++)
     {
@@ -94,6 +99,16 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     }
     //this->UpdateProgress(this->GetProgress()+0.25);
     // Read GroupGroup
+    if(umesheltnodes.nbeltnodes==0)
+    {
+    	//so there is only nodes in mesh
+    	for(int i=0;i<ugrid->GetNumberOfPoints();i++)
+    	{
+    		vtkVertex * vertexcell = vtkVertex::New();
+    		vertexcell->GetPointIds()->SetId(0,i);
+    		ugrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+    	}
+    }
     vtkIntArray *groupId = vtkIntArray::New();
     groupId->SetName("Group Id");
     // Initialize groupId to 0
@@ -123,9 +138,10 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     		H5Dclose(grpGrp_id);
     	}
     	H5Gclose(groupGroup_id);
+    	ugrid->GetCellData()->SetScalars(groupId);
     }
     //this->UpdateProgress(this->GetProgress()+0.5);
-    ugrid->GetCellData()->SetScalars(groupId);
+
     return 1;
 }
 
