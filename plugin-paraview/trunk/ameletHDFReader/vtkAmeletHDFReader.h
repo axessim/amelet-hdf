@@ -24,10 +24,11 @@
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "ahdfreaders/vtkAmeletHDFMeshReader.h"
+#include "ahdfreaders/vtkAmeletHDFDataReader.h"
 #include <sys/stat.h>
 #include <vtkstd/vector>
 #include <algorithm>
-
+#include <vtkTable.h>
 
 /**
 * @class vtkAmeletHDFReader vtkAmeletHDFReader.h PathToHeader/vtkAmeletHDFReader.h
@@ -61,6 +62,7 @@ class VTK_IO_EXPORT vtkAmeletHDFReader : public vtkMultiBlockDataSetAlgorithm
       static vtkInformationIntegerKey *IS_UMESH();
       static vtkInformationIntegerKey *IS_SMESH();
       static vtkInformationIntegerKey *IS_DATAONMESH();
+      static vtkInformationIntegerKey *IS_DATA();
 
       int ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *output);
       // Description:

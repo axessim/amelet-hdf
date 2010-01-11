@@ -27,6 +27,7 @@ vtkStandardNewMacro(vtkAmeletHDFReader);
 vtkInformationKeyMacro(vtkAmeletHDFReader, IS_UMESH, Integer);
 vtkInformationKeyMacro(vtkAmeletHDFReader, IS_SMESH, Integer);
 vtkInformationKeyMacro(vtkAmeletHDFReader, IS_DATAONMESH, Integer);
+vtkInformationKeyMacro(vtkAmeletHDFReader, IS_DATA, Integer);
 vtkInformationKeyMacro(vtkAmeletHDFReader, POINTS, ObjectBase);
 vtkInformationKeyMacro(vtkAmeletHDFReader, POINT_DATA, ObjectBase);
 
@@ -490,7 +491,7 @@ int vtkAmeletHDFReader::CanReadFile(const char *filename)
 
 // -----------------------------------------------------------------------------
 //
-int vtkAmeletHDFReader::RequestData( vtkInformation *vtkNotUsed(request),
+int vtkAmeletHDFReader::RequestData( vtkInformation *request,
                                       vtkInformationVector **inputVector,
                                       vtkInformationVector *outputVector)
 {
@@ -558,6 +559,12 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *vtkNotUsed(request),
   else if(dataType==2)
   {
    	  cout<<"data conversion"<<endl;
+   	  vtkTable *table = vtkTable::New();
+   	  output->SetBlock(0,table);
+   	  vtkAmeletHDFDataReader ahdfdata;
+   	  ahdfdata.readData(file_id,table);
+
+
   }
   else if(dataType==3) //mesh
   {
@@ -611,6 +618,7 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
 {
 	vtkInformation* outInfo = outputVector->GetInformationObject(0);
 	int dataType=0;
+
 
 	vtkDebugMacro("RequestInformation");
 	if (!this->FileName)
