@@ -111,7 +111,7 @@ The ``inputs`` dataset is :
 +---------------------------------------------------+
 | ``/mesh/sphere``                                  |
 +---------------------------------------------------+
-| ``/physicalModel/perfectlyConducting``            |
+| ``/physicalModel/perfectElectricConductor``       |
 +---------------------------------------------------+
 | ``/link/sphere_links``                            |
 +---------------------------------------------------+
@@ -128,7 +128,7 @@ In the ``inputs`` dataset, we find out :
   we have to recursively walk through this group to discover all mesh
   characteristic.
 * A physical model, in this example a PEC 
-  (``/physicalModel/perfectlyConducting``)
+  (``/physicalModel/perfectElectricConductor``)
 * A link (``/link/sphere_links``)
 * An electromagnetic source, in this example a plane wave 
   (``/electromagneticSource/planeWave/x_plane_wave``)
@@ -253,7 +253,7 @@ Physical Models
 
 In this example, only one material model is taken into account : PEC. In
 Amelet-HDF, PEC is a predefined material model called 
-``/physicalModel/perfectlyConducting``.
+``/physicalModel/perfectElectricConductor``.
 
 
 Electromagnetic sources
@@ -290,7 +290,7 @@ The reading of the attribute ``magnitude`` give the following information :
     |                         @unit=voltPerMeter
     |                         @value=(1,0)]
     |-- physicalModel/
-    |   `-- perfeclyConducting
+    |   `-- perfectElectricConductor
     |-- mesh/
     |   `-- sphere
     |       `-- surfaces
@@ -334,7 +334,7 @@ The meaning of links is given by the attributes, here we have :
 * ``incident_field`` : a link between the subject `'x_plane_wave`` and 
   the unstructured mesh object ``/mesh/sphere/surfaces``
 * ``skin_material`` : it is a link between the subject 
-  ``/physicalModel/perfectlyConducting`` and the object
+  ``/physicalModel/perfectElectricConductor`` and the object
   ``/mesh/sphere/surfaces/group/faceGroups`` (a group of the unstructured mesh).
   This group is the sphere.
 
