@@ -42,7 +42,6 @@ single_t read_single(hid_t loc_id, const char* path)
     {
     	strcpy(single.comment,read_string_attribute(loc_id,path,A_COMMENT));
     }
-    printf("%s\n",single_to_string(single));
     return single;
 }
 
