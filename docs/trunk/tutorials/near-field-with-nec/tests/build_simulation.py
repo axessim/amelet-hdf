@@ -51,6 +51,14 @@ input_h5.createGroup(part1, "groupGroup")
 # "/mesh/wire_mesh/part1/group" creation
 group = input_h5.createGroup(part1, "group")
 
+
+# output_nodes group for near field calculation
+# "/mesh/wire_mesh/part1/group/output_nodes" dataset creation
+output_group = input_h5.createArray(group, "output_nodes", np.arange(7, 22))
+# "/mesh/wire_mesh/part1/group/output_nodes" has a @type = nodes
+output_group.attrs.type = "node"
+
+
 # "/mesh/wire_mesh/part1/group/wire" dataset creation
 wire_group = input_h5.createArray(group, "wire", np.arange(0, 7))
 # "/mesh/wire_mesh/part1/group/output_nodes" has a @type = nodes
@@ -74,14 +82,6 @@ usome["v1"] = -1.
 usome["v2"] = -1.
 usome["v3"] = -1.
 usome.append()
-
-
-# output_nodes group for near field calculation
-
-# "/mesh/wire_mesh/part1/group/output_nodes" dataset creation
-output_group = input_h5.createArray(group, "output_nodes", np.arange(7, 22))
-# "/mesh/wire_mesh/part1/group/output_nodes" has a @type = nodes
-output_group.attrs.type = "node"
 
 
 # Setting the wire radius
@@ -114,10 +114,10 @@ mag._v_attrs.floatingType = "singleComplex"
 mag._v_attrs.value = np.complex64(complex(1, 0))
 
 # The voltage source link creation
-radius = input_h5.createGroup("/link/link_group", "generator")
-radius._v_attrs.subject = "/electromagneticSource/generator/voltage_source"
-radius._v_attrs.object = "/mesh/wire_mesh/part1/selectorOnMesh/elements"
-radius._v_attrs.object_shortName = "voltage_generator"
+generator = input_h5.createGroup("/link/link_group", "generator")
+generator._v_attrs.subject = "/electromagneticSource/generator/voltage_source"
+generator._v_attrs.object = "/mesh/wire_mesh/part1/selectorOnMesh/elements"
+generator._v_attrs.object_shortName = "voltage_generator"
 
 
 # OutputRequest handling
@@ -140,16 +140,17 @@ near_field._v_attrs.object = "/mesh/wire_mesh/part1/group/wire"
 near_field._v_attrs.output = "/floatingPoint/near_field"
 
 
-# "/simulation/simuXY" creation
+# "/simulation/simuNec" creation
 input_h5.createGroup("/", "simulation")
-simu = input_h5.createGroup("/simulation", "simuXY")
-# The entry point of the is /simulation/simuXY
-input_h5.root._v_attrs.entryPoint = "/simulation/simuXY"
+simu = input_h5.createGroup("/simulation", "simuNec")
+# The entry point of the is /simulation/simuNec
+input_h5.root._v_attrs.entryPoint = "/simulation/simuNec"
 simu._v_attrs.module = "nec"
 simu._v_attrs.version = "1.0.0"
 # Simulation inputs
 inputs = []
 inputs.extend(("/mesh/wire_mesh", 
+               "/globalEnvironment",
                "/link/link_group",
                "/outputRequest/request_group"))
 input_h5.createArray(simu, "inputs", inputs)
@@ -161,7 +162,12 @@ input_h5.createArray(simu, "outputs", outputs)
 
 # physicalModel category
 input_h5.createGroup("/", "physicalModel")
+input_h5.createGroup("/physicalModel", "perfectElectricConductor")
+
+# The frequency setting
 input_h5.createGroup("/", "globalEnvironment")
+freq = input_h5.createGroup("/globalEnvironment", "frequency")
+freq._v_attrs.singleReal = 299.8
 
 input_h5.close()
 

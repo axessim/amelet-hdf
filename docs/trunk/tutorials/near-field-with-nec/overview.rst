@@ -1,32 +1,27 @@
 Overview
 ========
 
-This tutorial aims at showing how computing the electric field along a dipole
-with the well known Nec2 software within the Quercy platform.
+This tutorial aims at showing how to compute the electric field alongside 
+a dipole with the well known Nec2 software within the Quercy platform.
 
-The use case is based upon the first example of Nec2 distribution :
+The use case is based upon the first example of Nec2 distribution.
 
 A 0.5m length dipole is modeled with two linked points :
 
-* the first point is (x=0  y=0  z=-0.25)
-* the second point (x=0  y=0  z=0.25)
+* the first point is at (x=0  y=0  z=-0.25 in meter)
+* the second point is at (x=0  y=0  z=0.25 in meter)
 
 The wire radius is 0.001m and finally the dipole is discretized in 7 segments.
 The source is a voltage source (1V) located on the fourth segment.
 
-A load serial impedance is located on the fourth segment :
+A load serial impedance is also located on the fourth segment :
 
-* The resistance is R = 10 ohms
-* The inductance is L = 3e-9 henries
-* The capacitance is C = 5.3e-11 farads
+* The resistance is R = 10 Ohms
+* The inductance is L = 3e-9 Henries
+* The capacitance is C = 5.3e-11 Farads
 
-A near electric fields calculation is requested from :
-
-* x = 0.001
-* y = 0
-* z = 0
-
-with a dz=0.1786m z step  15 points are requested.
+A near electric fields calculation is requested on 15 points from the point of
+coordinates (x = 0.001, y = 0, z = 0) and with a dz=0.1786m z step.
 
 The frequency is 299.8 MHz.
 
@@ -38,25 +33,25 @@ Prerequisites
 Nec
 ---
 
-http://www.si-list.net/swindex.html
+The Nec product can be downloaded at http://www.si-list.net/swindex.html
 
 
 
 Python
 ------
 
-Simulation input data will be written in the **input.h5** file.
+In order to introduce the python language and to show how it fits well with the 
+task we will generate input.h5 
+in python ( http://www.python.org  select at least the version 2.5.4 ). 
 
-In order to introduce the python language we will generate input.h5 
-in python language ( http://www.python.org  select at least the version 2.5.4 ). 
-Two python module must be present on the system :
+Two python modules must be present on the system :
 
 * numpy : numpy is a module to handle multidimensional matrices (à la Matlab)
   numpy 1.3 can be found out at http://sourceforge.net/projects/numpy/files.
 * pytables : pytables permits to read/write HDF5 file in a very easy way.
   pytables 2.1.2 can be found out at http://www.pytables.org/download/stable/
 
-Python module version must fit with the version of the python interpreter.
+Python module version must match with the version of the python interpreter.
 
 
 
@@ -68,7 +63,7 @@ We are going the build an unstructured mesh.
 The nodes
 ---------
 
-The wire is made up 7 segments (length = 0.5m/7m = 0.07143m)  
+The wire is made up 7 segments (length = 0.5/7 = 0.07143m)  
 so there are 8 points. The wire is oriented toward the Z axis with
 x=0m and y=0m.
 
@@ -181,12 +176,12 @@ with ``input.h5:/mesh/wiremesh/part1/nodes`` :
 The element types
 -----------------
 
-All the 15 elements are segments, the element type is 1.
+All the 7 elements are segments, the element type is 1.
 
 .. code-block:: python
 
     # write element type in input.h5
-    input_h5.createArray(part1, "elementTypes",  np.ones(15, np.int32))
+    input_h5.createArray(part1, "elementTypes",  np.ones(7, np.int32))
 
 ::
 
@@ -208,12 +203,6 @@ with ``input.h5:/mesh/wiremesh/part1/elementTypes`` :
     1
     1
     1
-    1
-    1
-    1
-    1
-    1
-    1
 
 
 The element nodes
@@ -221,19 +210,19 @@ The element nodes
 
 The element nodes are :
 
-* s1 = p1 p2
-* s2 = p2 p3
-* s3 = p3 p4
-* s4 = p4 p5
-* s5 = p5 p6
-* s6 = p6 p7
-* s7 = p7 p8
+* s1 = [p1 p2]
+* s2 = [p2 p3]
+* s3 = [p3 p4]
+* s4 = [p4 p5]
+* s5 = [p5 p6]
+* s6 = [p6 p7]
+* s7 = [p7 p8]
 
 .. code-block:: python
 
     # write element type in input.h5
     element_nodes = []
-    [element_nodes.extend((i[0], i[1])) for i in zip(range(1, 7), range(2, 8))]
+    [element_nodes.extend(i) for i in zip(range(0, 7), range(1, 8))]
     input_h5.createArray(part1, "elementNodes", element_nodes)
 
 
@@ -264,10 +253,37 @@ with ``input.h5:/mesh/wiremesh/part1/elementTypes`` :
     6
     7
 
-The calculation request points
-------------------------------
 
-We now have to create the point group where the near field will be computed :
+Finally, the wire is a group that gathers all segments named 
+``/mesh/wire_mesh/part1/group/wire`` :
+
+::
+
+    input.h5
+    `-- mesh/
+        `-- wire_mesh
+            `-- part1[@type=unstructured]
+                |-- elementNodes
+                |-- elementTypes
+                |-- nodes
+                `-- group
+                    `-- wire[@type=element
+                             @entityType=edge]
+
+with ``/mesh/wire_mesh/part1/group/wire`` :
+
+::
+
+    0
+    1
+    2
+    3
+    4
+    5
+    6
+
+
+In python this can be done with :
 
 .. code-block:: python
 
@@ -275,8 +291,17 @@ We now have to create the point group where the near field will be computed :
     input_h5.createGroup(part1, "groupGroup")
     group = input_h5.createArray(part1, "group")
 
+    # "/mesh/wire_mesh/part1/group/wire" dataset creation
+    wire_group = input_h5.createArray(group, "wire", np.arange(0, 7))
+    # "/mesh/wire_mesh/part1/group/output_nodes" has a @type = nodes
+    wire_group.attrs.type = "element"
+    wire_group.attrs.entityType = "edge"
 
-Then we create a node dataset which will contain ``output_nodes`` elements : 
+
+The calculation request points
+------------------------------
+
+We create a node dataset which will contain ``output_nodes`` elements : 
 
 .. code-block:: python
 
@@ -290,12 +315,13 @@ Then we create a node dataset which will contain ``output_nodes`` elements :
 
     input.h5
     `-- mesh/
-        `-- wire_mesh
-            `-- part1[@type=unstructured]
+        `-- wire_mesh/
+            `-- part1[@type=unstructured]/
                 |-- elementNodes
                 |-- elementTypes
                 |-- nodes
                 `-- group/
+                    |-- wire
                     `-- output_nodes
                     
 
@@ -306,8 +332,8 @@ We saw in the overview the wire radius is 1e-3m.
 The section 14.2.2. of Amelet-HDF 1.0.0 explains how to set the radius of
 a wire.
 
-The ``/label/predefinedLabels`` contains Amelet-HDF predefined label. The
-``wireRadius`` label can be used to set the radius :
+The ``/label/predefinedLabels`` dataset contains Amelet-HDF predefined label. 
+The ``wireRadius`` label can be used to set the radius :
 
 :: 
 
@@ -318,12 +344,13 @@ The ``/label/predefinedLabels`` contains Amelet-HDF predefined label. The
     |   `-- wire_mesh
     |       `-- part1
     |           `-- group
+    |               |-- wire
     |               `-- output_nodes
     `-- link
         `-- link_group
             `-- radius[@subject=/label/predefinedLabels
                        @subject_id=0
-                       @object=/mesh/wire_mesh/part1/group/output_nodes
+                       @object=/mesh/wire_mesh/part1/group/wire
                        @radius=1e-3]
 
 
@@ -349,13 +376,154 @@ Lets write this in the input file :
     radius = input_h5.createGroup("/link/link_group", "radius")
     radius._v_attrs.subject = "/label/predefinedLabels"
     radius._v_attrs.subject_id = 0
-    radius._v_attrs.object = "/mesh/wire_mesh/part1/group/output_nodes"
+    radius._v_attrs.object = "/mesh/wire_mesh/part1/group/wire"
     radius._v_attrs.radius = np.float32(1e-3)
 
 
 
-Setting the output requests
----------------------------
+The generator
+-------------
+
+First of all, we have to isolate the point where the generator is located.
+The is done by creating an element in 
+``/mesh/wire_mesh/part1/selectorOnMesh/elements`` 
+
+:: 
+
+    data.h5
+    `-- mesh/
+        `-- wire_mesh/
+            `-- part1/
+                |-- elementNodes
+                |-- elementTypes
+                |-- nodes
+                |-- selectorOnMesh/
+                |   `-- elements
+                `-- group/
+                    |-- wire
+                    `-- output_nodes
+
+where ``/mesh/wire_mesh/part1/selectorOnMesh/elements`` is :
+
+================== ========== ===== ===== =====
+shortName            index      v1   v2    v3
+================== ========== ===== ===== =====
+voltage_generator    4          -1    -1    -1
+================== ========== ===== ===== =====
+
+
+The equivalement python code is the following :
+
+.. code-block:: python
+
+    # Element for excitation location
+    som = input_h5.createGroup(part1, "selectorOnMesh")
+    class USelectorOnMeshElement(t.IsDescription):
+      shortName = t.StringCol(30, pos=0)
+      index     = t.Int32Col()
+      v1        = t.Float32Col()
+      v2        = t.Float32Col()
+      v3        = t.Float32Col()
+    some = input_h5.createTable(som, 'elements', USelectorOnMeshElement)
+    usome = some.row 
+    usome["shortName"] = "voltage_generator"
+    usome["index"] = 4
+    usome["v1"] = -1.
+    usome["v2"] = -1.
+    usome["v3"] = -1.
+    usome.append()
+
+
+Next a generator has to be created in ``/electromagneticSource`` named 
+``voltage_source`` : 
+
+::
+
+    data.h5
+    |-- electromagneticSource/
+    |   `-- generator/
+    |       `-- voltage_source[@type=voltage]
+    |           `-- magnitude[@singleComplex=(1,0)]
+    `-- mesh/
+
+The magnitude is complex and equals 1+0j V.
+
+.. code-block:: python
+
+    # Voltage source creation
+    input_h5.createGroup("/", "electromagneticSource")
+    input_h5.createGroup("/electromagneticSource", "generator")
+    vs = input_h5.createGroup("/electromagneticSource/generator", "voltage_source")
+    vs._v_attrs.type = "voltage"
+    mag = input_h5.createGroup(vs, "magnitude")
+    mag._v_attrs.floatingType = "singleComplex"
+    mag._v_attrs.value = np.complex64(complex(1, 0))
+
+
+Then the generator is located on the ``voltage_generator`` segment thanks a
+link :
+
+::
+
+    data.h5
+    |-- electromagneticSource/
+    |   `-- generator/
+    |       `-- voltage_source[@type=voltage]
+    |-- link/
+    |   `-- link_group/
+    |       `-- generator[@subject=/electromagneticSource/generator/voltage_source
+    |                     @object=/mesh/wire_mesh/part1/selectorOnMesh/elements
+    |                     @object_shortName=voltage_generator]
+    `-- mesh/
+        `-- selectorOnMesh/
+            `-- elements
+
+
+.. code-block:: python
+
+    # The voltage source link creation
+    generator = input_h5.createGroup("/link/link_group", "generator")
+    generator._v_attrs.subject = "/electromagneticSource/generator/voltage_source"
+    generator._v_attrs.object = "/mesh/wire_mesh/part1/selectorOnMesh/elements"
+    generator._v_attrs.object_shortName = "voltage_generator"
+
+
+The output requests
+-------------------
+
+We have seen at the beginning of the tutorial the current has to be 
+computed alongside the wire on ``output_nodes`` elements :
+
+
+::
+
+    data.h5
+    |-- label/
+    |   `-- predefinedOutputRequest
+    |-- outputRequest/
+    |   `-- request_group/
+    |       `-- near_field[@subject=/label/predefinedOutputRequests
+    |                      @subject_id=0
+    |                      @object=/mesh/wire_mesh/part1/group/output_nodes
+    |                      @output=/floatingPoint/near_field]
+    `-- mesh/
+        `-- wire_mesh/
+            `-- part1/
+                |-- elementNodes
+                |-- elementTypes
+                |-- nodes
+                |-- selectorOnMesh/
+                |   `-- elements
+                `-- group/
+                    |-- wire
+                    `-- output_nodes
+
+where ``/label/predefinedOutputRequest`` is :
+
++---------------------+
+| electricField       |
++---------------------+
+
 
 .. code-block:: python
 
@@ -375,35 +543,77 @@ Setting the output requests
     near_field = input_h5.createGroup("/outputRequest/request_group", "near_field")
     near_field._v_attrs.subject = "/label/predefinedOutputRequests"
     near_field._v_attrs.subject_id = 0
-    near_field._v_attrs.object = "/mesh/wire_mesh/part1/group/wire"
+    near_field._v_attrs.object = "/mesh/wire_mesh/part1/group/output_nodes"
     near_field._v_attrs.output = "/floatingPoint/near_field"
+
+
+The simulation frequency
+------------------------
+
+# The frequency setting
+input_h5.createGroup("/", "globalEnvironment")
+freq = input_h5.createGroup("/globalEnvironment", "frequency")
+freq._v_attrs.singleReal = 299.8
+
 
 
 The simulation object
 ---------------------
 
-A simulation is an HDF5 group :
+The simulation object is relatively straightforward :
+
+::
+
+    data.h5
+    |-- simulation/
+    |   `-- simuNec[@module=nec
+    |       |       @version=1.0.0]
+    |       |-- inputs
+    |       `-- outputs
+    |-- globalEnvironment
+    |   `-- frequency
+    |-- label/
+    |   `-- predefinedOutputRequest
+    |-- outputRequest/
+    |   `-- request_group/
+    `-- mesh/
+        `-- wire_mesh/
+
+where ``/simulation/simuNec/inputs`` is :
+
++---------------------------------+
+|``/mesh/wire_mesh``              |
++---------------------------------+
+|``/globalEnvironment/link_group``|
++---------------------------------+
+|``/link/link_group``             |
++---------------------------------+
+|``/outputRequest/request_group`` |
++---------------------------------+
+
+
+and  ``/simulation/simuNec/output`` is :
+
++---------------------------------+
+|``/floatingType/near_field``     |
++---------------------------------+
+
+
+This can be performed in python with the following sequence :
 
 .. code-block:: python
 
-    # The output request creation
-    near_field = input_h5.createGroup("/outputRequest/request_group", "near_field")
-    near_field._v_attrs.subject = "/label/predefinedOutputRequests"
-    near_field._v_attrs.subject_id = 0
-    near_field._v_attrs.object = "/mesh/wire_mesh/part1/group/wire"
-    near_field._v_attrs.output = "/floatingPoint/near_field"
-
-
-    # "/simulation/simuXY" creation
+    # "/simulation/simuNec" creation
     input_h5.createGroup("/", "simulation")
-    simu = input_h5.createGroup("/simulation", "simuXY")
-    # The entry point of the is /simulation/simuXY
-    input_h5.root._v_attrs.entryPoint = "/simulation/simuXY"
+    simu = input_h5.createGroup("/simulation", "simuNec")
+    # The entry point of the is /simulation/simuNec
+    input_h5.root._v_attrs.entryPoint = "/simulation/simuNec"
     simu._v_attrs.module = "nec"
     simu._v_attrs.version = "1.0.0"
     # Simulation inputs
     inputs = []
     inputs.extend(("/mesh/wire_mesh", 
+                   "/globalEnvironment",
                    "/link/link_group",
                    "/outputRequest/request_group"))
     input_h5.createArray(simu, "inputs", inputs)
@@ -413,8 +623,11 @@ A simulation is an HDF5 group :
     outputs.append("/floatingType/near_field")
     input_h5.createArray(simu, "outputs", outputs)
 
-Entire source code
-------------------
+
+
+
+Entire python source code
+-------------------------
 
 .. code-block:: python
 
@@ -442,7 +655,7 @@ Entire source code
     part1._v_attrs["type"] = "unstructured"
 
     # Build the nodes array for the wire
-    wire_nodes = np.array([[0., 0., r] for r in np.linspace(-0.25, 0.25, 7)], np.float32)
+    wire_nodes = np.array([[0., 0., r] for r in np.linspace(-0.25, 0.25, 8)], np.float32)
 
     # Build the nodes array for the output
     output_nodes = np.array([[0.001, 0., r] for r in np.linspace(0., 0.25, 15)], np.float32)
@@ -456,16 +669,28 @@ Entire source code
     # write element type in input.h5
     input_h5.createArray(part1, "elementTypes",  np.ones(7, np.int32))
 
-    # write element type in input.h5
+    # write element nodes in input.h5
     element_nodes = []
     [element_nodes.extend(i) for i in zip(range(0, 7), range(1, 8))]
     input_h5.createArray(part1, "elementNodes", element_nodes)
 
 
 
+    # mesh group init
+    input_h5.createGroup(part1, "groupGroup")
+
+
     # wire group
     # "/mesh/wire_mesh/part1/group" creation
     group = input_h5.createGroup(part1, "group")
+
+
+    # output_nodes group for near field calculation
+    # "/mesh/wire_mesh/part1/group/output_nodes" dataset creation
+    output_group = input_h5.createArray(group, "output_nodes", np.arange(7, 22))
+    # "/mesh/wire_mesh/part1/group/output_nodes" has a @type = nodes
+    output_group.attrs.type = "node"
+
 
     # "/mesh/wire_mesh/part1/group/wire" dataset creation
     wire_group = input_h5.createArray(group, "wire", np.arange(0, 7))
@@ -474,13 +699,22 @@ Entire source code
     wire_group.attrs.entityType = "edge"
 
 
-
-    # output_nodes group for near field calculation
-
-    # "/mesh/wire_mesh/part1/group/output_nodes" dataset creation
-    output_group = input_h5.createArray(group, "output_nodes", np.arange(7, 22))
-    # "/mesh/wire_mesh/part1/group/output_nodes" has a @type = nodes
-    output_group.attrs.type = "node"
+    # Element for excitation location
+    som = input_h5.createGroup(part1, "selectorOnMesh")
+    class USelectorOnMeshElement(t.IsDescription):
+      shortName = t.StringCol(30, pos=0)
+      index     = t.Int32Col()
+      v1        = t.Float32Col()
+      v2        = t.Float32Col()
+      v3        = t.Float32Col()
+    some = input_h5.createTable(som, 'elements', USelectorOnMeshElement)
+    usome = some.row 
+    usome["shortName"] = "voltage_generator"
+    usome["index"] = 4
+    usome["v1"] = -1.
+    usome["v2"] = -1.
+    usome["v3"] = -1.
+    usome.append()
 
 
     # Setting the wire radius
@@ -503,6 +737,22 @@ Entire source code
     radius._v_attrs.radius = np.float32(1e-3)
 
 
+    # Voltage source creation
+    input_h5.createGroup("/", "electromagneticSource")
+    input_h5.createGroup("/electromagneticSource", "generator")
+    vs = input_h5.createGroup("/electromagneticSource/generator", "voltage_source")
+    vs._v_attrs.type = "voltage"
+    mag = input_h5.createGroup(vs, "magnitude")
+    mag._v_attrs.floatingType = "singleComplex"
+    mag._v_attrs.value = np.complex64(complex(1, 0))
+
+    # The voltage source link creation
+    generator = input_h5.createGroup("/link/link_group", "generator")
+    generator._v_attrs.subject = "/electromagneticSource/generator/voltage_source"
+    generator._v_attrs.object = "/mesh/wire_mesh/part1/selectorOnMesh/elements"
+    generator._v_attrs.object_shortName = "voltage_generator"
+
+
     # OutputRequest handling
     # "/label" group creation
     predefinedOutputRequests = ["electricField"]
@@ -523,16 +773,17 @@ Entire source code
     near_field._v_attrs.output = "/floatingPoint/near_field"
 
 
-    # "/simulation/simuXY" creation
+    # "/simulation/simuNec" creation
     input_h5.createGroup("/", "simulation")
-    simu = input_h5.createGroup("/simulation", "simuXY")
-    # The entry point of the is /simulation/simuXY
-    input_h5.root._v_attrs.entryPoint = "/simulation/simuXY"
+    simu = input_h5.createGroup("/simulation", "simuNec")
+    # The entry point of the is /simulation/simuNec
+    input_h5.root._v_attrs.entryPoint = "/simulation/simuNec"
     simu._v_attrs.module = "nec"
     simu._v_attrs.version = "1.0.0"
     # Simulation inputs
     inputs = []
     inputs.extend(("/mesh/wire_mesh", 
+                   "/globalEnvironment",
                    "/link/link_group",
                    "/outputRequest/request_group"))
     input_h5.createArray(simu, "inputs", inputs)
@@ -542,18 +793,26 @@ Entire source code
     outputs.append("/floatingType/near_field")
     input_h5.createArray(simu, "outputs", outputs)
 
+    # physicalModel category
+    input_h5.createGroup("/", "physicalModel")
+    input_h5.createGroup("/physicalModel", "perfectElectricConductor")
+
+    # The frequency setting
+    input_h5.createGroup("/", "globalEnvironment")
+    freq = input_h5.createGroup("/globalEnvironment", "frequency")
+    freq._v_attrs.singleReal = 299.8
+
     input_h5.close()
 
 
 
-
-The pre converter
-=================
+The pre converter in fortran
+============================
 
 Now we have generated the simulation input.h5 file, we can create the
 Nec ``pre`` converter.
 
-The ``pre`` converter will written in fortran with the helper functions
+The ``pre`` converter is written in fortran with the helper functions
 provided with the SDK (the use of helper function is optional).
 
 
@@ -586,7 +845,7 @@ line is 10 columns :
  GA    I1    I2    I3    F1    F2    F3  
 ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 
-Each has a particular meaning relative to the first column value (see the 
+Each card has a particular meaning relative to the first column value (see the 
 Nec documentation for much detailed description) :
 
 * ``CE`` is a comment line
@@ -611,7 +870,8 @@ The pre converter project
 Amelet-HDF helper functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Fortran functions will be helpful for this task, we are going to compile them.
+Fortran helper functions will be helpful for this task, 
+we are going to compile them now.
 
 First of all, fetch and compile the Amelet-HDF fortran help functions.
 The compilation process is straightforward :
@@ -672,8 +932,8 @@ The convert part has to translate Amelet-HDF data into the nec card format.
 We decide the Nec input file will be named "input.nec".
 
 An important thing to notice, CW Nec card defines a straight line wire 
-with n segment. This concept doesn't exist in Amelet-HDF so we have to 
-describe the wire by 7 1 segment straight lines. The voltage source card
+with n segment. This concept does not exist in Amelet-HDF so we have to 
+describe the wire by 7 1-segment straight lines. The voltage source card
 is also modified. The input.nec looks like :
 
 ::
@@ -695,6 +955,28 @@ is also modified. The input.nec looks like :
     NE  0    1    1   15   .001      0         0          0.        0.      .01786
     EN
 
+The second modification does not use the same free formatting string 
+schema than C language. It is more common the write data in columns
+as the original nec defines it.
+
+.. --+++-----++++++++++----------++++++++++----------++++++++++----------+++++++++
+
+    CM EXAMPLE 1.  CENTER FED LINEAR ANTENNA
+    CE
+    GW  0    1     0.000     0.000       -0.250     0.000     0.000    -0.178    0.001
+    GW  0    1     0.000     0.000       -0.178     0.000     0.000    -0.107    0.001
+    GW  0    1     0.000     0.000       -0.107     0.000     0.000    -0.035    0.001
+    GW  1    1     0.000     0.000       -0.035     0.000     0.000     0.035    0.001
+    GW  0    1     0.000     0.000        0.035     0.000     0.000     0.107    0.001
+    GW  0    1     0.000     0.000        0.107     0.000     0.000     0.178    0.001
+    GW  0    1     0.000     0.000        0.178     0.000     0.000     0.250    0.001
+    GE
+    EX  0    1    1    0    1.
+    XQ
+    LD  0    1    1    1   10.     3.000E-09 5.300E-11
+    PQ
+    NE  0    1    1   15   .001      0         0          0.        0.      .01786
+    EN
 
 Along the process use the "compare with" tool of Eclipse to compare
 the reference ``input.nec`` and the generated ``input.nec`` : 
