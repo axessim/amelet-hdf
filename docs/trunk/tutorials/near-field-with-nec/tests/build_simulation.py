@@ -167,7 +167,8 @@ input_h5.createGroup("/physicalModel", "perfectElectricConductor")
 # The frequency setting
 input_h5.createGroup("/", "globalEnvironment")
 freq = input_h5.createGroup("/globalEnvironment", "frequency")
-freq._v_attrs.singleReal = 299.8
+freq._v_attrs.floatingType = "singleReal"
+freq._v_attrs.value = np.float32(299.8)
 
 input_h5.close()
 

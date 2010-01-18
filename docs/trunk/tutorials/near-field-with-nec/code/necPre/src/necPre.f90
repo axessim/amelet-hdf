@@ -29,6 +29,15 @@ module nec_model
         integer :: near, nrx, nry, nrz
         real :: xnr, ynr, znr, dxnr, dynr, dznr
     end type ne_t
+
+contains
+    function gw_to_string(gw) result(string)
+        type(gw_t), intent(in) :: gw
+        character(len=80) :: string
+        write(string, '(a2,i3,i5,7f10.4)') "GW", gw%itg, gw%ns, &
+                                          gw%xw1, gw%yw1, gw%zw1, &
+                                          gw%xw2, gw%yw2, gw%zw2, gw%rad
+    end function
 end module nec_model
 
 program necPre
@@ -111,7 +120,8 @@ program necPre
     call check("Can't open "//trim(filename))
 
     ! All categories
-    print *, "\nReading categories"
+    print *
+    print *, "Reading categories"
     if (allocated(children_name)) deallocate(children_name)
     call read_children_name(file_id, "/", children_name)
     do i=1, size(children_name)
@@ -119,7 +129,8 @@ program necPre
     enddo
 
     ! Simulations
-    print *, "\nReading simulation ..."
+    print *
+    print *, "Reading simulation ..."
     if (allocated(children_name)) deallocate(children_name)
     call read_children_name(file_id, C_SIMULATION, children_name)
     do i=1, size(children_name)
@@ -128,22 +139,25 @@ program necPre
     enddo
 
     ! Meshes
-    print *, "\nReading Mesh ..."
+    print *
+    print *, "Reading Mesh ..."
     if (allocated(children_name)) deallocate(children_name)
     call read_children_name(file_id, C_MESH, children_name)
     do i=1, size(children_name)
         path = trim(C_MESH//children_name(i))
-        print *, "Mesh group : ", path
+        print *, "Mesh group : ", trim(path)
         if (allocated(children_name2)) deallocate(children_name2)
         call read_children_name(file_id, path, children_name2)
         do j=1, size(children_name2)
             path2 = path//"/"//trim(children_name2(i))
-            print *, "\nReading ", trim(path2), " ..."
+            print *
+            print *, "Reading ", trim(path2), " ..."
             if (allocated(children_name3)) deallocate(children_name3)
             call read_children_name(file_id, path2, children_name3)
             do k=1, size(children_name3)
                 path3 = trim(path2)//"/"//trim(children_name3(i))
-                print *, "\nReading ", trim(path3), " ..."
+                print *
+                print *, "Reading ", trim(path3), " ..."
                 if (isStructured(file_id, trim(path3))) then
                     call readStructuredMesh(file_id, trim(path3), smesh)
                     call printStructuredMesh(smesh)
@@ -160,12 +174,13 @@ program necPre
     call umesh_generate_node_numbers(umesh, size(node_numbers), node_numbers)
 
     ! Electromagnetic sources
-    print *, "\nReading Electromagnetic Sources ..."
+    print *
+    print *, "Reading Electromagnetic Sources ..."
     if (allocated(children_name)) deallocate(children_name)
     call read_children_name(file_id, C_ELECTROMAGNETIC_SOURCE, children_name)
     do i=1, size(children_name)
         path = trim(C_ELECTROMAGNETIC_SOURCE)//trim(children_name(i))
-        print *, "Electromagnetic Sources : ", path
+        print *, "Electromagnetic Sources : ", trim(path)
         if (allocated(children_name2)) deallocate(children_name2)
         call read_children_name(file_id, trim(path), children_name2)
         if (like(path, C_ELECTROMAGNETIC_SOURCE//C_PLANE_WAVE)) then
@@ -184,14 +199,15 @@ program necPre
     enddo
 
     ! Global environment
-    print *, "\nReading global environment ..."
+    print *
+    print *, "Reading global environment ..."
     if (allocated(children_name)) deallocate(children_name)
     call read_children_name(file_id, C_GLOBAL_ENVIRONMENT, children_name)
     do i=1, size(children_name)
         path = trim(C_GLOBAL_ENVIRONMENT)//trim(children_name(i))
-        print *, "Global environment : ", path
-        call read_floatingtype(file_id, trim(path)//"/"//"frequency", ft)
-        print *, "Value : ", ft%vector%rvalue
+        print *, "Global environment : ", trim(path)
+        call read_floatingtype(file_id, trim(path), ft)
+        print *, "Value : ", convert_to_real_vector(ft), "Hz"
     enddo
 
     ! Label
@@ -383,7 +399,6 @@ program necPre
         enddo
     enddo
 
-
     ! Output Request
     print *
     print *, "Reading output request ..."
@@ -403,6 +418,10 @@ program necPre
         enddo
     enddo
 
+    ! Write nec wires to input.nec
+    do i=1, nb_wires
+        write(numnec, "(a80)"), gw_to_string(nec_wires(i))
+    enddo
 
     ! Physical Models
     print *, "\nReading Physical models ..."
