@@ -408,7 +408,7 @@ where ``/mesh/wire_mesh/part1/selectorOnMesh/elements`` is :
 ================== ========== ===== ===== =====
 shortName            index      v1   v2    v3
 ================== ========== ===== ===== =====
-voltage_generator    4          -1    -1    -1
+voltage_generator    3          -1    -1    -1
 ================== ========== ===== ===== =====
 
 
@@ -427,7 +427,7 @@ The equivalement python code is the following :
     some = input_h5.createTable(som, 'elements', USelectorOnMeshElement)
     usome = some.row 
     usome["shortName"] = "voltage_generator"
-    usome["index"] = 4
+    usome["index"] = 3
     usome["v1"] = -1.
     usome["v2"] = -1.
     usome["v3"] = -1.
@@ -986,6 +986,29 @@ following example :
     PQ
     NE  0    1    1   15   .001      0         0          0.        0.      .01786
     EN
+
+
+The same modification has to be performed on EX card, the file become :
+
+::
+
+    CM EXAMPLE 1.  CENTER FED LINEAR ANTENNA
+    CE
+    GW  0    1    0.0000    0.0000   -0.2500    0.0000    0.0000   -0.1786    0.0001
+    GW  0    1    0.0000    0.0000   -0.1786    0.0000    0.0000   -0.1071    0.0001
+    GW  0    1    0.0000    0.0000   -0.1071    0.0000    0.0000   -0.0357    0.0001
+    GW  1    1    0.0000    0.0000   -0.0357    0.0000    0.0000    0.0357    0.0001
+    GW  0    1    0.0000    0.0000    0.0357    0.0000    0.0000    0.1071    0.0001
+    GW  0    1    0.0000    0.0000    0.1071    0.0000    0.0000    0.1786    0.0001
+    GW  0    1    0.0000    0.0000    0.1786    0.0000    0.0000    0.2500    0.0001
+    GE
+    EX  0    1    1    0    1.0000    0.0000
+    XQ
+    LD  0    1    1    1   10.     3.000E-09 5.300E-11
+    PQ
+    NE  0    1    1   15   .001      0         0          0.        0.      .01786
+    EN
+
 
 Along the process use the "compare with" tool of Eclipse to compare
 the reference ``input.nec`` and the generated ``input.nec`` : 
