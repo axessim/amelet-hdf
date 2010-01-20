@@ -77,7 +77,7 @@ class USelectorOnMeshElement(t.IsDescription):
 some = input_h5.createTable(som, 'elements', USelectorOnMeshElement)
 usome = some.row 
 usome["shortName"] = "voltage_generator"
-usome["index"] = 4
+usome["index"] = 3
 usome["v1"] = -1.
 usome["v2"] = -1.
 usome["v3"] = -1.
@@ -120,6 +120,27 @@ generator._v_attrs.object = "/mesh/wire_mesh/part1/selectorOnMesh/elements"
 generator._v_attrs.object_shortName = "voltage_generator"
 
 
+
+# physicalModel category
+input_h5.createGroup("/", "physicalModel")
+input_h5.createGroup("/physicalModel", "perfectElectricConductor")
+
+# Load source creation
+input_h5.createGroup("/physicalModel", "multiport")
+ld = input_h5.createGroup("/physicalModel/multiport", "generator_load")
+ld._v_attrs.physicalNature = "resistance"
+ld._v_attrs.nbPort = 1
+ld._v_attrs.floatingType = "singleReal"
+ld._v_attrs.value = np.float32(1.)
+
+# The load link creation
+generator = input_h5.createGroup("/link/link_group", "load_generator")
+generator._v_attrs.subject = "/physicalModel/multiport/generator_load"
+generator._v_attrs.object = "/mesh/wire_mesh/part1/selectorOnMesh/elements"
+generator._v_attrs.object_shortName = "voltage_generator"
+
+
+
 # OutputRequest handling
 # "/label" group creation
 predefinedOutputRequests = ["electricField"]
@@ -136,7 +157,7 @@ input_h5.createGroup("/outputRequest", "request_group")
 near_field = input_h5.createGroup("/outputRequest/request_group", "near_field")
 near_field._v_attrs.subject = "/label/predefinedOutputRequests"
 near_field._v_attrs.subject_id = 0
-near_field._v_attrs.object = "/mesh/wire_mesh/part1/group/wire"
+near_field._v_attrs.object = "/mesh/wire_mesh/part1/group/output_nodes"
 near_field._v_attrs.output = "/floatingPoint/near_field"
 
 
@@ -159,10 +180,6 @@ input_h5.createArray(simu, "inputs", inputs)
 outputs = []
 outputs.append("/floatingType/near_field")
 input_h5.createArray(simu, "outputs", outputs)
-
-# physicalModel category
-input_h5.createGroup("/", "physicalModel")
-input_h5.createGroup("/physicalModel", "perfectElectricConductor")
 
 # The frequency setting
 input_h5.createGroup("/", "globalEnvironment")
