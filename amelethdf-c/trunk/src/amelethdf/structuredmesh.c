@@ -59,7 +59,13 @@ sgroup_t readSGroup(hid_t group_id, const char* name)
 	  /*
 	   * Allocate space for floating point data.
 	   */
+	  // read attributes
+	  ijk.entityType = readAttributes(group_id,"entityType");
+	  ijk.type = readAttributes(group_id,"type");
+
+
 	  rdata[0] = (int *) malloc (dims[0] * dims[1] * sizeof (int));
+
 	  ijk.imin = ( int *) malloc (dims[0] * sizeof (int *));
 	  ijk.imax = ( int *) malloc (dims[0] * sizeof (int *));
 	  ijk.jmin = ( int *) malloc (dims[0] * sizeof (int *));
@@ -71,19 +77,32 @@ sgroup_t readSGroup(hid_t group_id, const char* name)
 	  ijk.nbelt = dims[0];
 
 	  status = H5Dread(group_id, H5T_NATIVE_INT32, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata[0]);
-	  for(i=0;i<dims[0];i++)
+	  if(strcmp(ijk.type,"node")==0)
 	  {
-		  ijk.imin[i] = rdata[i][0];
-		  ijk.jmin[i] = rdata[i][1];
-		  ijk.kmin[i] = rdata[i][2];
-		  ijk.imax[i] = rdata[i][3];
-		  ijk.jmax[i] = rdata[i][4];
-		  ijk.kmax[i] = rdata[i][5];
+		  for(i=0;i<dims[0];i++)
+		  {
+		  	  ijk.imin[i] = rdata[i][0];
+		  	  ijk.jmin[i] = rdata[i][1];
+		  	  ijk.kmin[i] = rdata[i][2];
+		  	  ijk.imax[i] = rdata[i][0];
+		  	  ijk.jmax[i] = rdata[i][1];
+		  	  ijk.kmax[i] = rdata[i][2];
+		  }
+	  }
+	  else
+	  {
+		  for(i=0;i<dims[0];i++)
+		  {
+			  ijk.imin[i] = rdata[i][0];
+			  ijk.jmin[i] = rdata[i][1];
+			  ijk.kmin[i] = rdata[i][2];
+			  ijk.imax[i] = rdata[i][3];
+			  ijk.jmax[i] = rdata[i][4];
+			  ijk.kmax[i] = rdata[i][5];
+		  }
 	  }
       free(rdata);
-      // read attributes
-      ijk.entityType = readAttributes(group_id,"entityType");
-      ijk.type = readAttributes(group_id,"type");
+
       return ijk;
 }
 
@@ -95,6 +114,7 @@ char* readAttributes(hid_t loc_id, const char* attr_name)
 	hsize_t     dims[1]={1} ;
 	int ndims, i, ret_val;
 	char **rdata;
+
 
 	ret_val = 0;
 	attr_id = H5Aopen(loc_id,attr_name,H5P_DEFAULT);
@@ -117,8 +137,9 @@ char* readAttributes(hid_t loc_id, const char* attr_name)
 	  status = H5Tset_size (memtype, sdim);
 	  status = H5Aread(attr_id, memtype, rdata[0]);
 	  H5Aclose(attr_id);
+	  return rdata[0];
 	}
-	return rdata[0];
+	else return "Unknown";
 }
 
 snorm_t readNormals(hid_t loc_id)
