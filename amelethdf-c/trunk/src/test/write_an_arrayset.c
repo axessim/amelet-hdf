@@ -13,6 +13,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* This program write an HDF5 file with the following arraySet structure
+
+ data.h5
+ `-- floatingType
+     `-- an_arrayset
+         |-- data[@physicaNature=electricField
+         |        @unit=voltPerMeter]
+         `-- ds
+             |-- dim1[@physicalNature=length
+             |        @unit=meter]
+             `-- dim2[@physicalNature=length
+                      @unit=meter]
+
+    float, dimension(10, 20) :: data
+    float, dimension(20) :: dim1
+    float, dimension(10) :: dim2
+*/
 int set_floating_type_attr(hid_t file_id, char* path, char* label,
 		                     char* physical_nature, char *unit,
 		                     char* comment)
