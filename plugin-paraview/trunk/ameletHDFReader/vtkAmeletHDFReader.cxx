@@ -214,20 +214,24 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 
 
 
-    char **dataname;
+    //char **dataname;
+    int nbdataarray=1;
+    int max=ars.nbdims-1;
     if(ars.nbdims>1)
     {
-    	int nbdataarray=1;
-    	int max=ars.nbdims-1;
     	if(strcmp(ars.dims[1].single.physical_nature,"component")==0)max=ars.nbdims-2;
     	else if(strcmp(ars.dims[1].single.physical_nature,"time")==0)max=ars.nbdims-2;
     	for(int i=0;i<max;i++)
     			nbdataarray = nbdataarray*ars.dims[ars.nbdims-i-1].nbvalues;
+    }
 
     	//set data name
     	vtkstd::string dataname[nbdataarray];
     	for(int i=0;i<nbdataarray;i++)
+    	{
     		dataname[i]= child.childnames[0];
+    		std::cout<<"dataname["<<i<<"] = "<<child.childnames[0]<<std::endl;
+    	}
         int temp =  nbdataarray;
         for(int i=0;i<max;i++)
         {
@@ -281,144 +285,170 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
         	}
 
         }
-        char meshEntity[ABSOLUTE_PATH_NAME_LENGTH];
-        strcat(path,"/ds/dim1");
-        strcpy(attr,"meshEntity");
-        strcpy(meshEntity,read_string_attribute(file_id,path,attr));
-        cout<<meshEntity<<endl;
-        char * grp = path_element(meshEntity,1,1);
 
-        if(strcmp(grp,"group")==0)
-        {
-        	hid_t grp_id = H5Dopen1(file_id,meshEntity);
-        	ugroup_t grp;
-        	sgroup_t sgrp;
-        	char *grpname = path_element(meshEntity,0,1);
-        	char *meshname = path_element(meshEntity,2,1);
-        	char *meshgrp = path_element(meshEntity,3,1);
-        	char pathmesh[ABSOLUTE_PATH_NAME_LENGTH];
-        	strcpy(pathmesh,"/mesh/");
-        	strcat(pathmesh,meshgrp);
-        	strcat(pathmesh,"/");
-        	strcat(pathmesh,meshname);
-        	int meshType =  meshtype(file_id,pathmesh);
-        	if(meshType == 1)
-        		{
-        		 grp = readUGroup(grp_id,grpname);
-        		}
-        	else sgrp = readSGroup(grp_id,grpname);
+	char meshEntity[ABSOLUTE_PATH_NAME_LENGTH];
+	strcat(path,"/ds/dim1");
+	strcpy(attr,"meshEntity");
+	strcpy(meshEntity,read_string_attribute(file_id,path,attr));
+	cout<<meshEntity<<endl;
+	char * grp = path_element(meshEntity,1,1);
 
-        	strcpy(attr,"type");
-        	char *type;
-            cout<<nbdataarray<<endl;
-        	int offset=0;
-        	int nbeltgrp;
-        	if(meshType==1)nbeltgrp=grp.nbeltgroup;
-        	else nbeltgrp=sgrp.nbelt;
-        	for(int i=0;i<nbdataarray;i++)
-        	{
-       			vtkFloatArray *floatscalar = vtkFloatArray::New();
-       			floatscalar->SetName(dataname[i].c_str());
-       			if(strcmp(ars.dims[1].single.physical_nature,"component")==0)
-       			{
-       				cout<<"component"<<endl;
-       				floatscalar->SetNumberOfComponents(3);
-       				for(int j=0;j<ars.dims[1].nbvalues;j++)
-       				{
-       					for(int k=0;k<nbeltgrp;k++)
-       					{
-       					  if(j<3)
-       					  {
-       						  if(ars.data.rvalue!=NULL)
-       						  {
-       							  if(meshType==1) floatscalar->InsertComponent(grp.eltgroup[k],j,ars.data.rvalue[k+j+offset]);
-       							  else floatscalar->InsertComponent(k,j,ars.data.rvalue[k+j+offset]);
-       						  }
-       						  else if(ars.data.cvalue!=NULL)
-       						  {
-       							  float module;
-       							  module=cabs(ars.data.cvalue[k+offset]);
-       							  if(meshType==1) floatscalar->InsertComponent(grp.eltgroup[k],j,module);
-       							  else floatscalar->InsertComponent(k,j,module);
-       						  }
-       					  }
-        				}
-        				offset=offset+nbeltgrp;
-        			}
-       				if(strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0) grid->GetPointData()->AddArray(floatscalar);
-       				if(strcmp(read_string_attribute(file_id,meshEntity,attr),"element")==0) grid->GetCellData()->AddArray(floatscalar);
-        		}
-       			else if(strcmp(ars.dims[1].single.physical_nature,"time")==0)
-       			{
+	if(strcmp(grp,"group")==0)
+	{
+		hid_t grp_id = H5Dopen1(file_id,meshEntity);
+		ugroup_t grp;
+		sgroup_t sgrp;
+		char *grpname = path_element(meshEntity,0,1);
+		char *meshname = path_element(meshEntity,2,1);
+		char *meshgrp = path_element(meshEntity,3,1);
+		char pathmesh[ABSOLUTE_PATH_NAME_LENGTH];
+		strcpy(pathmesh,"/mesh/");
+		strcat(pathmesh,meshgrp);
+		strcat(pathmesh,"/");
+		strcat(pathmesh,meshname);
+		int meshType =  meshtype(file_id,pathmesh);
+		if(meshType == 1)
+			{
+			 grp = readUGroup(grp_id,grpname);
+			}
+		else sgrp = readSGroup(grp_id,grpname);
+
+		strcpy(attr,"type");
+		char *type;
+		cout<<nbdataarray<<endl;
+		int offset=0;
+		int nbeltgrp;
+		if(meshType==1)nbeltgrp=grp.nbeltgroup;
+		else nbeltgrp=sgrp.nbelt;
+		for(int i=0;i<nbdataarray;i++)
+		{
+			vtkFloatArray *floatscalar = vtkFloatArray::New();
+			floatscalar->SetName(dataname[i].c_str());
+			if(ars.nbdims>1)
+			{
+				if(strcmp(ars.dims[1].single.physical_nature,"component")==0)
+				{
+					cout<<"component"<<endl;
+					floatscalar->SetNumberOfComponents(3);
+					for(int j=0;j<ars.dims[1].nbvalues;j++)
+					{
+						for(int k=0;k<nbeltgrp;k++)
+						{
+							if(j<3)
+							{
+								if(ars.data.rvalue!=NULL)
+								{
+									if(meshType==1) floatscalar->InsertComponent(grp.eltgroup[k],j,ars.data.rvalue[k+j+offset]);
+									else floatscalar->InsertComponent(k,j,ars.data.rvalue[k+j+offset]);
+								}
+								else if(ars.data.cvalue!=NULL)
+								{
+									float module;
+									module=cabs(ars.data.cvalue[k+offset]);
+									if(meshType==1) floatscalar->InsertComponent(grp.eltgroup[k],j,module);
+									else floatscalar->InsertComponent(k,j,module);
+								}
+							}
+						}
+						offset=offset+nbeltgrp;
+					}
+					if(strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0) grid->GetPointData()->AddArray(floatscalar);
+					if(strcmp(read_string_attribute(file_id,meshEntity,attr),"element")==0) grid->GetCellData()->AddArray(floatscalar);
+				}
+				else if(strcmp(ars.dims[1].single.physical_nature,"time")==0)
+				{
 					this->TimeStepMode = true;
 					for(int j=0;j<ars.dims[1].nbvalues;j++)
 					{
 						for(int k=0;k<nbeltgrp;k++)
 						{
 							if(ars.data.rvalue!=NULL)
-					       	{
+							{
 								if(this->ActualTimeStep==j)
 								{
-								if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],ars.data.rvalue[k+offset]);
-					       		else floatscalar->InsertTuple1(k,ars.data.rvalue[k+offset]);
+									if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],ars.data.rvalue[k+offset]);
+									else floatscalar->InsertTuple1(k,ars.data.rvalue[k+offset]);
 								}
-					       	}
-					       	else if(ars.data.cvalue!=NULL)
-					       	{
-					       		if(this->ActualTimeStep==j)
-					       		{
-					       		float module;
-					       		module=cabs(ars.data.cvalue[k+offset]);
-					       		if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
-					       		else floatscalar->InsertTuple1(k,module);
-					       		}
-					       	}
+							}
+							else if(ars.data.cvalue!=NULL)
+							{
+								if(this->ActualTimeStep==j)
+								{
+									float module;
+									module=cabs(ars.data.cvalue[k+offset]);
+									if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
+									else floatscalar->InsertTuple1(k,module);
+								}
+							}
 
 						}
-					    offset=offset+nbeltgrp;
-					    if(this->ActualTimeStep==j)
-					    {
-					    if(strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0)
-						grid->GetPointData()->AddArray(floatscalar);
-					    if(strcmp(read_string_attribute(file_id,meshEntity,attr),"element")==0)
-					    {
-					    	grid->GetCellData()->AddArray(floatscalar);
-					    	double timevalue = (double)ars.dims[1].rvalue[j];
-					    	output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),&timevalue,1);
-					    }
-					    }
+						offset=offset+nbeltgrp;
+						if(this->ActualTimeStep==j)
+						{
+							if(strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0)
+								grid->GetPointData()->AddArray(floatscalar);
+							if(strcmp(read_string_attribute(file_id,meshEntity,attr),"element")==0)
+							{
+								grid->GetCellData()->AddArray(floatscalar);
+								double timevalue = (double)ars.dims[1].rvalue[j];
+								output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),&timevalue,1);
+							}
+						}
+					}
+				}
+				else
+				{
+					for(int k=0;k<nbeltgrp;k++)
+									{
+										if(ars.data.rvalue!=NULL)
+										{
+											if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],ars.data.rvalue[k+offset]);
+											else floatscalar->InsertTuple1(k,ars.data.rvalue[k+offset]);
+										}
+										else if(ars.data.cvalue!=NULL)
+										{
+											float module;
+											module=cabs(ars.data.cvalue[k+offset]);
+											if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
+											else floatscalar->InsertTuple1(k,module);
+										}
+
+									}
+									 offset=offset+nbeltgrp;
+									 std::cout<<"name = "<<floatscalar->GetName()<<std::endl;
+									 if(strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0) grid->GetPointData()->AddArray(floatscalar);
+									 if(strcmp(read_string_attribute(file_id,meshEntity,attr),"element")==0) grid->GetCellData()->AddArray(floatscalar);
+
+				}
+			}
+			else
+			{
+				for(int k=0;k<nbeltgrp;k++)
+				{
+					if(ars.data.rvalue!=NULL)
+					{
+						if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],ars.data.rvalue[k+offset]);
+						else floatscalar->InsertTuple1(k,ars.data.rvalue[k+offset]);
+					}
+					else if(ars.data.cvalue!=NULL)
+					{
+						float module;
+						module=cabs(ars.data.cvalue[k+offset]);
+						if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
+						else floatscalar->InsertTuple1(k,module);
 					}
 
+				}
+				 offset=offset+nbeltgrp;
+				 std::cout<<"name = "<<floatscalar->GetName()<<std::endl;
+				 grid->GetCellData()->AddArray(floatscalar);
 
 
-       			}
-       			else
-       			{
-       				for(int k=0;k<nbeltgrp;k++)
-       				{
-       					if(ars.data.rvalue!=NULL)
-       					{
-       						if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],ars.data.rvalue[k+offset]);
-       						else floatscalar->InsertTuple1(k,ars.data.rvalue[k+offset]);
-       					}
-       					else if(ars.data.cvalue!=NULL)
-       				   	{
-       				   		float module;
-       				   		module=cabs(ars.data.cvalue[k+offset]);
-       				   		if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
-       				   		else floatscalar->InsertTuple1(k,module);
-       				   	}
+			}
+		}
+		H5Dclose(grp_id);
+	}
 
-       				}
-       				 offset=offset+nbeltgrp;
-       				 if(strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0) grid->GetPointData()->AddArray(floatscalar);
-       				 if(strcmp(read_string_attribute(file_id,meshEntity,attr),"element")==0) grid->GetCellData()->AddArray(floatscalar);
-
-       			}
-        	}
-            H5Dclose(grp_id);
-        }
-    }
 
 
 

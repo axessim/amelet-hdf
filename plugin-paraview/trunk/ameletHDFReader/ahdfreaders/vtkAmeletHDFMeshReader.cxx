@@ -430,7 +430,6 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
 				int id = ijk[2]*(x.nbnodes)*(y.nbnodes)+
 					          ijk[1]*(x.nbnodes)+ijk[0];
 				sgrid->GetPoint(id,point);
-				std::cout<<"point x="<<point[0]<<" y="<<point[1]<<" z="<<point[2]<<std::endl;
 				vertexcell->GetPointIds()->SetId(0,id);
 				sgrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
 				groupId->InsertTuple1(cellId,groupId_value[grpchild.childnames[i]]);
