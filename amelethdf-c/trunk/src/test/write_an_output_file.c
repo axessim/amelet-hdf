@@ -1,5 +1,5 @@
 /*
- * write_an_arrayset.c
+ * write_an_output_file.c
  *
  *  Created on: 26 janv. 2010
  *      Author: didier
@@ -12,10 +12,13 @@
 #include <complex.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <amelethdf.h>
 
 /* This program write an HDF5 file with the following arraySet structure
 
  data.h5
+ |-- simulation
+ |   `-- outputs
  `-- floatingType
      `-- an_arrayset
          |-- data[@physicaNature=electricField
@@ -26,10 +29,11 @@
              `-- dim2[@physicalNature=length
                       @unit=meter]
 
-    float, dimension(10, 20) :: data
+float, dimension(10, 20) :: data
     float, dimension(20) :: dim1
     float, dimension(10) :: dim2
 */
+
 int set_floating_type_attr(hid_t file_id, char* path, char* label,
 		                     char* physical_nature, char *unit,
 		                     char* comment)
@@ -68,6 +72,7 @@ int set_floating_type_attr(hid_t file_id, char* path, char* label,
 	}
 	return 0;
 }
+
 
 int main(argc,argv)
 int argc;
@@ -120,7 +125,7 @@ char *argv[];
 	}
 
 	// Writes / attribute
-	printf("Write / attribute\n");
+	printf("Write / attributes\n");
 	status = H5LTset_attribute_string(file_id,"/","FORMAT","AMELET-HDF");
 	if(status < 0)
 	{
@@ -133,6 +138,14 @@ char *argv[];
 		printf("Can't create attribute !!!\n");
 		exit(-1);
 	}
+	status = H5LTset_attribute_string(file_id,"/","entryPoint",
+			"/simulation/this_simulation");
+	if(status < 0)
+	{
+		printf("Can't create attribute !!!\n");
+		exit(-1);
+	}
+
 
 	// floatingType group creation
 	printf("/floatingType group creation ...");
@@ -209,7 +222,56 @@ char *argv[];
 	set_floating_type_attr(file_id,"floatingType/an_arrayset/ds/dim2",
 			"y","length","meter", "The Y axis");
 
+	//Writes /simulation group
+	printf("/simulation creation ...\n");
+	grp_id = H5Gcreate(file_id, "simulation",H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	if (grp_id <0)
+	{
+		printf("Can't create group !!!\n");
+		exit(-1);
+	}
+
+	//Writes /simulation/this_simulation group
+	printf("/simulation/this_simulation creation ...\n");
+	grp_id = H5Gcreate(file_id, "simulation/this_simulation",H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	if (grp_id <0)
+	{
+		printf("Can't create group !!!\n");
+		exit(-1);
+	}
+
+	//Adds this_simulation attributes
+	printf("Writes /simulation/this_simulation@module ...\n");
+	status = H5LTset_attribute_string(file_id,"simulation/this_simulation",
+			"module","a_module");
+	if(status < 0)
+	{
+		printf("Can't create attribute !!!\n");
+		exit(-1);
+	}
+	printf("Writes /simulation/this_simulation@version ...\n");
+	status = H5LTset_attribute_string(file_id,"simulation/this_simulation",
+			"version","1.0.0");
+	if(status < 0)
+	{
+		printf("Can't create attribute !!!\n");
+		exit(-1);
+	}
+
+	// Writes simulation/this_simulation/outputs
+	printf("/simulation/this_simulation/outputs creation ...\n");
+	char *outputs[1];
+	outputs[0]=(char *)malloc(ABSOLUTE_PATH_NAME_LENGTH*sizeof(char));
+	strcpy(outputs[0],"/floatingType/an_arrayset");
+
+	status = H5LTmake_dataset_string(file_id,"simulation/this_simulation/outputs",outputs[0]);
+	if(status < 0)
+	{
+		printf("Can't create string dataset !!!\n");
+		exit(-1);
+	}
+
 	H5Fclose(file_id);
 
-    return 0;
+	return 0;
 }
