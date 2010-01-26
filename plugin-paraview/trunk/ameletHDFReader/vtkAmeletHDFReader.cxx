@@ -352,8 +352,9 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 						}
 						offset=offset+nbeltgrp;
 					}
-					if(strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0) grid->GetPointData()->AddArray(floatscalar);
-					if(strcmp(read_string_attribute(file_id,meshEntity,attr),"element")==0) grid->GetCellData()->AddArray(floatscalar);
+					if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0)) grid->GetPointData()->AddArray(floatscalar);
+					else grid->GetCellData()->AddArray(floatscalar);
+
 				}
 				else if(strcmp(ars.dims[1].single.physical_nature,"time")==0)
 				{
@@ -385,14 +386,17 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 						offset=offset+nbeltgrp;
 						if(this->ActualTimeStep==j)
 						{
-							if(strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0)
+							if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0))
+							{
 								grid->GetPointData()->AddArray(floatscalar);
-							if(strcmp(read_string_attribute(file_id,meshEntity,attr),"element")==0)
+							}
+							else
 							{
 								grid->GetCellData()->AddArray(floatscalar);
-								double timevalue = (double)ars.dims[1].rvalue[j];
-								output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),&timevalue,1);
 							}
+							double timevalue = (double)ars.dims[1].rvalue[j];
+							output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),&timevalue,1);
+
 						}
 					}
 				}
@@ -416,8 +420,9 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 									}
 									 offset=offset+nbeltgrp;
 									 std::cout<<"name = "<<floatscalar->GetName()<<std::endl;
-									 if(strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0) grid->GetPointData()->AddArray(floatscalar);
-									 if(strcmp(read_string_attribute(file_id,meshEntity,attr),"element")==0) grid->GetCellData()->AddArray(floatscalar);
+									 if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0)) grid->GetPointData()->AddArray(floatscalar);
+									 else grid->GetCellData()->AddArray(floatscalar);
+
 
 				}
 			}
@@ -441,7 +446,8 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 				}
 				 offset=offset+nbeltgrp;
 				 std::cout<<"name = "<<floatscalar->GetName()<<std::endl;
-				 grid->GetCellData()->AddArray(floatscalar);
+				 if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0)) grid->GetPointData()->AddArray(floatscalar);
+				 else grid->GetCellData()->AddArray(floatscalar);
 
 
 			}
