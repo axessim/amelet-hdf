@@ -128,6 +128,7 @@ int getAmeletHDFDataType(char* fileName)
 
 	}
 	H5Fclose(file_id);
+	std::cout<<"fileType="<<fileType<<std::endl;
     return fileType;
 
 }
@@ -499,7 +500,7 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
   hid_t file_id, loc_id;
   herr_t status;
 
-
+  cout<<"Request DATA"<<endl;
   // get the info objects
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::GetData(outInfo);
@@ -522,7 +523,7 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
 
   if(dataType==1)
   {
-
+	  cout<<"data on mesh conversion"<<endl;
 	  //read mesh under "/mesh"
 	  loc_id = H5Gopen(file_id, "/mesh",H5P_DEFAULT);
 	  child = read_children_name(file_id,"/mesh");
@@ -568,6 +569,7 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
   }
   else if(dataType==3) //mesh
   {
+	  cout<<"mesh conversion"<<endl;
 	  vtkAmeletHDFMeshReader ahdfmesh;
 	  //read mesh under "/mesh"
       loc_id = H5Gopen(file_id, "/mesh",H5P_DEFAULT);
@@ -607,6 +609,25 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
 	  vtkErrorMacro("This is not an ameletHDF data or mesh file .");
 	  return 0;
   }
+
+  size_t nbdata=H5Fget_obj_count(file_id,H5F_OBJ_DATASET);
+  hid_t data_id_list[nbdata];
+  H5Fget_obj_count(file_id,H5F_OBJ_DATASET);
+  H5Fget_obj_ids(file_id,H5F_OBJ_DATASET,nbdata,data_id_list);
+  for(int i=0;i<nbdata;i++)
+  {
+	  std::cout<<"data open="<<data_id_list[nbdata-1-i]<<std::endl;
+	  H5Dclose(data_id_list[nbdata-1-i]);
+  }
+
+  size_t nbobjects=H5Fget_obj_count(file_id,H5F_OBJ_GROUP);
+  hid_t grp_id_list[nbobjects];
+  H5Fget_obj_ids(file_id,H5F_OBJ_GROUP,nbobjects,grp_id_list);
+  for(int i=0;i<nbobjects;i++)
+  {
+     std::cout<<"group open="<< grp_id_list[nbobjects-1-i] <<" "<<file_id<<std::endl;
+     H5Gclose(grp_id_list[nbobjects-1-i]);
+  }
   H5Fclose(file_id);
   return 1;
 }
@@ -619,7 +640,7 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
 	vtkInformation* outInfo = outputVector->GetInformationObject(0);
 	int dataType=0;
 
-
+	std::cout<<"Request information"<<std::endl;
 	vtkDebugMacro("RequestInformation");
 	if (!this->FileName)
 	    {
@@ -639,8 +660,11 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
     	strcat(path,"/");
     	strcat(path,child.childnames[0]);
     	strcat(path,"/ds/dim2");
-    	vector_t vec=read_vector(file_id,path);
     	this->TimeStepMode = false;
+    	if(H5Lexists(file_id,path,H5P_DEFAULT)!=false)
+    	{
+    	vector_t vec=read_vector(file_id,path);
+
     	if(strcmp(vec.single.physical_nature,"time")==0)
     	{
     		outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
@@ -662,6 +686,7 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
     		timeRange[1]=this->TimeStepValues.back();
     		outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
 
+    	}
     	}
     	H5Fclose(file_id);
 
