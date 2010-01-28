@@ -107,7 +107,7 @@ char *argv[];
 	}
 	for(i=0;i<20;i++) dim1[i]=i;
 	// init
-    H5open();
+        H5open();
 	if(argc==1)
 	{
 	  printf("missing input file name\n");
@@ -183,7 +183,7 @@ char *argv[];
 		exit(-1);
 	}
 
-    // writes /floatingType/an_arrayset/data
+        // writes /floatingType/an_arrayset/data
 	printf("/floatingType/an_arrayset/data creation ...\n");
 	status = H5LTmake_dataset_float(file_id,"floatingType/an_arrayset/data",rank,dims,data[0]);
 	if(status < 0)
@@ -192,7 +192,7 @@ char *argv[];
 		exit(-1);
 	}
 
-    // writes data attribute
+        // writes data attribute
 	set_floating_type_attr(file_id,"floatingType/an_arrayset/data",
 			"Electric Field","electricField","voltPerMeter", "electric field");
 
@@ -205,7 +205,7 @@ char *argv[];
 		exit(-1);
 	}
 
-    // writes dim1 attribute
+        // writes dim1 attribute
 	set_floating_type_attr(file_id,"floatingType/an_arrayset/ds/dim1",
 			"x","length","meter", "The X axis");
 
@@ -218,7 +218,7 @@ char *argv[];
 		exit(-1);
 	}
 
-    // writes dim1 attribute
+        // writes dim1 attribute
 	set_floating_type_attr(file_id,"floatingType/an_arrayset/ds/dim2",
 			"y","length","meter", "The Y axis");
 
