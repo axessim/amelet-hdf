@@ -522,6 +522,8 @@ program necPre
     print *, "End"
 
     contains
+        ! From an integer array return the index
+        ! matching value
         function get_index(array, value) result(ind)
             integer, dimension(:), intent(in) :: array
             integer, intent(in) :: value

@@ -3,7 +3,7 @@
 # Author      : Cyril Giraudon
 # Version     :
 # Copyright   : Your copyright notice
-# Description : Makefile for input wrapper in Fortran
+# Description : Makefile for output wrapper in Fortran
 # ============================================================================
 
 .PHONY: all clean
@@ -21,16 +21,15 @@ HDF5_LIB=$(HDF5_ROOT)/lib/libhdf5hl_fortran.a \
 		 $(HDF5_ROOT)/lib/libhdf5_fortran.a \
 		 $(HDF5_ROOT)/lib/libhdf5.a
 
-all: bin/necPre.o
-	$(FORTRAN_COMPILER) -o bin/necPre \
-		bin/necPre.o $(AMELET_LIB) $(HDF5_LIB) -lz
+all: bin/necPost.o
+	$(FORTRAN_COMPILER) -o bin/necPost \
+		bin/necPost.o $(AMELET_LIB) $(HDF5_LIB) -lz
 
-bin/necPre.o: src/necPre.f90
+bin/necPost.o: src/necPost.f90
 	$(FORTRAN_COMPILER) $(COMPILER_OPTIONS) \
 		-I $(HDF5_ROOT)/include -I $(AMELET_MOD) \
-		src/necPre.f90 \
-		-o bin/necPre.o
+		src/necPost.f90 \
+		-o bin/necPost.o
 
 clean:
 	rm -f bin/*
-
