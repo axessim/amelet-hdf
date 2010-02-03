@@ -1,40 +1,30 @@
 ! ============================================================================
 ! Name        : necPost.f90
 ! Author      : Cyril Giraudon
-! Version     :
-! Copyright   : Your copyright notice
-! Description : Write an output simulation file
+! Copyright   : LGPL
+! Description : Nec format converter to Amelet-HDF
+!               This program reads a nec output file and generates an
+!               Amelet-HDF output.h5 file.
+!
+! The program writes an HDF5 file with the following arraySet structure :
+!
+! data.h5
+! |-- simulation
+! |   `-- outputs
+! `-- floatingType
+!     `-- an_arrayset
+!         |-- data[@physicaNature=electricField
+!         |        @unit=voltPerMeter]
+!         `-- ds
+!             |-- dim1[@physicalNature=component]
+!             `-- dim2[@physicalNature=meshEntity]
+!
 ! ============================================================================
 
+! A few functions
 module tools
-    use amelethdf
-    use h5lt
 
   contains
-    ! Print floatingType attributes in path
-    subroutine set_floating_type(file_id, path, label, physical_nature, unit, comment)
-        integer(hid_t), intent(in) :: file_id
-        character(len=*), intent(in) :: path
-        character(len=*), intent(in) :: label, physical_nature, unit, comment
-
-        ! Writes /floatingType/an_arrayset/data attributes
-        call h5ltset_attribute_string_f(file_id, trim(path), "label", &
-                                        trim(label), hdferr)
-        call check("Can't write label for "//path)
-
-        call h5ltset_attribute_string_f(file_id, trim(path), "physicalNature", &
-                                        trim(physical_nature), hdferr)
-        call check("Can't write physical nature for "//path)
-
-        call h5ltset_attribute_string_f(file_id, trim(path), "unit", &
-                                        trim(unit), hdferr)
-        call check("Can't write unit for "//path)
-
-        call h5ltset_attribute_string_f(file_id, trim(path), "comment", &
-                                        trim(comment), hdferr)
-        call check("Can't write comment for "//path)
-    end subroutine set_floating_type
-
     pure function deg2rad(degree) result(radian)
         real, intent(in) :: degree
 
@@ -45,26 +35,11 @@ module tools
     end function deg2rad
 end module tools
 
-! This program write an HDF5 file with the following arraySet structure
-!
-! data.h5
-! |-- simulation
-! |   `-- outputs
-! `-- floatingType
-!     `-- an_arrayset
-!         |-- data[@physicaNature=electricField
-!         |        @unit=voltPerMeter]
-!         `-- ds
-!             |-- dim1[@physicalNature=length
-!             |        @unit=meter]
-!             `-- dim2[@physicalNature=length
-!                      @unit=meter]
-!
-!    real, dimension(10, 10) :: data
-!    real, dimension(10) :: dim1, dim2
-!
+! Main program
 program necPost
     use tools
+    use amelethdf
+    use h5lt
 
     implicit none
 
