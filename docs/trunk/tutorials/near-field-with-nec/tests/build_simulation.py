@@ -127,15 +127,36 @@ input_h5.createGroup("/physicalModel", "perfectElectricConductor")
 
 # Load source creation
 input_h5.createGroup("/physicalModel", "multiport")
-ld = input_h5.createGroup("/physicalModel/multiport", "generator_load")
-ld._v_attrs.physicalNature = "resistance"
-ld._v_attrs.nbPort = 1
-ld._v_attrs.floatingType = "singleReal"
-ld._v_attrs.value = np.float32(1.)
+input_h5.createGroup("/physicalModel/multiport", "RLC")
+
+r = input_h5.createGroup("/physicalModel/multiport/", "resistance")
+r._v_attrs.physicalNature = "resistance"
+r._v_attrs.nbPort = 1
+r._v_attrs.floatingType = "singleReal"
+r._v_attrs.value = np.float32(10.)
+
+l = input_h5.createGroup("/physicalModel/multiport/", "inductance")
+l._v_attrs.physicalNature = "inductance"
+l._v_attrs.nbPort = 1
+l._v_attrs.floatingType = "singleReal"
+l._v_attrs.value = np.float32(3e-9)
+
+c = input_h5.createGroup("/physicalModel/multiport/", "capacitance")
+c._v_attrs.physicalNature = "capacitance"
+c._v_attrs.nbPort = 1
+c._v_attrs.floatingType = "singleReal"
+c._v_attrs.value = np.float32(5.3e-11)
+
+ld = input_h5.createGroup("/physicalModel/multiport/RLC", "generator_load")
+ld._v_attrs.type = np.int32(1)
+ld._v_attrs.R = "/physicalModel/multiport/resistance"
+ld._v_attrs.L = "/physicalModel/multiport/inductance"
+ld._v_attrs.C = "/physicalModel/multiport/capacitance"
+
 
 # The load link creation
 generator = input_h5.createGroup("/link/link_group", "load_generator")
-generator._v_attrs.subject = "/physicalModel/multiport/generator_load"
+generator._v_attrs.subject = "/physicalModel/multiport/RLC/generator_load"
 generator._v_attrs.object = "/mesh/wire_mesh/part1/selectorOnMesh/elements"
 generator._v_attrs.object_shortName = "voltage_generator"
 
@@ -161,6 +182,14 @@ near_field._v_attrs.object = "/mesh/wire_mesh/part1/group/output_nodes"
 near_field._v_attrs.output = "/floatingPoint/near_field"
 
 
+# The frequency setting
+input_h5.createGroup("/", "globalEnvironment")
+input_h5.createGroup("/globalEnvironment", "freq_env")
+freq = input_h5.createGroup("/globalEnvironment/freq_env", "frequency")
+freq._v_attrs.floatingType = "singleReal"
+freq._v_attrs.value = np.float32(299.8)
+
+
 # "/simulation/simuNec" creation
 input_h5.createGroup("/", "simulation")
 simu = input_h5.createGroup("/simulation", "simuNec")
@@ -170,8 +199,12 @@ simu._v_attrs.module = "nec"
 simu._v_attrs.version = "1.0.0"
 # Simulation inputs
 inputs = []
-inputs.extend(("/mesh/wire_mesh", 
-               "/globalEnvironment",
+inputs.extend(("/mesh/wire_mesh",
+               "/electromagneticSource/generator/voltage_source",
+               "/label/predefinedLabels",
+               "/label/predefinedOutputRequests",
+               "/physicalModel/multiport/RLC/generator_load",
+               "/globalEnvironment/freq_env",
                "/link/link_group",
                "/outputRequest/request_group"))
 input_h5.createArray(simu, "inputs", inputs)
@@ -181,11 +214,6 @@ outputs = []
 outputs.append("/floatingType/near_field")
 input_h5.createArray(simu, "outputs", outputs)
 
-# The frequency setting
-input_h5.createGroup("/", "globalEnvironment")
-freq = input_h5.createGroup("/globalEnvironment", "frequency")
-freq._v_attrs.floatingType = "singleReal"
-freq._v_attrs.value = np.float32(299.8)
 
 input_h5.close()
 
