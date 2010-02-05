@@ -14,10 +14,15 @@ int argc;
 char *argv[];
 {
 	char * filename;
-	int values_len = 5;
-	char values[4][5] = {"Go", "Toto", "Run", "Titi"};
-	int rank = 1;
-	hsize_t dims[] = {4};
+	int values_len = 34;
+
+	char values[2][3][34] = {{"/floatingType/far_field_theta_phi", "farfield.h5",
+			                                  "/floatingType/far_field_theta_phi"},
+			                  {"/floatingType/Enear_field_plane1",
+			                   "monitor_plane1_efield.h5",
+			                   "/floatingType/Enear_field_plane1"}};
+	int rank = 2;
+	hsize_t dims[2] = {2,3};
 
 	hid_t file_id;
 
