@@ -130,8 +130,8 @@ int str_index(char ** arr, char *aelement, int nbel)
 }
 
 // write a nd string dataset
-void write_nd_dataset(hid_t file_id, char* path, int values_len,
-					  int rank, hsize_t* dims, char* values[])
+void write_string_dataset(hid_t file_id, char* path, int values_len,
+					  int rank, hsize_t* dims, char** values)
 {
 	hid_t ds_id, dset_id, filetype, memtype;
 	herr_t err;
@@ -146,6 +146,7 @@ void write_nd_dataset(hid_t file_id, char* path, int values_len,
     ds_id = H5Screate_simple(rank, dims, NULL);
 	printf("rank : %d\n", rank);
 	printf("dims : [%d]\n", (int)dims[0]);
+
 
 	// Create the dataset
 	dset_id = H5Dcreate(file_id, path, filetype, ds_id, H5P_DEFAULT,
