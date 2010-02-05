@@ -488,6 +488,68 @@ link :
     generator._v_attrs.object_shortName = "voltage_generator"
 
 
+Generator's inner impedance
+---------------------------
+
+A load serial impedance is also located on the fourth segment :
+
+* The resistance is R = 10 Ohms
+* The inductance is L = 3e-9 Henries
+* The capacitance is C = 5.3e-11 Farads
+
+Amelet-HDF provides the RLC models :
+
+.. code-block: python
+
+    # Load source creation
+    input_h5.createGroup("/physicalModel", "multiport")
+    input_h5.createGroup("/physicalModel/multiport", "RLC")
+
+    r = input_h5.createGroup("/physicalModel/multiport/", "resistance")
+    r._v_attrs.physicalNature = "resistance"
+    r._v_attrs.nbPort = 1
+    r._v_attrs.floatingType = "singleReal"
+    r._v_attrs.value = np.float32(10.)
+
+    l = input_h5.createGroup("/physicalModel/multiport/", "inductance")
+    l._v_attrs.physicalNature = "inductance"
+    l._v_attrs.nbPort = 1
+    l._v_attrs.floatingType = "singleReal"
+    l._v_attrs.value = np.float32(3e-9)
+
+    c = input_h5.createGroup("/physicalModel/multiport/", "capacitance")
+    c._v_attrs.physicalNature = "capacitance"
+    c._v_attrs.nbPort = 1
+    c._v_attrs.floatingType = "singleReal"
+    c._v_attrs.value = np.float32(5.3e-11)
+
+    ld = input_h5.createGroup("/physicalModel/multiport/RLC", "generator_load")
+    ld._v_attrs.type = np.int32(1)
+    ld._v_attrs.R = "/physicalModel/multiport/resistance"
+    ld._v_attrs.L = "/physicalModel/multiport/inductance"
+    ld._v_attrs.C = "/physicalModel/multiport/capacitance"
+
+
+Then the impedance is located on the ``voltage_generator`` segment thanks a
+link :
+
+::
+
+    data.h5
+    |-- electromagneticSource/
+    |   `-- generator/
+    |       `-- voltage_source[@type=voltage]
+    |-- link/
+    |   `-- link_group/
+    |       `-- generator[@subject=/physicalModel/multiport/RLC/generator_load
+    |                     @object=/mesh/wire_mesh/part1/selectorOnMesh/elements
+    |                     @object_shortName=voltage_generator]
+    `-- mesh/
+        `-- selectorOnMesh/
+            `-- elements
+
+
+
 The output requests
 -------------------
 
@@ -710,7 +772,7 @@ Entire python source code
     some = input_h5.createTable(som, 'elements', USelectorOnMeshElement)
     usome = some.row 
     usome["shortName"] = "voltage_generator"
-    usome["index"] = 4
+    usome["index"] = 3
     usome["v1"] = -1.
     usome["v2"] = -1.
     usome["v3"] = -1.
@@ -727,7 +789,7 @@ Entire python source code
     # "/link" group creation
     input_h5.createGroup("/", "link")
     # "/link" group creation
-    input_h5.createGroup("/link", "link_group")http://www.google.fr/firefox?client=firefox-a&rls=org.mozilla:fr:official
+    input_h5.createGroup("/link", "link_group")
 
     # The radius link creation
     radius = input_h5.createGroup("/link/link_group", "radius")
@@ -753,6 +815,48 @@ Entire python source code
     generator._v_attrs.object_shortName = "voltage_generator"
 
 
+
+    # physicalModel category
+    input_h5.createGroup("/", "physicalModel")
+    input_h5.createGroup("/physicalModel", "perfectElectricConductor")
+
+    # Load source creation
+    input_h5.createGroup("/physicalModel", "multiport")
+    input_h5.createGroup("/physicalModel/multiport", "RLC")
+
+    r = input_h5.createGroup("/physicalModel/multiport/", "resistance")
+    r._v_attrs.physicalNature = "resistance"
+    r._v_attrs.nbPort = 1
+    r._v_attrs.floatingType = "singleReal"
+    r._v_attrs.value = np.float32(10.)
+
+    l = input_h5.createGroup("/physicalModel/multiport/", "inductance")
+    l._v_attrs.physicalNature = "inductance"
+    l._v_attrs.nbPort = 1
+    l._v_attrs.floatingType = "singleReal"
+    l._v_attrs.value = np.float32(3e-9)
+
+    c = input_h5.createGroup("/physicalModel/multiport/", "capacitance")
+    c._v_attrs.physicalNature = "capacitance"
+    c._v_attrs.nbPort = 1
+    c._v_attrs.floatingType = "singleReal"
+    c._v_attrs.value = np.float32(5.3e-11)
+
+    ld = input_h5.createGroup("/physicalModel/multiport/RLC", "generator_load")
+    ld._v_attrs.type = np.int32(1)
+    ld._v_attrs.R = "/physicalModel/multiport/resistance"
+    ld._v_attrs.L = "/physicalModel/multiport/inductance"
+    ld._v_attrs.C = "/physicalModel/multiport/capacitance"
+
+
+    # The load link creation
+    generator = input_h5.createGroup("/link/link_group", "load_generator")
+    generator._v_attrs.subject = "/physicalModel/multiport/RLC/generator_load"
+    generator._v_attrs.object = "/mesh/wire_mesh/part1/selectorOnMesh/elements"
+    generator._v_attrs.object_shortName = "voltage_generator"
+
+
+
     # OutputRequest handling
     # "/label" group creation
     predefinedOutputRequests = ["electricField"]
@@ -769,7 +873,7 @@ Entire python source code
     near_field = input_h5.createGroup("/outputRequest/request_group", "near_field")
     near_field._v_attrs.subject = "/label/predefinedOutputRequests"
     near_field._v_attrs.subject_id = 0
-    near_field._v_attrs.object = "/mesh/wire_mesh/part1/group/wire"
+    near_field._v_attrs.object = "/mesh/wire_mesh/part1/group/output_nodes"
     near_field._v_attrs.output = "/floatingPoint/near_field"
 
 
@@ -793,16 +897,14 @@ Entire python source code
     outputs.append("/floatingType/near_field")
     input_h5.createArray(simu, "outputs", outputs)
 
-    # physicalModel category
-    input_h5.createGroup("/", "physicalModel")
-    input_h5.createGroup("/physicalModel", "perfectElectricConductor")
-
     # The frequency setting
     input_h5.createGroup("/", "globalEnvironment")
     freq = input_h5.createGroup("/globalEnvironment", "frequency")
-    freq._v_attrs.singleReal = 299.8
+    freq._v_attrs.floatingType = "singleReal"
+    freq._v_attrs.value = np.float32(299.8)
 
     input_h5.close()
+
 
 
 
@@ -1018,6 +1120,41 @@ pre converter will create ``test/result/simu1/workingDir/input.nec``.
 By selecting ``test/result`` and ``test/reference``, right-click the
 ``compare-with/each other``, Eclipse allows to follows the difference between
 the reference and the awaited result.
+
+::
+
+    CM EXAMPLE 1.  CENTER FED LINEAR ANTENNA
+    CE
+    GW  0    1    0.0000    0.0000   -0.2500    0.0000    0.0000   -0.1786    0.0010
+    GW  0    1    0.0000    0.0000   -0.1786    0.0000    0.0000   -0.1071    0.0010
+    GW  0    1    0.0000    0.0000   -0.1071    0.0000    0.0000   -0.0357    0.0010
+    GW  1    1    0.0000    0.0000   -0.0357    0.0000    0.0000    0.0357    0.0010
+    GW  0    1    0.0000    0.0000    0.0357    0.0000    0.0000    0.1071    0.0010
+    GW  0    1    0.0000    0.0000    0.1071    0.0000    0.0000    0.1786    0.0010
+    GW  0    1    0.0000    0.0000    0.1786    0.0000    0.0000    0.2500    0.0010
+    GE
+    EX  0    1    1    0    1.0000    0.0000                                        
+    XQ
+    LD  0    1    1    1 1.000E+01 3.000E-09 5.300E-11                              
+    PQ
+    NE  0    1    1    1    0.0000    0.0000    0.1786    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0000    0.0000    0.2500    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.0000    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.0179    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.0357    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.0536    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.0714    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.0893    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.1071    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.1250    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.1429    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.1607    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.1786    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.1964    0.0000    0.0000    0.0000
+    NE  0    1    1    1    0.0010    0.0000    0.2143    0.0000    0.0000    0.0000
+    EN
+
+
 
 The fortran code
 ----------------
