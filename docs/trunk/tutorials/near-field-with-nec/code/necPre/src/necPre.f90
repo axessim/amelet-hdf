@@ -60,7 +60,7 @@ contains
     function ld_to_string(ld) result(string)
         type(ld_t), intent(in) :: ld
         character(len=CARD_LEN) :: string
-        write(string, '(a2,i3,3i5,3f10.4)') "LD", ld%ldtype, ld%ldtag, &
+        write(string, '(a2,i3,3i5,3es10.3)') "LD", ld%ldtype, ld%ldtag, &
                                             ld%ldtagf, ld%ldtagt, &
                                             ld%zlr, ld%zli, ld%zlc
     end function
@@ -73,6 +73,14 @@ contains
                                             ne%xnr, ne%ynr, ne%znr, &
                                             ne%dxnr, ne%dynr, ne%dznr
     end function
+
+    function generate_tag_wire() result(tag)
+        integer :: ref_tag = 0
+        integer :: tag
+
+        ref_tag = ref_tag + 1
+        tag = ref_tag
+    end function generate_tag_wire
 end module nec_model
 
 program necPre
@@ -93,12 +101,12 @@ program necPre
                                                     predefined_labels, &
                                                     predefined_output_requests
     integer :: i, j, k, id
-    integer, dimension(:), allocatable :: node_numbers
-    integer :: numnec, nb_nodes, elt_type, elt_ind, ibuf
+    integer :: numnec = 1, nb_nodes, elt_type, elt_ind, ibuf
     integer :: node1, node2, nb_wires, id_wires
     logical :: found
 
     real :: radius
+    real, dimension(1) :: frequency
 
     ! input.h5 file identifier
     integer(hid_t) :: file_id
@@ -122,6 +130,10 @@ program necPre
     type(ne_t), dimension(:), allocatable :: nec_fields
     ! Link between amelet wires and new nec wires
     integer, dimension(:), allocatable :: nec_amelet
+
+
+    ! Some initializations
+    umesh%name = ""
 
     ! Write working directory
     call getcwd(working_directory)
@@ -152,7 +164,6 @@ program necPre
     write(numnec, "(a2)"), "CE"
 
 
-
     ! HDF5 library initialization
     hdferr = 0
     call h5open_f(hdferr)
@@ -162,16 +173,7 @@ program necPre
     call h5fopen_f(filename, H5F_ACC_RDONLY_F, file_id, hdferr, H5P_DEFAULT_F)
     call check("Can't open "//trim(filename))
 
-    ! Real all categories and print them on the console
-    print *
-    print *, "Reading categories"
-    if (allocated(children_name)) deallocate(children_name)
-    call read_children_name(file_id, "/", children_name)
-    do i=1, size(children_name)
-        print *, "Category : ", children_name(i)
-    enddo
-
-    ! Simulations
+    ! Read the simulation instance
     print *
     print *, "Reading simulation ..."
     if (allocated(children_name)) deallocate(children_name)
@@ -179,311 +181,328 @@ program necPre
     do i=1, size(children_name)
         call readSimulation(file_id, C_SIMULATION//trim(children_name(i)), sim)
         call printSimulation(sim)
-    enddo
-
-    ! Meshes
-    print *
-    print *, "Reading Mesh ..."
-    if (allocated(children_name)) deallocate(children_name)
-    call read_children_name(file_id, C_MESH, children_name)
-    do i=1, size(children_name)
-        path = trim(C_MESH//children_name(i))
-        print *, "Mesh group : ", trim(path)
-        if (allocated(children_name2)) deallocate(children_name2)
-        call read_children_name(file_id, path, children_name2)
-        do j=1, size(children_name2)
-            path2 = path//"/"//trim(children_name2(i))
+        print *
+        print *, "--Handle inputs ..."
+        ! We read inputs except links
+        do j=1, size(sim%inputs)
+            path = sim%inputs(j)
+            if (like(path, "/mesh/*")) then
+                print *, "+A mesh !!! : ", trim(path)
+			    if (allocated(children_name2)) deallocate(children_name2)
+			    call read_children_name(file_id, trim(path), children_name2)
+			    path2 = trim(path)//"/"//trim(children_name2(1))
+                call readUnstructuredMesh(file_id, trim(path2), umesh)
+                !call printUnstructuredMesh(umesh)
+                ! Generate the array containing the number
+                ! of points per element
+                call umesh_generate_offsets(umesh)
+            else if (like(path, "/electromagneticSource/generator/*")) then
+                print *, "+A generator !!!"
+            else if (like(path, "/label/*")) then
+                print *, "+Labels !!! "
+		        if (path == "/label/predefinedLabels") then
+		            if (allocated(predefined_labels)) deallocate(predefined_labels)
+		            call read_string_vector(file_id, path, predefined_labels)
+		            print *, "  Predefined labels : ", predefined_labels(:)
+		        else if (path == "/label/predefinedOutputRequests") then
+		            if (allocated(predefined_output_requests)) then
+		                deallocate(predefined_output_requests)
+		            endif
+		            call read_string_vector(file_id, path, predefined_output_requests)
+		            print *, "  Predefined output requests : ", predefined_output_requests(:)
+		        else
+		            if (allocated(children_name2)) deallocate(children_name2)
+		            call read_string_vector(file_id, path, children_name2)
+		            print *, "  Label : ", children_name2(:)
+		        endif
+            else if (like(path, "/physicalModel/multiport/RLC/*")) then
+                print *, "+RLC !!!"
+            else if (like(path, "/globalEnvironment/*")) then
+                print *, "+Global environment !!!"
+		        if (allocated(children_name2)) deallocate(children_name2)
+		        call read_children_name(file_id, trim(path), children_name2)
+	            path2 = trim(path)//"/"//trim(children_name2(1))
+	            print *, "  Environment : ", trim(path2)
+	            call read_floatingtype(file_id, trim(path2), ft)
+	            frequency = convert_to_real_vector(ft)
+	            print *, "  Value : ", frequency, "Hz"
+            else
+                print *, "-Unknown : ", trim(path)
+            endif
+        enddo
+        ! Now we read links & output requests
+        print *
+        print *, "--Handle links & outputRequests ..."
+        do j=1, size(sim%inputs)
+            path = sim%inputs(j)
             print *
-            print *, "Reading ", trim(path2), " ..."
-            if (allocated(children_name3)) deallocate(children_name3)
-            call read_children_name(file_id, path2, children_name3)
-            do k=1, size(children_name3)
-                path3 = trim(path2)//"/"//trim(children_name3(i))
+            print *, "Sim inputs : ", trim(path)
+            if (like(path, "/link/*")) then
                 print *
-                print *, "Reading ", trim(path3), " ..."
-                if (isStructured(file_id, trim(path3))) then
-                    call readStructuredMesh(file_id, trim(path3), smesh)
-                    call printStructuredMesh(smesh)
-                else
-                    call readUnstructuredMesh(file_id, trim(path3), umesh)
-                    call printUnstructuredMesh(umesh)
-                endif
-            enddo
-        enddo
-    enddo
-
-    ! Generate the array containing the number of points per element
-    allocate(node_numbers(size(umesh%elements)))
-    call umesh_generate_node_numbers(umesh, size(node_numbers), node_numbers)
-
-    ! Electromagnetic sources
-    print *
-    print *, "Reading Electromagnetic Sources ..."
-    if (allocated(children_name)) deallocate(children_name)
-    call read_children_name(file_id, C_ELECTROMAGNETIC_SOURCE, children_name)
-    do i=1, size(children_name)
-        path = trim(C_ELECTROMAGNETIC_SOURCE)//trim(children_name(i))
-        print *, "Electromagnetic Sources : ", trim(path)
-        if (allocated(children_name2)) deallocate(children_name2)
-        call read_children_name(file_id, trim(path), children_name2)
-        if (like(path, C_ELECTROMAGNETIC_SOURCE//C_PLANE_WAVE)) then
-            do j=1, size(children_name2)
-                path2 = trim(path)//"/"//trim(children_name2(j))
-                print *, path2
-                call read_planewave(file_id, path2, pw)
-                print *, "Theta : ", pw%theta
-                print *, "Phi : ", pw%phi
-                print *, "Polarization : ", pw%polarization
-                print *, "Polarization is linear : ", islinear(pw)
-                print *, "Polarization is elliptic : ", iselliptic(pw)
-                print *, "Magnitude : ", pw%magnitude%singlecomplex%value
-            enddo
-        endif
-    enddo
-
-    ! Global environment
-    print *
-    print *, "Reading global environment ..."
-    if (allocated(children_name)) deallocate(children_name)
-    call read_children_name(file_id, C_GLOBAL_ENVIRONMENT, children_name)
-    do i=1, size(children_name)
-        path = trim(C_GLOBAL_ENVIRONMENT)//trim(children_name(i))
-        print *, "Global environment : ", trim(path)
-        call read_floatingtype(file_id, trim(path), ft)
-        print *, "Value : ", convert_to_real_vector(ft), "Hz"
-    enddo
-
-    ! Label
-    print *
-    print *, "Reading label ..."
-    if (allocated(children_name)) deallocate(children_name)
-    call read_children_name(file_id, C_LABEL, children_name)
-    do i=1, size(children_name)
-        path = trim(C_LABEL)//trim(children_name(i))
-        if (path == "/label/predefinedLabels") then
-            if (allocated(predefined_labels)) deallocate(predefined_labels)
-            call read_string_vector(file_id, path, predefined_labels)
-            print *, "Predefined labels : ", predefined_labels(:)
-        else if (path == "/label/predefinedOutputRequests") then
-            if (allocated(predefined_output_requests)) then
-                deallocate(predefined_output_requests)
-            endif
-            call read_string_vector(file_id, path, predefined_output_requests)
-            print *, "Predefined output requests : ", predefined_output_requests(:)
-        else
-            if (allocated(children_name2)) deallocate(children_name2)
-            call read_string_vector(file_id, path, children_name2)
-            print *, "Label : ", children_name2(:)
-        endif
-    enddo
-
-    ! Link wireRadius -> Give the number of wires
-    print *
-    print *, "Reading wireRadius links ..."
-    if (allocated(children_name)) deallocate(children_name)
-    call read_children_name(file_id, C_LINK, children_name)
-    nb_wires = 0
-    do i=1, size(children_name)
-        path = trim(C_LINK)//trim(children_name(i))
-        if (allocated(children_name2)) deallocate(children_name2)
-        call read_children_name(file_id, trim(path), children_name2)
-        do j=1, size(children_name2)
-            path2 = trim(path)//"/"//trim(children_name2(j))
-            call read_link(file_id, path2, link)
-            ! /label/predefinedLabels#wireRadius handling
-            if (link%subject == "/label/predefinedLabels") then
-                if (predefined_labels(id+1) == "wireRadius") then
-                    ! We take into account only groups
-                    if (like(link%object, "/mesh/*/*/group/*")) then
-                        print * ,"  Wire radius on group !!"
-                        ugroup => umesh_get_group_by_name(umesh, link%object)
-                        if (associated(ugroup)) then
-                            nb_wires = nb_wires + size(ugroup%elements)
-                        endif
-                    endif
-                endif
-            endif
-        enddo
-    enddo
-    print *, "The number of wires is : ", nb_wires
-    allocate(nec_wires(nb_wires))
-    allocate(nec_amelet(nb_wires))
-
-    ! Build nec wire model
-    print *
-    id_wires = 0
-    do i=1, size(children_name)
-        path = trim(C_LINK)//trim(children_name(i))
-        print *, "Link group : ", trim(path)
-        if (allocated(children_name2)) deallocate(children_name2)
-        call read_children_name(file_id, trim(path), children_name2)
-        do j=1, size(children_name2)
-            print *, "children name 2 : ", trim(children_name2(j))
-            path2 = trim(path)//"/"//trim(children_name2(j))
-            print *, "Link : ", trim(path2)
-            call read_link(file_id, path2, link)
-            print *, "Subject : ", trim(link%subject)
-            print *, "Object : ", trim(link%object)
-            print *, "Is dataonmesh : ", isdataonmesh(link)
-            ! /label/predefinedLabels#wireRadius handling
-            if (link%subject == "/label/predefinedLabels") then
-                found = read_int_attribute(file_id, path2, "subject_id", id)
-                print *, "id : ", id
-                print *, "Label : ", trim(predefined_labels(id+1))
-                if (predefined_labels(id+1) == "wireRadius") then
-                    found = read_float_attribute(file_id, path2, "radius", radius)
-                    print *, "  Radius : ", radius
-                    ! Group management
-                    if (like(link%object, "/mesh/*/*/group/*")) then
-                        print * ,"  Wire radius on group !!"
-                        ugroup => umesh_get_group_by_name(umesh, link%object)
-                        if (associated(ugroup)) then
-                            print *, "  Group path :", trim(ugroup%name)
-                            do k=1, size(ugroup%elements)
-                                id_wires = id_wires + 1
-                                elt_ind = ugroup%elements(k)
-                                elt_type = umesh%elements(elt_ind+1)
-                                nb_nodes = umesh_number_of_nodes(elt_type)
-                                node1 = umesh%element_nodes(sum(node_numbers(1:elt_ind))+1)
-                                node2 = node1 + 1
-                                print *, k , elt_ind, elt_type, nb_nodes, &
-                                         node1, node2
-                                nec_wires(id_wires)%ns = 1
-                                nec_wires(id_wires)%xw1 = umesh%nodes(1,node1+1)
-                                nec_wires(id_wires)%yw1 = umesh%nodes(2,node1+1)
-                                nec_wires(id_wires)%zw1 = umesh%nodes(3,node1+1)
-                                nec_wires(id_wires)%xw2 = umesh%nodes(1,node2+1)
-                                nec_wires(id_wires)%yw2 = umesh%nodes(2,node2+1)
-                                nec_wires(id_wires)%zw2 = umesh%nodes(3,node2+1)
-                                nec_wires(id_wires)%rad = radius
-                                write(*, "(7f8.4)"), umesh%nodes(:,node1+1), &
-                                                umesh%nodes(:,node2+1), &
-                                                radius
-                                nec_amelet(id_wires) = elt_ind
-                            enddo
-                        endif
-                        nullify(ugroup)
-                    endif
-                endif
+                print *, "+Links !!! : ", trim(path)
+                call read_links(trim(path))
+            else if (like(path, "/outputRequest/*")) then
+                print *
+                print *, "+OutputRequest !!!"
+                call read_output_requests(trim(path))
             endif
         enddo
     enddo
 
-    ! voltage source links -> Give the number of voltage source
-    ! Hypothesis : we take into account only one voltage source
-    ! -> the first read
-    print *
-    print *, "Reading voltage source links ..."
-    if (allocated(children_name)) deallocate(children_name)
-    call read_children_name(file_id, C_LINK, children_name)
-    do i=1, size(children_name)
-        path = trim(C_LINK)//trim(children_name(i))
-        if (allocated(children_name2)) deallocate(children_name2)
-        call read_children_name(file_id, trim(path), children_name2)
-        do j=1, size(children_name2)
-            path2 = trim(path)//"/"//trim(children_name2(j))
-            call read_link(file_id, path2, link)
+    write(numnec, "(a2)"), "EN"
+
+    ! Close the input.h5
+    call h5fclose_f(file_id, hdferr)
+
+    ! Close the generated input.nec file
+    close(numnec)
+    print *, "End"
+
+contains
+    ! From an integer array return the index
+    ! matching value
+    function get_index(array, value) result(ind)
+        integer, dimension(:), intent(in) :: array
+        integer, intent(in) :: value
+        integer :: i, ind
+
+        ind = 0
+        do i=1, size(array)
+            if (array(i) == value) then
+                ind = i
+                exit
+            endif
+        enddo
+    end function get_index
+
+    ! Read links
+    subroutine read_links(link_group)
+        character(len=*), intent(in) :: link_group
+
+        character(len=AL) :: path
+        integer :: j, k
+        character(len=EL), dimension(:), allocatable :: children_name
+
+	    path = trim(link_group)
+        if (allocated(children_name)) deallocate(children_name)
+        call read_children_name(file_id, trim(path), children_name)
+
+        ! wireRadius links -> gives the number of wires
+        print *
+        print *, "Reading wireRadius links ..."
+        nb_wires = 0
+	    do j=1, size(children_name)
+	        path2 = trim(path)//"/"//trim(children_name(j))
+	        call read_link(file_id, path2, link)
             print *, "--Subject : ", trim(link%subject)
-            if (like(link%subject, "/electromagneticSource/generator/*")) then
-                found = read_string_attribute(file_id, link%subject, "type", buf)
-                print *, "Type : ", trim(buf)
-                print *, "Object : ", trim(link%object)
-                if (like(link%object, "/mesh/*/*/selectorOnMesh/elements")) then
-                    found = read_string_attribute(file_id, path2, &
-                                                  "object_shortName", buf)
-                    print *, "It is an element : ", trim(buf)
-                    elt_ind = &
-                        umesh_get_index_by_short_name_in_some(umesh%som_element, &
-                                                              trim(buf))
-                    print *, "Amelet wire index : ", elt_ind
-                    print *, "Nec wire index : ", get_index(nec_amelet, elt_ind)
-                    nec_wires(get_index(nec_amelet, elt_ind))%itg = 1
-                    nec_generator%source_type = 0
-                    nec_generator%tag = 1
-                    nec_generator%m = 1
-                    nec_generator%real_part = 1
-                    nec_generator%imaginary_part = 0
-                endif
-            endif
-        enddo
-    enddo
+	        ! /label/predefinedLabels#wireRadius handling
+	        if (link%subject == "/label/predefinedLabels") then
+                found = read_int_attribute(file_id, path2, &
+                                           "subject_id", id, .true.)
+	            if (predefined_labels(id+1) == "wireRadius") then
+	                ! We take into account only groups
+	                if (like(link%object, "/mesh/*/*/group/*")) then
+	                    print * ,"  Wire radius on group !!"
+	                    print *, "  Mesh : ", trim(link%object)
+	                    ugroup => umesh_get_group_by_name(umesh, link%object)
+	                    if (associated(ugroup)) then
+	                        nb_wires = nb_wires + size(ugroup%elements)
+	                    endif
+	                endif
+	            endif
+	        endif
+	    enddo
 
+        print *
+		print *, "The number of wires is : ", nb_wires
+		allocate(nec_wires(nb_wires))
+		allocate(nec_amelet(nb_wires))
 
-    ! Write nec wires to input.nec
-    do i=1, nb_wires
-        write(numnec, "(a80)"), gw_to_string(nec_wires(i))
-    enddo
-    write(numnec, "(a2)"), "GE"
-    write(numnec, "(a80)"), ex_to_string(nec_generator)
-    write(numnec, "(a2)"), "XQ"
-
-
-    ! load links -> Give the number of loads
-    ! Hypothesis : we take into account only one load
-    ! -> the first read
-    print *
-    print *, "Reading load source links ..."
-    if (allocated(children_name)) deallocate(children_name)
-    call read_children_name(file_id, C_LINK, children_name)
-    do i=1, size(children_name)
-        path = trim(C_LINK)//trim(children_name(i))
-        if (allocated(children_name2)) deallocate(children_name2)
-        call read_children_name(file_id, trim(path), children_name2)
-        do j=1, size(children_name2)
-            path2 = trim(path)//"/"//trim(children_name2(j))
-            call read_link(file_id, path2, link)
+		! Build nec wire model
+		print *
+		id_wires = 0
+	    do j=1, size(children_name)
+	        path2 = trim(path)//"/"//trim(children_name(j))
+	        call read_link(file_id, path2, link)
             print *, "--Subject : ", trim(link%subject)
-            if (like(link%subject, "/physicalModel/multiport/*")) then
-                print *, "Object : ", trim(link%object)
-                if (like(link%object, "/mesh/*/*/selectorOnMesh/elements")) then
-                    found = read_string_attribute(file_id, path2, &
-                                                  "object_shortName", buf)
-                    print *, "It is an element : ", trim(buf)
-                    elt_ind = &
-                        umesh_get_index_by_short_name_in_some(umesh%som_element, &
-                                                              trim(buf))
-                    print *, "Amelet wire index : ", elt_ind
-                    print *, "Nec wire index : ", get_index(nec_amelet, elt_ind)
-                    nec_wires(get_index(nec_amelet, elt_ind))%itg = 1
-                    nec_load%ldtype = 0
-                    nec_load%ldtag = 1
-                    nec_load%ldtagf = 1
-                    nec_load%ldtagt = 1
-                    nec_load%zlr = 10.
-                    nec_load%zli = 0
-                    nec_load%zlc = 0
-                endif
-            endif
-        enddo
-    enddo
+	        ! /label/predefinedLabels#wireRadius handling
+	        if (link%subject == "/label/predefinedLabels") then
+	            found = read_int_attribute(file_id, path2, "subject_id", id)
+	            print *, "id : ", id
+	            print *, "Label : ", trim(predefined_labels(id+1))
+	            if (predefined_labels(id+1) == "wireRadius") then
+	                found = read_float_attribute(file_id, path2, "radius", radius)
+	                print *, "  Radius : ", radius
+	                ! Group management
+	                if (like(link%object, "/mesh/*/*/group/*")) then
+	                    print * ,"  Wire radius on group !!"
+	                    ugroup => umesh_get_group_by_name(umesh, link%object)
+	                    if (associated(ugroup)) then
+	                        print *, "  Group path :", trim(ugroup%name)
+	                        do k=1, size(ugroup%elements)
+	                            id_wires = id_wires + 1
+	                            elt_ind = ugroup%elements(k)
+	                            elt_type = umesh%elements(elt_ind+1)
+	                            nb_nodes = umesh_number_of_nodes(elt_type)
+	                            node1 = umesh%element_nodes(&
+	                                        umesh%offsets(elt_ind+1))
+	                            node2 = node1 + 1
+	                            print *, k , elt_ind, elt_type, nb_nodes, &
+	                                     node1, node2
+	                            nec_wires(id_wires)%ns = 1
+	                            nec_wires(id_wires)%xw1 = umesh%nodes(1,node1+1)
+	                            nec_wires(id_wires)%yw1 = umesh%nodes(2,node1+1)
+	                            nec_wires(id_wires)%zw1 = umesh%nodes(3,node1+1)
+	                            nec_wires(id_wires)%xw2 = umesh%nodes(1,node2+1)
+	                            nec_wires(id_wires)%yw2 = umesh%nodes(2,node2+1)
+	                            nec_wires(id_wires)%zw2 = umesh%nodes(3,node2+1)
+	                            nec_wires(id_wires)%rad = radius
+	                            write(*, "(7f8.4)"), umesh%nodes(:,node1+1), &
+	                                            umesh%nodes(:,node2+1), &
+	                                            radius
+	                            nec_amelet(id_wires) = elt_ind
+	                        enddo
+	                    endif
+	                    nullify(ugroup)
+	                endif
+	            endif
+	        endif
+	    enddo
 
-    ! Write loads wires to input.nec
-    write(numnec, "(a80)"), ld_to_string(nec_load)
-    write(numnec, "(a2)"), "PQ"
+		! voltage source links -> Give the number of voltage source
+		! Hypothesis : we take into account only one voltage source
+		! -> the first read
+		print *
+		print *, "Reading voltage source links ..."
+	    do j=1, size(children_name)
+	        path2 = trim(path)//"/"//trim(children_name(j))
+	        call read_link(file_id, path2, link)
+	        print *, "--Subject : ", trim(link%subject)
+	        if (like(link%subject, "/electromagneticSource/generator/*")) then
+	            found = read_string_attribute(file_id, link%subject, "type", buf)
+	            print *, "  Type : ", trim(buf)
+	            print *, "  Object : ", trim(link%object)
+	            if (like(link%object, "/mesh/*/*/selectorOnMesh/elements")) then
+	                found = read_string_attribute(file_id, path2, &
+	                                              "object_shortName", buf)
+	                print *, "  It is an element : ", trim(buf)
+	                elt_ind = &
+	                    umesh_get_index_by_short_name_in_some(umesh%som_element, &
+	                                                          trim(buf))
+	                print *, "  Amelet wire index : ", elt_ind
+	                print *, "  Nec wire index : ", get_index(nec_amelet, elt_ind)
+	                nec_wires(get_index(nec_amelet, elt_ind))%itg = 1
+	                nec_generator%source_type = 0
+	                nec_generator%tag = 1
+	                nec_generator%m = 1
+	                nec_generator%real_part = 1
+	                nec_generator%imaginary_part = 0
+	            endif
+	        endif
+	    enddo
 
+
+		! Write nec wires to input.nec
+		do i=1, nb_wires
+		    write(numnec, "(a80)"), gw_to_string(nec_wires(i))
+		enddo
+		write(numnec, "(a2)"), "GE"
+		write(numnec, "(a80)"), ex_to_string(nec_generator)
+		write(numnec, "(a2)"), "XQ"
+
+
+		! load links -> Give the number of loads
+		! Hypothesis : we take into account only one load RLC model
+		! -> the first read
+		print *
+		print *, "Reading load source links ..."
+	    do j=1, size(children_name)
+	        path2 = trim(path)//"/"//trim(children_name(j))
+	        call read_link(file_id, path2, link)
+	        print *, "--Subject : ", trim(link%subject)
+	        if (like(link%subject, "/physicalModel/multiport/RLC/*")) then
+	            print *, "Object : ", trim(link%object)
+	            if (like(link%object, "/mesh/*/*/selectorOnMesh/elements")) then
+	                found = read_string_attribute(file_id, path2, &
+	                                              "object_shortName", buf)
+	                print *, "It is an element : ", trim(buf)
+	                elt_ind = &
+	                    umesh_get_index_by_short_name_in_some(umesh%som_element, &
+	                                                          trim(buf))
+	                print *, "Amelet wire index : ", elt_ind
+	                print *, "Nec wire index : ", get_index(nec_amelet, elt_ind)
+
+	                ! Resistance value
+	                found = read_string_attribute(file_id, link%subject, "R", buf)
+	                call read_floatingtype(file_id, trim(buf), ft)
+	                nec_load%zlr = ft%singlereal%value
+	                print *, "Resistance value : ", nec_load%zlr
+
+	                ! Inductance value
+	                found = read_string_attribute(file_id, link%subject, "L", buf)
+	                call read_floatingtype(file_id, trim(buf), ft)
+	                nec_load%zli = ft%singlereal%value
+	                print *, "Inductance value : ", nec_load%zli
+
+	                ! Capacitance value
+	                found = read_string_attribute(file_id, link%subject, "C", buf)
+	                call read_floatingtype(file_id, trim(buf), ft)
+	                nec_load%zlc = ft%singlereal%value
+	                print *, "Capacitance value : ", nec_load%zlc
+
+	                ! RLC type
+	                found = read_int_attribute(file_id, link%subject, "type", &
+	                                           nec_load%ldtype, .true.)
+	                print *, "RLC model : ", nec_load%ldtype
+
+	                ! RLC Model
+	                if (nec_load%ldtype==1) then
+	                    nec_load%ldtype = 0
+	                else if (nec_load%ldtype==8) then
+	                    nec_load%ldtype = 1
+	                endif
+	                if (nec_wires(get_index(nec_amelet, elt_ind))%itg == 0) then
+	                    nec_wires(get_index(nec_amelet, elt_ind))%itg = &
+	                        generate_tag_wire()
+	                endif
+	                nec_load%ldtag = 1
+	                nec_load%ldtagf = 1
+	                nec_load%ldtagt = 1
+	            endif
+	        endif
+	    enddo
+
+		! Write loads wires to input.nec
+		write(numnec, "(a80)"), ld_to_string(nec_load)
+		write(numnec, "(a2)"), "PQ"
+    end subroutine read_links
 
     ! Output Request
-    print *
-    print *, "Reading output request ..."
-    if (allocated(children_name)) deallocate(children_name)
-    call read_children_name(file_id, C_OUTPUT_REQUEST, children_name)
-    do i=1, size(children_name)
-        path = trim(C_OUTPUT_REQUEST)//trim(children_name(i))
-        if (allocated(children_name2)) deallocate(children_name2)
-        call read_children_name(file_id, trim(path), children_name2)
-        do j=1, size(children_name2)
-            path2 = trim(path)//"/"//trim(children_name2(j))
+    subroutine read_output_requests(request_group)
+        character(len=*), intent(in) :: request_group
+
+        character(len=AL) :: path
+        integer :: j, k
+        character(len=EL), dimension(:), allocatable :: children_name
+
+	    print *
+	    print *, "  Reading output request ..."
+
+        path = trim(request_group)
+        call read_children_name(file_id, trim(path), children_name)
+        do j=1, size(children_name)
+            path2 = trim(path)//"/"//trim(children_name(j))
             call read_link(file_id, path2, link)
             print *, "--Subject : ", trim(link%subject)
             if (like(link%subject, "/label/predefinedOutputRequests")) then
-                print *, "Object : ", trim(link%object)
+                print *, "  Object : ", trim(link%object)
                 found = read_int_attribute(file_id, path2, "subject_id", ibuf)
-                print *, "Output request : ",  trim(predefined_output_requests(ibuf+1))
+                print *, "  Output request : ",  trim(predefined_output_requests(ibuf+1))
                 found = read_string_attribute(file_id, link%object, &
                                               "type", buf)
                 ! If electric field request
                 if (ibuf==0 .and. like(link%object, "/mesh/*/*/group/*")) then
-                    write(*, "(a23)", advance='no') "Electric field on group"
+                    write(*, "(a25)", advance='no') "  Electric field on group"
                     if (buf == "node") then
                         print *, "of nodes"
                     endif
@@ -506,35 +525,10 @@ program necPre
                 endif
             endif
         enddo
-    enddo
 
-    ! Write loads wires to input.nec
-    do i=1,size(nec_fields)
-        write(numnec, "(a80)"), ne_to_string(nec_fields(i))
-    enddo
-    write(numnec, "(a2)"), "EN"
-
-    ! Close the input.h5
-    call h5fclose_f(file_id, hdferr)
-
-    ! Close the generated input.nec file
-    close(numnec)
-    print *, "End"
-
-    contains
-        ! From an integer array return the index
-        ! matching value
-        function get_index(array, value) result(ind)
-            integer, dimension(:), intent(in) :: array
-            integer, intent(in) :: value
-            integer :: i, ind
-
-            ind = 0
-            do i=1, size(array)
-                if (array(i) == value) then
-                    ind = i
-                    exit
-                endif
-            enddo
-        end function get_index
+	    ! Write loads wires to input.nec
+	    do i=1,size(nec_fields)
+	        write(numnec, "(a80)"), ne_to_string(nec_fields(i))
+	    enddo
+    end subroutine read_output_requests
 end program necPre
