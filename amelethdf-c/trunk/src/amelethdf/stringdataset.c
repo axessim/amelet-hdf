@@ -99,7 +99,8 @@ children_t read_string_vector(hid_t file_id, char* path)
 
 	lmn = (int *)malloc(3*sizeof(int));
 	lmn = get_dataset_lmn(file_id, path);
-	if((lmn[1]!=0) && (lmn[1]!=1)) printf("%s must be a (n x 1) or (n) dataset\n",path);
+	if((lmn[1]!=0) && (lmn[1]!=1))
+		printf("%s must be a (n x 1) or (n) dataset\n",path);
 	vector =(char ***) malloc(sizeof(char **));
 	for (i=0; i<1;i++)
 	{
@@ -117,7 +118,7 @@ children_t read_string_vector(hid_t file_id, char* path)
 	return child;
 }
 
-//return the index of an element
+// return the index of an element
 int str_index(char ** arr, char *aelement, int nbel)
 {
 	int index = -1;
@@ -126,4 +127,36 @@ int str_index(char ** arr, char *aelement, int nbel)
 	for(i=0;i<nbel;i++)
 		if(strcmp(arr[i],aelement)==0) index=i;
 	return index;
+}
+
+// write a nd string dataset
+void write_nd_dataset(hid_t file_id, char* path, int values_len,
+					  int rank, hsize_t* dims, char* values[])
+{
+	hid_t ds_id, dset_id, filetype, memtype;
+	herr_t err;
+
+	// Create string data type
+    filetype = H5Tcopy(H5T_FORTRAN_S1);
+    err = H5Tset_size(filetype, values_len-1);
+    memtype = H5Tcopy(H5T_C_S1);
+    err = H5Tset_size(memtype, values_len);
+
+	// Create the data space
+    ds_id = H5Screate_simple(rank, dims, NULL);
+	printf("rank : %d\n", rank);
+	printf("dims : [%d]\n", (int)dims[0]);
+
+	// Create the dataset
+	dset_id = H5Dcreate(file_id, path, filetype, ds_id, H5P_DEFAULT,
+						H5P_DEFAULT, H5P_DEFAULT);
+	printf("dset_id OK %d\n", (hid_t)dset_id);
+	// Write data
+	err = H5Dwrite(dset_id, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, values);
+	printf("write OK\n");
+
+	H5Tclose(filetype);
+	H5Tclose(memtype);
+	H5Dclose(dset_id);
+	H5Sclose(ds_id);
 }
