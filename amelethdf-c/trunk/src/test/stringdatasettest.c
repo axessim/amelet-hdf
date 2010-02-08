@@ -6,7 +6,6 @@
  */
 
 #include <hdf5.h>
-#include <hdf5_hl.h>
 #include <dataset.h>
 
 int main(argc,argv)
@@ -26,7 +25,7 @@ char *argv[];
 
 	hid_t file_id;
 
-    // Initialization
+        // Initialization
 	H5open();
 	if(argc==1)
 	{
