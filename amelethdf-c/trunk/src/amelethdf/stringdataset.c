@@ -144,17 +144,13 @@ void write_string_dataset(hid_t file_id, char* path, int values_len,
 
     // Create the data space
     ds_id = H5Screate_simple(rank, dims, NULL);
-    printf("rank : %d\n", rank);
-    printf("dims : [%d]\n", (int)dims[0]);
 
 
     // Create the dataset
     dset_id = H5Dcreate(file_id, path, filetype, ds_id, H5P_DEFAULT,
                         H5P_DEFAULT, H5P_DEFAULT);
-    printf("dset_id OK %d\n", (hid_t)dset_id);
     // Write data
     err = H5Dwrite(dset_id, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, values);
-    printf("write OK\n");
 
     H5Tclose(filetype);
     H5Tclose(memtype);
