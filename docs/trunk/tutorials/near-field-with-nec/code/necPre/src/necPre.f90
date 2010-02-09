@@ -94,7 +94,7 @@ program necPre
     character(len=AL) :: output_folder = ""
     character(len=AL) :: inputnec = "input.nec"
 
-    character(len=AL) :: working_directory, path, path2, path3, buf
+    character(len=AL) :: working_directory, path, path2, path3, buf, simulation
     character(len=EL), dimension(:), allocatable :: children_name, &
                                                     children_name2, &
                                                     children_name3, &
@@ -173,80 +173,82 @@ program necPre
     call h5fopen_f(filename, H5F_ACC_RDONLY_F, file_id, hdferr, H5P_DEFAULT_F)
     call check("Can't open "//trim(filename))
 
-    ! Read the simulation instance
+    found = read_string_attribute(file_id, "/", "entryPoint", simulation)
+    print *, "entry point : ", trim(simulation)
+
+    if (.not. like(simulation, "/simulation/*")) then
+        print *, "The entry point is not a simulation..."
+        print *, "stop !!!"
+        stop
+    endif
+
+    call read_simulation(file_id, trim(simulation), sim)
+
     print *
-    print *, "Reading simulation ..."
-    if (allocated(children_name)) deallocate(children_name)
-    call read_children_name(file_id, C_SIMULATION, children_name)
-    do i=1, size(children_name)
-        call readSimulation(file_id, C_SIMULATION//trim(children_name(i)), sim)
-        call printSimulation(sim)
-        print *
-        print *, "--Handle inputs ..."
-        ! We read inputs except links
-        do j=1, size(sim%inputs)
-            path = sim%inputs(j)
-            if (like(path, "/mesh/*")) then
-                print *, "+A mesh !!! : ", trim(path)
-                if (allocated(children_name2)) deallocate(children_name2)
-                call read_children_name(file_id, trim(path), children_name2)
-                path2 = trim(path)//"/"//trim(children_name2(1))
-                call readUnstructuredMesh(file_id, trim(path2), umesh)
-                !call printUnstructuredMesh(umesh)
-                ! Generate the array containing the number
-                ! of points per element
-                call umesh_generate_offsets(umesh)
-            else if (like(path, "/electromagneticSource/generator/*")) then
-                print *, "+A generator !!!"
-            else if (like(path, "/label/*")) then
-                print *, "+Labels !!! "
-                if (path == "/label/predefinedLabels") then
-                    if (allocated(predefined_labels)) deallocate(predefined_labels)
-                    call read_string_vector(file_id, path, predefined_labels)
-                    print *, "  Predefined labels : ", predefined_labels(:)
-                else if (path == "/label/predefinedOutputRequests") then
-                    if (allocated(predefined_output_requests)) then
-                        deallocate(predefined_output_requests)
-                    endif
-                    call read_string_vector(file_id, path, predefined_output_requests)
-                    print *, "  Predefined output requests : ", predefined_output_requests(:)
-                else
-                    if (allocated(children_name2)) deallocate(children_name2)
-                    call read_string_vector(file_id, path, children_name2)
-                    print *, "  Label : ", children_name2(:)
+    print *, "--Handle inputs ..."
+    ! We read inputs except links
+    do j=1, size(sim%inputs)
+        path = sim%inputs(j)
+        if (like(path, "/mesh/*")) then
+            print *, "+A mesh !!! : ", trim(path)
+            if (allocated(children_name2)) deallocate(children_name2)
+            call read_children_name(file_id, trim(path), children_name2)
+            path2 = trim(path)//"/"//trim(children_name2(1))
+            call readUnstructuredMesh(file_id, trim(path2), umesh)
+            !call printUnstructuredMesh(umesh)
+            ! Generate the array containing the number
+            ! of points per element
+            call umesh_generate_offsets(umesh)
+        else if (like(path, "/electromagneticSource/generator/*")) then
+            print *, "+A generator !!!"
+        else if (like(path, "/label/*")) then
+            print *, "+Labels !!! "
+            if (path == "/label/predefinedLabels") then
+                if (allocated(predefined_labels)) deallocate(predefined_labels)
+                call read_string_vector(file_id, path, predefined_labels)
+                print *, "  Predefined labels : ", predefined_labels(:)
+            else if (path == "/label/predefinedOutputRequests") then
+                if (allocated(predefined_output_requests)) then
+                    deallocate(predefined_output_requests)
                 endif
-            else if (like(path, "/physicalModel/multiport/RLC/*")) then
-                print *, "+RLC !!!"
-            else if (like(path, "/globalEnvironment/*")) then
-                print *, "+Global environment !!!"
-                if (allocated(children_name2)) deallocate(children_name2)
-                call read_children_name(file_id, trim(path), children_name2)
-                path2 = trim(path)//"/"//trim(children_name2(1))
-                print *, "  Environment : ", trim(path2)
-                call read_floatingtype(file_id, trim(path2), ft)
-                frequency = convert_to_real_vector(ft)
-	            print *, "  Value : ", frequency, "Hz"
+                call read_string_vector(file_id, path, predefined_output_requests)
+                print *, "  Predefined output requests : ", predefined_output_requests(:)
             else
-                print *, "-Unknown : ", trim(path)
+                if (allocated(children_name2)) deallocate(children_name2)
+                call read_string_vector(file_id, path, children_name2)
+                print *, "  Label : ", children_name2(:)
             endif
-        enddo
-        ! Now we read links & output requests
+        else if (like(path, "/physicalModel/multiport/RLC/*")) then
+            print *, "+RLC !!!"
+        else if (like(path, "/globalEnvironment/*")) then
+            print *, "+Global environment !!!"
+            if (allocated(children_name2)) deallocate(children_name2)
+            call read_children_name(file_id, trim(path), children_name2)
+            path2 = trim(path)//"/"//trim(children_name2(1))
+            print *, "  Environment : ", trim(path2)
+            call read_floatingtype(file_id, trim(path2), ft)
+            frequency = convert_to_real_vector(ft)
+            print *, "  Value : ", frequency, "Hz"
+        else
+            print *, "-Unknown : ", trim(path)
+        endif
+    enddo
+    ! Now we read links & output requests
+    print *
+    print *, "--Handle links & outputRequests ..."
+    do j=1, size(sim%inputs)
+        path = sim%inputs(j)
         print *
-        print *, "--Handle links & outputRequests ..."
-        do j=1, size(sim%inputs)
-            path = sim%inputs(j)
+        print *, "Sim inputs : ", trim(path)
+        if (like(path, "/link/*")) then
             print *
-            print *, "Sim inputs : ", trim(path)
-            if (like(path, "/link/*")) then
-                print *
-                print *, "+Links !!! : ", trim(path)
-                call read_links(trim(path))
-            else if (like(path, "/outputRequest/*")) then
-                print *
-                print *, "+OutputRequest !!!"
-                call read_output_requests(trim(path))
-            endif
-        enddo
+            print *, "+Links !!! : ", trim(path)
+            call read_links(trim(path))
+        else if (like(path, "/outputRequest/*")) then
+            print *
+            print *, "+OutputRequest !!!"
+            call read_output_requests(trim(path))
+        endif
     enddo
 
     write(numnec, "(a2)"), "EN"
