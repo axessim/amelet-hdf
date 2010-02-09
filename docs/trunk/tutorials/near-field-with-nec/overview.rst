@@ -692,6 +692,7 @@ Entire python source code
 -------------------------
 
 .. code-block:: python
+    :linenos:
 
     # import the numpy module into the session
     import numpy as np
@@ -1112,14 +1113,11 @@ The same modification has to be performed on EX card, the file become :
     EN
 
 
-Along the process use the "compare with" tool of Eclipse to compare
-the reference ``input.nec`` and the generated ``input.nec`` : 
-create a file "input.nec" in ``test/reference/simu1/workingDir``. On the 
-over side, the
-pre converter will create ``test/result/simu1/workingDir/input.nec``. 
-By selecting ``test/result`` and ``test/reference``, right-click the
-``compare-with/each other``, Eclipse allows to follows the difference between
-the reference and the awaited result.
+Finally the load element format is adapted to the fortran language and the
+implicitly defined comptation location request is replaced by an explicit point
+definition.
+
+the final referenced nec file is :
 
 ::
 
@@ -1155,14 +1153,121 @@ the reference and the awaited result.
     EN
 
 
+Along the process use the "compare with" tool of Eclipse to compare
+the reference ``input.nec`` and the generated ``input.nec`` : 
+create a file "input.nec" in ``test/reference/simu1/workingDir``. On the 
+over side, the
+pre converter will create ``test/result/simu1/workingDir/input.nec``. 
+By selecting ``test/result`` and ``test/reference``, right-click the
+``compare-with/each other``, Eclipse allows to follows the difference between
+the reference and the awaited result.
+
+
 
 The fortran code
 ----------------
 
+The converter are coded in fortran.
+
+.. note::
+
+    The fortran code is contained is a file named necPre.f90 in the code folder.
+
+
+
+Nec card model
+^^^^^^^^^^^^^^
+
+The first thing we do is a nec card model in fortran :
+
+.. code-block:: fortran
+
+    module nec_model
+        implicit none
+
+        integer, parameter :: CARD_LEN = 80
+
+        ! Nec GW card
+        type gw_t
+            integer :: itg, ns
+            real :: xw1, yw1, zw1, xw2, yw2, zw2, rad
+        end type gw_t
+
+        ! Nec EX card
+        type ex_t
+            integer :: source_type, tag, m
+            integer :: c19 = 0, c20 = 0
+            real :: real_part, imaginary_part
+        end type ex_t
+
+        ! Nec LD card
+        type ld_t
+            integer :: ldtype, ldtag, ldtagf, ldtagt
+            real :: zlr, zli, zlc
+        end type ld_t
+
+        ! Nec NE card
+        type ne_t
+            ! Coordinate system 0 -> rectangular coordinates
+            integer :: near, nrx, nry, nrz
+            real :: xnr, ynr, znr, dxnr, dynr, dznr
+        end type ne_t
+
+    contains
+        function gw_to_string(gw) result(string)
+            type(gw_t), intent(in) :: gw
+            character(len=CARD_LEN) :: string
+            write(string, '(a2,i3,i5,7f10.4)') "GW", gw%itg, gw%ns, &
+                                               gw%xw1, gw%yw1, gw%zw1, &
+                                               gw%xw2, gw%yw2, gw%zw2, gw%rad
+        end function
+
+        function ex_to_string(ex) result(string)
+            type(ex_t), intent(in) :: ex
+            character(len=CARD_LEN) :: string
+            write(string, '(a2,i3,3i5,2f10.4)') "EX", ex%source_type, ex%tag, &
+                                                ex%m, ex%c19, &
+                                                ex%real_part, ex%imaginary_part
+        end function
+
+        function ld_to_string(ld) result(string)
+            type(ld_t), intent(in) :: ld
+            character(len=CARD_LEN) :: string
+            write(string, '(a2,i3,3i5,3es10.3)') "LD", ld%ldtype, ld%ldtag, &
+                                                ld%ldtagf, ld%ldtagt, &
+                                                ld%zlr, ld%zli, ld%zlc
+        end function
+
+        function ne_to_string(ne) result(string)
+            type(ne_t), intent(in) :: ne
+            character(len=CARD_LEN) :: string
+            write(string, '(a2,i3,3i5,6f10.4)') "NE", ne%near,  &
+                                                ne%nrx, ne%nry, ne%nrz, &
+                                                ne%xnr, ne%ynr, ne%znr, &
+                                                ne%dxnr, ne%dynr, ne%dznr
+        end function
+
+        function generate_tag_wire() result(tag)
+            integer :: ref_tag = 0
+            integer :: tag
+
+            ref_tag = ref_tag + 1
+            tag = ref_tag
+        end function generate_tag_wire
+    end module nec_model
+
+
+This code declares a nec_model module, types represent the nec cards met in
+the example. in addition, the module provides function to write cards in
+a file according the preceding format. See the Nec documentation for further
+details.
+
+
+
 Nec input file creation
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-From the skeletal project, the first thing to do is the creation of the 
+Now, the first thing to do is the creation of the 
 ``input.nec`` file, add the following fortran code line after the reading
 of ``output_folder`` :
 
@@ -1179,6 +1284,163 @@ permits to overwrite an existing file.
 
 Compile and run the project and compare ``test/reference`` and ``test/result``
 folders. The two first line are identical.
+
+
+First step with HDF5 library
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+HDF5 library has to be initialized to handle properly elements and constants. 
+At the same time we open the HDF5 input file :
+
+.. code-block:: fortran
+
+    ! HDF5 library initialization
+    hdferr = 0
+    call h5open_f(hdferr)
+    print *, "HDF5 library initialized"
+
+    print *, "Reading ", trim(filename), " ..."
+    call h5fopen_f(filename, H5F_ACC_RDONLY_F, file_id, hdferr, H5P_DEFAULT_F)
+    call check("Can't open "//trim(filename))
+
+Functions stating with ``h5`` come from the HDF5 library. The trailing ``_``
+marks the fortran binding.
+
+The ``check`` function is provided in the Amelet-HDF helper functions. It checks
+the value of ``hdferr``. If there is an error, the message is print at the
+console and the program is stoped.
+
+The constant ``H5F_ACC_RDONLY_F`` signifies the file is opened in read only
+mode. We can't write into it. Finally ``file_id`` is the identifier 
+of the HDF5 file in our program.
+
+Next we read the ``entryPoint`` attribute of the file (we suppose the file is
+a correct Amelet-HDF file). If the value of ``entryPoint`` does not begin
+with ``/simulation/*`` the program stops :
+
+.. code-block:: fortran
+
+    found = read_string_attribute(file_id, "/", "entryPoint", simulation)
+    print *, "entry point : ", trim(simulation)
+
+    if (.not. like(simulation, "/simulation/*")) then
+        print *, "The entry point is not a simulation..."
+        print *, "stop !!!"
+        stop
+    endif
+
+If the ``entryPoint`` is a simulation, the simulation is read :
+
+.. code-block:: fortran
+
+    call read_simulation(file_id, trim(simulation), sim)
+
+Read information are stored in the ``sim`` object which has been declared as 
+follow at the beginning of the program :
+
+.. code-block:: fortran
+
+    ! Amelet types
+    type(simulation_t) :: sim
+    type(structured_mesh_t) :: smesh
+    type(unstructured_mesh_t) :: umesh
+    type(umesh_group_t), pointer :: ugroup
+    type(planewave_t) :: pw
+    type(floatingtype_t) :: ft
+    type(link_t) :: link
+
+``simulation_t`` type is a fortran type modeling an Amelet-HDF simulation :
+
+.. code-block:: fortran
+
+    ! The simulation type
+    type simulation_t
+        character(len=AL) :: name = ""
+        character(len=AL), dimension(:), allocatable :: inputs, outputs
+    end type simulation_t
+
+This type has a name and two arrays containing the inputs and outputs of the
+simulation. The ``read_simulation`` function fill in these arrays.
+
+Walking through the simulation's inputs
+---------------------------------------
+
+For each element of ``inputs`` we take a decision :
+
+* Either the information is read right now
+* Either the reading is suspended and delayed until the links discovery.
+
+Globally the algorithm revolved around the like function :
+
+.. code-block:: fortran
+
+   print *
+    print *, "--Handle inputs ..."
+    ! We read inputs except links
+    do j=1, size(sim%inputs)
+        path = sim%inputs(j)
+        if (like(path, "/mesh/*")) then
+            print *, "+A mesh !!! : ", trim(path)
+            if (allocated(children_name2)) deallocate(children_name2)
+            call read_children_name(file_id, trim(path), children_name2)
+            path2 = trim(path)//"/"//trim(children_name2(1))
+            call readUnstructuredMesh(file_id, trim(path2), umesh)
+            !call printUnstructuredMesh(umesh)
+            ! Generate the array containing the number
+            ! of points per element
+            call umesh_generate_offsets(umesh)
+        else if (like(path, "/electromagneticSource/generator/*")) then
+            print *, "+A generator !!!"
+        else if (like(path, "/label/*")) then
+            print *, "+Labels !!! "
+            if (path == "/label/predefinedLabels") then
+                if (allocated(predefined_labels)) deallocate(predefined_labels)
+                call read_string_vector(file_id, path, predefined_labels)
+                print *, "  Predefined labels : ", predefined_labels(:)
+            else if (path == "/label/predefinedOutputRequests") then
+                if (allocated(predefined_output_requests)) then
+                    deallocate(predefined_output_requests)
+                endif
+                call read_string_vector(file_id, path, predefined_output_requests)
+                print *, "  Predefined output requests : ", predefined_output_requests(:)
+            else
+                if (allocated(children_name2)) deallocate(children_name2)
+                call read_string_vector(file_id, path, children_name2)
+                print *, "  Label : ", children_name2(:)
+            endif
+        else if (like(path, "/physicalModel/multiport/RLC/*")) then
+            print *, "+RLC !!!"
+        else if (like(path, "/globalEnvironment/*")) then
+            print *, "+Global environment !!!"
+            if (allocated(children_name2)) deallocate(children_name2)
+            call read_children_name(file_id, trim(path), children_name2)
+            path2 = trim(path)//"/"//trim(children_name2(1))
+            print *, "  Environment : ", trim(path2)
+            call read_floatingtype(file_id, trim(path2), ft)
+            frequency = convert_to_real_vector(ft)
+            print *, "  Value : ", frequency, "Hz"
+        else
+            print *, "-Unknown : ", trim(path)
+        endif
+    enddo
+    ! Now we read links & output requests
+    print *
+    print *, "--Handle links & outputRequests ..."
+    do j=1, size(sim%inputs)
+        path = sim%inputs(j)
+        print *
+        print *, "Sim inputs : ", trim(path)
+        if (like(path, "/link/*")) then
+            print *
+            print *, "+Links !!! : ", trim(path)
+            call read_links(trim(path))
+        else if (like(path, "/outputRequest/*")) then
+            print *
+            print *, "+OutputRequest !!!"
+            call read_output_requests(trim(path))
+        endif
+    enddo
+
 
 
 The wire definition (GW)
