@@ -194,7 +194,7 @@ program necPre
             if (allocated(children_name2)) deallocate(children_name2)
             call read_children_name(file_id, trim(path), children_name2)
             path2 = trim(path)//"/"//trim(children_name2(1))
-            call readUnstructuredMesh(file_id, trim(path2), umesh)
+            call umesh_read(file_id, trim(path2), umesh)
             !call printUnstructuredMesh(umesh)
             ! Generate the array containing the number
             ! of points per element
@@ -238,8 +238,6 @@ program necPre
     print *, "--Handle links & outputRequests ..."
     do j=1, size(sim%inputs)
         path = sim%inputs(j)
-        print *
-        print *, "Sim inputs : ", trim(path)
         if (like(path, "/link/*")) then
             print *
             print *, "+Links !!! : ", trim(path)
@@ -500,6 +498,15 @@ contains
                 print *, "  Object : ", trim(link%object)
                 found = read_int_attribute(file_id, path2, "subject_id", ibuf)
                 print *, "  Output request : ",  trim(predefined_output_requests(ibuf+1))
+
+                if (predefined_output_requests(ibuf+1) /= "electricField") then
+                    print *
+                    print *, "Not an electricField output request : ", &
+                        predefined_output_requests(ibuf+1)
+                    print *, "STOP !!!"
+                    stop
+                endif
+
                 found = read_string_attribute(file_id, link%object, &
                                               "type", buf)
                 ! If electric field request
