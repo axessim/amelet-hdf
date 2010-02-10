@@ -1367,30 +1367,91 @@ Walking through the simulation's inputs
 
 For each element of ``inputs`` we take a decision :
 
-* Either the information is read right now
+* Either the information is read immediately
 * Either the reading is suspended and delayed until the links discovery.
 
-Globally the algorithm revolved around the like function :
+Globally the algorithm revolved around the ``like`` function, its signature
+is as follow :
 
 .. code-block:: fortran
 
-   print *
+    ! Return true if a path looks like a patter
+    ! For "/foo/bar/baz" & "/foo/*/baz" return true
+    function like(path, pattern)
+    character(len=*), intent(in) :: path
+    character(len=*), intent(in) :: pattern
+
+The function take 2 arguments :
+
+* A string ``path``. A path is a string looking like 
+  ``/some/thing/in/an/amelet/file``
+* A string ``pattern``. ``pattern`` must be as string looking like
+  ``/some/*/*/an/amelet/*``
+  ``*`` is a jocker character and can replace of whatever string.
+  
+``like`` returns ``true`` if pattern looks lik ``path``.
+  
+Thanks to ``like``, simulation's inputs are checked relative to the 
+possibilities of the integrated solver.
+
+
+.. code-block:: fortran
+
+    print *
     print *, "--Handle inputs ..."
     ! We read inputs except links
     do j=1, size(sim%inputs)
         path = sim%inputs(j)
+
+
+Let start with the mesh elements :
+
+.. code-block:: fortran
+
         if (like(path, "/mesh/*")) then
             print *, "+A mesh !!! : ", trim(path)
             if (allocated(children_name2)) deallocate(children_name2)
             call read_children_name(file_id, trim(path), children_name2)
             path2 = trim(path)//"/"//trim(children_name2(1))
-            call readUnstructuredMesh(file_id, trim(path2), umesh)
-            !call printUnstructuredMesh(umesh)
-            ! Generate the array containing the number
-            ! of points per element
+            ! The mesh is read
+            ! The umesh structured is filled in with read data
+            call umesh_read(file_id, trim(path2), umesh)
+            ! Generate the array containing the offset of element
+            ! in elementNodes
             call umesh_generate_offsets(umesh)
+
+If the input is a *mesh group*, its children are returned with the 
+``read_children_name`` subroutine. this subroutine is intensively used
+to walk through the element hierarchy. The ``children`` string array
+is populated with the name of the children of the group.
+
+.. code-block:: fortran
+
+        ! Read the children's name of a group
+        subroutine read_children_name(file_id, path, children)
+            integer(hid_t), intent(in) :: file_id
+            character(len=*), intent(in) :: path
+            character(len=ELEMENT_NAME_LENGTH), &
+                dimension(:), allocatable :: children
+
+The mesh is read thanks to the ``umesh_read`` subroutine as well as
+the ``offset`` field. The ``offset`` field is an array containing the
+offset of elements in ``elementNodes``.
+
+.. code-block:: fortran
+
         else if (like(path, "/electromagneticSource/generator/*")) then
             print *, "+A generator !!!"
+
+If the input is a *generator* the handle is delayed until a link used it.
+
+.. note:: 
+
+    It a subjective choice and not a general rule.
+
+
+.. code-block:: fortran
+
         else if (like(path, "/label/*")) then
             print *, "+Labels !!! "
             if (path == "/label/predefinedLabels") then
@@ -1408,8 +1469,41 @@ Globally the algorithm revolved around the like function :
                 call read_string_vector(file_id, path, children_name2)
                 print *, "  Label : ", children_name2(:)
             endif
+
+
+It this code snippet the predefined label lists are read :
+
+* ``/label/predefinedLabels``
+* ``/label/predefinedOutputRequest``
+
+
+This operation is performed with the ``read_string_vector`` subroutine, 
+its signature is presented here below :
+
+.. code-block:: fortran
+
+    subroutine read_string_vector(file_id, path, vector)
+        integer(hid_t), intent(in) :: file_id
+        character(len=*), intent(in) :: path
+        character(len=*), dimension(:), allocatable :: vector
+
+
+This subroutine read a one dimensional string dataset and put the values
+in the vector array.
+
+Just after a RLC circuit is detected, but we choose to handle it during
+the links management.
+
+.. code-block:: fortran
+
         else if (like(path, "/physicalModel/multiport/RLC/*")) then
             print *, "+RLC !!!"
+
+
+Then the global environment is inspected :
+
+.. code-block:: fortran
+
         else if (like(path, "/globalEnvironment/*")) then
             print *, "+Global environment !!!"
             if (allocated(children_name2)) deallocate(children_name2)
@@ -1423,6 +1517,80 @@ Globally the algorithm revolved around the like function :
             print *, "-Unknown : ", trim(path)
         endif
     enddo
+
+The global environment is a floating type. As a consequence we use the
+``read_floatingtype`` subroutine :
+
+.. code-block:: fortran
+
+    subroutine read(file_id, path, ft)
+        integer(hid_t), intent(in) :: file_id
+        character(len=*), intent(in) :: path
+        type(floatingtype_t), intent(inout) :: ft
+
+with the ``floatingtype_t`` type defined by :
+
+.. code-block:: fortran
+
+    type floatingtype_t
+        integer :: floatingtype
+        type(singlereal_t) :: singlereal
+        type(singlecomplex_t) :: singlecomplex
+        type(vector_t) :: vector
+        type(dataset_t) :: dataset
+        type(arrayset_t) :: arrayset
+    end type floatingtype_t
+
+The ``floatingtype_t`` type is a container fortran ``type``. The field 
+``integer floatingtype`` gives the real type and the children field
+which holds data.
+
+Children types are defined by :
+
+.. code-block:: fortran
+
+    ! Base type, common with all floating types
+    type single_t
+        character(len=EL) :: label = ""
+        character(len=EL) :: physical_nature = ""
+        character(len=EL) :: unit = ""
+        character(len=EL) :: comment = ""
+    end type single_t
+
+    type singlereal_t
+        type(single_t) :: single
+        real :: value
+    end type singlereal_t
+
+    type singlecomplex_t
+        type(single_t) :: single
+        complex :: value
+    end type singlecomplex_t
+
+    type dataset_t
+        type(single_t) :: single
+        integer, dimension(:), allocatable :: ivalue
+        real, dimension(:), allocatable :: rvalue
+        complex, dimension(:), allocatable :: cvalue
+    end type dataset_t
+
+    type dataset_t
+        type(single_t) :: single
+        integer, dimension(:), allocatable :: dims
+        integer, dimension(:), allocatable :: ivalue
+        real, dimension(:), allocatable :: rvalue
+        complex, dimension(:), allocatable :: cvalue
+    end type dataset_t
+
+(See the ``test/floatingtypetest.f90`` file for further explanation)
+
+
+
+Links and output requests management
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: fortran
+
     ! Now we read links & output requests
     print *
     print *, "--Handle links & outputRequests ..."
@@ -1430,33 +1598,470 @@ Globally the algorithm revolved around the like function :
         path = sim%inputs(j)
         print *
         print *, "Sim inputs : ", trim(path)
+
+.. code-block:: fortran
+
         if (like(path, "/link/*")) then
             print *
             print *, "+Links !!! : ", trim(path)
             call read_links(trim(path))
+
+
+A link is an instance of the ``link`` type :
+
+.. code-block:: fortran
+
+    type link_t
+        character(len=AL) :: name = ""
+        character(len=AL) :: subject = "", object = ""
+    end type link_t
+
+The field of ``link_t`` are defined relative to Amelet-HDF specification.
+
+
+When a *link* pattern is met the subroutine ``read_links`` is executed 
+(comments are given in the code in order to facilitate the code review) :
+
+.. code-block:: fortran
+
+    ! Read links
+    subroutine read_links(link_group)
+        character(len=*), intent(in) :: link_group
+
+        character(len=AL) :: path
+        integer :: j, k
+        character(len=EL), dimension(:), allocatable :: children_name
+
+        path = trim(link_group)
+        if (allocated(children_name)) deallocate(children_name)
+        call read_children_name(file_id, trim(path), children_name)
+
+        ! wireRadius links -> gives the number of wires
+        print *
+        print *, "Reading wireRadius links ..."
+        nb_wires = 0
+        
+        !
+        ! 'wireRadius' links are handled a first time
+        ! Thanks to this information, the number of wires in the
+        ! structure can be calculated and memory allocated
+        !
+        do j=1, size(children_name)
+            path2 = trim(path)//"/"//trim(children_name(j))
+            call read_link(file_id, path2, link)
+            print *, "--Subject : ", trim(link%subject)
+            ! /label/predefinedLabels#wireRadius handling
+            if (link%subject == "/label/predefinedLabels") then
+                found = read_int_attribute(file_id, path2, &
+                                           "subject_id", id, .true.)
+                if (predefined_labels(id+1) == "wireRadius") then
+                    ! We take into account only groups
+                    if (like(link%object, "/mesh/*/*/group/*")) then
+                        print * ,"  Wire radius on group !!"
+                        print *, "  Mesh : ", trim(link%object)
+                        ugroup => umesh_get_group_by_name(umesh, link%object)
+                        if (associated(ugroup)) then
+                            ! The number of wires is updated
+                            nb_wires = nb_wires + size(ugroup%elements)
+                        endif
+                    endif
+                endif
+            endif
+        enddo
+
+        print *
+        print *, "The number of wires is : ", nb_wires
+        ! We allocate the memory for the linear structure
+        allocate(nec_wires(nb_wires))
+        ! An array to keep a relation between Nec wires and Amelet wires
+        allocate(nec_amelet(nb_wires))
+
+        ! Build nec wire model
+        print *
+        id_wires = 0
+
+        !
+        ! Secondly we look for the 'wireRadius' once again.
+        ! Amelet wires are converter into Nec segment.
+        ! 
+
+        do j=1, size(children_name)
+            path2 = trim(path)//"/"//trim(children_name(j))
+            call read_link(file_id, path2, link)
+            print *, "--Subject : ", trim(link%subject)
+            ! /label/predefinedLabels#wireRadius handling
+            if (link%subject == "/label/predefinedLabels") then
+                found = read_int_attribute(file_id, path2, "subject_id", id)
+                print *, "id : ", id
+                print *, "Label : ", trim(predefined_labels(id+1))
+                if (predefined_labels(id+1) == "wireRadius") then
+                    found = read_float_attribute(file_id, path2, "radius", radius)
+                    print *, "  Radius : ", radius
+                    ! Group management
+                    if (like(link%object, "/mesh/*/*/group/*")) then
+                        print * ,"  Wire radius on group !!"
+                        
+                        ugroup => umesh_get_group_by_name(umesh, link%object)
+                        if (associated(ugroup)) then
+                            print *, "  Group path :", trim(ugroup%name)
+                            do k=1, size(ugroup%elements)
+                                id_wires = id_wires + 1
+                                elt_ind = ugroup%elements(k)
+                                elt_type = umesh%elements(elt_ind+1)
+                                nb_nodes = umesh_number_of_nodes(elt_type)
+                                node1 = umesh%element_nodes(&
+                                            umesh%offsets(elt_ind+1))
+                                node2 = node1 + 1
+                                print *, k , elt_ind, elt_type, nb_nodes, &
+                                         node1, node2
+                                nec_wires(id_wires)%ns = 1
+                                nec_wires(id_wires)%xw1 = umesh%nodes(1,node1+1)
+                                nec_wires(id_wires)%yw1 = umesh%nodes(2,node1+1)
+                                nec_wires(id_wires)%zw1 = umesh%nodes(3,node1+1)
+                                nec_wires(id_wires)%xw2 = umesh%nodes(1,node2+1)
+                                nec_wires(id_wires)%yw2 = umesh%nodes(2,node2+1)
+                                nec_wires(id_wires)%zw2 = umesh%nodes(3,node2+1)
+                                nec_wires(id_wires)%rad = radius
+                                write(*, "(7f8.4)"), umesh%nodes(:,node1+1), &
+                                                     umesh%nodes(:,node2+1), &
+                                                     radius
+                                nec_amelet(id_wires) = elt_ind
+                            enddo
+                        endif
+                        nullify(ugroup)
+                    endif
+                endif
+            endif
+        enddo
+
+
+        ! 
+        ! Voltage source links -> Give the number of voltage sources
+        ! Hypothesis : we take into account only one voltage source
+        ! -> the first read
+        !
+        print *
+        print *, "Reading voltage source links ..."
+        do j=1, size(children_name)
+            path2 = trim(path)//"/"//trim(children_name(j))
+            call read_link(file_id, path2, link)
+            print *, "--Subject : ", trim(link%subject)
+            if (like(link%subject, "/electromagneticSource/generator/*")) then
+                found = read_string_attribute(file_id, link%subject, "type", buf)
+                print *, "  Type : ", trim(buf)
+                print *, "  Object : ", trim(link%object)
+                if (like(link%object, "/mesh/*/*/selectorOnMesh/elements")) then
+                    found = read_string_attribute(file_id, path2, &
+                                                  "object_shortName", buf)
+                    print *, "  It is an element : ", trim(buf)
+                    elt_ind = &
+                        umesh_get_index_by_short_name_in_some(umesh%som_element, &
+                                                              trim(buf))
+                    print *, "  Amelet wire index : ", elt_ind
+                    print *, "  Nec wire index : ", get_index(nec_amelet, elt_ind)
+                    nec_wires(get_index(nec_amelet, elt_ind))%itg = 1
+                    nec_generator%source_type = 0
+                    nec_generator%tag = 1
+                    nec_generator%m = 1
+                    nec_generator%real_part = 1
+                    nec_generator%imaginary_part = 0
+                endif
+            endif
+        enddo
+
+
+        ! Write nec wires to input.nec
+        do i=1, nb_wires
+            write(numnec, "(a80)"), gw_to_string(nec_wires(i))
+        enddo
+        write(numnec, "(a2)"), "GE"
+        write(numnec, "(a80)"), ex_to_string(nec_generator)
+        write(numnec, "(a2)"), "XQ"
+
+
+        !
+        ! load links -> Give the number of loads
+        ! Hypothesis : we take into account only one load RLC model
+        ! -> the first read
+        !
+        print *
+        print *, "Reading load links ..."
+        do j=1, size(children_name)
+            path2 = trim(path)//"/"//trim(children_name(j))
+            call read_link(file_id, path2, link)
+            print *, "--Subject : ", trim(link%subject)
+            if (like(link%subject, "/physicalModel/multiport/RLC/*")) then
+                print *, "Object : ", trim(link%object)
+                if (like(link%object, "/mesh/*/*/selectorOnMesh/elements")) then
+                    found = read_string_attribute(file_id, path2, &
+                                                  "object_shortName", buf)
+                    print *, "It is an element : ", trim(buf)
+                    elt_ind = &
+                        umesh_get_index_by_short_name_in_some(umesh%som_element, &
+                                                              trim(buf))
+                    print *, "Amelet wire index : ", elt_ind
+                    print *, "Nec wire index : ", get_index(nec_amelet, elt_ind)
+
+                    ! Resistance value
+                    found = read_string_attribute(file_id, link%subject, "R", buf)
+                    call read_floatingtype(file_id, trim(buf), ft)
+                    nec_load%zlr = ft%singlereal%value
+                    print *, "Resistance value : ", nec_load%zlr
+
+                    ! Inductance value
+                    found = read_string_attribute(file_id, link%subject, "L", buf)
+                    call read_floatingtype(file_id, trim(buf), ft)
+                    nec_load%zli = ft%singlereal%value
+                    print *, "Inductance value : ", nec_load%zli
+
+                    ! Capacitance value
+                    found = read_string_attribute(file_id, link%subject, "C", buf)
+                    call read_floatingtype(file_id, trim(buf), ft)
+                    nec_load%zlc = ft%singlereal%value
+                    print *, "Capacitance value : ", nec_load%zlc
+
+                    ! RLC type
+                    found = read_int_attribute(file_id, link%subject, "type", &
+                                               nec_load%ldtype, .true.)
+                    print *, "RLC model : ", nec_load%ldtype
+
+                    ! RLC Model
+                    if (nec_load%ldtype==1) then
+                        nec_load%ldtype = 0
+                    else if (nec_load%ldtype==8) then
+                        nec_load%ldtype = 1
+                    endif
+                    if (nec_wires(get_index(nec_amelet, elt_ind))%itg == 0) then
+                        nec_wires(get_index(nec_amelet, elt_ind))%itg = &
+                            generate_tag_wire()
+                    endif
+                    nec_load%ldtag = 1
+                    nec_load%ldtagf = 1
+                    nec_load%ldtagt = 1
+                endif
+            endif
+        enddo
+
+        ! Write loads wires to input.nec
+        write(numnec, "(a80)"), ld_to_string(nec_load)
+        write(numnec, "(a2)"), "PQ"
+    end subroutine read_links
+
+
+In this code, we use many more subroutines and types for the first time.
+
+The type ``selector_on_mesh_node_t`` represents the
+``/mesh/$gmesh/$mesh/selectorOnMesh/node`` table :
+
+.. code-block:: fortran
+
+    type selector_on_mesh_node_t
+        character(len=EL), dimension(:), allocatable :: short_name
+        integer, dimension(:), allocatable :: index
+    end type selector_on_mesh_node_t
+
+
+The type ``selector_on_mesh_element_t`` represents the
+``/mesh/$gmesh/$mesh/selectorOnMesh/element`` table :
+
+.. code-block:: fortran
+
+    type selector_on_mesh_element_t
+        character(len=EL), dimension(:), allocatable  :: short_name
+        integer, dimension(:), allocatable  :: index
+        real, dimension(:), allocatable  :: v1, v2, v3
+    end type selector_on_mesh_element_t
+
+
+The type ``group_t`` represents the ``/mesh/$gmesh/$mesh/group`` table :
+
+.. code-block:: fortran
+
+    type group_t
+        character(len=AL) :: name = ""
+        character(len=EL) :: type = ""
+        character(len=EL) :: entity_type = ""
+        integer, dimension(:), allocatable :: elements
+    end type group_t
+
+
+Finally, the type ``unstructured_mesh_t`` represents an unstructured
+mesh as Amelet-HDF defines it.
+
+.. code-block:: fortran
+
+    type unstructured_mesh_t
+        character(len=AL) :: name = ""
+        real, dimension(:,:), allocatable :: nodes
+        integer, dimension(:), allocatable :: elements
+        integer, dimension(:), allocatable :: offsets
+        integer, dimension(:), allocatable :: element_nodes
+        type(group_t), dimension(:), allocatable :: groups
+        type(groupgroup_t), dimension(:), allocatable :: groupgroups
+        type(selector_on_mesh_node_t) :: som_node
+        type(selector_on_mesh_element_t) :: som_element
+    end type unstructured_mesh_t
+
+
+We use the function ``umesh_get_group_by_name`` to return a reference on
+a ``group_t`` in a ``unstructured_mesh_t`` by its name ;
+
+.. code-block:: fortran
+
+    function umesh_get_group_by_name(umesh, path) result(group)
+        type(unstructured_mesh_t), target, intent(in) :: umesh
+        character(len=*), intent(in) :: path
+        type(group_t), pointer :: group
+
+And the function ``umesh_get_index_by_short_name_in_some`` returns index of
+an element by its name is a ``selector_on_mesh_element_t`` of a
+``unstructured_mesh_t``.
+
+.. code-block:: fortran
+
+    function umesh_get_index_by_short_name_in_some(some, short_name) result(ind)
+        type(selector_on_mesh_element_t), intent(in) :: some
+        character(len=*), intent(in) :: short_name
+
+A last function ``read_int_attribute`` allows to read an integer 
+attribute ``attr`` in ``path``. The result is put in ``buf`` and the function
+return ``logical``. If the function return ``false`` the attribute has
+not been found.
+
+An optional parameter indicates that the attribute is mandatory (the program
+stops) are optional (the program continues).
+
+.. code-block:: fortran
+
+    function read_int_attribute(file_id, path, attr, buf, mandatory) result(here)
+        integer(hid_t), intent(in) :: file_id
+        character(len=*), intent(in) :: path, attr
+        integer, intent(inout) :: buf
+        logical, intent(in), optional :: mandatory
+
+
+Now we handle output requests. For this the ``read_output_requests`` 
+subroutine is executed :
+
+.. code-block:: fortran
+
         else if (like(path, "/outputRequest/*")) then
             print *
             print *, "+OutputRequest !!!"
             call read_output_requests(trim(path))
         endif
+
+
+.. code-block:: fortran
+
+    subroutine read_output_requests(request_group)
+        character(len=*), intent(in) :: request_group
+
+        character(len=AL) :: path
+        integer :: j, k
+        character(len=EL), dimension(:), allocatable :: children_name
+
+        print *
+        print *, "  Reading output request ..."
+
+        path = trim(request_group)
+        call read_children_name(file_id, trim(path), children_name)
+        do j=1, size(children_name)
+            path2 = trim(path)//"/"//trim(children_name(j))
+            call read_link(file_id, path2, link)
+            print *, "--Subject : ", trim(link%subject)
+            if (like(link%subject, "/label/predefinedOutputRequests")) then
+                print *, "  Object : ", trim(link%object)
+                found = read_int_attribute(file_id, path2, "subject_id", ibuf)
+                print *, "  Output request : ",  trim(predefined_output_requests(ibuf+1))
+
+                if (predefined_output_requests(ibuf+1) /= "electricField") then
+                    print *
+                    print *, "Not an electricField output request : ", &
+                        predefined_output_requests(ibuf+1)
+                    print *, "STOP !!!"
+                    stop
+                endif
+
+                found = read_string_attribute(file_id, link%object, &
+                                              "type", buf)
+                ! If electric field request
+                if (ibuf==0 .and. like(link%object, "/mesh/*/*/group/*")) then
+                    write(*, "(a25)", advance='no') "  Electric field on group"
+                    if (buf == "node") then
+                        print *, "of nodes"
+                    endif
+                    ugroup => umesh_get_group_by_name(umesh, link%object)
+                    allocate(nec_fields(size(ugroup%elements)))
+                    do k=1,size(ugroup%elements)
+                        elt_ind = ugroup%elements(k)
+                        print *, "Node : ", elt_ind, umesh%nodes(:,elt_ind)
+                        nec_fields(k)%near = 0
+                        nec_fields(k)%nrx = 1
+                        nec_fields(k)%nry = 1
+                        nec_fields(k)%nrz = 1
+                        nec_fields(k)%xnr = umesh%nodes(1, elt_ind)
+                        nec_fields(k)%ynr = umesh%nodes(2, elt_ind)
+                        nec_fields(k)%znr = umesh%nodes(3, elt_ind)
+                        nec_fields(k)%dxnr = 0
+                        nec_fields(k)%dynr = 0
+                        nec_fields(k)%dznr = 0
+                    enddo
+                endif
+            endif
+        enddo
+
+	    ! Write loads wires to input.nec
+	    do i=1,size(nec_fields)
+	        write(numnec, "(a80)"), ne_to_string(nec_fields(i))
+	    enddo
+    end subroutine read_output_requests
+
+There's nothing new in this part. The predefined output request 
+``electricField`` is awaited, if it is not found the program stops. Each member
+of the output request group is converted is a Nec output request card.
+
+
+.. code-block:: fortran
+
+    ! End of inputs management
     enddo
 
 
 
-The wire definition (GW)
-------------------------
-
-Nec take into account only segment elements so the structure is ``elementTypes``
-elements. For each ``elementTypes`` elements we have to create a ``GW`` card.
-
-But first of all, we have to know the radius of wires. All wires should be
-linked the ``label#wireRadius`` label. So the strategy is to look for 
-``wireRadius`` label link.
+The post converter in fortran
+=============================
 
 
+The "post converter" project within the SDK
+-------------------------------------------
 
-The Nec output file
-===================
+Project creation and configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The SDK permits to create a runable project in a few steps :
+
+* Open the SDK.
+* Create a new "Fortran Output Wrapper Skeletal Project" named "postNec"
+* Edit the Makefile and set the following variables :
+
+ * The fortran compiler executable : FORTRAN_COMPILER = ifort | gfortran ... 
+ * The fortran compiler options  : COMPILER_OPTIONS = -O2 -g -Wall -c
+ * The HDF5 library root folder : HDF5_ROOT = /usr/local
+ * The Amelet-HDF fortran help functions : AMELET_ROOT = /user/local
+
+* Build the project with the menu "Project / Build Project". There should a
+  a new binary file in the bin and Binaries folders.
+
+
+The fortran code
+^^^^^^^^^^^^^^^^
+
+In this project, we hace to read the nec output file and create an 
+Amelet-HDf output.h5.
+
+The Nec output file is presented below :
+
 
 ::
 
