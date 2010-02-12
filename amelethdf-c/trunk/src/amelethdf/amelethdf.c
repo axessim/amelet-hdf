@@ -1,5 +1,3 @@
-#include <hdf5.h>
-#include <hdf5_hl.h>
 #include <string.h>
 #include "amelethdf.h"
 
@@ -15,9 +13,8 @@ children_t read_children_name(hid_t loc_id, const char* path)
     group_id = H5Gopen1(loc_id, path);
 
     status = H5Gget_info(group_id, &ginfo);
-    /*
-     * Get size of name, add 1 for null terminator.
-     */
+
+    // Get size of name, add 1 for null terminator
     child.nbchild = (int) ginfo.nlinks;
     child.childnames = (char **) malloc(child.nbchild * sizeof(char *));
     for (i = 0; i < child.nbchild; i++)
@@ -71,7 +68,6 @@ char * read_string_attribute(hid_t loc_id, const char* path, char* attr)
         status = H5Tclose(filetype);
         status = H5Tclose(memtype);
     }
-
     return rdata[0];
 }
 
