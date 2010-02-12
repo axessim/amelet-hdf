@@ -4,4 +4,8 @@
 
 Two Amelet-HDF mesh files are accessible in the download section.
 
-The use case is a pencil, from which unstructured and structured meshes have been generated.
+The use case is a pencil, from which unstructured and structured meshes have been generated :
+
+Unstructured mesh : http://amelet-hdf.googlecode.com/files/unstructured_pencil.h5
+
+Structured mesh : http://amelet-hdf.googlecode.com/files/unstructured_pencil.h5
