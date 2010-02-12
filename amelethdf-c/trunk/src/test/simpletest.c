@@ -1,9 +1,14 @@
+/*
+ *  simpletest.c
+ *
+ *  Created on: 26 janv. 2010
+ *  Author: Didier Roisse
+ */
+
 #include <hdf5.h>
 #include <hdf5_hl.h>
-#include <string.h>
 #include <amelethdf.h>
 #include <simpletype.h>
-#include <stdlib.h>
 
 int main(argc, argv)
     int argc;char *argv[];

@@ -2,16 +2,12 @@
  *  write_an_arrayset.c
  *
  *  Created on: 26 janv. 2010
- *  Author: didier
+ *  Author: Didier Roisse
  */
 
 #include <hdf5.h>
 #include <hdf5_hl.h>
-#include <string.h>
 #include <dataset.h>
-#include <complex.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 /* This program write an HDF5 file with the following arraySet structure
 

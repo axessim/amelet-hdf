@@ -2,15 +2,12 @@
  * datasettest.c
  *
  *  Created on: 7 déc. 2009
- *      Author: Didier
+ *  Author: Didier Roisse
  */
 
 #include <hdf5.h>
 #include <hdf5_hl.h>
-#include <string.h>
 #include <dataset.h>
-#include <complex.h>
-#include <stdio.h>
 
 int main(argc, argv)
     int argc;char *argv[];
