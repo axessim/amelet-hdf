@@ -1,4 +1,4 @@
-#summary Some Amelet-HDF mesh files.
+#summary Amelet-HDF mesh files.
 
 = Some Amelet-HDF mesh file =
 
