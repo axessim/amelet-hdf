@@ -2,13 +2,13 @@
 #include <hdf5_hl.h>
 #include <string.h>
 
-#define TRUE            1
-#define FALSE           0
+#define TRUE  1
+#define FALSE  0
 
 typedef struct
 {
-	int nb;
-	char ** chartab;
+        int nb;
+        char ** chartab;
 } stringtab_t;
 
 char* path_basename(char *path);

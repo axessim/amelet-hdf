@@ -14,15 +14,14 @@
 #define E_DATA_SET 4
 #define E_ARRAY_SET 5
 
-
 typedef struct
 {
-	int floatingtype;
-	singlereal_t singlereal;
-	singlecomplex_t singlecomplex;
-	vector_t vector;
-	dataset_t dataset;
-	arrayset_t arrayset;
+        int floatingtype;
+        singlereal_t singlereal;
+        singlecomplex_t singlecomplex;
+        vector_t vector;
+        dataset_t dataset;
+        arrayset_t arrayset;
 } floatingtype_t;
 
 floatingtype_t read_floatingtype(hid_t loc_id, const char *path);

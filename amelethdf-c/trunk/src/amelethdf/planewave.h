@@ -16,16 +16,16 @@
 
 typedef struct
 {
-	float theta;
-	float phi;
-	float linear_polarization;
-	int polarization;
-	complex float elliptical_polarization_etheta;
-	complex float elliptical_polarization_ephi;
-	floatingtype_t magnitude;
+        float theta;
+        float phi;
+        float linear_polarization;
+        int polarization;complex
+        float elliptical_polarization_etheta;complex
+        float elliptical_polarization_ephi;
+        floatingtype_t magnitude;
 } planewave_t;
 
-planewave_t read_planewave(hid_t file_id,const char* path);
+planewave_t read_planewave(hid_t file_id, const char* path);
 planewave_t clear_content_planewave(planewave_t pw);
 int islinear(planewave_t pw);
 int iselliptic(planewave_t pw);

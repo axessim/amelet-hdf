@@ -2,16 +2,12 @@
 #include <string.h>
 #include "vector.h"
 
-
-
 #define V_DATASET "dataset"
 #define P_INTEGER 1
 #define P_REAL    2
 #define P_COMPLEX 3
 
-
-
-dataset_t read_dataset(hid_t loc_id,const char* path);
+dataset_t read_dataset(hid_t loc_id, const char* path);
 dataset_t clear_content_dataset(dataset_t dataset);
 int get_index_dataset(hsize_t * indices, hsize_t* ishape);
 herr_t get_check_dataset(dataset_t ds, hsize_t *indices, int datatype);

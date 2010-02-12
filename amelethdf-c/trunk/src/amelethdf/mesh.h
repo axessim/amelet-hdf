@@ -20,51 +20,50 @@
 
 typedef struct
 {
-	char** groupGroupnames;
-	int nbeltgroupGroup;
-	char* name;
+        char** groupGroupnames;
+        int nbeltgroupGroup;
+        char* name;
 } groupgroup_t;
 
 typedef struct
 {
-	groupgroup_t *groupgroups;
-	int nbgroupGroup;
+        groupgroup_t *groupgroups;
+        int nbgroupGroup;
 } groupgroups_t;
 
+typedef struct
+{
+        ugroup_t* groups;
+        int nbgroup;
+} ugroups_t;
 
 typedef struct
 {
-	ugroup_t* groups;
-	int nbgroup;
-}ugroups_t;
+        sgroup_t* groups;
+        int nbgroup;
+} sgroups_t;
 
 typedef struct
 {
-	sgroup_t* groups;
-	int nbgroup;
-}sgroups_t;
+        char * name;
+        nodes_t nodes;
+        elttypes_t elements;
+        eltnodes_t element_nodes;
+        ugroups_t groups;
+        groupgroups_t groupgroups;
+        semnodes_t som_nodes;
+        semelts_t som_elements;
+} unstructured_mesh_t;
 
 typedef struct
 {
-	char * name;
-	nodes_t nodes;
-	elttypes_t elements;
-	eltnodes_t element_nodes;
-	ugroups_t groups;
-	groupgroups_t groupgroups;
-	semnodes_t som_nodes;
-	semelts_t som_elements;
-}unstructured_mesh_t;
-
-typedef struct
-{
-	char * name;
-	axis_t x;
-	axis_t y;
-	axis_t z;
-	sgroups_t groups;
-	groupgroups_t groupgroups;
-}structured_mesh_t;
+        char * name;
+        axis_t x;
+        axis_t y;
+        axis_t z;
+        sgroups_t groups;
+        groupgroups_t groupgroups;
+} structured_mesh_t;
 
 int meshtype(hid_t loc_id, const char * path);
 groupgroup_t readGroupGroup(hid_t grpgrp_id, const char* name);

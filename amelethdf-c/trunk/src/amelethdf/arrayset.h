@@ -2,10 +2,6 @@
 #include <string.h>
 #include "dataset.h"
 
-
-
-
-
 #define P_DATA  "data"
 #define P_DIMS  "ds"
 #define P_DIM "ds/dim"
@@ -13,17 +9,17 @@
 
 typedef struct
 {
-	single_t single;
-	vector_t data;
-	vector_t dim1;
+        single_t single;
+        vector_t data;
+        vector_t dim1;
 } arrayset2_t;
 
 typedef struct
 {
-	single_t single;
-	dataset_t data;
-	vector_t *dims;
-	int nbdims;
+        single_t single;
+        dataset_t data;
+        vector_t *dims;
+        int nbdims;
 } arrayset_t;
 
 arrayset_t read_arrayset(hid_t loc_id, const char* path);

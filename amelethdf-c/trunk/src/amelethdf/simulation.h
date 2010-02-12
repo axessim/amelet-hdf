@@ -11,14 +11,14 @@
 
 typedef struct
 {
-	char* name;
-	char** inputs;
-	char** outputs;
-	int* nb_input;
-	int* nb_output;
-}simulation_t;
+        char* name;
+        char** inputs;
+        char** outputs;
+        int* nb_input;
+        int* nb_output;
+} simulation_t;
 
 simulation_t read_simulation(hid_t file_id, const char* sim_path);
-int* read_nb_inputs_outputs(hid_t file_id,const char* path);
-char ** read_inputs_outputs(hid_t file_id,const char* path);
+int* read_nb_inputs_outputs(hid_t file_id, const char* path);
+char ** read_inputs_outputs(hid_t file_id, const char* path);
 void printSimulation(simulation_t sim);

@@ -4,9 +4,10 @@
 #include "amelethdf.h"
 
 char ** read_string_dataset2(hid_t file_id, const char * path, int l, int nb);
-char *** read_string_dataset1(hid_t file_id, const char * path, int l, int m, int n);
-int *get_dataset_lmn(hid_t file_id, char* path);
+char *** read_string_dataset1(hid_t file_id, const char * path, int l, int m,
+        int n);
+int * get_dataset_lmn(hid_t file_id, char* path);
 children_t read_string_vector(hid_t file_id, char* path);
 int str_index(char ** arr, char *aelement, int nbel);
-void write_string_dataset(hid_t file_id, char* path, int values_len,
-					  int rank, hsize_t* dims, char** values);
+void write_string_dataset(hid_t file_id, char* path, int values_len, int rank,
+        hsize_t* dims, char** values);
