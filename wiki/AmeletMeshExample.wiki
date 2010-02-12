@@ -1,6 +1,6 @@
 #summary Amelet-HDF mesh files.
 
-= Some Amelet-HDF mesh file =
+= Some Amelet-HDF mesh files =
 
 Two Amelet-HDF mesh files are accessible in the download section.
 
