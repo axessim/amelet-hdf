@@ -54,11 +54,11 @@ program necPost
     complex, dimension(:, :), allocatable :: fields
     real :: x, y, z, ex_m, ex_p, ey_m, ey_p, ez_m, ez_p
 
-    real, dimension(10, 10) :: data
-    real, dimension(10) :: dim1, dim2
+    real, dimension(1) :: dim2
     character(len=AL) :: label, physical_nature, unit, comment
     character(len=AL), dimension(:), allocatable :: outputs
     character(len=AL), dimension(:), allocatable :: buf
+    character(len=AL), dimension(:,:), allocatable :: external_element
 
 
     ! HDF5 library initialization
@@ -148,6 +148,114 @@ program necPost
                                     "/simulation/this_simulation", hdferr)
     call check("Can't write entryPoint attribute for "//path)
 
+    ! Writes /simulation group
+    print *, "Creates /simulation ..."
+    path = "simulation"
+    call h5gcreate_f(file_id, trim(path), grp_id, hdferr)
+    call check("Can't create /simulation")
+    call h5gclose_f(grp_id, hdferr)
+
+    ! Writes /simulation/this_simulation group
+    print *, "Creates /simulation/this_simulation ..."
+    path = "simulation/this_simulation"
+    call h5gcreate_f(file_id, trim(path), grp_id, hdferr)
+    call check("Can't create /simulation")
+    call h5gclose_f(grp_id, hdferr)
+
+    ! Adds this_simulation attributes
+    print *, "Writes /", trim(path)//"@module ..."
+    call h5ltset_attribute_string_f(file_id, trim(path), &
+                                    "module", "a_module", hdferr)
+    call check("Can't write module attribute for "//path)
+    print *, "Writes /", trim(path)//"@version ..."
+    call h5ltset_attribute_string_f(file_id, trim(path), &
+                                    "version", "1.0.0", hdferr)
+    call check("Can't write version attribute for "//path)
+
+    ! Writes simulation/this_simulation/outputs
+    allocate(outputs(1))
+    outputs(1) = "/floatingType/near_field"
+    path = "simulation/this_simulation/outputs"
+    print *, "Writes /", trim(path) //" ..."
+    call write_string_dataset(file_id, trim(path), outputs, shape(outputs))
+    call check("Can't create "//path)
+
+
+
+    ! Since near field data are stored in an external element
+    ! We have to create an /externalElement object
+    print *, "Creates /externalElement/external_element ..."
+    path = "/externalElement"
+    call h5gcreate_f(file_id, trim(path), grp_id, hdferr)
+    call check("Can't create /externalElement")
+    call h5gclose_f(grp_id, hdferr)
+    path = "/externalElement/external_element"
+    allocate(external_element(3, 2))
+    external_element(1,1) = "/mesh/result_mesh_group/near_field"
+    external_element(2,1) = "near_field.h5"
+    external_element(3,1) = "/mesh/result_mesh_group/near_field"
+    external_element(1,2) = "/floatingType/near_field"
+    external_element(2,2) = "near_field.h5"
+    external_element(3,2) = "/floatingType/near_field"
+    call write_string_dataset(file_id, path, external_element, &
+                              shape(external_element))
+    ! close filename
+    call h5fclose_f(file_id, hdferr)
+    call check("Can't close "//trim(filename))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ! Field file creation
+    print *
+    print *, "filename : ", trim(filename)
+    print *, "dirname : ", trim(dirname(filename))
+    if (allocated(buf)) deallocate(buf)
+    allocate(buf(2))
+    buf(1) = trim(dirname(filename))
+    buf(2) = "near_field.h5"
+    filename = join(buf)
+    print *, "near field filename : ", trim(filename)
+    print *
+    print *, "Create ", trim(filename), " ..."
+    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, file_id, hdferr, &
+                     H5P_DEFAULT_F, H5P_DEFAULT_F)
+    call check("Can't create "//trim(filename))
+
+    ! Amelet attributes
+    print *, "Write FORMAT attribute..."
+    call h5ltset_attribute_string_f(file_id, "/", &
+                                    "FORMAT", "AMELET-HDF", hdferr)
+    call check("Can't write FORMAT attribute for "//path)
+
+    print *, "Write AMELETHDF_FORMAT_VERSION attribute..."
+    call h5ltset_attribute_string_f(file_id, "/", &
+                                    "AMELETHDF_FORMAT_VERSION", &
+                                    "1.0.0", hdferr)
+    call check("Can't write AMELETHDF_FORMAT_VERSION attribute for "//path)
+
+    print *, "Write entryPoint attribute..."
+    call h5ltset_attribute_string_f(file_id, "/", &
+                                    "entryPoint", &
+                                    "/floatingType/near_field", hdferr)
+    call check("Can't write entryPoint attribute for "//path)
 
     ! Points mesh for locating computed fields
     print *, "/mesh group creation ..."
@@ -229,6 +337,7 @@ program necPost
     ! Writes /floatingType/near_field/ds/dim1
     path = "/floatingType/near_field/ds/dim1"
     print *, "Writes ", trim(path), " ..."
+    deallocate(buf)
     allocate(buf(3))
     buf = (/"Ex", "Ey", "Ez"/)
     call write_string_dataset(file_id, path, buf, shape(buf))
@@ -242,7 +351,7 @@ program necPost
     path = "/floatingType/near_field/ds/dim2"
     print *, "Writes ",  trim(path), " ..."
     allocate(dims(1))
-    dims = (/10/)
+    dims = (/1/)
     call h5ltmake_dataset_float_f(file_id, trim(path), 1, dims, dim2, hdferr)
     call check("Can't write dataset for "//path)
     deallocate(dims)
@@ -253,45 +362,9 @@ program necPost
     print *, "Writes /floatingType/near_field/dim2@meshEntity ..."
     call h5ltset_attribute_string_f(file_id, "/floatingType/near_field/ds/dim2", &
                                     "meshEntity", &
-                                    "/mesh/result_mesh/near_fiel/nodes", &
+                                    "/mesh/result_mesh/near_field/nodes", &
                                     hdferr)
     call check("Can't write floatingType attribute for floatingType/near_field")
-
-
-
-    ! Writes /simulation group
-    print *, "Creates /simulation ..."
-    path = "simulation"
-    call h5gcreate_f(file_id, trim(path), grp_id, hdferr)
-    call check("Can't create /simulation")
-    call h5gclose_f(grp_id, hdferr)
-
-    ! Writes /simulation/this_simulation group
-    print *, "Creates /simulation/this_simulation ..."
-    path = "simulation/this_simulation"
-    call h5gcreate_f(file_id, trim(path), grp_id, hdferr)
-    call check("Can't create /simulation")
-    call h5gclose_f(grp_id, hdferr)
-
-    ! Adds this_simulation attributes
-    print *, "Writes /", trim(path)//"@module ..."
-    call h5ltset_attribute_string_f(file_id, trim(path), &
-                                    "module", "a_module", hdferr)
-    call check("Can't write module attribute for "//path)
-    print *, "Writes /", trim(path)//"@version ..."
-    call h5ltset_attribute_string_f(file_id, trim(path), &
-                                    "version", "1.0.0", hdferr)
-    call check("Can't write version attribute for "//path)
-
-
-    ! Writes simulation/this_simulation/outputs
-    allocate(outputs(1))
-    outputs(1) = "/floatingType/near_field"
-    path = "simulation/this_simulation/outputs"
-    print *, "Writes /", trim(path) //" ..."
-    call write_string_dataset(file_id, trim(path), outputs, shape(outputs))
-    call check("Can't create "//path)
-
 
     ! close filename
     call h5fclose_f(file_id, hdferr)
