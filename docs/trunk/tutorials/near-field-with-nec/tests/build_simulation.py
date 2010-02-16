@@ -179,7 +179,7 @@ near_field = input_h5.createGroup("/outputRequest/request_group", "near_field")
 near_field._v_attrs.subject = "/label/predefinedOutputRequests"
 near_field._v_attrs.subject_id = 0
 near_field._v_attrs.object = "/mesh/wire_mesh/part1/group/output_nodes"
-near_field._v_attrs.output = "/floatingPoint/near_field"
+near_field._v_attrs.output = "/floatingType/near_field"
 
 
 # The frequency setting
