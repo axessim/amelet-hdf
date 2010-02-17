@@ -172,8 +172,11 @@ htmlhelp_basename = 'ComputingnearelectricfieldwithnecinQuercydoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'ComputingnearelectricfieldwithnecinQuercy.tex', u'Computing near electric field with nec in Quercy Documentation',
-   u'Cyril Giraudon', 'manual'),
+  ('index',
+   'ComputingnearelectricfieldwithnecinQuercy.tex', 
+   u'Computing near electric field with nec in Quercy',
+   u'Cyril Giraudon',
+   'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
