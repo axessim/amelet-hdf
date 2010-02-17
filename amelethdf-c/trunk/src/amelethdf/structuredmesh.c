@@ -177,3 +177,111 @@ snorm_t readNormals(hid_t loc_id)
     // read attributes
     return rdata;
 }
+
+structured_mesh_t read_structured_mesh(hid_t file_id, const char* path)
+{
+    structured_mesh_t smesh;
+    int i;
+    children_t children;
+    hid_t group_id, grpGrp_id;
+
+    char *bufpath;
+    char *bufpath2;
+
+    bufpath = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    // X Axis
+    strcpy(bufpath, path);
+    strcat(bufpath, G_CARTESIAN_GRID);
+    strcat(bufpath, "/x");
+    smesh.x = readAxis(file_id, bufpath);
+    free(bufpath);
+
+    // Y Axis
+    bufpath = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    strcpy(bufpath, path);
+    strcat(bufpath, G_CARTESIAN_GRID);
+    strcat(bufpath, "/y");
+    smesh.y = readAxis(file_id, bufpath);
+    free(bufpath);
+
+    // Z Axis
+    bufpath = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    strcpy(bufpath, path);
+    strcat(bufpath, G_CARTESIAN_GRID);
+    strcat(bufpath, "/z");
+    smesh.z = readAxis(file_id, bufpath);
+    free(bufpath);
+
+    // groups
+    bufpath = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    strcpy(bufpath, path);
+    strcat(bufpath, GROUP);
+    children = read_children_name(file_id, bufpath);
+    smesh.groups.nbgroup = children.nbchild;
+    smesh.groups.groups = (sgroup_t *) malloc(children.nbchild
+            * sizeof(sgroup_t));
+    for (i = 0; i < children.nbchild; i++)
+    {
+        bufpath2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+        strcpy(bufpath2, bufpath);
+        strcat(bufpath2, "/");
+        strcat(bufpath2, children.childnames[i]);
+        group_id = H5Dopen1(file_id, bufpath2);
+        smesh.groups.groups[i] = readSGroup(group_id, children.childnames[i]);
+        H5Dclose(group_id);
+        free(bufpath2);
+    }
+    free(children.childnames);
+    free(bufpath);
+
+    // groupGroups
+    bufpath = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    strcpy(bufpath, path);
+    strcat(bufpath, GROUPGROUP);
+
+    smesh.groupgroups.nbgroupGroup = 0;
+    if (H5Lexists(file_id, bufpath, H5P_DEFAULT) != FALSE)
+    {
+        children = read_children_name(file_id, bufpath);
+        smesh.groupgroups.groupgroups = (groupgroup_t *) malloc(
+                children.nbchild * sizeof(groupgroup_t));
+        smesh.groupgroups.nbgroupGroup = children.nbchild;
+        for (i = 0; i < children.nbchild; i++)
+        {
+            bufpath2
+                    = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+            strcpy(bufpath2, bufpath);
+            strcat(bufpath2, "/");
+            strcat(bufpath2, children.childnames[i]);
+            grpGrp_id = H5Dopen1(file_id, bufpath2);
+            smesh.groupgroups.groupgroups[i] = readGroupGroup(grpGrp_id,
+                    children.childnames[i]);
+            H5Dclose(grpGrp_id);
+            free(bufpath2);
+        }
+        free(children.childnames);
+    }
+    free(bufpath);
+
+    return smesh;
+}
+
+void print_structured_mesh(structured_mesh_t smesh)
+{
+    int i;
+    printf("Structured mesh\n");
+    printf("Name : %s\n", smesh.name);
+    printf("Groups : \n");
+    printf("Number of groups : %i\n", smesh.groups.nbgroup);
+    for (i = 0; i < smesh.groups.nbgroup; i++)
+    {
+        printf("Name : %s, type : %s\n", smesh.groups.groups[i].name,
+                smesh.groups.groups[i].type);
+    }
+    printf("GroupGRoups :\n");
+    printf("Number of groupgroups : %i\n", smesh.groupgroups.nbgroupGroup);
+    for (i = 0; i < smesh.groupgroups.nbgroupGroup; i++)
+    {
+        printf("Name : %s\n", smesh.groupgroups.groupgroups[i].name);
+    }
+}

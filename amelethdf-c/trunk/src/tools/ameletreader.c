@@ -2,7 +2,8 @@
 
 #include "category.h"
 #include "simulation.h"
-#include "mesh.h"
+#include "unstructuredmesh.h"
+#include "structuredmesh.h"
 #include "planewave.h"
 #include "externalelement.h"
 #include "linkoutputrequest.h"

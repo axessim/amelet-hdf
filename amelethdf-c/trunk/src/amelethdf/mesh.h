@@ -1,12 +1,10 @@
 #include "amelethdf.h"
-#include "unstructuredmesh.h"
-#include "structuredmesh.h"
 
 #ifndef MESH_H
 #define MESH_H
 
-#define STRUCTURED            0
-#define UNSTRUCTURED          1
+#define STRUCTURED         0
+#define UNSTRUCTURED       1
 #define C_MESH             "/mesh"
 #define NODES              "/nodes"
 #define ELEMENTS           "/elementTypes"
@@ -34,45 +32,7 @@ typedef struct
         int nbgroupGroup;
 } groupgroups_t;
 
-typedef struct
-{
-        ugroup_t* groups;
-        int nbgroup;
-} ugroups_t;
-
-typedef struct
-{
-        sgroup_t* groups;
-        int nbgroup;
-} sgroups_t;
-
-typedef struct
-{
-        char * name;
-        nodes_t nodes;
-        elttypes_t elements;
-        eltnodes_t element_nodes;
-        ugroups_t groups;
-        groupgroups_t groupgroups;
-        semnodes_t som_nodes;
-        semelts_t som_elements;
-} unstructured_mesh_t;
-
-typedef struct
-{
-        char * name;
-        axis_t x;
-        axis_t y;
-        axis_t z;
-        sgroups_t groups;
-        groupgroups_t groupgroups;
-} structured_mesh_t;
-
 int meshtype(hid_t loc_id, const char * path);
 groupgroup_t readGroupGroup(hid_t grpgrp_id, const char* name);
-unstructured_mesh_t read_unstructured_mesh(hid_t file_id, const char* path);
-void print_unstructured_mesh(unstructured_mesh_t umesh);
-structured_mesh_t read_structured_mesh(hid_t file_id, const char* path);
-void print_structured_mesh(structured_mesh_t smesh);
 
 #endif // MESH_H
