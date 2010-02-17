@@ -1,4 +1,4 @@
-#summary Amelet-HDF tutorial.
+#summary Amelet-HDF tutorials.
 
 = Bistatic RCS example =
 
