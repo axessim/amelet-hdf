@@ -8,7 +8,7 @@ typedef struct
         single_t single;
         int* ivalue;
         float* rvalue;
-        _Complex float* cvalue;
+        complex float* cvalue;
         char ** svalue;
         int nbvalues;
 } vector_t;
