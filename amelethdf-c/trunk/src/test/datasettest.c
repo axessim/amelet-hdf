@@ -4,10 +4,10 @@
  *  Created on: 7 déc. 2009
  *  Author: Didier Roisse
  */
+#include <stdlib.h>
+#include <string.h>
 
-#include <hdf5.h>
-#include <hdf5_hl.h>
-#include <dataset.h>
+#include "dataset.h"
 
 int main(argc, argv)
     int argc;char *argv[];

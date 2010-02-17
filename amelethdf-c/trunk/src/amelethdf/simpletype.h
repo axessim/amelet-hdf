@@ -1,9 +1,7 @@
-#include <hdf5.h>
-#include <string.h>
-#include <math.h>
-#include <complex.h>
-
 #include "complextype.h"
+
+#ifndef SIMPLETYPE_H
+#define SIMPLETYPE_h
 
 #define A_LABEL  "label"
 #define A_PHYSICAL_NATURE  "physicalNature"
@@ -27,8 +25,8 @@ typedef struct
 
 typedef struct
 {
-        single_t single;complex
-        float value;
+        single_t single;
+        complex float value;
 } singlecomplex_t;
 
 typedef struct
@@ -37,8 +35,8 @@ typedef struct
         hsize_t *dims;
         int nbdims;
         int *ivalue;
-        float *rvalue;complex
-        float *cvalue;
+        float *rvalue;
+        complex float *cvalue;
 } dataset_t;
 
 typedef struct
@@ -76,16 +74,6 @@ typedef struct
         int number_of_values;
 } linearlistofinteger2_t;
 
-typedef struct
-{
-        single_t single;
-        int* ivalue;
-        float* rvalue;complex
-        float* cvalue;
-        char ** svalue;
-        int nbvalues;
-} vector_t;
-
 single_t read_single(hid_t loc_id, const char *path);
 single_t clear_content_single(single_t single);
 singlereal_t clear_content_singlereal(singlereal_t singlereal);
@@ -98,3 +86,5 @@ char* singlereal_to_string(singlereal_t singlereal);
 char* singlecomplex_to_string(singlecomplex_t singlecomplex);
 
 herr_t make_single(hid_t loc_id, const char* path, single_t single);
+
+#endif // SIMPLETYPE_H

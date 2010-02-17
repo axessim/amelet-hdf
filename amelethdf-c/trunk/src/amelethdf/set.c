@@ -1,11 +1,7 @@
-#include <hdf5.h>
-#include <hdf5_hl.h>
-#include "set.h"
 #include <string.h>
-#include "amelethdf.h"
 
-#define FALSE 0
-#define TRUE 1
+#include "amelethdf.h"
+#include "set.h"
 
 // Return TRUE if aelement is in aset
 int in(set_t aset, char* aelement)

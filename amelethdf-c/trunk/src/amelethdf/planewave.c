@@ -1,5 +1,7 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include "planewave.h"
-#include "amelethdf.h"
 
 #define FALSE 0
 #define TRUE 1

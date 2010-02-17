@@ -1,7 +1,6 @@
-#include <hdf5.h>
-#include <hdf5_hl.h>
+#include <stdlib.h>
+
 #include "complextype.h"
-#include <complex.h>
 
 // Create datatype
 hid_t create_type_id(hid_t real_or_double)

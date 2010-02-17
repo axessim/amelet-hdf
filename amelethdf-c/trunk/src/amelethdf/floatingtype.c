@@ -1,9 +1,7 @@
-#include <hdf5.h>
-#include "floatingtype.h"
+#include <stdlib.h>
 #include <string.h>
-#include "amelethdf.h"
-#define TRUE 1
-#define FALSE 0
+
+#include "floatingtype.h"
 
 floatingtype_t read_floatingtype(hid_t loc_id, const char *path)
 {

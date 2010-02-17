@@ -5,9 +5,10 @@
  *  Author: Didier Roisse
  */
 
-#include <hdf5.h>
-#include <hdf5_hl.h>
-#include <arrayset.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "arrayset.h"
 
 int main(argc, argv)
     int argc;char *argv[];

@@ -1,7 +1,6 @@
-#include <hdf5.h>
-#include <hdf5_hl.h>
 #include <string.h>
 #include <stdlib.h>
+
 #include "externalelement.h"
 #include "set.h"
 #include "stringdataset.h"

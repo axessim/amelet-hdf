@@ -1,12 +1,7 @@
 #include <stdlib.h>
-#include <hdf5.h>
 #include <string.h>
 
 #include "mesh.h"
-#include "amelethdf.h"
-
-#define FALSE 0
-#define TRUE 1
 
 int meshtype(hid_t loc_id, const char * path)
 {

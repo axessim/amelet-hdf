@@ -1,6 +1,6 @@
 #include <stdlib.h>
-#include <hdf5.h>
 #include <string.h>
+
 #include "structuredmesh.h"
 
 axis_t readAxis(hid_t loc_id, const char *axisname)

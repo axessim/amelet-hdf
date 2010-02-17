@@ -1,4 +1,7 @@
-#include <hdf5.h>
+#include "amelethdf.h"
+
+#ifndef STRUCTUREDMESH_H
+#define STRUCTUREDMESH_H
 
 typedef struct
 {
@@ -31,3 +34,4 @@ sgroup_t readSGroup(hid_t group_id, const char* name);
 snorm_t readNormals(hid_t loc_id);
 char* readAttributes(hid_t group_id, const char* attr_name);
 
+#endif // STRUCTUREDMESH_H

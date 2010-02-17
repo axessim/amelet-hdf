@@ -1,9 +1,6 @@
-// CLASS Unstructuredmesh
-
 #include <stdlib.h>
-#include <hdf5.h>
-#include <hdf5_hl.h>
 #include <string.h>
+
 #include "unstructuredmesh.h"
 
 nodes_t readNodes(hid_t nodes_id)

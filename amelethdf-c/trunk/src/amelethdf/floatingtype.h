@@ -1,5 +1,7 @@
-#include <hdf5.h>
 #include "arrayset.h"
+
+#ifndef FLOATINGTYPE_H
+#define FLOATINGTYPE_H
 
 #define A_FLOATING_TYPE "floatingType"
 #define V_SINGLE_REAL "singleReal"
@@ -32,3 +34,5 @@ int issinglecomplex(floatingtype_t ft);
 int isvector(floatingtype_t ft);
 int isdataset(floatingtype_t ft);
 int isarrayset(floatingtype_t ft);
+
+#endif // FLOATINGTYPE_H

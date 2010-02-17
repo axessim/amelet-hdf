@@ -1,9 +1,11 @@
-#include <category.h>
-#include <simulation.h>
-#include <mesh.h>
-#include <planewave.h>
-#include <externalelement.h>
-#include <linkoutputrequest.h>
+#include <stdlib.h>
+
+#include "category.h"
+#include "simulation.h"
+#include "mesh.h"
+#include "planewave.h"
+#include "externalelement.h"
+#include "linkoutputrequest.h"
 
 #define FALSE 0
 #define TRUE 1

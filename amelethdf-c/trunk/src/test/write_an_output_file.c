@@ -5,10 +5,10 @@
  *  Author: Didier Roisse
  */
 
-#include <hdf5.h>
-#include <hdf5_hl.h>
-#include <dataset.h>
-#include <amelethdf.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "dataset.h"
 
 /* This program write an HDF5 file with the following arraySet structure
 

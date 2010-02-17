@@ -4,9 +4,10 @@
  *  Created on: 2010/02/04
  *  Author: Cyril Giraudon
  */
+#include <stdlib.h>
+#include <string.h>
 
-#include <hdf5.h>
-#include <dataset.h>
+#include "dataset.h"
 
 int main(argc, argv)
     int argc;char *argv[];

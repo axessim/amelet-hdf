@@ -1,9 +1,15 @@
-#include <hdf5.h>
-#include <hdf5_hl.h>
+/*
+ * Some category definitions
+ */
 
-#define C_LABEL  "/label/"
-#define C_ELECTROMAGNETIC_SOURCE  "/electromagneticSource"
-#define C_GLOBAL_ENVIRONMENT  "/globalEnvironment"
+#ifndef CATEGORY_H
+#define CATEGORY_H
+
+#define C_LABEL "/label/"
+#define C_ELECTROMAGNETIC_SOURCE "/electromagneticSource"
+#define C_GLOBAL_ENVIRONMENT "/globalEnvironment"
 #define C_PHYSICAL_MODEL "/physicalModel"
 #define C_LINK "/link/"
 #define C_OUTPUT_REQUEST "/outputRequest/"
+
+#endif // CATEGORY_H

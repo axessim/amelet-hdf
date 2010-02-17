@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "simulation.h"
 
 simulation_t read_simulation(hid_t file_id, const char* sim_path)

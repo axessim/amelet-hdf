@@ -1,9 +1,7 @@
 #include <stdlib.h>
-#include <hdf5.h>
-#include <hdf5_hl.h>
 #include <string.h>
+
 #include "arrayset.h"
-#include "amelethdf.h"
 
 // read an arrayset_t floating type
 arrayset_t read_arrayset(hid_t file_id, const char* path)

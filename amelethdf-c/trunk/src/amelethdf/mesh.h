@@ -1,6 +1,9 @@
-#include <hdf5.h>
-#include <unstructuredmesh.h>
-#include <structuredmesh.h>
+#include "amelethdf.h"
+#include "unstructuredmesh.h"
+#include "structuredmesh.h"
+
+#ifndef MESH_H
+#define MESH_H
 
 #define STRUCTURED            0
 #define UNSTRUCTURED          1
@@ -71,3 +74,5 @@ unstructured_mesh_t read_unstructured_mesh(hid_t file_id, const char* path);
 void print_unstructured_mesh(unstructured_mesh_t umesh);
 structured_mesh_t read_structured_mesh(hid_t file_id, const char* path);
 void print_structured_mesh(structured_mesh_t smesh);
+
+#endif // MESH_H

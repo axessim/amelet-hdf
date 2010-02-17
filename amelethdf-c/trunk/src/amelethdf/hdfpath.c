@@ -1,8 +1,7 @@
 #include <stdlib.h>
-#include <hdf5.h>
-#include <hdf5_hl.h>
-#include "hdfpath.h"
 #include <string.h>
+
+#include "hdfpath.h"
 
 char* path_basename(char *path)
 {

@@ -1,9 +1,5 @@
 #include "linkoutputrequest.h"
-#include "amelethdf.h"
 #include "hdfpath.h"
-
-#define FALSE 0
-#define TRUE 1
 
 // Reads a (subject/object) of link/outputRequest
 link_t read_link(hid_t loc_id, char * path)

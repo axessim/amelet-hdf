@@ -5,10 +5,9 @@
  *  Author: Didier Roisse
  */
 
-#include <hdf5.h>
-#include <hdf5_hl.h>
-#include <amelethdf.h>
-#include <simpletype.h>
+#include <string.h>
+
+#include "simpletype.h"
 
 int main(argc, argv)
     int argc;char *argv[];

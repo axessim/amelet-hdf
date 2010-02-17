@@ -1,7 +1,6 @@
 #include <stdlib.h>
-#include <hdf5.h>
-#include <hdf5_hl.h>
-#include <complex.h>
+#include <string.h>
+
 #include "dataset.h"
 
 // read a dataset_t floating type

@@ -1,4 +1,7 @@
-#include <hdf5.h>
+#include "amelethdf.h"
+
+#ifndef UNSTRUCTUREDMESH_H
+#define UNSTRUCTUREDMESH_H
 
 typedef struct
 {
@@ -59,3 +62,4 @@ semelts_t readSemElt(hid_t file_id, const char *table_name);
 semnodes_t readSemNodes(hid_t file_id, const char *table_name);
 ugroup_t readUGroup(hid_t group_id, const char* name);
 
+#endif // UNSTRUCTUREDMESH_H

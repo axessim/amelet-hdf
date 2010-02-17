@@ -1,7 +1,7 @@
-#include <hdf5.h>
-#include <hdf5_hl.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "amelethdf.h"
+
+#ifndef LINKOUTPUTREQUEST_H
+#define LINKOUTPUTREQUEST_H
 
 #define A_SUBJECT "subject"
 #define A_OBJECT "object"
@@ -20,3 +20,5 @@ typedef struct
 link_t read_link(hid_t loc_id, char * path);
 int get_type_link(link_t link);
 int isdataonmesh(link_t link);
+
+#endif // LINKOUTPUTREQUEST_H

@@ -1,9 +1,7 @@
-#include <hdf5.h>
-#include <hdf5_hl.h>
-#include <string.h>
+#include "amelethdf.h"
 
-#define TRUE  1
-#define FALSE  0
+#ifndef HDFPATH_H
+#define HDFPATH_H
 
 typedef struct
 {
@@ -28,3 +26,5 @@ int path_contain(char *path, char *subpath);
 char * path_element(char *path, int index, int back);
 stringtab_t path_split(char *path);
 int path_like(char * path, char* pattern);
+
+#endif // HDFPATH_H

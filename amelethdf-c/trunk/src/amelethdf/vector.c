@@ -1,8 +1,7 @@
-#include <hdf5.h>
+#include <stdlib.h>
 #include <string.h>
+
 #include "vector.h"
-#include "amelethdf.h"
-#include <complex.h>
 
 vector_t read_vector(hid_t loc_id, const char* path)
 {
@@ -13,7 +12,7 @@ vector_t read_vector(hid_t loc_id, const char* path)
     herr_t status;
     int rank, i;
 
-    //init vector
+    // initializes vec
     vec.ivalue = NULL;
     vec.rvalue = NULL;
     vec.cvalue = NULL;

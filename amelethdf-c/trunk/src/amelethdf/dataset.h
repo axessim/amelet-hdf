@@ -1,6 +1,9 @@
-#include <hdf5.h>
-#include <string.h>
+#include <complex.h>
+
 #include "vector.h"
+
+#ifndef DATASET_H
+#define DATASET_H
 
 #define V_DATASET "dataset"
 #define P_INTEGER 1
@@ -15,3 +18,5 @@ int get_integer_dataset(dataset_t ds, hsize_t *indices);
 float get_float_dataset(dataset_t ds, hsize_t *indices);
 complex float get_complexfloat_dataset(dataset_t ds, hsize_t *indices);
 char * dataset_to_string(dataset_t ds);
+
+#endif // DATASET_H
