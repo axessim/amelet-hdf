@@ -90,8 +90,8 @@ arrayset2_t read_arrayset2(hid_t loc_id, const char* path)
 // clear an arrayset2_t
 arrayset2_t clear_content_ars2(arrayset2_t ars2)
 {
-    clear_content_vector(ars2.data);
-    clear_content_vector(ars2.dim1);
+    vector_clear_content(ars2.data);
+    vector_clear_content(ars2.dim1);
     return ars2;
 }
 

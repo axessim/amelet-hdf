@@ -65,7 +65,7 @@ int main(argc, argv)
         strcat(simus, "/");
         strcat(simus, children.childnames[i]);
         simulation = read_simulation(file_id, simus);
-        printSimulation(simulation);
+        print_simulation(simulation);
         free(simus);
     }
 

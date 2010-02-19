@@ -9,9 +9,9 @@ floatingtype_t read_floatingtype(hid_t loc_id, const char *path)
 
     ft.floatingtype = get_type_ft(loc_id, path);
     if (ft.floatingtype == E_SINGLE_REAL)
-        ft.singlereal = read_single_real(loc_id, path);
+        ft.singlereal = read_singlereal(loc_id, path);
     else if (ft.floatingtype == E_SINGLE_COMPLEX)
-        ft.singlecomplex = read_single_complex(loc_id, path);
+        ft.singlecomplex = read_singlecomplex(loc_id, path);
     else if (ft.floatingtype == E_VECTOR)
         ft.vector = read_vector(loc_id, path);
     else if (ft.floatingtype == E_DATA_SET)
@@ -51,7 +51,7 @@ floatingtype_t clear_content_ft(floatingtype_t ft)
     ft.floatingtype = 0;
     ft.singlereal = clear_content_singlereal(ft.singlereal);
     ft.singlecomplex = clear_content_singlecomplex(ft.singlecomplex);
-    ft.vector = clear_content_vector(ft.vector);
+    ft.vector = vector_clear_content(ft.vector);
     ft.dataset = clear_content_dataset(ft.dataset);
     ft.arrayset = clear_content_ars(ft.arrayset);
 
