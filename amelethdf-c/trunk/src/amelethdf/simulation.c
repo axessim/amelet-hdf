@@ -93,7 +93,7 @@ char ** read_inputs_outputs(hid_t file_id, const char* path)
     return in_out[0];
 }
 
-void printSimulation(simulation_t sim)
+void print_simulation(simulation_t sim)
 {
     int i;
     printf("Name : %s\n", sim.name);

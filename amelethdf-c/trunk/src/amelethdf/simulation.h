@@ -20,6 +20,6 @@ typedef struct
 simulation_t read_simulation(hid_t file_id, const char* sim_path);
 int* read_nb_inputs_outputs(hid_t file_id, const char* path);
 char ** read_inputs_outputs(hid_t file_id, const char* path);
-void printSimulation(simulation_t sim);
+void print_simulation(simulation_t sim);
 
 #endif // SIMULATION_H
