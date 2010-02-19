@@ -130,7 +130,7 @@ char * remove_sep(char *path)
 
 // join paths of an array of path
 // for ["/foo", "bar"] returns "/foo/bar"
-char* join_path(char **paths, int nbpath)
+char* path_join(char **paths, int nbpath)
 {
     int i;
     char *buf = "";

@@ -18,7 +18,7 @@ herr_t closetype(hid_t obj_id);
 int path_isleaf(hid_t loc_id, char* path);
 int path_isgroup(hid_t loc_id, char* path);
 char * remove_sep(char *path);
-char* join_path(char **paths, int nbpath);
+char* path_join(char **paths, int nbpath);
 char** rsplit(char *path);
 char** lsplit(char *path);
 char * path_head(char *path);
