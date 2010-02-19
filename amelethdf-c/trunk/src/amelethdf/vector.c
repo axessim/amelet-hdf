@@ -60,7 +60,7 @@ vector_t read_vector(hid_t loc_id, const char* path)
     return vec;
 }
 
-vector_t clear_content_vector(vector_t vec)
+vector_t vector_clear_content(vector_t vec)
 {
     vec.single = clear_content_single(vec.single);
     if (vec.ivalue != NULL)
