@@ -88,6 +88,23 @@ float read_float_attribute(hid_t loc_id, const char* path, char* attr)
     return rdata;
 }
 
+int read_int_attribute(hid_t loc_id, const char* path, char* attr)
+{
+    herr_t status;
+    int idata;
+
+    status = H5Aexists_by_name(loc_id, path, attr, H5P_DEFAULT);
+    if (status < 0)
+    {
+        printf("%s doesn't exist for %s\n", attr, path);
+    }
+    else
+    {
+        H5LTget_attribute_int(loc_id, path, attr, &idata);
+    }
+    return idata;
+}
+
 int read_number_of_children(hid_t file_id, const char* path)
 {
     int nbchild;

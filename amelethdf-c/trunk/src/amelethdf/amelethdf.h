@@ -37,5 +37,10 @@ char * read_string_attribute(hid_t loc_id, const char* path, char* attr);
  */
 float read_float_attribute(hid_t loc_id, const char* path, char* attr);
 
+/*
+ * Reads a float attribute at path
+ */
+int read_int_attribute(hid_t loc_id, const char* path, char* attr);
+
 #endif // AMELETHDF_H
 
