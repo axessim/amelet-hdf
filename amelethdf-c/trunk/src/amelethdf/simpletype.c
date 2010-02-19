@@ -71,7 +71,7 @@ singlecomplex_t clear_content_singlecomplex(singlecomplex_t singlecomplex)
     return singlecomplex;
 }
 
-singlereal_t read_single_real(hid_t loc_id, const char *path)
+singlereal_t read_singlereal(hid_t loc_id, const char *path)
 {
     herr_t status;
     singlereal_t singlereal;
@@ -83,7 +83,7 @@ singlereal_t read_single_real(hid_t loc_id, const char *path)
     return singlereal;
 }
 
-singlecomplex_t read_single_complex(hid_t loc_id, const char *path)
+singlecomplex_t read_singlecomplex(hid_t loc_id, const char *path)
 {
     herr_t status;
     singlecomplex_t singlecomplex;

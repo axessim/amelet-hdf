@@ -78,8 +78,8 @@ single_t read_single(hid_t loc_id, const char *path);
 single_t clear_content_single(single_t single);
 singlereal_t clear_content_singlereal(singlereal_t singlereal);
 singlecomplex_t clear_content_singlecomplex(singlecomplex_t singlcomplex);
-singlereal_t read_single_real(hid_t loc_id, const char *path);
-singlecomplex_t read_single_complex(hid_t loc_id, const char *path);
+singlereal_t read_singlereal(hid_t loc_id, const char *path);
+singlecomplex_t read_singlecomplex(hid_t loc_id, const char *path);
 
 char* single_to_string(single_t single);
 char* singlereal_to_string(singlereal_t singlereal);
