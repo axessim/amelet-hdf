@@ -25,26 +25,45 @@ Types
 ``read_simulation``
 -------------------
 
-``(=> read)``
+Read a ``simulation_t`` at path.
 
+* Fortran interface
 
-.. code-block:: fortran
+    ``(=> read)``
 
-    ! Reads a simulation
-    subroutine read(file_id, sim_path, sim)
-        integer(hid_t), intent(in) :: file_id
-        character(len=*), intent(in) :: sim_path
-        type(simulation_t), intent(inout) :: sim
+    .. code-block:: fortran
+
+        ! Reads a simulation
+        subroutine read(file_id, sim_path, sim)
+            integer(hid_t), intent(in) :: file_id
+            character(len=*), intent(in) :: sim_path
+            type(simulation_t), intent(inout) :: sim
+
+* C interface
+
+    .. code-block:: c
+    
+        simulation_t read_simulation(hid_t file_id, const char* sim_path)
 
 
 ``print_simulation``
 --------------------
 
-``(=> printt)``
+Print a ``simulation_t`` to the console.
 
-.. code-block:: fortran
+* Fortran interface 
 
-    ! Print a simulation
-    subroutine printt(sim)
-        type(simulation_t), intent(in) :: sim
+    ``(=> printt)``
 
+    .. code-block:: fortran
+
+        ! Print a simulation
+        subroutine printt(sim)
+            type(simulation_t), intent(in) :: sim
+
+* C interface
+
+    .. code-block:: c
+    
+        void print_simulation(simulation_t sim)
+        

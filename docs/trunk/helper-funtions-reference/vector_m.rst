@@ -22,26 +22,46 @@ Types
 ``read_vector``
 ---------------
 
-``(=> read)``
+Read a ``vector_t`` at path.
 
-.. code-block:: fortran
+* Fortran interface :
 
-    ! read a vector_t floating type
-    subroutine read(file_id, path, vector)
-        integer(hid_t), intent(in) :: file_id
-        character(len=*), intent(in) :: path
-        type(vector_t), intent(inout) :: vector
+    ``(=> read)``
 
+    .. code-block:: fortran
 
+        ! read a vector_t floating type
+        subroutine read(file_id, path, vector)
+            integer(hid_t), intent(in) :: file_id
+            character(len=*), intent(in) :: path
+            type(vector_t), intent(inout) :: vector
+
+* C interface :
+
+    .. code-block:: c
+    
+        vector_t read_vector(hid_t loc_id, const char* path)
+        
 
 ``vector_clear_content``
 ------------------------
 
-``(=> clear_content)``
+Clear the content of a ``vector_t``
 
-.. code-block:: fortran
+* Fortran interface :
 
-    ! clear vector
-    subroutine clear_content(vector)
-        type(vector_t), intent(inout) :: vector
+    ``(=> clear_content)``
+
+    .. code-block:: fortran
+
+        ! clear vector
+        subroutine clear_content(vector)
+            type(vector_t), intent(inout) :: vector
+
+* C interface :
+
+    .. code-block:: c
+    
+        vector_t vector_clear_content(vector_t vec)
+
 

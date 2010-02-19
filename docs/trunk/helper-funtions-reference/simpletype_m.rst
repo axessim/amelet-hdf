@@ -68,45 +68,86 @@ Types
 ``read_singlereal``
 -------------------
 
-.. code-block:: fortran
+Read a ``singlereal_t`` at path.
 
-    ! read a singlereal_t floating type
-    subroutine read_singlereal(file_id, path, singlereal)
-        integer(hid_t), intent(in) :: file_id
-        character(len=*), intent(in) :: path
-        type(singlereal_t), intent(out) :: singlereal
+* Fortran interface :
+
+    .. code-block:: fortran
+
+        ! read a singlereal_t floating type
+        subroutine read_singlereal(file_id, path, singlereal)
+            integer(hid_t), intent(in) :: file_id
+            character(len=*), intent(in) :: path
+            type(singlereal_t), intent(out) :: singlereal
+
+* C interface :
+
+    .. code-block:: c
+    
+        singlereal_t read_single_real(hid_t loc_id, const char *path)
 
 
 
 ``singlereal_to_string``
 ------------------------
 
-.. code-block:: fortran
+Return a ``singlereal_t`` as a string.
 
-    ! return a string representation of singlereal_t
-    character(len=S_SINGLE_LENGTH) function singlereal_to_string(singlereal)
-        type(singlereal_t), intent(inout) :: singlereal
+* Fortran interface :
 
+    .. code-block:: fortran
+
+        ! return a string representation of singlereal_t
+        character(len=S_SINGLE_LENGTH) function singlereal_to_string(singlereal)
+            type(singlereal_t), intent(inout) :: singlereal
+
+
+* C interface :
+
+    .. code-block:: c
+    
+        char* singlereal_to_string(singlereal_t singlereal)
 
 
 ``read_singlecomplex``
 ----------------------
 
-.. code-block:: fortran
+Read a ``singlecomplex_t`` at path.
 
-    ! read a singlecomplex_t floating type
-    subroutine read_singlecomplex(file_id, path, singlecomplex)
-        integer(hid_t), intent(in) :: file_id
-        character(len=*), intent(in) :: path
-        type(singlecomplex_t), intent(out) :: singlecomplex
+* Fortran interface :
+
+    .. code-block:: fortran
+
+        ! read a singlecomplex_t floating type
+        subroutine read_singlecomplex(file_id, path, singlecomplex)
+            integer(hid_t), intent(in) :: file_id
+            character(len=*), intent(in) :: path
+            type(singlecomplex_t), intent(out) :: singlecomplex
+
+* C interface :
+
+    .. code-block:: c
+    
+        singlecomplex_t read_single_complex(hid_t loc_id, const char *path)
 
 
 ``singlecomplex_to_string``
 ---------------------------
 
-.. code-block:: fortran
+Return a ``singlecomplex_t`` as a string.
 
-    ! return a string representation of singlecomplex_t
-    character(len=S_SINGLE_LENGTH) function singlecomplex_to_string(singlecomplex)
-        type(singlecomplex_t), intent(inout) :: singlecomplex
+* Fortran interface :
+
+    .. code-block:: fortran
+
+        ! return a string representation of singlecomplex_t
+        character(len=S_SINGLE_LENGTH) function singlecomplex_to_string(singlecomplex)
+            type(singlecomplex_t), intent(inout) :: singlecomplex
+
+* C interface :
+
+    .. code-block:: c
+    
+        char* singlecomplex_to_string(singlecomplex_t singlecomplex)
+
 
