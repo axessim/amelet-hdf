@@ -3,6 +3,8 @@
 ``linkoutputrequest``
 =====================
 
+Links and output requests definition and management.
+
 Constants
 ---------
 
@@ -26,25 +28,42 @@ Types
 ``read_link``
 -------------
 
-``(=> read)``
+Read a ``link_t`` object at path.
 
-.. code-block:: fortran
+* Fortran interface :
 
-    ! Reads a (subject/object) of link/outputRequest
-    subroutine read(loc_id, path, link)
-        integer(hid_t), intent(in) :: loc_id
-        character(len=*), intent(in) :: path
-        type(link_t), intent(inout) :: link
+    ``(=> read)``
 
+    .. code-block:: fortran
+
+        ! Reads a (subject/object) of link/outputRequest
+        subroutine read(loc_id, path, link)
+            integer(hid_t), intent(in) :: loc_id
+            character(len=*), intent(in) :: path
+            type(link_t), intent(inout) :: link
+
+* C interface :
+
+    .. code-block:: c
+    
+        link_t read_link(hid_t loc_id, char * path);
+       
 
 ``isdataonmesh``
 ----------------
 
-.. code-block:: fortran
+* Fortran interface :
 
-    ! Returns .true. if link is a DATA_ON_MESH
-    logical function isdataonmesh(link)
-        type(link_t), intent(in) :: link
+    .. code-block:: fortran
+
+        ! Return .true. if link is a DATA_ON_MESH
+        logical function isdataonmesh(link)
+            type(link_t), intent(in) :: link
 
 
+* C interface :
 
+    .. code-block:: c
+    
+        int isdataonmesh(link_t link);
+        

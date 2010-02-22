@@ -1,7 +1,9 @@
 .. _simulation:
 
-``simulation_m``
-================
+``simulation``
+==============
+
+Simulation definition and management.
 
 Constants
 ---------

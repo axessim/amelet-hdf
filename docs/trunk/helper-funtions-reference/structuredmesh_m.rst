@@ -3,6 +3,8 @@
 ``structuredmesh``
 ==================
 
+Structured mesh definition and management.
+
 Types
 -----
 
@@ -27,25 +29,40 @@ Types
 ``smesh_read``
 --------------
 
-``(=> read)``
+Read a ``structured_mesh_t`` object at path.
 
-.. code-block:: fortran
+* Fortran interface :
 
-    ! Reads a structured mesh and store the result in smesh
-    subroutine read(file_id, mesh_path, smesh)
-        integer(hid_t), intent(in) :: file_id
-        character(len=*), intent(in) :: mesh_path
-        type(structured_mesh_t), intent(inout) :: smesh
+    ``(=> read)``
 
+    .. code-block:: fortran
+
+        ! Reads a structured mesh and store the result in smesh
+        subroutine read(file_id, mesh_path, smesh)
+            integer(hid_t), intent(in) :: file_id
+            character(len=*), intent(in) :: mesh_path
+            type(structured_mesh_t), intent(inout) :: smesh
+
+* C interface :
+
+    .. code-block:: c
+    
+        structured_mesh_t read_structured_mesh(hid_t file_id, const char* path);
+      
 
 ``smesh_print``
 ---------------
 
-``(=> printt)``
+Print a ``structured_mesh_t`` object.
 
-.. code-block:: fortran
+* Fortran interface :
 
-    ! Print to the console smesh characteristics
-    subroutine printt(smesh)
-        type(structured_mesh_t), intent(in) :: smesh
+    ``(=> printt)``
+
+    .. code-block:: fortran
+
+        ! Print to the console smesh characteristics
+        subroutine printt(smesh)
+            type(structured_mesh_t), intent(in) :: smesh
+
 
