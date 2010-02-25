@@ -18,8 +18,8 @@ from amelethdf.model.api \
         Complex, Float, Bool, String, Int, Array,
         HasTraits, BaseStr, UserName,
         Any, Instance,
-        UserName, DataSet, Group, Table, IsModel, TableObject)
-from amelethdf.model.node import load
+        UserName, IsModel)
+from amelethdf.model.model_inspector import load
 
 __all__ = ['AA', 'AAA', 'AAB', 'SimpleContainer', 'ConstContainer',
            'ComplexContainer']
@@ -143,7 +143,7 @@ class Test(unittest.TestCase):
         r = ModelNode(self.h5, '/', '', DEFAULT_MODEL)
         self.assertEqual(r.name, '')
         self.assertEqual(r.path, '/')
-        self.assertEqual(r.xpath, '/')
+        self.assertEqual(r.xpath, '/(FORMAT=AMELETHDF, AMELETHDF_FORMAT_VERSION=1.0.0)')
         
     def test_name_of_sub_elements(self):
         r = ModelNode(self.h5, '/', '', load(SimpleContainer))

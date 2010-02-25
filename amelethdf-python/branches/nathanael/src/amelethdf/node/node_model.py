@@ -75,7 +75,7 @@ class ModelNode(HDFNode):
                             for name in self.model.consts_name])
         xname = self.name
         if select:
-            xname += '(' + select + ')' + self.model._tostring_type()
+            xname += '(' + select + ')' + self.model._DrawingTree__tostring_type()
         return xname
         
     @property
@@ -99,7 +99,7 @@ class ModelNode(HDFNode):
         name, xselect = split_xname(xname)
         select.update(xselect)
         if self.can_create_child(name):
-            return self.model.get_child(name, select)
+            return self.model.get_child(name, select=select)
         else:
             raise ModelNodeError('%s is node a children of %s' % (xname, self))
             
