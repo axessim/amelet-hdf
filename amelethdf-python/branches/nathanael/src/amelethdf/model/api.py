@@ -9,8 +9,7 @@ Created on 9 fevr. 2010
 __all__ = ('Enum', 'Dict', 'List', 'ReadOnly', 'Tuple', 'Set',
            'Complex', 'Float', 'Bool', 'String', 'Int', 'Array',
            'Any', 'Instance',
-           'IsModel', 'IsGroup', 'IsTable', 'IsArray', 'Node',
-           'Group', 'DataSet', 'Table',
+           'IsModel', 'IsGroup', 'IsTable', 'IsArray',
            'UserName',)
 
 from enthought.traits.api \
@@ -28,15 +27,12 @@ class IsGroup(IsModel): pass
 class IsTable(IsModel): pass
 class IsArray(IsModel): pass
 
-class Node(IsModel): pass
+def PathWhere(type, **metadata):
+    #
+    # At this time just a string by in the future can by some this else :   
+    #  * Instance(type, ispath=True, **metadata) (using Traits metadata)
+    #  * or WeakRef(type, **metadata)            (or WeakRef pattern)
+    #
+    return String
 
-class Group(Node): pass
-
-class DataSet(Node):
-    type = Any
-
-class Table(Node):
-    pass
-
-class TableObject(IsModel): pass
 
