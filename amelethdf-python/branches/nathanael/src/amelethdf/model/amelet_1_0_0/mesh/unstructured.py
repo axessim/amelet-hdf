@@ -6,6 +6,7 @@ Created on 23 fevr. 2010
 @author: nathanael
 '''
 
+from ..comon_amelet import ah5_int, ah5_float
 from all import Mesh, Group, GroupGroup
 
 from amelethdf.model.api import \
@@ -14,7 +15,7 @@ from amelethdf.model.api import \
 __all__ = ['UGroup', 'UMesh']
 
 class UGroup(Group):
-    array = Array(shape=(None,), dtype=int)
+    array = Array(shape=(None,), dtype=ah5_int)
     
 class UGroupGroup(GroupGroup):
     data = List(Instance(UGroup))
@@ -22,9 +23,9 @@ class UGroupGroup(GroupGroup):
 class UMesh(Mesh):
     type = String('unstructured') 
     
-    nodes = Array(shape=(None, None), dtype=float)
-    elementTypes = Array(shape=(None,), dtype=int)
-    elementNodes = Array(Shape=(None,), dtype=int)
+    nodes = Array(shape=(None, None), dtype=ah5_float)
+    elementTypes = Array(shape=(None,), dtype=ah5_int)
+    elementNodes = Array(Shape=(None,), dtype=ah5_int)
 
     group = Dict(UserName, Instance(UGroup))
     groupGroup = Dict(UserName, Instance(UGroupGroup))

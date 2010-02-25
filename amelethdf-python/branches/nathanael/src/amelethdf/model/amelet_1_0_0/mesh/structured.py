@@ -6,7 +6,7 @@ Created on 23 fevr. 2010
 @author: nathanael
 '''
 
-
+from ..comon_amelet import ah5_int
 from ..floatingtype.vector import Vector
 from all import Mesh, Group, GroupGroup
 
@@ -16,7 +16,7 @@ from amelethdf.model.api import \
 __all__ = ['SGroup', 'CartesianGrid', 'SMesh']
 
 class SGroup(Group):
-    array = Array(shape=(None, None), dtype=int)
+    array = Array(shape=(None, None), dtype=ah5_int)
     
 class SGroupGroup(GroupGroup):
     data = List(Instance(SGroup))

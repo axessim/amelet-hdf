@@ -8,7 +8,7 @@ Created on 10 fevr. 2010
 
 if __name__ == '__main__':
     from amelethdf.model.amelet_1_0_0.amelet import Amelet
-    from amelethdf.model.node import load
+    from amelethdf.model import load
 
     
     node = load(Amelet)
