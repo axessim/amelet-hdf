@@ -5,7 +5,7 @@
 """
 
 SEPARATOR = '/'
-SELF = '.'
+SELF = '/.'
 
 def format(p):
     if len(p) > 1 and p[-1] == SEPARATOR:

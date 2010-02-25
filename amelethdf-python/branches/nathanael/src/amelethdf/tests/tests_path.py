@@ -45,6 +45,8 @@ class TestPast(unittest.TestCase):
         self.assertEqual(normpath('/a/a/.'), '/a/a')
         self.assertEqual(normpath('//.'), '/')
         
+        self.assertEqual(normpath('/path/where.my/is'), '/path/where.my/is')
+        
     def test_splits(self):
         self.assertEqual(splits('/a/b/c'), ['', 'a', 'b', 'c'])
         self.assertEqual(splits('a/b/c'), ['a', 'b', 'c'])
