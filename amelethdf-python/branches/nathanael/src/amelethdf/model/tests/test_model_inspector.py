@@ -4,16 +4,18 @@
 from unittest import TestCase, main
 
 
-    
-from amelethdf.model.node import load, MTYPE_GROUP, MTYPE_DATASET, \
-    MTYPE_LIST_OF, MTYPE_ILIST_OF, MTYPE_TABLE_OF, MTYPE_ENUM
+ 
+
 
 from amelethdf.model.api \
     import (Enum, Dict, List, ReadOnly, Tuple, Set,
         Complex, Float, Bool, String, Int, Array,
         HasTraits, BaseStr, UserName,
         Any, Instance,
-        UserName, DataSet, Group, Table, IsModel, TableObject)
+        UserName, IsModel)
+    
+from amelethdf.model import model_inspector as minspect
+from amelethdf.model.model_inspector import load
     
     
 __all__ = ['AA', 'AAA', 'AAB', 'SimpleContainer', 'ConstContainer',
@@ -78,7 +80,7 @@ class EnumContainer(IsModel):
     value = Instance(AA)
     
 
-class tests_model_base(TestCase):
+class tests_model_inspector(TestCase):
     def setUp(self):
         pass
     
@@ -87,24 +89,27 @@ class tests_model_base(TestCase):
     
     def test_to_string_line(self):
         node = load(SimpleContainer)
-        self.assertEqual(node._tostring_line(), 'simpleContainer(@c, @b, @f, @i, @s)/')
+        self.assertEqual(node._DrawingTree__tostring_line(),
+                         'simpleContainer(@c, @b, @f, @i, @s)/')
         
         node = load(ConstContainer)
-        self.assertEqual(node._tostring_line(), 'constContainer(#c=(0.1+0.1j), #b=True, #f=1.0, #i=1, #s=string)/')
+        self.assertEqual(node._DrawingTree__tostring_line(),
+                         'constContainer(#c=(0.1+0.1j), #b=True, #f=1.0, #i=1, #s=string)/')
         
         node = load(ComplexContainer)
         child = node.get_child('array')
-        self.assertEqual(child._tostring_line(), 'array{}')
+        self.assertEqual(child._DrawingTree__tostring_line(), 'array{}')
         
         child = node.get_child('table_t')
-        self.assertEqual(child._tostring_line(), 'table_t[]')
+        self.assertEqual(child._DrawingTree__tostring_line(), 'table_t[]')
         
         node = load(EnumContainer)
         child = node.get_child('value')
-        self.assertEqual(child._tostring_line(), 'value(@c)/')
+        self.assertEqual(child._DrawingTree__tostring_line(), 'value(@c)/')
         
     def test_to_string(self):
         node = load(ComplexContainer)
+        
         self.assertEqual(node.tostring(),
 """complexContainer(#const=MODEL)/
 |-- list_indexed/
@@ -116,14 +121,14 @@ class tests_model_base(TestCase):
 |-- table_t[]
 |-- subContainer(@c, @b, @f, @i, @s)/
 `-- array{}""")
-        
+    
         node = load(EnumContainer)
         self.assertEqual(node.tostring(),
 """enumContainer/
 `-- value(@c)/
     |?- aAA(#c=a)/
     `?- aAB(#c=b)/""")
-        
+    
     
     def test_simple_container(self):
         """Test simple container class model.
@@ -132,7 +137,6 @@ class tests_model_base(TestCase):
         self.assertEqual(node.attrs_name, ['c', 'b', 'f', 'i', 's'])
         self.assertEqual(node.consts_name, [])
         self.assertEqual(node.children_name, [])
-        
         
     def test_simple_const_container(self):
         """Test simple constant container class model.
@@ -155,47 +159,40 @@ class tests_model_base(TestCase):
         list_of = node.get_child('list_of')
         self.assertEqual(list_of.children_name, ['$user_name'])
         
+        
     def test_node_type(self):
         """Test the hdf node type (group, data-set or table)
         """
         node = load(SimpleContainer)
-        self.assertEqual(node.mtype, MTYPE_GROUP)
+        self.assertEqual(node.mtype, minspect.InstanceOf_Inspector.MTYPE)
         
         node = load(ConstContainer)
-        self.assertEqual(node.mtype, MTYPE_GROUP)
+        self.assertEqual(node.mtype, minspect.InstanceOf_Inspector.MTYPE)
         
         node = load(ComplexContainer)
-        self.assertEqual(node.mtype, MTYPE_GROUP)
+        self.assertEqual(node.mtype, minspect.InstanceOf_Inspector.MTYPE)
         
         child = node.get_child('array')
-        self.assertEqual(child.mtype, MTYPE_DATASET)
+        self.assertEqual(child.mtype, minspect.Array_Inspector.MTYPE)
         
         child = node.get_child('subContainer')
-        self.assertEqual(child.mtype, MTYPE_GROUP)
+        self.assertEqual(child.mtype, minspect.InstanceOf_Inspector.MTYPE)
         
         child = node.get_child('list_of')
-        self.assertEqual(child.mtype, MTYPE_LIST_OF)
+        self.assertEqual(child.mtype, minspect.ListOf_Inspector.MTYPE)
         
         child = node.get_child('list_indexed')
-        self.assertEqual(child.mtype, MTYPE_ILIST_OF)
+        self.assertEqual(child.mtype, minspect.IListOf_Inspector.MTYPE)
         
         child = node.get_child('table_t')
-        self.assertEqual(child.mtype, MTYPE_TABLE_OF)
+        self.assertEqual(child.mtype, minspect.TableTupled_Inspector.MTYPE)
         
         node = load(EnumContainer)
-        self.assertEqual(node.mtype, MTYPE_GROUP)
+        self.assertEqual(node.mtype, minspect.InstanceOf_Inspector.MTYPE)
         
         child = node.get_child('value')
-        self.assertEqual(child.mtype, MTYPE_ENUM)
+        self.assertEqual(child.mtype, minspect.SubClassOf_Inspector.MTYPE)
         
         
-        
-    def test_children(self):
-        pass
-        
-        
-    
-        
-
 if __name__ == "__main__":
     main()

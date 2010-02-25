@@ -6,7 +6,7 @@ from amelet_1_0_0.amelet import Amelet
 Amelet_1_0_0 = Amelet
 
 
-from node import load
+from model_inspector import load
 
 AMELET_1_0_0_MODEL = load(Amelet)
 AMELET_MODEL = AMELET_1_0_0_MODEL
@@ -17,6 +17,6 @@ import api
 __all__ += api.__all__
 from api import *
 
-import node
-__all__ += node.__all__
-from node import *
+import model_inspector
+__all__ += model_inspector.__all__
+from model_inspector import *

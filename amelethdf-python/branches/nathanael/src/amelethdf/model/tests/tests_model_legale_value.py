@@ -10,7 +10,7 @@ import unittest
 
 from amelethdf.model.api import \
     (IsModel, Int, Float, Bool, Complex, String)
-from amelethdf.model.node import load
+from amelethdf.model.model_inspector import load
 
 import numpy
 
