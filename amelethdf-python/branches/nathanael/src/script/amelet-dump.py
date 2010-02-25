@@ -10,7 +10,8 @@ import sys
 
 from optparse import OptionParser, OptionGroup
 
-from amelethdf import openAmelet, openHDF, VERSION
+from amelethdf import VERSION
+from amelethdf.tools import Dump
 
 USAGE = """
     %s [OPTIONS] amelet-file
@@ -21,27 +22,7 @@ DESCRIPTION = """Dump the Amelet-HDF file give in to string tree view."""
 
 
 
-class Dump:
-    def __init__(self, file, all=False):
-        self.file = file
-        self.for_all_node = all
-    
-        
-    def open(self):
-        if self.for_all_node:
-            self.root = openHDF(self.file)
-        else:
-            self.root = openAmelet(self.file)
-        
-    def close(self):
-        self.root.close()
-        
-    def __str__(self):
-        self.open()
-        return self.root.tostring()
-    
-    def __del__(self):
-        self.close()
+
 
 
 
@@ -56,12 +37,12 @@ if __name__ == '__main__':
                       help="Amelet-HDF file.")
     
     dump_opts = OptionGroup(parser, 'dump options', '')
-    dump_opts.add_option("--all",
-                         dest="all_node",
+    dump_opts.add_option("--force",
+                         dest="force",
                          action="store_const",
                          const=True,
                          default=False,
-                         help="Dump all node of this HDF5.")
+                         help="Force to dump all data record in the given HDF5.")
     parser.add_option_group(dump_opts)
     
     
@@ -74,4 +55,4 @@ if __name__ == '__main__':
     else:
         parser.error("the Amelet-HDF file is not pointed out.")
         
-    print Dump(h5file, options.all_node)
+    print Dump(h5file, options.force)
