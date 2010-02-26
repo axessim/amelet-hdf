@@ -10,10 +10,18 @@ from amelethdf.node import openAmelet, openHDF
 
 __all__ = ['Check']
 
+
+ERR_CONST_TYPE = "'%s' Invalid type for const name '%s': TRAC: %s"
+ERR_CONST_VALUE = "'%s' Invalid const '%s' value expected '%s' read '%s'"
+ERR_ATTR_NAME = "'%s' Invalid attr name '%s' expected %s"
+ERR_ATTR_TYPE = "'%s' Invalid type for attr name '%s': TRAC: %s"
+ERR_ATTR_VALUE = "'%s' Invalid value for attr name '%s'"
+ERR_CHILD_NAME = "'%s' Invalid child named '%s' expected %s"
+
 class CheckNode:
     def __init__(self, node_r, node_c, parent=None):
-        self.node_r = node_r
-        self.node_c = node_c
+        self.node_r = node_r # node used to read
+        self.node_c = node_c # node used to check the model
         
         self.parent = parent
         
@@ -32,27 +40,48 @@ class CheckNode:
         check = []
         
         for name in self.node_r.attrs_name:
-            if name not in self.node_c.attrs_name:
-                check.append("'%s' Invalid attr name '%s'" % (self.node_r.path, name))
+            if name not in self.node_c.model.attrs_name:
+                if name in self.node_c.model.consts_name:
+                    val = self.node_r.get_attr(name)
+                    val_type = self.node_c.model.get_attr_type(name)
+                    
+                    try:
+                        val = val_type(val)
+                    except Exception, e:
+                        check.append(ERR_CONST_TYPE % (self.node_r.path,
+                                                       name,
+                                                       str(e)))
+                    
+                    if val != self.node_c.model.get_const(name):
+                        check.append(ERR_CONST_VALUE % 
+                                     (self.node_r.path, name,
+                                      str(self.node_c.model.get_const(name)),
+                                      str(val)))
+                    
+                else:
+                    check.append(ERR_ATTR_NAME % (self.node_r.path,
+                                                  name,
+                                                  str(self.node_c.model.attrs_name)))
             else:
                 val = self.node_r.get_attr(name)
-
                 val_type = self.node_c.model.get_attr_type(name)
                 
                 try:
                     val = val_type(val)
                 except Exception, e:
-                    check.append("'%s' Invalid type for attr name '%s': TRAC: %s" % (self.node_r.path, name, str(e)))
+                    check.append(ERR_ATTR_TYPE % (self.node_r.path, name, str(e)))
                 
                 if not self.node_c.can_set_attr(name, val):
-                    check.append("'%s' Invalid value for attr name '%s'" % (self.node_r.path, name))
+                    check.append(ERR_ATTR_VALUE % (self.node_r.path, name))
         return check
                 
     
     def check(self):
         check = []
         if not self.check_node():
-            check.append("'%s' Invalid child named '%s'" % (self.parent.node_r.path, self.node_r.name))
+            check.append(ERR_CHILD_NAME % (self.parent.node_r.path,
+                                           self.node_r.name,
+                                           self.parent.node_c.children_name))
         else:
             check.extend(self.check_attrs())
             for child in self:
