@@ -21,12 +21,16 @@ def openHDF(path, mode='r', PYTABLES_SYS_ATTRS=False, **kw):
     hdf = openFile(path, mode, PYTABLES_SYS_ATTRS=PYTABLES_SYS_ATTRS, **kw)
     return HDFNode(hdf, '/', '')
 
+
+
 class HDFNode(object):
     def __init__(self, hdf, where, name):
         self.hdf = hdf
         self.__where = where
         self.__name = name
         
+    
+    
     
     def __eq__(self, other):
         return self.path == other.path
@@ -213,6 +217,10 @@ class HDFNode(object):
     #---------------------------------------------------------------------------
     #--- Internal API
     #---------------------------------------------------------------------------
+    
+    def _hdf_node(self):
+        return HDFNode(self.hdf, self.__where, self.__name)
+    
     def _build_child(self, name):
         """Internal method to build child.
         

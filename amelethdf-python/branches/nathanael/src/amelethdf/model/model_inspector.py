@@ -136,6 +136,9 @@ class IsGroup_Inspector(GroupModelInspector):
         return (trait_inspector.has_klass() 
                 and issubclass(trait_inspector.klass, IsGroup))
     
+    def has_children_user_name(self):
+        return True
+    
     @property
     def children_name(self):
         childdren_name = []
@@ -150,8 +153,8 @@ class IsGroup_Inspector(GroupModelInspector):
         return children
     
     def get_child(self, name, select, **kw):
-        if self.has_children_user_name() and not select:
-            raise ModelInspectorError("Try to get unnamed child without select")
+        if self.has_children_user_name() and select == None:
+            raise ModelInspectorError("Try to get unnamed child without select attribute.")
 
         #
         # try to get for all natural children 
@@ -163,18 +166,22 @@ class IsGroup_Inspector(GroupModelInspector):
             elif child.has_children_user_name():
                 # if the children has user name use `select` to fount it
                 # on all children
+                
+                print self, name, select
+                
                 for child_name in super(IsGroup_Inspector, self).children_name:
+                    print 'child_name', child_name
                     # Get all children 
-                    sub_child = super(IsGroup_Inspector, self).get_child(child_name)
-                    sub_child = sub_child._get_list_of_children()
-                    # if the child is model call get this friend 
-                    # (model sub class) and test it.
-                    if hasattr(sub_child, 'klass'):
-                        for item in self._db.get_subklass_of(sub_child.klass):
-                            sub_child_friend = self._build_child(item, None) 
-                            if dict(sub_child_friend.consts) == select:
-                                return sub_child_friend
-        
+                    child_ = super(IsGroup_Inspector, self).get_child(child_name)
+                    for sub_child in child_.iter_children():
+                        # if the child is model call get this friend 
+                        # (model sub class) and test it.
+                        if hasattr(sub_child, 'klass'):
+                            for item in self._db.get_subklass_of(sub_child.klass):
+                                sub_child_friend = self._build_child(item, None) 
+                                if dict(sub_child_friend.consts) == select:
+                                    return sub_child_friend
+        raise ModelInspectorError("No found child model '%s' of '%s'" % (name, str(self)))
         
         
         
@@ -299,13 +306,13 @@ class Array_Inspector(ArrayModelInspector):
     def is_model_for(trait_inspector):
         return isinstance(trait_inspector.tlass, Array)
 
-BaseModelInspector.ModelInspectors = [InstanceOf_Inspector,
-                                      SubClassOf_Inspector,
-                                      IListOf_Inspector,
+BaseModelInspector.ModelInspectors = [IListOf_Inspector,
                                       ListOf_Inspector,
                                       IsGroup_Inspector,
                                       TableTupled_Inspector,
-                                      Array_Inspector, ]
+                                      Array_Inspector,
+                                      InstanceOf_Inspector,
+                                      SubClassOf_Inspector, ]
     
 def load(model):
     node = BaseModelInspector._build_model_inspector(TraitInspector(model))

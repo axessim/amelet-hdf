@@ -99,6 +99,15 @@ class ModelNode(HDFNode):
         name, xselect = split_xname(xname)
         select.update(xselect)
         if self.can_create_child(name):
+            if self.model.has_children_user_name() and not select:
+                #
+                # If is user name and no const dict define read the attributes 
+                # of this node to build const dict. 
+                #
+                node = self._hdf_node().get_child(name)
+                for attr_name in node.attrs_name:
+                    select.setdefault(attr_name, node.get_attr(attr_name))
+            
             return self.model.get_child(name, select=select)
         else:
             raise ModelNodeError('%s is node a children of %s' % (xname, self))
