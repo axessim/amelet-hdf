@@ -11,7 +11,14 @@ __all__ = ['ModelDataBase']
 ALL_VAR_NAME = '__all__'
 
 class ModelDataBase:
+    """Define a data base of model class define in model.
+    
+    This data base can be used to look for a class model get its path ...
+    """
+    
     def __init__(self):
+        """Init the data base
+        """
         self.klass_db = {}
         self.xpath_db = {}
         self.class_model = []
@@ -40,7 +47,19 @@ class ModelDataBase:
         
         
     @staticmethod
-    def _recorde(db, key, data):
+    def _record(db, key, data):
+        """Function to record a data on dict
+        
+            >>> db = {}
+            >>> ModelDataBase._record(db, 'key', 'data')
+            >>> db['key']
+            ['data']
+            
+            >>> ModelDataBase._record(db, 'key', 'data2')
+            >>> db['key']
+            ['data', 'data2']
+        
+        """
         recorde = None
         if not db.has_key(key):
             recorde = []
@@ -54,23 +73,36 @@ class ModelDataBase:
         
         
     def recorde(self, klass, xpath):
+        """Recode a new model class
+        
+        @param klass: model class
+        @param xpath: path of this model class on the model
+        """
         if klass not in self.class_model:
             self.class_model.append(klass)
-        self._recorde(self.klass_db, xpath, klass)
-        self._recorde(self.xpath_db, klass, xpath)
+        self._record(self.klass_db, xpath, klass)
+        self._record(self.xpath_db, klass, xpath)
     
     def get_klass(self, xpath):
+        """Return all model class of this model path.
+        """
         return self.klass_db.get(xpath, None)
     
     def get_xpath(self, klass):
+        """Return all path on model of this model class.
+        """
         return self.xpath_db.get(klass, None)
     
     def get_subklass_of(self, klass):
+        """Return all sub model class recorded of the given model class.
+        """
         return [slass 
                 for slass in self.class_model 
                 if issubclass(slass, klass) and slass != klass]
         
     def __str__(self):
+        """Sort string view of this data base.
+        """
         l = [ (str(xpath), ' '.join([klass.__name__ for klass in klass_l])) 
              for xpath, klass_l in self.klass_db.items()]
         l.sort()

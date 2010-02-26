@@ -15,11 +15,17 @@ from .. import tree_print
 
 __all__ = ['ModelInspectorError', 'load']
 
-class ModelInspectorError(InspectorError): pass
+class ModelInspectorError(InspectorError):
+    """Base exception for model inspector.
+    """
     
 
 class BaseModelInspector(TraitInspector):
+    """Base class for all model inspector.
+    """
+    # List of Model Inspector recorded
     ModelInspectors = []
+    # Model inspector type 
     MTYPE = None
     
     def __init__(self, trait_inspector):
@@ -28,26 +34,45 @@ class BaseModelInspector(TraitInspector):
                                                  trait_inspector._db,
                                                  trait_inspector.xpath)
     
+    #---------------------------------------------------------------------------
+    #--- Public methods
+    #---------------------------------------------------------------------------
+    
     @property
     def mtype(self):
+        """Return the type of this model inspector.
+        """
         return self.MTYPE 
     
     @staticmethod
-    def is_model_for(trait_inspector):
+    def is_model_for(inspector):
+        """Test of this class model inspector is valid for the given inspector
+        """
         return False
     
     @classmethod
     def _build_model_inspector(cls, inspector):
+        """Try to found in recording model inspector the first valid inspector
+        and init it. 
+        """
         for m_inspector in cls.ModelInspectors:
             if m_inspector.is_model_for(inspector):
                 return m_inspector.init_by_copy(inspector)
         raise ModelInspectorError("Any Model inspector found for node '%s'"\
                                   % (inspector.xpath))
 
+    #---------------------------------------------------------------------------
+    #--- Over define TraitInspector
+    #---------------------------------------------------------------------------
     def _build_child(self, model, name, **kw):
+        """
+        """
         inspector = TraitInspector(model, name, self._db, self.xpath)
         return self._build_model_inspector(inspector)
         
+    #---------------------------------------------------------------------------
+    #--- Over define DrawingTree
+    #---------------------------------------------------------------------------
         
     def _DrawingTree__get_attrs_name(self):
         return self.attrs_name + self.consts_name
@@ -63,16 +88,25 @@ class BaseModelInspector(TraitInspector):
             return tree_print.ATTR1
         
     
+    
+    
+    
+    
+    
+    
+    
         
-class AttrModelInspector(BaseModelInspector): pass
+class AttrModelInspector(BaseModelInspector):
+    """Base model inspector for attribute 
+    """
 
 class LeafModelInspector(BaseModelInspector):
     """For all element that are tree leaf.
     """
-    
     MTYPE = 0
+    
     #---------------------------------------------------------------------------
-    # Over define children methods of TraitInspector
+    #--- Over define children methods of TraitInspector
     #---------------------------------------------------------------------------
     @property
     def children_name(self):
@@ -90,27 +124,51 @@ class LeafModelInspector(BaseModelInspector):
 
 
 class GroupModelInspector(BaseModelInspector):
+    """For all element that are tree group.
+    """
     MTYPE = 100
+    
+    #---------------------------------------------------------------------------
+    #--- Over define DrawingTree
+    #---------------------------------------------------------------------------
     
     def _DrawingTree__tostring_type(self):
         return tree_print.GROUP_TAG
     
     
 class ArrayModelInspector(LeafModelInspector):
+    """For all element that are leaf array.
+    """
     MTYPE = 200
+    
+    
+    #---------------------------------------------------------------------------
+    #--- Public methods
+    #---------------------------------------------------------------------------
     
     @property
     def dtype(self):
+        """return the dtype of this model array
+        """
         return self.tlass.dtype
     
     @property
     def shape(self):
+        """return the shape of this model array
+        """
         return self.tlass.shape
     
     def is_legale_array(self, array):
-        """
+        """Test if the given array is valid
+        
+        Most strong that 'is_legale_value' on the parent model inspector. 
+        Test if the array is valid in this state.
         """
         return self.dtype != None or array.dtype == self.dtype
+    
+    #---------------------------------------------------------------------------
+    #--- Over define DrawingTree
+    #---------------------------------------------------------------------------
     
     def _DrawingTree__tostring_type(self):
         l = []
@@ -124,7 +182,14 @@ class ArrayModelInspector(LeafModelInspector):
 
     
 class TableModelInspector(LeafModelInspector):
+    """For all element that are leaf table.
+    """
     MTYPE = 300
+    
+    
+    #---------------------------------------------------------------------------
+    #--- Over define DrawingTree
+    #---------------------------------------------------------------------------
     
     def _DrawingTree__tostring_type(self):
         return tree_print.S_TAB + tree_print.E_TAB
@@ -138,6 +203,9 @@ class TableTupled_Inspector(TableModelInspector):
     """
     MTYPE = TableModelInspector.MTYPE + 1
     
+    #---------------------------------------------------------------------------
+    #--- Implement TableModelInspector
+    #---------------------------------------------------------------------------
     
     @staticmethod
     def is_model_for(trait_inspector):
@@ -151,11 +219,19 @@ class IsGroup_Inspector(GroupModelInspector):
     """
     MTYPE = GroupModelInspector.MTYPE + 1
     
+    #---------------------------------------------------------------------------
+    #--- Implement TableModelInspector
+    #---------------------------------------------------------------------------.
     
     @staticmethod
     def is_model_for(trait_inspector):
         return (trait_inspector.has_klass() 
                 and issubclass(trait_inspector.klass, IsGroup))
+    
+    
+    #---------------------------------------------------------------------------
+    #--- Over define children methods of TraitInspector
+    #---------------------------------------------------------------------------
     
     def has_children_user_name(self):
         return True
@@ -215,11 +291,17 @@ class ListOf_Inspector(GroupModelInspector):
     """
     MTYPE = GroupModelInspector.MTYPE + 2
     
+    #---------------------------------------------------------------------------
+    #--- Implement TableModelInspector
+    #---------------------------------------------------------------------------.
     
     @staticmethod
     def is_model_for(trait_inspector):
         return isinstance(trait_inspector.tlass, Dict)
     
+    #---------------------------------------------------------------------------
+    #--- Over define DrawingTree
+    #---------------------------------------------------------------------------
     
     def _DrawingTree__get_children_type(self):
         return tree_print.TTL_L
@@ -227,6 +309,7 @@ class ListOf_Inspector(GroupModelInspector):
     #---------------------------------------------------------------------------
     # Over define children methods of TraitInspector
     #---------------------------------------------------------------------------
+    
     @property
     def children_name(self):
         return [USER_NAME]
@@ -252,15 +335,25 @@ class IListOf_Inspector(GroupModelInspector):
     """
     MTYPE = GroupModelInspector.MTYPE + 3
     
-    def _DrawingTree__get_children_type(self):
-        return tree_print.TTL_L
-    
+    #---------------------------------------------------------------------------
+    #--- Implement TableModelInspector
+    #---------------------------------------------------------------------------.
     
     @staticmethod
     def is_model_for(trait_inspector):
         return (isinstance(trait_inspector.tlass, List)
                 and isinstance(trait_inspector.tlass.item_trait._CTrait__get_trait_type(), Instance))
     
+    #---------------------------------------------------------------------------
+    #--- Over define DrawingTree
+    #---------------------------------------------------------------------------
+    
+    def _DrawingTree__get_children_type(self):
+        return tree_print.TTL_L
+    
+    #---------------------------------------------------------------------------
+    # Over define children methods of TraitInspector
+    #---------------------------------------------------------------------------
     
     def iter_children(self):
         return [self.get_child(None)]
@@ -278,6 +371,10 @@ class InstanceOf_Inspector(GroupModelInspector):
     recording in 'Model data base' (see: module 'model_db')
     """
     MTYPE = GroupModelInspector.MTYPE + 4
+    
+    #---------------------------------------------------------------------------
+    #--- Implement TableModelInspector
+    #---------------------------------------------------------------------------.
     
     @staticmethod
     def is_model_for(trait_inspector):
@@ -297,8 +394,9 @@ class SubClassOf_Inspector(GroupModelInspector):
     """
     MTYPE = GroupModelInspector.MTYPE + 5
     
-    def _DrawingTree__get_children_type(self):
-        return tree_print.TTL_E
+    #---------------------------------------------------------------------------
+    #--- Implement TableModelInspector
+    #---------------------------------------------------------------------------.
     
     @staticmethod
     def is_model_for(trait_inspector):
@@ -306,6 +404,14 @@ class SubClassOf_Inspector(GroupModelInspector):
                 and trait_inspector.has_klass() 
                 and issubclass(trait_inspector.klass, IsModel)
                 and len(trait_inspector._db.get_subklass_of(trait_inspector.klass)) > 0)
+    
+    #---------------------------------------------------------------------------
+    #--- Over define DrawingTree
+    #---------------------------------------------------------------------------
+    
+    def _DrawingTree__get_children_type(self):
+        return tree_print.TTL_E
+   
         
     #---------------------------------------------------------------------------
     # Over define children methods of TraitInspector
@@ -323,10 +429,18 @@ class Array_Inspector(ArrayModelInspector):
     """
     MTYPE = ArrayModelInspector.MTYPE + 1
     
+    #---------------------------------------------------------------------------
+    #--- Implement TableModelInspector
+    #---------------------------------------------------------------------------.
+    
     @staticmethod
     def is_model_for(trait_inspector):
         return isinstance(trait_inspector.tlass, Array)
 
+
+#
+# Record all model inspectors
+#
 BaseModelInspector.ModelInspectors = [IListOf_Inspector,
                                       ListOf_Inspector,
                                       IsGroup_Inspector,
@@ -336,6 +450,9 @@ BaseModelInspector.ModelInspectors = [IListOf_Inspector,
                                       SubClassOf_Inspector, ]
     
 def load(model):
+    """Load the model with for root of this model the given model class.
+    
+    """
     node = BaseModelInspector._build_model_inspector(TraitInspector(model))
     node._load()
     return node

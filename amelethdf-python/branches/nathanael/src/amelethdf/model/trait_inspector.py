@@ -58,7 +58,7 @@ def only_consts(model):
 
 
 class InspectorError(Exception):
-    """Base exception for model.
+    """Base exception for inspector.
     """
     
 
@@ -66,6 +66,8 @@ from ..tree_print import DrawingTree
 
 
 class WithDataBase:
+    """For all class are use a data base.
+    """
     def __init__(self, db=None):
         if not db:
             db = ModelDataBase()
@@ -74,6 +76,9 @@ class WithDataBase:
         
 
 class TraitInspector(DrawingTree, WithDataBase):
+    """Trait inspector is the first level to inspect model class
+    
+    """
     def __init__(self, model=None, name=None, _model_db=None, _xpath='/'):
         WithDataBase.__init__(self, _model_db)
         
@@ -107,10 +112,9 @@ class TraitInspector(DrawingTree, WithDataBase):
         
     @classmethod
     def init_by_copy(cls, inspector):
-        """Build a new instance by copy of given inspector
+        """Build a new instance by copy of given inspector.
 
-        
-
+        It a power full method to build up class inspector            
         """
         inited = cls.__new__(cls)
         inited.model = inspector.model
@@ -125,6 +129,8 @@ class TraitInspector(DrawingTree, WithDataBase):
     
     
     def has_klass(self):
+        """test if this node is an model node inspector
+        """
         return hasattr(self, 'klass')
     
     
@@ -160,6 +166,8 @@ class TraitInspector(DrawingTree, WithDataBase):
         return self._get_items_name(only_attrs)
     
     def has_attrs_user_name(self):
+        """Have some not named attributes
+        """
         for name in self.attrs_name:
             if name == USER_NAME:
                 return True
@@ -197,6 +205,8 @@ class TraitInspector(DrawingTree, WithDataBase):
         return self._get_items_name(only_consts)
     
     def get_const(self, name):
+        """Return the value of the constant 'name'   
+        """
         return self.tlass.get(name).default
     
     @property
@@ -217,6 +227,8 @@ class TraitInspector(DrawingTree, WithDataBase):
         return self._get_items_name(only_children)
         
     def has_children_user_name(self):
+        """Have some not named children. 
+        """
         for name in self.children_name:
             if name == USER_NAME:
                 return True
@@ -257,6 +269,12 @@ class TraitInspector(DrawingTree, WithDataBase):
                               ** kw)
         
     def _tlass_items(self, with_=lambda model: True):
+        """Method that inspect the trait model attributes and return a list of
+        name, model of valid elements.
+        
+        The elements return paste the given function 'with_'
+        
+        """
         if hasattr(self.tlass, 'items') and self.tlass.items:
             return [(name, model) 
                     for name, model in self.tlass.items()
