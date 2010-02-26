@@ -99,8 +99,29 @@ class GroupModelInspector(BaseModelInspector):
 class ArrayModelInspector(LeafModelInspector):
     MTYPE = 200
     
+    @property
+    def dtype(self):
+        return self.tlass.dtype
+    
+    @property
+    def shape(self):
+        return self.tlass.shape
+    
+    def is_legale_array(self, array):
+        """
+        """
+        return self.dtype != None or array.dtype == self.dtype
+    
     def _DrawingTree__tostring_type(self):
-        return tree_print.S_DATA + tree_print.E_DATA
+        l = []
+        
+        if not self.dtype is None:
+            l.append('dtype=%s' % str(self.dtype))
+        if self.shape:
+            l.append('shape=%s' % str(self.shape))
+                
+        return  tree_print.S_DATA + ', '.join(l) + tree_print.E_DATA
+
     
 class TableModelInspector(LeafModelInspector):
     MTYPE = 300

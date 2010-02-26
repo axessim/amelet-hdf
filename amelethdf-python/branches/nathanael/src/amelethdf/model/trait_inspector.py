@@ -126,6 +126,8 @@ class TraitInspector(DrawingTree, WithDataBase):
     
     def has_klass(self):
         return hasattr(self, 'klass')
+    
+    
         
     #---------------------------------------------------------------------------
     # All methods associated to string view of instance.

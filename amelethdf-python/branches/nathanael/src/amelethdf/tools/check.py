@@ -6,7 +6,7 @@ Created on 25 fevr. 2010
 @author: nathanael
 '''
 
-from amelethdf.node import openAmelet, openHDF
+from amelethdf.node import openAmelet, openHDF, NTYPE_DATASET
 
 __all__ = ['Check']
 
@@ -17,6 +17,7 @@ ERR_ATTR_NAME = "'%s' Invalid attr name '%s' expected %s"
 ERR_ATTR_TYPE = "'%s' Invalid type for attr name '%s': TRAC: %s"
 ERR_ATTR_VALUE = "'%s' Invalid value for attr name '%s'"
 ERR_CHILD_NAME = "'%s' Invalid child named '%s' expected %s"
+ERR_LEAF_ARRAY = "'%s' Invalid DataSet '%s' property read {%s}, expected %s"
 
 class CheckNode:
     def __init__(self, node_r, node_c, parent=None):
@@ -31,10 +32,32 @@ class CheckNode:
         
     def check_node(self):
         if self.parent is None:
-            return True
+            return []
         else:
-            return (self.parent.node_c.can_create_child(self.node_r.name) 
-                    and self.node_c != None) 
+            if (self.parent.node_c.can_create_child(self.node_r.name) 
+                and self.node_c != None):
+                if self.node_c.ntype == NTYPE_DATASET:
+                    
+                    def build_property(array):
+                        property_list = ['dtype', 'shape']
+                        l = ["%s=%s" % (name, str(getattr(array, name))) 
+                             for name in property_list]
+                        return ', '.join(l)
+                    
+                    array = self.node_r.hdfo[:]
+                    if not (self.parent.node_c.model.\
+                                is_legale_value(self.node_r.name, array)
+                            and self.node_c.model.is_legale_array(array)):
+                        return [ERR_LEAF_ARRAY % (self.parent.node_r.path,
+                                                  self.node_r.name,
+                                                  build_property(self.node_r.hdfo[:]),
+                                                  self.node_c.model._DrawingTree__tostring_type())]
+                    
+                return []
+            else:
+                return [ERR_CHILD_NAME % (self.parent.node_r.path,
+                                          self.node_r.name,
+                                          self.parent.node_c.children_name)]
             
     def check_attrs(self):
         check = []
@@ -77,12 +100,9 @@ class CheckNode:
                 
     
     def check(self):
-        check = []
-        if not self.check_node():
-            check.append(ERR_CHILD_NAME % (self.parent.node_r.path,
-                                           self.node_r.name,
-                                           self.parent.node_c.children_name))
-        else:
+        check = self.check_node()
+        
+        if not check:
             check.extend(self.check_attrs())
             for child in self:
                 check.extend(child.check())
