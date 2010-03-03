@@ -3,6 +3,7 @@
 #include "simpletype.h"
 #include <string.h>
 #include <amelethdf.h>
+#include <stdlib.h>
 
 single_t read_single(hid_t loc_id, const char* path)
 {

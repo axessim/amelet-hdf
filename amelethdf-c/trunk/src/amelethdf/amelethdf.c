@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 #include "amelethdf.h"
 
 children_t read_children_name(hid_t loc_id, const char* path)

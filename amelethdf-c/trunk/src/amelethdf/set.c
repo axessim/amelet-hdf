@@ -1,5 +1,5 @@
 #include <string.h>
-
+#include <stdlib.h>
 #include "amelethdf.h"
 #include "set.h"
 
