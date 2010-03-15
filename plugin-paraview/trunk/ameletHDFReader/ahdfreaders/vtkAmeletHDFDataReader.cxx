@@ -8,10 +8,6 @@
 #include "vtkAmeletHDFDataReader.h"
 
 
-extern "C" {
-    #include "amelethdf.h"
-    #include "arrayset.h"
-}
 
 #define TRUE            1
 #define FALSE           0

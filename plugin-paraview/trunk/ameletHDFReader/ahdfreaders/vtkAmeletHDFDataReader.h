@@ -16,6 +16,11 @@
 #include <iostream>
 #include <sstream>
 #include <stdlib.h>
+extern "C" {
+    #include "amelethdf.h"
+    #include "arrayset.h"
+    #include "vector.h"
+}
 
 class vtkAmeletHDFDataReader
 {

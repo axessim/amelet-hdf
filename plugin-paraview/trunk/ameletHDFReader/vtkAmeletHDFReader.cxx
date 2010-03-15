@@ -7,6 +7,8 @@ extern "C" {
     #include "mesh.h"
     #include "arrayset.h"
     #include "hdfpath.h"
+    #include "unstructuredmesh.h"
+    #include "structuredmesh.h"
 }
 
 
@@ -621,21 +623,21 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
       meshChild = read_children_name(loc_id,child.childnames[0]);
       for(int i=0;i<meshChild.nbchild;i++)
       {
-       	   int meshType;
-       	   meshType = meshtype(mesh_id,meshChild.childnames[i]);
-       	   if(meshType==UNSTRUCTURED)
-       	   {
-       	       vtkUnstructuredGrid *ugrid = AllocateGetBlock(output, i,IS_UMESH());
-       	       ahdfmesh.readUmesh(mesh_id,meshChild.childnames[i],ugrid);
-       		   //this->readUmesh(mesh_id,meshChild.childnames[i],ugrid);
-       	   }
-       	   else if(meshType==STRUCTURED)
-       	   {
-       		   vtkUnstructuredGrid *sgrid = AllocateGetBlock(output, i , IS_SMESH());
-       		   ahdfmesh.readSmesh(mesh_id,meshChild.childnames[i],sgrid);
-       		   //this->readSmesh(mesh_id,meshChild.childnames[i],sgrid);
-       	   }
-       	   this->UpdateProgress(this->GetProgress()+i/(meshChild.nbchild));
+          int meshType;
+          meshType = meshtype(mesh_id,meshChild.childnames[i]);
+          if(meshType==UNSTRUCTURED)
+          {
+              vtkUnstructuredGrid *ugrid = AllocateGetBlock(output, i,IS_UMESH());
+              ahdfmesh.readUmesh(mesh_id,meshChild.childnames[i],ugrid);
+              //this->readUmesh(mesh_id,meshChild.childnames[i],ugrid);
+          }
+          else if(meshType==STRUCTURED)
+          {
+              vtkUnstructuredGrid *sgrid = AllocateGetBlock(output, i , IS_SMESH());
+              ahdfmesh.readSmesh(mesh_id,meshChild.childnames[i],sgrid);
+              //this->readSmesh(mesh_id,meshChild.childnames[i],sgrid);
+          }
+          this->UpdateProgress(this->GetProgress()+i/(meshChild.nbchild));
       }
       H5Gclose(mesh_id);
       H5Gclose(loc_id);

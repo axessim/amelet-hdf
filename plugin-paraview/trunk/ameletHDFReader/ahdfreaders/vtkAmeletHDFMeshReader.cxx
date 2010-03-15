@@ -18,6 +18,8 @@
 extern "C" {
 	#include "amelethdf.h"
 	#include "mesh.h"
+        #include "unstructuredmesh.h"
+        #include "structuredmesh.h"
 }
 
 using namespace vtkstd;
