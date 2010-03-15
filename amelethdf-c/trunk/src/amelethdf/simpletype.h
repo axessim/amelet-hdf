@@ -1,7 +1,7 @@
 #include "complextype.h"
 
 #ifndef SIMPLETYPE_H
-#define SIMPLETYPE_h
+#define SIMPLETYPE_H
 
 #define A_LABEL  "label"
 #define A_PHYSICAL_NATURE  "physicalNature"
