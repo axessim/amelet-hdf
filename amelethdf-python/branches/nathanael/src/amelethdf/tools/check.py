@@ -57,7 +57,7 @@ class CheckNode:
             else:
                 return [ERR_CHILD_NAME % (self.parent.node_r.path,
                                           self.node_r.name,
-                                          self.parent.node_c.children_name)]
+                                          self.parent.node_c.model.children_name)]
             
     def check_attrs(self):
         check = []
@@ -116,7 +116,7 @@ class CheckNode:
                 child_c = None
             else:
                 child_c = self.node_c.get_child(child_r.name)
-                
+
             yield CheckNode(child_r, child_c, self)
 
 class Check:
