@@ -221,7 +221,7 @@ class IsGroup_Inspector(GroupModelInspector):
     
     #---------------------------------------------------------------------------
     #--- Implement TableModelInspector
-    #---------------------------------------------------------------------------.
+    #---------------------------------------------------------------------------
     
     @staticmethod
     def is_model_for(trait_inspector):
@@ -264,10 +264,7 @@ class IsGroup_Inspector(GroupModelInspector):
                 # if the children has user name use `select` to fount it
                 # on all children
                 
-                print self, name, select
-                
                 for child_name in super(IsGroup_Inspector, self).children_name:
-                    print 'child_name', child_name
                     # Get all children 
                     child_ = super(IsGroup_Inspector, self).get_child(child_name)
                     for sub_child in child_.iter_children():
@@ -293,7 +290,7 @@ class ListOf_Inspector(GroupModelInspector):
     
     #---------------------------------------------------------------------------
     #--- Implement TableModelInspector
-    #---------------------------------------------------------------------------.
+    #---------------------------------------------------------------------------
     
     @staticmethod
     def is_model_for(trait_inspector):
@@ -321,8 +318,10 @@ class ListOf_Inspector(GroupModelInspector):
         return [self.get_child(None)]
         
     def get_child(self, name, **kw):
-        return self._build_child(self.tlass.value_trait._CTrait__get_trait_type(),
-                                 USER_NAME)
+        
+        child = self.tlass.value_trait._CTrait__get_trait_type()
+        return self._build_child(child, USER_NAME)
+
     
     
     
@@ -337,7 +336,7 @@ class IListOf_Inspector(GroupModelInspector):
     
     #---------------------------------------------------------------------------
     #--- Implement TableModelInspector
-    #---------------------------------------------------------------------------.
+    #---------------------------------------------------------------------------
     
     @staticmethod
     def is_model_for(trait_inspector):
@@ -374,7 +373,7 @@ class InstanceOf_Inspector(GroupModelInspector):
     
     #---------------------------------------------------------------------------
     #--- Implement TableModelInspector
-    #---------------------------------------------------------------------------.
+    #---------------------------------------------------------------------------
     
     @staticmethod
     def is_model_for(trait_inspector):
@@ -393,10 +392,10 @@ class SubClassOf_Inspector(GroupModelInspector):
     recording in 'Model data base' (see: module 'model_db')
     """
     MTYPE = GroupModelInspector.MTYPE + 5
-    
+
     #---------------------------------------------------------------------------
     #--- Implement TableModelInspector
-    #---------------------------------------------------------------------------.
+    #---------------------------------------------------------------------------
     
     @staticmethod
     def is_model_for(trait_inspector):
@@ -419,6 +418,41 @@ class SubClassOf_Inspector(GroupModelInspector):
     def iter_children(self):
         return [self._build_child(item, None) 
                 for item in self._db.get_subklass_of(self.klass)]
+
+    @property
+    def children_name(self):
+        children_name = []
+        for child in self.iter_children():
+            children_name.extend(child.children_name)
+        return children_name
+
+    def get_child(self, name, select, **kw):
+        if self.has_children_user_name() and select == None:
+            raise ModelInspectorError("Try to get unnamed child without select attribute.")
+
+        #
+        # try to get for all natural children 
+        #
+        for child in self.iter_children():
+            if name in child.children_name:
+                # if match name
+                return child.get_child(name)
+            elif child.has_children_user_name():
+                # if the children has user name use `select` to fount it
+                # on all children
+                
+                for child_name in super(SubClassOf_Inspector, self).children_name:
+                    # Get all children 
+                    child_ = super(SubClassOf_Inspector, self).get_child(child_name)
+                    for sub_child in child_.iter_children():
+                        # if the child is model call get this friend 
+                        # (model sub class) and test it.
+                        if hasattr(sub_child, 'klass'):
+                            for item in self._db.get_subklass_of(sub_child.klass):
+                                sub_child_friend = self._build_child(item, None) 
+                                if dict(sub_child_friend.consts) == select:
+                                    return sub_child_friend
+        raise ModelInspectorError("No found child model '%s' of '%s'" % (name, str(self)))
         
         
 class Array_Inspector(ArrayModelInspector):
@@ -431,7 +465,7 @@ class Array_Inspector(ArrayModelInspector):
     
     #---------------------------------------------------------------------------
     #--- Implement TableModelInspector
-    #---------------------------------------------------------------------------.
+    #---------------------------------------------------------------------------
     
     @staticmethod
     def is_model_for(trait_inspector):

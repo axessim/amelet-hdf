@@ -107,7 +107,6 @@ class ModelNode(HDFNode):
                 node = self._hdf_node().get_child(name)
                 for attr_name in node.attrs_name:
                     select.setdefault(attr_name, node.get_attr(attr_name))
-            
             return self.model.get_child(name, select=select)
         else:
             raise ModelNodeError('%s is node a children of %s' % (xname, self))
