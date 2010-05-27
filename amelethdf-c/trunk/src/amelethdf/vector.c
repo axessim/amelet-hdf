@@ -50,8 +50,11 @@ vector_t read_vector(hid_t loc_id, const char* path)
     {
         vec.svalue = (char **) malloc(dims[0] * sizeof(char*));
         vec.svalue[0] = (char *) malloc(type_size * sizeof(char));
-        for (i = 1; i < dims[0]; i++)
-            vec.svalue[i] = vec.svalue[0] + i * type_size;
+        if(vec.nbvalues>=2)
+        {
+            for (i = 1; i < dims[0]; i++)
+                vec.svalue[i] = vec.svalue[0] + i * type_size;
+        }
         vec.svalue = (char **) read_string_dataset2(loc_id, path, type_size,
                 dims[0]);
     }
