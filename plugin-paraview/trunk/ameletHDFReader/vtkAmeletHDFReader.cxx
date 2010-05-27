@@ -9,6 +9,7 @@ extern "C" {
     #include "hdfpath.h"
     #include "unstructuredmesh.h"
     #include "structuredmesh.h"
+    #include "stringdataset.h"
 }
 
 
@@ -291,7 +292,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 	char meshEntity[ABSOLUTE_PATH_NAME_LENGTH];
 	strcat(path,"/ds/dim1");
 	strcpy(attr,"meshEntity");
-	strcpy(meshEntity,read_string_attribute(file_id,path,attr));
+        strcpy(meshEntity,ars.dims[0].svalue[0]);
 	cout<<meshEntity<<endl;
 	char * grp = path_element(meshEntity,1,1);
 
@@ -404,29 +405,28 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 				}
 				else
 				{
-					for(int k=0;k<nbeltgrp;k++)
-									{
-										if(ars.data.rvalue!=NULL)
-										{
-											if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],ars.data.rvalue[k+offset]);
-											else floatscalar->InsertTuple1(k,ars.data.rvalue[k+offset]);
-										}
-										else if(ars.data.cvalue!=NULL)
-										{
-											float module;
-											module=cabs(ars.data.cvalue[k+offset]);
-											if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
-											else floatscalar->InsertTuple1(k,module);
-										}
+                                    for(int k=0;k<nbeltgrp;k++)
+                                    {
+                                        if(ars.data.rvalue!=NULL)
+                                        {
+                                            if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],ars.data.rvalue[k+offset]);
+                                            else floatscalar->InsertTuple1(k,ars.data.rvalue[k+offset]);
+                                        }
+                                        else if(ars.data.cvalue!=NULL)
+                                        {
+                                            float module;
+                                            module=cabs(ars.data.cvalue[k+offset]);
+                                            if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
+                                            else floatscalar->InsertTuple1(k,module);
+                                        }
+                                    }
+                                    offset=offset+nbeltgrp;
+                                    std::cout<<"name = "<<floatscalar->GetName()<<std::endl;
+                                    if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0)) grid->GetPointData()->AddArray(floatscalar);
+                                    else grid->GetCellData()->AddArray(floatscalar);
 
-									}
-									 offset=offset+nbeltgrp;
-									 std::cout<<"name = "<<floatscalar->GetName()<<std::endl;
-									 if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0)) grid->GetPointData()->AddArray(floatscalar);
-									 else grid->GetCellData()->AddArray(floatscalar);
 
-
-				}
+                                }
 			}
 			else
 			{
