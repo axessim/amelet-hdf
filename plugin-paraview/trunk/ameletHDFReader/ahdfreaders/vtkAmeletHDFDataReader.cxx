@@ -41,74 +41,92 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
     ars = read_arrayset(file_id,path);
 
     int nbdataarray=1;
-    int max;
+    int max=1;
     if(ars.nbdims>1)
     {
-        	nbdataarray=1;
-        	max=ars.nbdims-1;
-        	for(int i=0;i<max;i++)
-        			nbdataarray = nbdataarray*ars.dims[ars.nbdims-i-1].nbvalues;
+        nbdataarray=1;
+        max=ars.nbdims-1;
+        for(int i=0;i<max;i++)
+            nbdataarray = nbdataarray*ars.dims[ars.nbdims-i-1].nbvalues;
     }
     //set data name
     vtkstd::string dataname[nbdataarray];
     for(int i=0;i<nbdataarray;i++)
     	dataname[i]= child.childnames[0];
-    int temp =  nbdataarray;
+    int temp;
     for(int i=0;i<max;i++)
-    	{
-    	   	temp = (int)temp/ars.dims[ars.nbdims-i-1].nbvalues;
-          	int j=0;
-           	while(j<nbdataarray)
-           	{
-        	  if(ars.dims[ars.nbdims-i-1].cvalue!=NULL)
-        		  for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
-        		  {
-        			  std::ostringstream buf;
-        			  buf<<"_"<<crealf(ars.dims[ars.nbdims-i-1].cvalue[l])<<"_j"<<cimagf(ars.dims[ars.nbdims-i-1].cvalue[l]);
-        			  for(int k=0;k<temp;k++)
-        			  dataname[j+k]=dataname[j+k]
-        			                           +"_"+ars.dims[ars.nbdims-i-1].single.label
-        			                           +buf.str();
-        			  j=j+temp;
-        		  }
-              else if(ars.dims[ars.nbdims-i-1].rvalue!=NULL)
-            	for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
-            	{
-            	    std::ostringstream buf;
-            		buf<<"_"<<ars.dims[ars.nbdims-i-1].rvalue[l];
-            		for(int k=0;k<temp;k++)
-            		dataname[j+k]=dataname[j+k]
-            		                +"_"+ars.dims[ars.nbdims-i-1].single.label
-            		                +buf.str();
-            		j=j+temp;
-            	}
-              else if(ars.dims[ars.nbdims-i-1].ivalue!=NULL)
+    {
+        temp = (int)temp/ars.dims[ars.nbdims-i-1].nbvalues;
+        if(temp<1) temp=1;
+        cout<<"temp ="<<temp<<" nbdataarray="<<nbdataarray<<endl;
+        int j=0;
+        while(j<nbdataarray)
+        {
+            if(ars.dims[ars.nbdims-i-1].cvalue!=NULL)
+            {
+                cout<<"complex values"<<endl;
                 for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
-            	{
-            	    std::ostringstream buf;
-            		buf<<"_"<<ars.dims[ars.nbdims-i-1].ivalue[l];
-             		for(int k=0;k<temp;k++)
-           				  dataname[j+k]=dataname[j+k]
-           				                           +"_"+ars.dims[ars.nbdims-i-1].single.label
-           				                           +buf.str();
-           				  j=j+temp;
-           			  }
-       		  else if(ars.dims[ars.nbdims-i-1].svalue!=NULL)
-       			  for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
-       			  {
-       				  for(int k=0;k<temp;k++)
-       				  dataname[j+k]=dataname[j+k]
-           						  +"_"+ars.dims[ars.nbdims-i-1].single.label
-           						  +"_"+ars.dims[ars.nbdims-i-1].svalue[l];
-       				  j=j+temp;
-       			  }
-         	}
+                {
+                    std::ostringstream buf;
+                   // buf<<"_"<<crealf(ars.dims[ars.nbdims-i-1].cvalue[l])<<"_j"<<cimagf(ars.dims[ars.nbdims-i-1].cvalue[l]);
+                   // for(int k=0;k<temp;k++)
+                   //     dataname[j+k]=dataname[j+k]
+                   //                   +"_"+ars.dims[ars.nbdims-i-1].single.label
+                   //                   +buf.str();
+                 }
+                    j=j+temp;
+            }
+            else if(ars.dims[ars.nbdims-i-1].rvalue!=NULL)
+            {
+                cout<<"real values"<<endl;
+                for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
+                {
+                    std::ostringstream buf;
+                    //buf<<"_"<<ars.dims[ars.nbdims-i-1].rvalue[l];
+                    //for(int k=0;k<temp;k++)
+                        //dataname[j+k]=dataname[j+k]
+                        //              +"_"+ars.dims[ars.nbdims-i-1].single.label;
+                                      //+buf.str();
+                }
+                
+                j=j+temp;
+                
+            }
+            else if(ars.dims[ars.nbdims-i-1].ivalue!=NULL)
+            {
+                cout<<"int values"<<endl;
+                for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
+                {
+                    std::ostringstream buf;
+                    //buf<<"_"<<ars.dims[ars.nbdims-i-1].ivalue[l];
+                    //for(int k=0;k<temp;k++)
+                      //  dataname[j+k]=dataname[j+k]
+                        //              +"_"+ars.dims[ars.nbdims-i-1].single.label
+                          //            +buf.str();
+                }
+                j=j+temp;
+                
+            }
+            else if(ars.dims[ars.nbdims-i-1].svalue!=NULL)
+            {
+                cout<<"string values"<<endl;
+                for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
+                {
+                    for(int k=0;k<temp;k++)
+                        dataname[j+k]=dataname[j+k]
+                                      +"_"+ars.dims[ars.nbdims-i-1].single.label
+                                      +"_"+ars.dims[ars.nbdims-i-1].svalue[l];
+                }
+                j=j+temp;
+                
+            }
+        }
 
     }
     int offset=0;
     for(int i=0;i<nbdataarray;i++)
     {
-    	array = vtkFloatArray::New();
+        array = vtkFloatArray::New();
         // get the column name
         array->SetName(dataname[i].c_str());
         for (int j=0;j<ars.dims[0].nbvalues;j++)
@@ -131,6 +149,7 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
     //add column for abs
     array = vtkFloatArray::New();
     array->SetName(ars.dims[0].single.label);
+    cout<<ars.dims[0].single.label<<endl;
     for (int j=0;j<ars.dims[0].nbvalues;j++)
     {
     	if(ars.dims[0].rvalue!=NULL)
@@ -141,10 +160,5 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
 
     table->AddColumn(array);
 
-
-
-
-
-
-	return 1;
+    return 1;
 }
