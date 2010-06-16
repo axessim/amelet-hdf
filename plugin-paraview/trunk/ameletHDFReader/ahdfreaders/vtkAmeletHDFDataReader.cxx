@@ -44,16 +44,15 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
     int max=1;
     if(ars.nbdims>1)
     {
-        nbdataarray=1;
         max=ars.nbdims-1;
-        for(int i=0;i<max;i++)
-            nbdataarray = nbdataarray*ars.dims[ars.nbdims-i-1].nbvalues;
+        for(int i=1;i<ars.nbdims;i++)
+            nbdataarray = nbdataarray*ars.dims[ars.nbdims-i].nbvalues;
     }
     //set data name
     vtkstd::string dataname[nbdataarray];
     for(int i=0;i<nbdataarray;i++)
     	dataname[i]= child.childnames[0];
-    int temp;
+    int temp=nbdataarray;
     for(int i=0;i<max;i++)
     {
         temp = (int)temp/ars.dims[ars.nbdims-i-1].nbvalues;
@@ -78,15 +77,15 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
             }
             else if(ars.dims[ars.nbdims-i-1].rvalue!=NULL)
             {
-                cout<<"real values"<<endl;
+                //cout<<"real values"<<endl;
                 for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
                 {
                     std::ostringstream buf;
                     //buf<<"_"<<ars.dims[ars.nbdims-i-1].rvalue[l];
                     //for(int k=0;k<temp;k++)
-                        //dataname[j+k]=dataname[j+k]
-                        //              +"_"+ars.dims[ars.nbdims-i-1].single.label;
-                                      //+buf.str();
+                    //    dataname[j+k]=dataname[j+k]
+                    //                  +"_"+ars.dims[ars.nbdims-i-1].single.label
+                    //                  +buf.str();
                 }
                 
                 j=j+temp;
@@ -123,39 +122,76 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
         }
 
     }
-    int offset=0;
-    for(int i=0;i<nbdataarray;i++)
+    int offset = 0;
+    for(int i=0;i<ars.nbdims;i++)
     {
         array = vtkFloatArray::New();
+        array->SetName(ars.dims[i].single.label);
+        offset = 0;
+        while(offset<(nbdataarray*ars.dims[0].nbvalues))
+        {
+            if(i>0)
+            {
+                int offset2=0;
+                for(int k=0;k<i;k++)
+                    offset2+=ars.dims[k].nbvalues-1;
+                for(int k=0;k<ars.dims[i].nbvalues;k++)
+                {
+                    for(int j=0;j<offset2;j++)
+                    {
+                        cout<<j+k+offset<<endl;
+                        if((j+k+offset)<(nbdataarray*ars.dims[0].nbvalues))
+                            array->InsertTuple1(j+k+offset,ars.dims[i].rvalue[k]);
+                    }
+                    cout<<ars.dims[i].rvalue[offset2-1]<<endl;
+                    offset+=offset2;
+                    cout<<"offset X1="<<offset<<endl;
+                }
+                cout<<"offset = "<<offset<<" offset2 = "<<offset2<<" "<<(nbdataarray*ars.dims[0].nbvalues)<<endl;
+            }
+            else
+            {
+                for(int j=0;j<ars.dims[i].nbvalues;j++)
+                    array->InsertTuple1(j+offset,ars.dims[i].rvalue[j]);
+                offset +=ars.dims[0].nbvalues;
+                cout<<"offset = "<<offset<<endl;
+            }
+        }
+        table->AddColumn(array);
+    }
+    offset=0;
+     
+    array = vtkFloatArray::New();
+    array->SetName(dataname[0].c_str());
+    for(int i=0;i<nbdataarray;i++)
+    {
         // get the column name
-        array->SetName(dataname[i].c_str());
         for (int j=0;j<ars.dims[0].nbvalues;j++)
         {
         	if(ars.data.rvalue!=NULL)
         	{
-        		array->InsertTuple1(j,ars.data.rvalue[j+offset]);
+        		array->InsertTuple1(j+offset,ars.data.rvalue[j+offset]);
         	}
         	else if(ars.data.cvalue!=NULL)
         	{
         		float module;
         		module=cabs(ars.data.cvalue[j+offset]);
-        		array->InsertTuple1(j,module);
+        		array->InsertTuple1(j+offset,module);
         	}
 
         }
         offset=offset+ars.dims[0].nbvalues;
-        table->AddColumn(array);
+        //table->AddColumn(array);
     }
-    //add column for abs
+    cout<<array->GetNumberOfTuples()<<endl;
+    table->AddColumn(array);
+    //add ia dummy column 
     array = vtkFloatArray::New();
-    array->SetName(ars.dims[0].single.label);
+    array->SetName("dummy");
     cout<<ars.dims[0].single.label<<endl;
-    for (int j=0;j<ars.dims[0].nbvalues;j++)
+    for (int j=0;j<(ars.dims[0].nbvalues*nbdataarray);j++)
     {
-    	if(ars.dims[0].rvalue!=NULL)
-    	    array->InsertTuple1(j,ars.dims[0].rvalue[j]);
-    	else if(ars.dims[0].ivalue!=NULL)
-    		array->InsertTuple1(j,float(ars.dims[0].ivalue[j]));
+        array->InsertTuple1(j,0.0);
     }
 
     table->AddColumn(array);
