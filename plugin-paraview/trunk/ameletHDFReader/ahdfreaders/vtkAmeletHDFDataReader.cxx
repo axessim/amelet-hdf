@@ -57,13 +57,11 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
     {
         temp = (int)temp/ars.dims[ars.nbdims-i-1].nbvalues;
         if(temp<1) temp=1;
-        cout<<"temp ="<<temp<<" nbdataarray="<<nbdataarray<<endl;
         int j=0;
         while(j<nbdataarray)
         {
             if(ars.dims[ars.nbdims-i-1].cvalue!=NULL)
             {
-                cout<<"complex values"<<endl;
                 for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
                 {
                     std::ostringstream buf;
@@ -77,7 +75,6 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
             }
             else if(ars.dims[ars.nbdims-i-1].rvalue!=NULL)
             {
-                //cout<<"real values"<<endl;
                 for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
                 {
                     std::ostringstream buf;
@@ -93,7 +90,6 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
             }
             else if(ars.dims[ars.nbdims-i-1].ivalue!=NULL)
             {
-                cout<<"int values"<<endl;
                 for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
                 {
                     std::ostringstream buf;
@@ -108,7 +104,6 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
             }
             else if(ars.dims[ars.nbdims-i-1].svalue!=NULL)
             {
-                cout<<"string values"<<endl;
                 for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
                 {
                     for(int k=0;k<temp;k++)
@@ -128,33 +123,30 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
         array = vtkFloatArray::New();
         array->SetName(ars.dims[i].single.label);
         offset = 0;
-        while(offset<(nbdataarray*ars.dims[0].nbvalues))
+        int offsettemp=0;
+        int nbtest = nbdataarray*ars.dims[0].nbvalues;
+        while(offset<nbtest)
         {
             if(i>0)
             {
                 int offset2=0;
                 for(int k=0;k<i;k++)
-                    offset2+=ars.dims[k].nbvalues-1;
+                    offset2=offset2+ars.dims[k].nbvalues;
                 for(int k=0;k<ars.dims[i].nbvalues;k++)
                 {
                     for(int j=0;j<offset2;j++)
                     {
-                        cout<<j+k+offset<<endl;
-                        if((j+k+offset)<(nbdataarray*ars.dims[0].nbvalues))
-                            array->InsertTuple1(j+k+offset,ars.dims[i].rvalue[k]);
-                    }
-                    cout<<ars.dims[i].rvalue[offset2-1]<<endl;
-                    offset+=offset2;
-                    cout<<"offset X1="<<offset<<endl;
+                        array->InsertTuple1(j+k+offsettemp,ars.dims[i].rvalue[k]);
+                        offset=offset+1;
+                    } 
+                    offsettemp=offsettemp+offset2-1;
                 }
-                cout<<"offset = "<<offset<<" offset2 = "<<offset2<<" "<<(nbdataarray*ars.dims[0].nbvalues)<<endl;
             }
-            else
+            else if(i==0)
             {
                 for(int j=0;j<ars.dims[i].nbvalues;j++)
                     array->InsertTuple1(j+offset,ars.dims[i].rvalue[j]);
                 offset +=ars.dims[0].nbvalues;
-                cout<<"offset = "<<offset<<endl;
             }
         }
         table->AddColumn(array);
@@ -183,12 +175,10 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
         offset=offset+ars.dims[0].nbvalues;
         //table->AddColumn(array);
     }
-    cout<<array->GetNumberOfTuples()<<endl;
     table->AddColumn(array);
     //add ia dummy column 
     array = vtkFloatArray::New();
     array->SetName("dummy");
-    cout<<ars.dims[0].single.label<<endl;
     for (int j=0;j<(ars.dims[0].nbvalues*nbdataarray);j++)
     {
         array->InsertTuple1(j,0.0);
