@@ -135,12 +135,18 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     		groupgroup_t grpGrp = readGroupGroup(grpGrp_id,child.childnames[i]);
     		for(int j=0;j<grpGrp.nbeltgroupGroup;j++)
     		{
-    			hid_t grp_id = H5Dopen1(group_id,grpGrp.groupGroupnames[j]);
-    			ugroup_t grp;
-    			grp = readUGroup(grp_id,grpGrp.groupGroupnames[j]);
-    			for(int k=0;k<grp.nbeltgroup;k++)
-    				grpgroupId->SetTuple1(grp.eltgroup[k],i);
-    			H5Dclose(grp_id);
+                    if (H5Lexists(group_id,grpGrp.groupGroupnames[j],H5P_DEFAULT)!=FALSE)
+                    {
+                        hid_t grp_id = H5Dopen1(group_id,grpGrp.groupGroupnames[j]);
+                        ugroup_t grp;
+                        if(strcmp(read_string_attribute(group_id, grpGrp.groupGroupnames[j], "type"),"node")!=0)
+                        {
+    			    grp = readUGroup(grp_id,grpGrp.groupGroupnames[j]);
+                            for(int k=0;k<grp.nbeltgroup;k++)
+                                grpgroupId->SetTuple1(grp.eltgroup[k],i);
+                            H5Dclose(grp_id);
+                        }
+                    }
     		}
     		H5Dclose(grpGrp_id);
     	}
@@ -153,13 +159,30 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     // set data for each group
     group_id = H5Gopen1(loc_id,"group");
     child = read_children_name(loc_id,"group");
+    std::cout<<"read groups"<<std::endl;
     for (int i=0;i<child.nbchild;i++)
     {
         hid_t grp_id = H5Dopen1(group_id,child.childnames[i]);
         ugroup_t grp;
-        grp = readUGroup(grp_id,child.childnames[i]);
-        for (int k=0;k<grp.nbeltgroup;k++)
-            groupId->SetTuple1(grp.eltgroup[k],i);
+        if(strcmp(read_string_attribute(group_id, child.childnames[i], "type"),"node")!=0)
+        {
+            grp = readUGroup(grp_id,child.childnames[i]);
+            for (int k=0;k<grp.nbeltgroup;k++)
+                groupId->SetTuple1(grp.eltgroup[k],i);
+        }
+        else
+        {
+            grp = readUGroup(grp_id,child.childnames[i]);
+            for(int k=0;k<grp.nbeltgroup;k++)
+            {
+                vtkVertex * vertexcell = vtkVertex::New();
+                vertexcell->GetPointIds()->SetId(0,grp.eltgroup[k]);
+                int nbcells = ugrid->GetNumberOfCells();
+                ugrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+                grpgroupId->InsertTuple1(nbcells,-1);
+                groupId->InsertTuple1(nbcells,i);
+            }
+        }
         H5Dclose(grp_id);
     }
     H5Dclose(group_id);
@@ -257,17 +280,21 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
             if (H5Lexists(norm_id,grpchild.childnames[i],H5P_DEFAULT)!=FALSE)
             {
                 hid_t normChildId = H5Dopen1(norm_id,grpchild.childnames[i]);
+                std::cout<<"read normals"<<std::endl;
                 normals = readNormals(normChildId);
                 H5Dclose(normChildId);
             }
         }
+        
         sgroup = readSGroup(grp_id,grpchild.childnames[i]);
+        
         //std::cout<<"type ="<<sgroup.type<<" entityType= "<<sgroup.entityType<<std::endl;
         H5Dclose(grp_id);
         for(int j=0;j<sgroup.nbelt;j++)
         {
             if(strcmp(sgroup.entityType,"face")==0)
             {
+              
                 int ijk[4][3];
                 if(norm_id!=-1)
                 {
@@ -275,21 +302,21 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         (strcmp(normals.normals[j],"x-")==0))
                     {
                         // point 1
-                        ijk[0][0]=sgroup.imin[j]-1;
-                        ijk[0][1]=sgroup.jmin[j]-1;
-                        ijk[0][2]=sgroup.kmin[j]-1;
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
                         // point 2
-                        ijk[1][0]=sgroup.imin[j]-1;
-                        ijk[1][1]=sgroup.jmax[j]-1;
-                        ijk[1][2]=sgroup.kmin[j]-1;
+                        ijk[1][0]=sgroup.imin[j];
+                        ijk[1][1]=sgroup.jmax[j];
+                        ijk[1][2]=sgroup.kmin[j];
                         // point 3
-                        ijk[2][0]=sgroup.imin[j]-1;
-                        ijk[2][1]=sgroup.jmin[j]-1;
-                        ijk[2][2]=sgroup.kmax[j]-1;
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmin[j];
+                        ijk[2][2]=sgroup.kmax[j];
                         // point 4
-                        ijk[3][0]=sgroup.imin[j]-1;
-                        ijk[3][1]=sgroup.jmax[j]-1;
-                        ijk[3][2]=sgroup.kmax[j]-1;
+                        ijk[3][0]=sgroup.imin[j];
+                        ijk[3][1]=sgroup.jmax[j];
+                        ijk[3][2]=sgroup.kmax[j];
                         double point[4][3];
                         vtkPixel *pixelcell = vtkPixel::New();
                         for (int ii=0; ii<4; ii++)
@@ -308,21 +335,21 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         (strcmp(normals.normals[j],"y-")==0))
                     {
                         // point 1
-                        ijk[0][0]=sgroup.imin[j]-1;
-                        ijk[0][1]=sgroup.jmin[j]-1;
-                        ijk[0][2]=sgroup.kmin[j]-1;
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
                         // point 2
-                        ijk[1][0]=sgroup.imax[j]-1;
-                        ijk[1][1]=sgroup.jmin[j]-1;
-                        ijk[1][2]=sgroup.kmin[j]-1;
+                        ijk[1][0]=sgroup.imax[j];
+                        ijk[1][1]=sgroup.jmin[j];
+                        ijk[1][2]=sgroup.kmin[j];
                         // point 3
-                        ijk[2][0]=sgroup.imin[j]-1;
-                        ijk[2][1]=sgroup.jmin[j]-1;
-                        ijk[2][2]=sgroup.kmax[j]-1;
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmin[j];
+                        ijk[2][2]=sgroup.kmax[j];
                         // point 4
-                        ijk[3][0]=sgroup.imax[j]-1;
-                        ijk[3][1]=sgroup.jmin[j]-1;
-                        ijk[3][2]=sgroup.kmax[j]-1;
+                        ijk[3][0]=sgroup.imax[j];
+                        ijk[3][1]=sgroup.jmin[j];
+                        ijk[3][2]=sgroup.kmax[j];
                         double point[4][3];
                         vtkPixel *pixelcell = vtkPixel::New();
                         for (int ii=0; ii<4; ii++)
@@ -341,21 +368,21 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         (strcmp(normals.normals[j],"z-")==0))
                     {
                         // point 1
-                        ijk[0][0]=sgroup.imin[j]-1;
-                        ijk[0][1]=sgroup.jmin[j]-1;
-                        ijk[0][2]=sgroup.kmin[j]-1;
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
                         // point 2
-                        ijk[1][0]=sgroup.imax[j]-1;
-                        ijk[1][1]=sgroup.jmin[j]-1;
-                        ijk[1][2]=sgroup.kmin[j]-1;
+                        ijk[1][0]=sgroup.imax[j];
+                        ijk[1][1]=sgroup.jmin[j];
+                        ijk[1][2]=sgroup.kmin[j];
                         // point 3
-                        ijk[2][0]=sgroup.imin[j]-1;
-                        ijk[2][1]=sgroup.jmax[j]-1;
-                        ijk[2][2]=sgroup.kmin[j]-1;
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmax[j];
+                        ijk[2][2]=sgroup.kmin[j];
                         // point 4
-                        ijk[3][0]=sgroup.imax[j]-1;
-                        ijk[3][1]=sgroup.jmax[j]-1;
-                        ijk[3][2]=sgroup.kmin[j]-1;
+                        ijk[3][0]=sgroup.imax[j];
+                        ijk[3][1]=sgroup.jmax[j];
+                        ijk[3][2]=sgroup.kmin[j];
                         double point[4][3];
                         vtkPixel *pixelcell = vtkPixel::New();
                         for (int ii=0; ii<4; ii++)
@@ -377,37 +404,37 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
             {
                 int ijk[8][3];
                 // point 1
-                ijk[0][0]=sgroup.imin[j]-1;
-                ijk[0][1]=sgroup.jmin[j]-1;
-                ijk[0][2]=sgroup.kmin[j]-1;
+                ijk[0][0]=sgroup.imin[j];
+                ijk[0][1]=sgroup.jmin[j];
+                ijk[0][2]=sgroup.kmin[j];
                 // point 2
-                ijk[1][0]=sgroup.imax[j]-1;
-                ijk[1][1]=sgroup.jmin[j]-1;
-                ijk[1][2]=sgroup.kmin[j]-1;
+                ijk[1][0]=sgroup.imax[j];
+                ijk[1][1]=sgroup.jmin[j];
+                ijk[1][2]=sgroup.kmin[j];
                 // point 3
-                ijk[2][0]=sgroup.imin[j]-1;
-                ijk[2][1]=sgroup.jmax[j]-1;
-                ijk[2][2]=sgroup.kmin[j]-1;
+                ijk[2][0]=sgroup.imin[j];
+                ijk[2][1]=sgroup.jmax[j];
+                ijk[2][2]=sgroup.kmin[j];
                 // point 4
-                ijk[3][0]=sgroup.imax[j]-1;
-                ijk[3][1]=sgroup.jmax[j]-1;
-                ijk[3][2]=sgroup.kmin[j]-1;
+                ijk[3][0]=sgroup.imax[j];
+                ijk[3][1]=sgroup.jmax[j];
+                ijk[3][2]=sgroup.kmin[j];
                 // point 5
-                ijk[4][0]=sgroup.imin[j]-1;
-                ijk[4][1]=sgroup.jmin[j]-1;
-                ijk[4][2]=sgroup.kmax[j]-1;
+                ijk[4][0]=sgroup.imin[j];
+                ijk[4][1]=sgroup.jmin[j];
+                ijk[4][2]=sgroup.kmax[j];
                 // point 6
-                ijk[5][0]=sgroup.imax[j]-1;
-                ijk[5][1]=sgroup.jmin[j]-1;
-                ijk[5][2]=sgroup.kmax[j]-1;
+                ijk[5][0]=sgroup.imax[j];
+                ijk[5][1]=sgroup.jmin[j];
+                ijk[5][2]=sgroup.kmax[j];
                 // point 7
-                ijk[6][0]=sgroup.imin[j]-1;
-                ijk[6][1]=sgroup.jmax[j]-1;
-                ijk[6][2]=sgroup.kmax[j]-1;
+                ijk[6][0]=sgroup.imin[j];
+                ijk[6][1]=sgroup.jmax[j];
+                ijk[6][2]=sgroup.kmax[j];
                 // point 8
-                ijk[7][0]=sgroup.imax[j]-1;
-                ijk[7][1]=sgroup.jmax[j]-1;
-                ijk[7][2]=sgroup.kmax[j]-1;
+                ijk[7][0]=sgroup.imax[j];
+                ijk[7][1]=sgroup.jmax[j];
+                ijk[7][2]=sgroup.kmax[j];
                 double point[8][3];
                 vtkVoxel *voxelcell = vtkVoxel::New();
                 for (int ii=0; ii<8; ii++)
@@ -427,13 +454,13 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
             {
                 int ijk[2][3];
                 // point 1
-                ijk[0][0]=sgroup.imin[j]-1;
-                ijk[0][1]=sgroup.jmin[j]-1;
-                ijk[0][2]=sgroup.kmin[j]-1;
+                ijk[0][0]=sgroup.imin[j];
+                ijk[0][1]=sgroup.jmin[j];
+                ijk[0][2]=sgroup.kmin[j];
                 // point 2
-                ijk[1][0]=sgroup.imax[j]-1;
-                ijk[1][1]=sgroup.jmax[j]-1;
-                ijk[1][2]=sgroup.kmax[j]-1;
+                ijk[1][0]=sgroup.imax[j];
+                ijk[1][1]=sgroup.jmax[j];
+                ijk[1][2]=sgroup.kmax[j];
                 vtkLine *linecell = vtkLine::New();
                 double point[2][3];
                 for (int ii=0; ii<2; ii++)
@@ -451,9 +478,9 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
             else if(strcmp(sgroup.type,"node")==0)
             {
                 int ijk[3];
-                ijk[0]=sgroup.imin[j]-1;
-                ijk[1]=sgroup.jmin[j]-1;
-                ijk[2]=sgroup.kmin[j]-1;
+                ijk[0]=sgroup.imin[j];
+                ijk[1]=sgroup.jmin[j];
+                ijk[2]=sgroup.kmin[j];
                 vtkVertex *vertexcell = vtkVertex::New();
                 double point[3];
                 int id = ijk[2]*(x.nbnodes)*(y.nbnodes)+
