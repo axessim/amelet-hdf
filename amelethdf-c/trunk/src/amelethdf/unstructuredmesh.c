@@ -157,8 +157,16 @@ ugroup_t readUGroup(hid_t group_id, const char* name)
     /*
      * Allocate array of pointers to rows.
      */
-    rdata.eltgroup = (int *) malloc(dims[0] * sizeof(int *));
-    rdata.nbeltgroup = dims[0];
+    if(ndims!=0)
+    {
+      rdata.eltgroup = (int *) malloc(dims[0] * sizeof(int *));
+      rdata.nbeltgroup = dims[0];
+    }
+    else
+    {
+      rdata.eltgroup = (int *) malloc( sizeof(int *));
+      rdata.nbeltgroup = 1;
+    }
     status = H5Dread(group_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
             rdata.eltgroup);
     return rdata;
