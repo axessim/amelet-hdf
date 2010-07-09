@@ -45,6 +45,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
          points->InsertNextPoint(umeshnodes.nodes[i][0],umeshnodes.nodes[i][1],
        		                                        umeshnodes.nodes[i][2]);
     ugrid->SetPoints(points);
+    points->Delete();
     //this->UpdateProgress(this->GetProgress()+0.125);
     elttypes_t umeshelttypes;
     eltnodes_t umesheltnodes;
@@ -67,6 +68,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
        		linecell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
        		linecell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
        		ugrid->InsertNextCell(linecell->GetCellType(),linecell->GetPointIds());
+                linecell->Delete();
        		idnode=idnode+2;
        	}
        	else if(umeshelttypes.elttypes[i]==11)
@@ -76,6 +78,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
        		tricell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
        		tricell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
        		ugrid->InsertNextCell(tricell->GetCellType(),tricell->GetPointIds());
+                tricell->Delete();
        		idnode=idnode+3;
        	}
        	else if(umeshelttypes.elttypes[i]==13)
@@ -86,6 +89,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
        		quadcell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
        		quadcell->GetPointIds()->SetId(3,umesheltnodes.eltnodes[idnode+3]);
        		ugrid->InsertNextCell(quadcell->GetCellType(),quadcell->GetPointIds());
+                quadcell->Delete();
        		idnode=idnode+4;
        	}
        	else if(umeshelttypes.elttypes[i]==101)
@@ -96,6 +100,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
        		tetracell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
        		tetracell->GetPointIds()->SetId(3,umesheltnodes.eltnodes[idnode+3]);
        		ugrid->InsertNextCell(tetracell->GetCellType(),tetracell->GetPointIds());
+                tetracell->Delete();
        		idnode=idnode+4;
        	}
     }
@@ -109,6 +114,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     		vtkVertex * vertexcell = vtkVertex::New();
     		vertexcell->GetPointIds()->SetId(0,i);
     		ugrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+                vertexcell->Delete();
     	}
     }
     vtkIntArray *grpgroupId = vtkIntArray::New();
@@ -155,6 +161,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
         
     	//ugrid->GetCellData()->SetScalars(grpgroupId);
         ugrid->GetCellData()->AddArray(grpgroupId);
+        grpgroupId->Delete();
     }
     // set data for each group
     group_id = H5Gopen1(loc_id,"group");
@@ -179,6 +186,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
                 vertexcell->GetPointIds()->SetId(0,grp.eltgroup[k]);
                 int nbcells = ugrid->GetNumberOfCells();
                 ugrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+                vertexcell->Delete();
                 grpgroupId->InsertTuple1(nbcells,-1);
                 groupId->InsertTuple1(nbcells,i);
             }
@@ -188,7 +196,8 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     H5Dclose(group_id);
     //this->UpdateProgress(this->GetProgress()+0.5);
     ugrid->GetCellData()->AddArray(groupId);
-
+    groupId->Delete();
+    
     return 1;
 }
 
@@ -220,6 +229,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
     //this->UpdateProgress(this->GetProgress()+0.125);
 
     sgrid->SetPoints(points2);
+    points2->Delete();
     vtkIntArray *grpgroupId = vtkIntArray::New();
     vtkIntArray *groupId = vtkIntArray::New();
     grpgroupId->SetName("groupGroup Id");
@@ -327,8 +337,10 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                             pixelcell->GetPointIds()->SetId(ii,id);
                         }
                         sgrid->InsertNextCell(pixelcell->GetCellType(),
-                        pixelcell->GetPointIds());
+                                              pixelcell->GetPointIds());
+                        pixelcell->Delete();
                         grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
+                        
                         cellId++;
                     }
                     if ((strcmp(normals.normals[j],"y+")==0) ||
@@ -361,6 +373,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         }
                         sgrid->InsertNextCell(pixelcell->GetCellType(),
                                               pixelcell->GetPointIds());
+                        pixelcell->Delete();
                         grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
                         cellId++;
                     }
@@ -394,6 +407,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         }
                         sgrid->InsertNextCell(pixelcell->GetCellType(),
                                               pixelcell->GetPointIds());
+                        pixelcell->Delete();
                         grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
                         cellId++;
                     }
@@ -445,8 +459,10 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                     voxelcell->GetPointIds()->SetId(ii,id);
                 }
                 sgrid->InsertNextCell(voxelcell->GetCellType(),voxelcell->GetPointIds());
+                voxelcell->Delete();
                 grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
                 groupId->InsertTuple1(cellId,groupValue);
+                
                 cellId++;
             }
             else if((strcmp(sgroup.entityType,"edge")==0) ||
@@ -471,8 +487,10 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                     linecell->GetPointIds()->SetId(ii,id);
                 }
                 sgrid->InsertNextCell(linecell->GetCellType(),linecell->GetPointIds());
+                linecell->Delete();
                 grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
                 groupId->InsertTuple1(cellId,groupValue);
+                
                 cellId++;
             }
             else if(strcmp(sgroup.type,"node")==0)
@@ -488,6 +506,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 sgrid->GetPoint(id,point);
                 vertexcell->GetPointIds()->SetId(0,id);
                 sgrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+                vertexcell->Delete();
                 grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
                 groupId->InsertTuple1(cellId,groupValue);
                 cellId++;
@@ -500,6 +519,8 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
     //this->UpdateProgress(this->GetProgress()+0.5);
     sgrid->GetCellData()->AddArray(grpgroupId);
     sgrid->GetCellData()->AddArray(groupId);
+    grpgroupId->Delete();
+    groupId->Delete();
 
 
     return 1;
