@@ -1,8 +1,11 @@
-#include "arrayset.h"
-
 #ifndef FLOATINGTYPE_H
 #define FLOATINGTYPE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "arrayset.h"
 #define A_FLOATING_TYPE "floatingType"
 #define V_SINGLE_REAL "singleReal"
 #define V_SINGLE_COMPLEX "singleComplex"
@@ -34,5 +37,9 @@ int issinglecomplex(floatingtype_t ft);
 int isvector(floatingtype_t ft);
 int isdataset(floatingtype_t ft);
 int isarrayset(floatingtype_t ft);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // FLOATINGTYPE_H

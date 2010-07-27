@@ -1,8 +1,11 @@
-#include "mesh.h"
-
 #ifndef UNSTRUCTUREDMESH_H
 #define UNSTRUCTUREDMESH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "mesh.h"
 typedef struct
 {
         float ** nodes;
@@ -81,5 +84,9 @@ semnodes_t readSemNodes(hid_t file_id, const char *table_name);
 ugroup_t readUGroup(hid_t group_id, const char* name);
 unstructured_mesh_t read_unstructured_mesh(hid_t file_id, const char* path);
 void print_unstructured_mesh(unstructured_mesh_t umesh);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // UNSTRUCTUREDMESH_H

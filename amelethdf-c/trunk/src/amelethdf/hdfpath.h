@@ -1,8 +1,11 @@
-#include "amelethdf.h"
-
 #ifndef HDFPATH_H
 #define HDFPATH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "amelethdf.h"
 typedef struct
 {
         int nb;
@@ -26,5 +29,9 @@ int path_contain(char *path, char *subpath);
 char * path_element(char *path, int index, int back);
 stringtab_t path_split(char *path);
 int path_like(char * path, char* pattern);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // HDFPATH_H

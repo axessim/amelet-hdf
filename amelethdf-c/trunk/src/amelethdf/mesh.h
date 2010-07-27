@@ -1,8 +1,11 @@
-#include "amelethdf.h"
-
 #ifndef MESH_H
 #define MESH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "amelethdf.h"
 #define STRUCTURED         0
 #define UNSTRUCTURED       1
 #define C_MESH             "/mesh"
@@ -34,5 +37,9 @@ typedef struct
 
 int meshtype(hid_t loc_id, const char * path);
 groupgroup_t readGroupGroup(hid_t grpgrp_id, const char* name);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // MESH_H

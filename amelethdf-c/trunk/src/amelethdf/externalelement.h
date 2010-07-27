@@ -1,8 +1,11 @@
-#include "amelethdf.h"
-
 #ifndef EXTERNALELEMENT_H
 #define EXTERNALELEMENT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "amelethdf.h"
 typedef struct
 {
         char **internal_name;
@@ -19,5 +22,9 @@ hid_t get_file_id_ext_elt(external_element_t ext_elt, char * path);
 char * get_external_name(external_element_t ext_elt, char* path);
 external_element_t open_external_files(external_element_t ext_elt);
 herr_t close_external_files(external_element_t ext_elt);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // EXTERNALELEMENT_H

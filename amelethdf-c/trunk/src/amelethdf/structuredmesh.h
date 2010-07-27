@@ -1,8 +1,11 @@
-#include "mesh.h"
-
 #ifndef STRUCTUREDMESH_H
 #define STRUCTUREDMESH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "mesh.h"
 typedef struct
 {
         float * nodes;
@@ -52,5 +55,9 @@ snorm_t readNormals(hid_t loc_id);
 char* readAttributes(hid_t group_id, const char* attr_name);
 structured_mesh_t read_structured_mesh(hid_t file_id, const char* path);
 void print_structured_mesh(structured_mesh_t smesh);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // STRUCTUREDMESH_H

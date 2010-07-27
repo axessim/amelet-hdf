@@ -1,3 +1,8 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include <hdf5.h>
 #include <hdf5_hl.h>
 #include <string.h>
@@ -11,3 +16,7 @@ children_t read_string_vector(hid_t file_id, char* path);
 int str_index(char ** arr, char *aelement, int nbel);
 void write_string_dataset(hid_t file_id, char* path, int values_len, int rank,
         hsize_t* dims, char** values);
+
+#ifdef __cplusplus
+}
+#endif

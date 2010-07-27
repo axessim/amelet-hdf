@@ -1,8 +1,13 @@
-#include "complextype.h"
+
 
 #ifndef SIMPLETYPE_H
 #define SIMPLETYPE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "complextype.h"
 #define A_LABEL  "label"
 #define A_PHYSICAL_NATURE  "physicalNature"
 #define A_UNIT  "unit"
@@ -86,5 +91,9 @@ char* singlereal_to_string(singlereal_t singlereal);
 char* singlecomplex_to_string(singlecomplex_t singlecomplex);
 
 herr_t make_single(hid_t loc_id, const char* path, single_t single);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SIMPLETYPE_H

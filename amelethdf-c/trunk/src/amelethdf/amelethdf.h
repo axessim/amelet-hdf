@@ -1,8 +1,13 @@
+#ifndef AMELETHDF_H
+#define AMELETHDF_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <hdf5.h>
 #include <hdf5_hl.h>
 
-#ifndef AMELETHDF_H
-#define AMELETHDF_H
 
 #define ABSOLUTE_PATH_NAME_LENGTH 100
 #define ELEMENT_NAME_LENGTH 30
@@ -41,6 +46,10 @@ float read_float_attribute(hid_t loc_id, const char* path, char* attr);
  * Reads a float attribute at path
  */
 int read_int_attribute(hid_t loc_id, const char* path, char* attr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // AMELETHDF_H
 
