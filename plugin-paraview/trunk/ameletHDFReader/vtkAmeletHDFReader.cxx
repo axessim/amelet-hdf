@@ -505,7 +505,7 @@ int vtkAmeletHDFReader::CanReadFile(const char *filename)
   // Check FORMAT and AMELETHDF_FORMAT_VERSION attributes values
   group_id = H5Gopen(file_id,"/",H5P_DEFAULT);
   ret_val = getAmeletHDFAttribut(group_id, "FORMAT", "AMELETHDF");
-  ret_val = getAmeletHDFAttribut(group_id, "AMELETHDF_FORMAT_VERSION", "1.0.0");
+  //ret_val = getAmeletHDFAttribut(group_id, "AMELETHDF_FORMAT_VERSION", "1.0.0");
 
   H5Gclose(group_id);
 
