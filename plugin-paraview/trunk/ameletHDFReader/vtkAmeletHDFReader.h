@@ -1,7 +1,7 @@
 #ifndef __VTKvtkAmeletHDFReader_H_
 #define __VTKvtkAmeletHDFReader_H_
 
-#include <complex.h>
+
 #include <iostream>
 #include <sstream>
 #include <stdlib.h>
@@ -40,7 +40,7 @@
 class vtkInformationIntegerKey;
 class vtkInformationObjectBaseKey;
 
-class VTK_IO_EXPORT vtkAmeletHDFReader : public vtkMultiBlockDataSetAlgorithm
+class VTK_EXPORT vtkAmeletHDFReader : public vtkMultiBlockDataSetAlgorithm
 {
   public:
       static vtkAmeletHDFReader *New();
