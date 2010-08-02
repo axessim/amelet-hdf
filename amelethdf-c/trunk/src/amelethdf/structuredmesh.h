@@ -14,13 +14,13 @@ typedef struct
 
 typedef struct
 {
-        int *imin;
-        int *jmin;
-        int *kmin;
-        int *imax;
-        int *jmax;
-        int *kmax;
-        int nbelt;
+        unsigned int *imin;
+        unsigned int *jmin;
+        unsigned int *kmin;
+        unsigned int *imax;
+        unsigned int *jmax;
+        unsigned int *kmax;
+        unsigned int nbelt;
         char *type;
         char *entityType;
         char *name;
@@ -29,7 +29,7 @@ typedef struct
 typedef struct
 {
         char ** normals;
-        int nbelt;
+        unsigned int nbelt;
 } snorm_t;
 
 typedef struct

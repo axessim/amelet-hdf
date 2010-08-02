@@ -57,16 +57,19 @@ int main(argc, argv)
     // Simulations
     printf("\nReading simulation ...\n");
     free(children.childnames);
-    children = read_children_name(file_id, C_SIMULATION);
-    for (i = 0; i < children.nbchild; i++)
+    if(H5Lexists(file_id, C_SIMULATION, H5P_DEFAULT) != FALSE)
     {
-        simus = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-        strcpy(simus, C_SIMULATION);
-        strcat(simus, "/");
-        strcat(simus, children.childnames[i]);
-        simulation = read_simulation(file_id, simus);
-        print_simulation(simulation);
-        free(simus);
+        children = read_children_name(file_id, C_SIMULATION);
+        for (i = 0; i < children.nbchild; i++)
+        {
+            simus = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+            strcpy(simus, C_SIMULATION);
+            strcat(simus, "/");
+            strcat(simus, children.childnames[i]);
+            simulation = read_simulation(file_id, simus);
+            print_simulation(simulation);
+            free(simus);
+        }
     }
 
     // Meshes

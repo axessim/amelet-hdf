@@ -38,10 +38,11 @@ axis_t readAxis(hid_t loc_id, const char *axisname)
 sgroup_t readSGroup(hid_t group_id, const char* name)
 {
     hid_t space;
-    int ndims, i;
+    int ndims;
+    unsigned int i;
     hsize_t dims[1];
     sgroup_t ijk;
-    int **rdata;
+    unsigned int **rdata;
     herr_t status;
 
     ijk.name = (char *) malloc(30 * sizeof(char));
@@ -49,11 +50,10 @@ sgroup_t readSGroup(hid_t group_id, const char* name)
 
     space = H5Dget_space(group_id);
     ndims = H5Sget_simple_extent_dims(space, dims, NULL);
-
     /*
      * Allocate array of pointers to rows.
      */
-    rdata = (int **) malloc(dims[0] * sizeof(int *));
+    rdata = (unsigned int **) malloc(dims[0] * sizeof(unsigned int *));
 
     /*
      * Allocate space for floating point data.
@@ -62,18 +62,17 @@ sgroup_t readSGroup(hid_t group_id, const char* name)
     ijk.entityType = readAttributes(group_id, "entityType");
     ijk.type = readAttributes(group_id, "type");
 
-    rdata[0] = (int *) malloc(dims[0] * dims[1] * sizeof(int));
+    rdata[0] = (unsigned int *) malloc(dims[0] * dims[1] * sizeof(unsigned int));
 
-    ijk.imin = (int *) malloc(dims[0] * sizeof(int *));
-    ijk.imax = (int *) malloc(dims[0] * sizeof(int *));
-    ijk.jmin = (int *) malloc(dims[0] * sizeof(int *));
-    ijk.jmax = (int *) malloc(dims[0] * sizeof(int *));
-    ijk.kmin = (int *) malloc(dims[0] * sizeof(int *));
-    ijk.kmax = (int *) malloc(dims[0] * sizeof(int *));
+    ijk.imin = (unsigned int *) malloc(dims[0] * sizeof(unsigned int *));
+    ijk.imax = (unsigned int *) malloc(dims[0] * sizeof(unsigned int *));
+    ijk.jmin = (unsigned int *) malloc(dims[0] * sizeof(unsigned int *));
+    ijk.jmax = (unsigned int *) malloc(dims[0] * sizeof(unsigned int *));
+    ijk.kmin = (unsigned int *) malloc(dims[0] * sizeof(unsigned int *));
+    ijk.kmax = (unsigned int *) malloc(dims[0] * sizeof(unsigned int *));
     for (i = 1; i < dims[0]; i++)
         rdata[i] = rdata[0] + i * dims[1];
     ijk.nbelt = dims[0];
-
     status = H5Dread(group_id, H5T_NATIVE_INT32, H5S_ALL, H5S_ALL, H5P_DEFAULT,
             rdata[0]);
     if (strcmp(ijk.type, "node") == 0)
@@ -147,9 +146,9 @@ snorm_t readNormals(hid_t loc_id)
     herr_t status;
     hid_t filetype, space, memtype;
     size_t sdim;
-    hsize_t dims[1] =
-    { 1 };
-    int ndims, i, ret_val;
+    hsize_t dims[1] =  { 1 };
+    int ndims, ret_val;
+    unsigned int i;
     snorm_t rdata;
 
     filetype = H5Dget_type(loc_id);
