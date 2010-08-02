@@ -31,14 +31,16 @@ using namespace vtkstd;
 
 int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredGrid *ugrid)
 {
-   	//Unstructuredmesh umesh;
-   	hid_t nodes_id, eltype_id, eltnode_id, loc_id;
-   	nodes_t umeshnodes;
+    std::cout<<"Read umesh"<<std::endl;
+    std::cout<<"=========="<<std::endl;
+    //Unstructuredmesh umesh;
+    hid_t nodes_id, eltype_id, eltnode_id, loc_id;
+    nodes_t umeshnodes;
     loc_id = H5Gopen1(meshId,name);
-   	// read nodes
-   	nodes_id = H5Dopen1(loc_id,"nodes");
-   	vtkPoints *points = vtkPoints::New();
-   	umeshnodes = readNodes(nodes_id);
+    // read nodes
+    nodes_id = H5Dopen1(loc_id,"nodes");
+    vtkPoints *points = vtkPoints::New();
+    umeshnodes = readNodes(nodes_id);
     for (int i=0 ;i<umeshnodes.nbnodes;i++)
          points->InsertNextPoint(umeshnodes.nodes[i][0],umeshnodes.nodes[i][1],
        		                                        umeshnodes.nodes[i][2]);
@@ -201,8 +203,8 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
 
 int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredGrid *sgrid)
 {
-    std::cout<<"smesh convertion"<<std::endl;
-    std::cout<<"================"<<std::endl;
+    std::cout<<"Read smesh"<<std::endl;
+    std::cout<<"=========="<<std::endl;
     hid_t cgrid, loc_id;
 
     loc_id = H5Gopen1(meshId, name);
@@ -213,21 +215,25 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
     y = readAxis(cgrid,"y");
     z = readAxis(cgrid,"z");
     H5Gclose(cgrid);
-    vtkPoints *points2 = vtkPoints::New();
+
+    map<unsigned long int,int>ptexist;
+    int idptexist;
+    cout<<"nbx="<<x.nbnodes<<endl;
+    cout<<"nby="<<y.nbnodes<<endl;
+    cout<<"nbz="<<z.nbnodes<<endl;
+
     for(int k=0;k<z.nbnodes;k++)
-    {
+    { 
         for(int j=0;j<y.nbnodes;j++)
         {
             for(int i=0;i<x.nbnodes;i++)
             {
-                points2->InsertNextPoint(x.nodes[i],y.nodes[j],z.nodes[k]);
+		idptexist = (k*(x.nbnodes)*(y.nbnodes))+(j*x.nbnodes)+i;
+		ptexist[idptexist]=-1;
             }
         }
     }
     //this->UpdateProgress(this->GetProgress()+0.125);
-
-    sgrid->SetPoints(points2);
-    points2->Delete();
     vtkIntArray *grpgroupId = vtkIntArray::New();
     vtkIntArray *groupId = vtkIntArray::New();
     grpgroupId->SetName("groupGroup Id");
@@ -282,7 +288,6 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
     for(int i=0;i<grpchild.nbchild;i++)
     {
         hid_t grp_id = H5Dopen1(group_id,grpchild.childnames[i]);
-        groupValue=groupValue+1;
         if(norm_id!=-1)
         {
             if (H5Lexists(norm_id,grpchild.childnames[i],H5P_DEFAULT)!=FALSE)
@@ -293,12 +298,10 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 H5Dclose(normChildId);
             }
         }
-        
+        cout<<"read sgroup :"<< grpchild.childnames[i]<<endl;
         sgroup = readSGroup(grp_id,grpchild.childnames[i]);
-        
-        //std::cout<<"type ="<<sgroup.type<<" entityType= "<<sgroup.entityType<<std::endl;
         H5Dclose(grp_id);
-        for(int j=0;j<sgroup.nbelt;j++)
+        for(unsigned int j=0;j<sgroup.nbelt;j++)
         {
             if(strcmp(sgroup.entityType,"face")==0)
             {
@@ -326,12 +329,221 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         ijk[3][1]=sgroup.jmax[j];
                         ijk[3][2]=sgroup.kmax[j];
                         double point[4][3];
+                        for (int ii=0; ii<4; ii++)
+                        {
+                            unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                     (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                            
+			    ptexist[id]=1;
+                        }
+                    }
+                    if ((strcmp(normals.normals[j],"y+")==0) ||
+                        (strcmp(normals.normals[j],"y-")==0))
+                    {
+                        // point 1
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
+                        // point 2
+                        ijk[1][0]=sgroup.imax[j];
+                        ijk[1][1]=sgroup.jmin[j];
+                        ijk[1][2]=sgroup.kmin[j];
+                        // point 3
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmin[j];
+                        ijk[2][2]=sgroup.kmax[j];
+                        // point 4
+                        ijk[3][0]=sgroup.imax[j];
+                        ijk[3][1]=sgroup.jmin[j];
+                        ijk[3][2]=sgroup.kmax[j];
+                        double point[4][3];
+                        for (int ii=0; ii<4; ii++)
+                        {
+                            unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                     (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+			    ptexist[id]=1;
+                        }
+                    }
+                    if ((strcmp(normals.normals[j],"z+")==0) ||
+                        (strcmp(normals.normals[j],"z-")==0))
+                    {
+                        // point 1
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
+                        // point 2
+                        ijk[1][0]=sgroup.imax[j];
+                        ijk[1][1]=sgroup.jmin[j];
+                        ijk[1][2]=sgroup.kmin[j];
+                        // point 3
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmax[j];
+                        ijk[2][2]=sgroup.kmin[j];
+                        // point 4
+                        ijk[3][0]=sgroup.imax[j];
+                        ijk[3][1]=sgroup.jmax[j];
+                        ijk[3][2]=sgroup.kmin[j];
+                        double point[4][3];
+                        for (int ii=0; ii<4; ii++)
+                        {
+                            unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                     (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                            ptexist[id]=1;
+                        }
+                    }
+                }
+            }
+            else if(strcmp(sgroup.entityType,"volume")==0)
+            {
+                int ijk[8][3];
+                // point 1
+                ijk[0][0]=sgroup.imin[j];
+                ijk[0][1]=sgroup.jmin[j];
+                ijk[0][2]=sgroup.kmin[j];
+                // point 2
+                ijk[1][0]=sgroup.imax[j];
+                ijk[1][1]=sgroup.jmin[j];
+                ijk[1][2]=sgroup.kmin[j];
+                // point 3
+                ijk[2][0]=sgroup.imin[j];
+                ijk[2][1]=sgroup.jmax[j];
+                ijk[2][2]=sgroup.kmin[j];
+                // point 4
+                ijk[3][0]=sgroup.imax[j];
+                ijk[3][1]=sgroup.jmax[j];
+                ijk[3][2]=sgroup.kmin[j];
+                // point 5
+                ijk[4][0]=sgroup.imin[j];
+                ijk[4][1]=sgroup.jmin[j];
+                ijk[4][2]=sgroup.kmax[j];
+                // point 6
+                ijk[5][0]=sgroup.imax[j];
+                ijk[5][1]=sgroup.jmin[j];
+                ijk[5][2]=sgroup.kmax[j];
+                // point 7
+                ijk[6][0]=sgroup.imin[j];
+                ijk[6][1]=sgroup.jmax[j];
+                ijk[6][2]=sgroup.kmax[j];
+                // point 8
+                ijk[7][0]=sgroup.imax[j];
+                ijk[7][1]=sgroup.jmax[j];
+                ijk[7][2]=sgroup.kmax[j];
+                double point[8][3];
+                for (int ii=0; ii<8; ii++)
+                {
+                    unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                             (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+		    ptexist[id]=1;
+                }
+            }
+            else if((strcmp(sgroup.entityType,"edge")==0) ||
+                    (strcmp(sgroup.entityType,"slot")==0))
+            {
+                int ijk[2][3];
+                // point 1
+                ijk[0][0]=sgroup.imin[j];
+                ijk[0][1]=sgroup.jmin[j];
+                ijk[0][2]=sgroup.kmin[j];
+                // point 2
+                ijk[1][0]=sgroup.imax[j];
+                ijk[1][1]=sgroup.jmax[j];
+                ijk[1][2]=sgroup.kmax[j];
+                double point[2][3];
+                for (int ii=0; ii<2; ii++)
+                {
+                    unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                             (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+		    ptexist[id]=1;
+                }
+            }
+            else if(strcmp(sgroup.type,"node")==0)
+            {
+                int ijk[3];
+                ijk[0]=sgroup.imin[j];
+                ijk[1]=sgroup.jmin[j];
+                ijk[2]=sgroup.kmin[j];
+                unsigned int id = (ijk[2]*(x.nbnodes)*(y.nbnodes))+
+                         (ijk[1]*(x.nbnodes))+ijk[0];
+		ptexist[id]=1;
+            }
+        }
+    }
+    unsigned int nbptexistreal=0;
+    unsigned int nbexist=0;
+    vtkPoints *xyzpointsreal = vtkPoints::New();
+    map <unsigned long int,int> ptugridreal;
+    for (int k=0; k<z.nbnodes;k++)
+    {
+	for(int j=0;j<y.nbnodes;j++)
+	{
+		for(int i=0;i<x.nbnodes;i++)
+		{
+			idptexist = (k*(x.nbnodes)*(y.nbnodes))+(j*(x.nbnodes))+i;
+			if(ptexist[idptexist]>0)
+			{
+				xyzpointsreal->InsertNextPoint(x.nodes[i],y.nodes[j],z.nodes[k]);
+				ptugridreal[idptexist]=nbptexistreal;
+				nbptexistreal=nbptexistreal+1;
+			}
+			nbexist=nbexist+1;
+		}
+	}
+    }
+    sgrid->SetPoints(xyzpointsreal);
+    xyzpointsreal->Delete();
+    ptexist.clear();
+    for(int i=0;i<grpchild.nbchild;i++)
+    {
+        hid_t grp_id = H5Dopen1(group_id,grpchild.childnames[i]);
+        groupValue=groupValue+1;
+        if(norm_id!=-1)
+        {
+            if (H5Lexists(norm_id,grpchild.childnames[i],H5P_DEFAULT)!=FALSE)
+            {
+                hid_t normChildId = H5Dopen1(norm_id,grpchild.childnames[i]);
+                std::cout<<"read normals"<<std::endl;
+                normals = readNormals(normChildId);
+                H5Dclose(normChildId);
+            }
+        }
+        sgroup = readSGroup(grp_id,grpchild.childnames[i]);
+        
+        H5Dclose(grp_id);
+	for(unsigned int j=0;j<sgroup.nbelt;j++)
+        {
+            if(strcmp(sgroup.entityType,"face")==0)
+            {
+                int ijk[4][3];
+                if(norm_id!=-1)
+                {
+                    if ((strcmp(normals.normals[j],"x+")==0) ||
+                        (strcmp(normals.normals[j],"x-")==0))
+                    {
+                        // point 1
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
+                        // point 2
+                        ijk[1][0]=sgroup.imin[j];
+                        ijk[1][1]=sgroup.jmax[j];
+                        ijk[1][2]=sgroup.kmin[j];
+                        // point 3
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmin[j];
+                        ijk[2][2]=sgroup.kmax[j];
+                        // point 4
+                        ijk[3][0]=sgroup.imin[j];
+                        ijk[3][1]=sgroup.jmax[j];
+                        ijk[3][2]=sgroup.kmax[j];
+                        double point[4][3];
                         vtkPixel *pixelcell = vtkPixel::New();
                         for (int ii=0; ii<4; ii++)
                         {
-                            int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                            unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
                                      (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+			    unsigned int id = ptugridreal[idtemp];
                             sgrid->GetPoint(id,point[ii]);
+			    ptexist[id]=1;
                             pixelcell->GetPointIds()->SetId(ii,id);
                         }
                         sgrid->InsertNextCell(pixelcell->GetCellType(),
@@ -364,9 +576,11 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         vtkPixel *pixelcell = vtkPixel::New();
                         for (int ii=0; ii<4; ii++)
                         {
-                            int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                            unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
                                      (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+			    unsigned int id = ptugridreal[idtemp];
                             sgrid->GetPoint(id,point[ii]);
+			    ptexist[id]=1;
                             pixelcell->GetPointIds()->SetId(ii,id);
                         }
                         sgrid->InsertNextCell(pixelcell->GetCellType(),
@@ -398,8 +612,9 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         vtkPixel *pixelcell = vtkPixel::New();
                         for (int ii=0; ii<4; ii++)
                         {
-                            int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                            unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
                                      (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+			    unsigned int id = ptugridreal[idtemp];
                             sgrid->GetPoint(id,point[ii]);
                             pixelcell->GetPointIds()->SetId(ii,id);
                         }
@@ -451,8 +666,9 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 vtkVoxel *voxelcell = vtkVoxel::New();
                 for (int ii=0; ii<8; ii++)
                 {
-                    int id = ijk[ii][2]*(x.nbnodes)*(y.nbnodes)+
+                    unsigned int idtemp = ijk[ii][2]*(x.nbnodes)*(y.nbnodes)+
                              ijk[ii][1]*(x.nbnodes)+ijk[ii][0];
+		    unsigned int id = ptugridreal[idtemp];
                     sgrid->GetPoint(id,point[ii]);
                     voxelcell->GetPointIds()->SetId(ii,id);
                 }
@@ -479,8 +695,9 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 double point[2][3];
                 for (int ii=0; ii<2; ii++)
                 {
-                    int id = ijk[ii][2]*(x.nbnodes)*(y.nbnodes)+
+                    unsigned int idtemp = ijk[ii][2]*(x.nbnodes)*(y.nbnodes)+
                              ijk[ii][1]*(x.nbnodes)+ijk[ii][0];
+		    unsigned int id = ptugridreal[idtemp];
                     sgrid->GetPoint(id,point[ii]);
                     linecell->GetPointIds()->SetId(ii,id);
                 }
@@ -499,8 +716,9 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 ijk[2]=sgroup.kmin[j];
                 vtkVertex *vertexcell = vtkVertex::New();
                 double point[3];
-                int id = ijk[2]*(x.nbnodes)*(y.nbnodes)+
+                unsigned int idtemp = ijk[2]*(x.nbnodes)*(y.nbnodes)+
                          ijk[1]*(x.nbnodes)+ijk[0];
+		unsigned int id = ptugridreal[idtemp];
                 sgrid->GetPoint(id,point);
                 vertexcell->GetPointIds()->SetId(0,id);
                 sgrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
@@ -511,6 +729,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
             }
         }
     }
+    ptugridreal.clear();
     if(norm_id!=-1) H5Gclose(norm_id);
     H5Gclose(group_id);
     H5Gclose(loc_id);
