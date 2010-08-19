@@ -38,6 +38,8 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     nodes_t umeshnodes;
     loc_id = H5Gopen1(meshId,name);
     // read nodes
+    if (H5Lexists(loc_id,"nodes",H5P_DEFAULT)!=FALSE)
+    {
     nodes_id = H5Dopen1(loc_id,"nodes");
     vtkPoints *points = vtkPoints::New();
     umeshnodes = readNodes(nodes_id);
@@ -199,6 +201,11 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     groupId->Delete();
     
     return 1;
+    }
+    else
+    {
+	    return 0;
+    }
 }
 
 int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredGrid *sgrid)
