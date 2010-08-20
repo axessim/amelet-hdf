@@ -223,7 +223,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
     z = readAxis(cgrid,"z");
     H5Gclose(cgrid);
 
-    map<unsigned long int,int>ptexist;
+    vector<bool> ptexist;
     int idptexist;
     cout<<"nbx="<<x.nbnodes<<endl;
     cout<<"nby="<<y.nbnodes<<endl;
@@ -236,7 +236,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
             for(int i=0;i<x.nbnodes;i++)
             {
 		idptexist = (k*(x.nbnodes)*(y.nbnodes))+(j*x.nbnodes)+i;
-		ptexist[idptexist]=-1;
+                ptexist.push_back(false);
             }
         }
     }
@@ -341,7 +341,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                             unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
                                      (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
                             
-			    ptexist[id]=1;
+                            ptexist[id]=true;
                         }
                     }
                     if ((strcmp(normals.normals[j],"y+")==0) ||
@@ -368,7 +368,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         {
                             unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
                                      (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
-			    ptexist[id]=1;
+                            ptexist[id]=true;
                         }
                     }
                     if ((strcmp(normals.normals[j],"z+")==0) ||
@@ -395,7 +395,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         {
                             unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
                                      (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
-                            ptexist[id]=1;
+                            ptexist[id]=true;
                         }
                     }
                 }
@@ -440,7 +440,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 {
                     unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
                              (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
-		    ptexist[id]=1;
+                    ptexist[id]=true;
                 }
             }
             else if((strcmp(sgroup.entityType,"edge")==0) ||
@@ -460,7 +460,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 {
                     unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
                              (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
-		    ptexist[id]=1;
+                    ptexist[id]=true;
                 }
             }
             else if(strcmp(sgroup.type,"node")==0)
@@ -471,14 +471,14 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 ijk[2]=sgroup.kmin[j];
                 unsigned int id = (ijk[2]*(x.nbnodes)*(y.nbnodes))+
                          (ijk[1]*(x.nbnodes))+ijk[0];
-		ptexist[id]=1;
+                ptexist[id]=true;
             }
         }
     }
     unsigned int nbptexistreal=0;
     unsigned int nbexist=0;
     vtkPoints *xyzpointsreal = vtkPoints::New();
-    map <unsigned long int,int> ptugridreal;
+    map <unsigned int,int> ptugridreal;
     for (int k=0; k<z.nbnodes;k++)
     {
 	for(int j=0;j<y.nbnodes;j++)
@@ -486,7 +486,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
 		for(int i=0;i<x.nbnodes;i++)
 		{
 			idptexist = (k*(x.nbnodes)*(y.nbnodes))+(j*(x.nbnodes))+i;
-			if(ptexist[idptexist]>0)
+			if(ptexist[idptexist])
 			{
 				xyzpointsreal->InsertNextPoint(x.nodes[i],y.nodes[j],z.nodes[k]);
 				ptugridreal[idptexist]=nbptexistreal;
@@ -550,7 +550,6 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                                      (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
 			    unsigned int id = ptugridreal[idtemp];
                             sgrid->GetPoint(id,point[ii]);
-			    ptexist[id]=1;
                             pixelcell->GetPointIds()->SetId(ii,id);
                         }
                         sgrid->InsertNextCell(pixelcell->GetCellType(),
@@ -587,7 +586,6 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                                      (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
 			    unsigned int id = ptugridreal[idtemp];
                             sgrid->GetPoint(id,point[ii]);
-			    ptexist[id]=1;
                             pixelcell->GetPointIds()->SetId(ii,id);
                         }
                         sgrid->InsertNextCell(pixelcell->GetCellType(),
