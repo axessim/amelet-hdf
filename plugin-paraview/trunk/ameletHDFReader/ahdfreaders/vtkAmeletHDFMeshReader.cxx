@@ -314,89 +314,83 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
             {
               
                 int ijk[4][3];
-                if(norm_id!=-1)
+                if(sgroup.imin[j]==sgroup.imax[j])
                 {
-                    if ((strcmp(normals.normals[j],"x+")==0) ||
-                        (strcmp(normals.normals[j],"x-")==0))
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imin[j];
+                    ijk[1][1]=sgroup.jmax[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmin[j];
+                    ijk[2][2]=sgroup.kmax[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imin[j];
+                    ijk[3][1]=sgroup.jmax[j];
+                    ijk[3][2]=sgroup.kmax[j];
+                    double point[4][3];
+                    for (int ii=0; ii<4; ii++)
                     {
-                        // point 1
-                        ijk[0][0]=sgroup.imin[j];
-                        ijk[0][1]=sgroup.jmin[j];
-                        ijk[0][2]=sgroup.kmin[j];
-                        // point 2
-                        ijk[1][0]=sgroup.imin[j];
-                        ijk[1][1]=sgroup.jmax[j];
-                        ijk[1][2]=sgroup.kmin[j];
-                        // point 3
-                        ijk[2][0]=sgroup.imin[j];
-                        ijk[2][1]=sgroup.jmin[j];
-                        ijk[2][2]=sgroup.kmax[j];
-                        // point 4
-                        ijk[3][0]=sgroup.imin[j];
-                        ijk[3][1]=sgroup.jmax[j];
-                        ijk[3][2]=sgroup.kmax[j];
-                        double point[4][3];
-                        for (int ii=0; ii<4; ii++)
-                        {
-                            unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
-                                     (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
-                            
-                            ptexist[id]=true;
-                        }
+                        unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                         
+                        ptexist[id]=true;
                     }
-                    if ((strcmp(normals.normals[j],"y+")==0) ||
-                        (strcmp(normals.normals[j],"y-")==0))
+                }
+                if(sgroup.jmin[j]==sgroup.jmax[j])
+                {
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmin[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmin[j];
+                    ijk[2][2]=sgroup.kmax[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imax[j];
+                    ijk[3][1]=sgroup.jmin[j];
+                    ijk[3][2]=sgroup.kmax[j];
+                    double point[4][3];
+                    for (int ii=0; ii<4; ii++)
                     {
-                        // point 1
-                        ijk[0][0]=sgroup.imin[j];
-                        ijk[0][1]=sgroup.jmin[j];
-                        ijk[0][2]=sgroup.kmin[j];
-                        // point 2
-                        ijk[1][0]=sgroup.imax[j];
-                        ijk[1][1]=sgroup.jmin[j];
-                        ijk[1][2]=sgroup.kmin[j];
-                        // point 3
-                        ijk[2][0]=sgroup.imin[j];
-                        ijk[2][1]=sgroup.jmin[j];
-                        ijk[2][2]=sgroup.kmax[j];
-                        // point 4
-                        ijk[3][0]=sgroup.imax[j];
-                        ijk[3][1]=sgroup.jmin[j];
-                        ijk[3][2]=sgroup.kmax[j];
-                        double point[4][3];
-                        for (int ii=0; ii<4; ii++)
-                        {
-                            unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
-                                     (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
-                            ptexist[id]=true;
-                        }
+                        unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                        ptexist[id]=true;
                     }
-                    if ((strcmp(normals.normals[j],"z+")==0) ||
-                        (strcmp(normals.normals[j],"z-")==0))
+                }
+                if(sgroup.kmin[j]==sgroup.kmax[j])
+                {
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmin[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmax[j];
+                    ijk[2][2]=sgroup.kmin[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imax[j];
+                    ijk[3][1]=sgroup.jmax[j];
+                    ijk[3][2]=sgroup.kmin[j];
+                    double point[4][3];
+                    for (int ii=0; ii<4; ii++)
                     {
-                        // point 1
-                        ijk[0][0]=sgroup.imin[j];
-                        ijk[0][1]=sgroup.jmin[j];
-                        ijk[0][2]=sgroup.kmin[j];
-                        // point 2
-                        ijk[1][0]=sgroup.imax[j];
-                        ijk[1][1]=sgroup.jmin[j];
-                        ijk[1][2]=sgroup.kmin[j];
-                        // point 3
-                        ijk[2][0]=sgroup.imin[j];
-                        ijk[2][1]=sgroup.jmax[j];
-                        ijk[2][2]=sgroup.kmin[j];
-                        // point 4
-                        ijk[3][0]=sgroup.imax[j];
-                        ijk[3][1]=sgroup.jmax[j];
-                        ijk[3][2]=sgroup.kmin[j];
-                        double point[4][3];
-                        for (int ii=0; ii<4; ii++)
-                        {
-                            unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
-                                     (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
-                            ptexist[id]=true;
-                        }
+                        unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                        ptexist[id]=true;
                     }
                 }
             }
@@ -521,114 +515,108 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
             if(strcmp(sgroup.entityType,"face")==0)
             {
                 int ijk[4][3];
-                if(norm_id!=-1)
+                if(sgroup.imin[j]==sgroup.imax[j])
                 {
-                    if ((strcmp(normals.normals[j],"x+")==0) ||
-                        (strcmp(normals.normals[j],"x-")==0))
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imin[j];
+                    ijk[1][1]=sgroup.jmax[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmin[j];
+                    ijk[2][2]=sgroup.kmax[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imin[j];
+                    ijk[3][1]=sgroup.jmax[j];
+                    ijk[3][2]=sgroup.kmax[j];
+                    double point[4][3];
+                    vtkPixel *pixelcell = vtkPixel::New();
+                    for (int ii=0; ii<4; ii++)
                     {
-                        // point 1
-                        ijk[0][0]=sgroup.imin[j];
-                        ijk[0][1]=sgroup.jmin[j];
-                        ijk[0][2]=sgroup.kmin[j];
-                        // point 2
-                        ijk[1][0]=sgroup.imin[j];
-                        ijk[1][1]=sgroup.jmax[j];
-                        ijk[1][2]=sgroup.kmin[j];
-                        // point 3
-                        ijk[2][0]=sgroup.imin[j];
-                        ijk[2][1]=sgroup.jmin[j];
-                        ijk[2][2]=sgroup.kmax[j];
-                        // point 4
-                        ijk[3][0]=sgroup.imin[j];
-                        ijk[3][1]=sgroup.jmax[j];
-                        ijk[3][2]=sgroup.kmax[j];
-                        double point[4][3];
-                        vtkPixel *pixelcell = vtkPixel::New();
-                        for (int ii=0; ii<4; ii++)
-                        {
-                            unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
-                                     (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
-			    unsigned int id = ptugridreal[idtemp];
-                            sgrid->GetPoint(id,point[ii]);
-                            pixelcell->GetPointIds()->SetId(ii,id);
-                        }
-                        sgrid->InsertNextCell(pixelcell->GetCellType(),
-                                              pixelcell->GetPointIds());
-                        pixelcell->Delete();
-                        grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
-                        
-                        cellId++;
+                        unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+		        unsigned int id = ptugridreal[idtemp];
+                        sgrid->GetPoint(id,point[ii]);
+                        pixelcell->GetPointIds()->SetId(ii,id);
                     }
-                    if ((strcmp(normals.normals[j],"y+")==0) ||
-                        (strcmp(normals.normals[j],"y-")==0))
+                    sgrid->InsertNextCell(pixelcell->GetCellType(),
+                                          pixelcell->GetPointIds());
+                    pixelcell->Delete();
+                    grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
+                    
+                    cellId++;
+                }
+                if(sgroup.jmin[j]==sgroup.jmax[j])
+                {
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmin[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmin[j];
+                    ijk[2][2]=sgroup.kmax[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imax[j];
+                    ijk[3][1]=sgroup.jmin[j];
+                    ijk[3][2]=sgroup.kmax[j];
+                    double point[4][3];
+                    vtkPixel *pixelcell = vtkPixel::New();
+                    for (int ii=0; ii<4; ii++)
                     {
-                        // point 1
-                        ijk[0][0]=sgroup.imin[j];
-                        ijk[0][1]=sgroup.jmin[j];
-                        ijk[0][2]=sgroup.kmin[j];
-                        // point 2
-                        ijk[1][0]=sgroup.imax[j];
-                        ijk[1][1]=sgroup.jmin[j];
-                        ijk[1][2]=sgroup.kmin[j];
-                        // point 3
-                        ijk[2][0]=sgroup.imin[j];
-                        ijk[2][1]=sgroup.jmin[j];
-                        ijk[2][2]=sgroup.kmax[j];
-                        // point 4
-                        ijk[3][0]=sgroup.imax[j];
-                        ijk[3][1]=sgroup.jmin[j];
-                        ijk[3][2]=sgroup.kmax[j];
-                        double point[4][3];
-                        vtkPixel *pixelcell = vtkPixel::New();
-                        for (int ii=0; ii<4; ii++)
-                        {
-                            unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
-                                     (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
-			    unsigned int id = ptugridreal[idtemp];
-                            sgrid->GetPoint(id,point[ii]);
-                            pixelcell->GetPointIds()->SetId(ii,id);
-                        }
-                        sgrid->InsertNextCell(pixelcell->GetCellType(),
-                                              pixelcell->GetPointIds());
-                        pixelcell->Delete();
-                        grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
-                        cellId++;
+                        unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+		        unsigned int id = ptugridreal[idtemp];
+                        sgrid->GetPoint(id,point[ii]);
+                        pixelcell->GetPointIds()->SetId(ii,id);
                     }
-                    if ((strcmp(normals.normals[j],"z+")==0) ||
-                        (strcmp(normals.normals[j],"z-")==0))
+                    sgrid->InsertNextCell(pixelcell->GetCellType(),
+                                          pixelcell->GetPointIds());
+                    pixelcell->Delete();
+                    grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
+                    cellId++;
+                }
+                if(sgroup.kmin[j]==sgroup.kmax[j])
+                {
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmin[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmax[j];
+                    ijk[2][2]=sgroup.kmin[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imax[j];
+                    ijk[3][1]=sgroup.jmax[j];
+                    ijk[3][2]=sgroup.kmin[j];
+                    double point[4][3];
+                    vtkPixel *pixelcell = vtkPixel::New();
+                    for (int ii=0; ii<4; ii++)
                     {
-                        // point 1
-                        ijk[0][0]=sgroup.imin[j];
-                        ijk[0][1]=sgroup.jmin[j];
-                        ijk[0][2]=sgroup.kmin[j];
-                        // point 2
-                        ijk[1][0]=sgroup.imax[j];
-                        ijk[1][1]=sgroup.jmin[j];
-                        ijk[1][2]=sgroup.kmin[j];
-                        // point 3
-                        ijk[2][0]=sgroup.imin[j];
-                        ijk[2][1]=sgroup.jmax[j];
-                        ijk[2][2]=sgroup.kmin[j];
-                        // point 4
-                        ijk[3][0]=sgroup.imax[j];
-                        ijk[3][1]=sgroup.jmax[j];
-                        ijk[3][2]=sgroup.kmin[j];
-                        double point[4][3];
-                        vtkPixel *pixelcell = vtkPixel::New();
-                        for (int ii=0; ii<4; ii++)
-                        {
-                            unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
-                                     (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
-			    unsigned int id = ptugridreal[idtemp];
-                            sgrid->GetPoint(id,point[ii]);
-                            pixelcell->GetPointIds()->SetId(ii,id);
-                        }
-                        sgrid->InsertNextCell(pixelcell->GetCellType(),
-                                              pixelcell->GetPointIds());
-                        pixelcell->Delete();
-                        grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
-                        cellId++;
+                        unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                        unsigned int id = ptugridreal[idtemp];
+                        sgrid->GetPoint(id,point[ii]);
+                        pixelcell->GetPointIds()->SetId(ii,id);
                     }
+                    sgrid->InsertNextCell(pixelcell->GetCellType(),
+                                          pixelcell->GetPointIds());
+                    pixelcell->Delete();
+                    grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
+                    cellId++;
                 }
                 groupId->InsertTuple1(cellId-1,groupValue);
             }
