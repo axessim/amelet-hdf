@@ -242,6 +242,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
             }
         }
     }
+    
 
     //set data name
     vtkstd::string dataname[nbdataarray];
@@ -351,6 +352,13 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
             if(meshType==1)nbeltgrp=grp.nbeltgroup;
             else nbeltgrp=sgrp.nbelt;
             
+            cout<<"nbdataarray="<<nbdataarray<<endl;
+            int nbtotaldata=1;
+            if(ars.nbdims>1)
+            {
+            for(int i=0;i<ars.nbdims;i++)
+                   nbtotaldata = nbtotaldata*ars.dims[i].nbvalues;
+            }
             
             for(int i=0;i<nbdataarray;i++)
             {
@@ -361,13 +369,22 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                 {
                     if(componentdim>-1)
                     {
-                        
+                      int offsetcomp=0;
+                      for(int ioffsetdim=0;ioffsetdim<componentdim;ioffsetdim++)
+                        offsetcomp=offsetcomp+ars.dims[ioffsetdim].nbvalues;
+                      cout<<"offsetcomp="<<offsetcomp<<endl;
+                      int offsetmesh=0;
+                      for(int ioffsetdim=0;ioffsetdim<meshentitydim;ioffsetdim++)
+                        offsetmesh=offsetmesh+ars.dims[ioffsetdim].nbvalues;
+                      cout<<"offsetmesh="<<offsetmesh<<endl;
                         floatscalar->SetNumberOfComponents(3);
-                        for(int j=0;j<ars.dims[componentdim].nbvalues;j++)
-                        {
-                           
+                        
+                      for(int j=0;j<ars.dims[componentdim].nbvalues;j++)
+                      {
+                            int offsetm=offset;
                             for(int k=0;k<nbeltgrp;k++)
                             {
+                              
                                 if(j<3)
                                 {
                                     if(ars.data.rvalue!=NULL)
@@ -376,22 +393,28 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                                         if(meshType==1)
                                             floatscalar->InsertComponent(grp.eltgroup[k],
                                                                          j,ars.
-                                                                         data.rvalue[k+j+offset]);
-                                        else floatscalar->InsertComponent(k,j,ars.data.rvalue[k+j+offset]);
+                                                                         data.rvalue[offsetm]);
+                                        else floatscalar->InsertComponent(k,j,ars.data.rvalue[offsetm]);
                                     }
                                     else if(ars.data.cvalue!=NULL)
                                     {
                                         float module;
-                                        //std::cout<<"cvalue"<<std::endl;
-                                        module=cabs(ars.data.cvalue[k+offset]);
+                                        module=cabs(ars.data.cvalue[offsetm]);
                                         if(meshType==1) floatscalar->InsertComponent(grp.eltgroup[k],j,module);
                                         else floatscalar->InsertComponent(k,j,module);
+                                        
+                                        
                                     }
-                                } 
-                            }
-                            
-                            offset=offset+nbeltgrp;
+                                        
+                                  }
+                                  if(offsetmesh==0) offsetm=offsetm+1;
+                                  else offsetm=offsetm+offsetmesh;
+                               }
+                               //offset=offset+offsetcomp+j;
                         }
+                        offset=offset+ars.dims[componentdim].nbvalues*nbeltgrp;
+                        cout<<"offset="<<offset<<endl;
+
                         if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0))
                             grid->GetPointData()->AddArray(floatscalar);
                         else grid->GetCellData()->AddArray(floatscalar);
