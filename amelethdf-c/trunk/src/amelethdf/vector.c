@@ -12,6 +12,7 @@ vector_t read_vector(hid_t loc_id, const char* path)
     herr_t status;
     int rank, i;
 
+    dims[0]=1;
     // initializes vec
     vec.ivalue = NULL;
     vec.rvalue = NULL;
