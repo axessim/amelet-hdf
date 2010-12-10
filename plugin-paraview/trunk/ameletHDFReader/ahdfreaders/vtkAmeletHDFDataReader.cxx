@@ -132,11 +132,15 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
                 int offset2=0;
                 for(int k=0;k<i;k++)
                     offset2=offset2+ars.dims[k].nbvalues;
+                cout<<"dims.nbvalues = "<<ars.dims[i].nbvalues<<endl;
                 for(int k=0;k<ars.dims[i].nbvalues;k++)
                 {
                     for(int j=0;j<offset2;j++)
                     {
-                        array->InsertTuple1(j+k+offsettemp,ars.dims[i].rvalue[k]);
+                        if(ars.dims[i].rvalue!=NULL)
+                            array->InsertTuple1(j+k+offsettemp,ars.dims[i].rvalue[k]);
+                        else
+                            cout<<"Attention !!!!"<<endl;
                         offset=offset+1;
                     } 
                     offsettemp=offsettemp+offset2-1;
@@ -152,7 +156,6 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
         table->AddColumn(array);
     }
     offset=0;
-     
     array = vtkFloatArray::New();
     array->SetName(dataname[0].c_str());
     for(int i=0;i<nbdataarray;i++)
@@ -183,7 +186,6 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
     {
         array->InsertTuple1(j,0.0);
     }
-
     table->AddColumn(array);
 
     return 1;

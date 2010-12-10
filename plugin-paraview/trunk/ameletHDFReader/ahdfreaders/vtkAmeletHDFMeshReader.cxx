@@ -134,11 +134,13 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     hid_t groupGroup_id, group_id;
     if (H5Lexists(loc_id,"groupGroup",H5P_DEFAULT)!=FALSE)
     {
+        std::cout<<"read groupGroup"<<std::endl;
     	groupGroup_id = H5Gopen1(loc_id,"groupGroup");
     	child = read_children_name(loc_id,"groupGroup");
     	group_id = H5Gopen1(loc_id,"group");
     	for(int i=0;i<child.nbchild;i++)
     	{
+                
     		hid_t grpGrp_id = H5Dopen1(groupGroup_id , child.childnames[i]);
     		groupgroup_t grpGrp = readGroupGroup(grpGrp_id,child.childnames[i]);
     		for(int j=0;j<grpGrp.nbeltgroupGroup;j++)
