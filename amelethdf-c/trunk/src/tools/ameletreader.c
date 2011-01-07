@@ -17,7 +17,7 @@ int main(argc, argv)
     hid_t status;
     char *filename;
     hid_t file_id, loc_id;
-    int i, j, k, offset;
+    int i, j, k, offset, idel;
     children_t children;
     children_t children2;
     children_t children3;
@@ -56,7 +56,8 @@ int main(argc, argv)
 
     // Simulations
     printf("\nReading simulation ...\n");
-    free(children.childnames);
+    for (idel=0;idel<children.nbchild; idel++)
+      free(*(children.childnames + idel));
     if(H5Lexists(file_id, C_SIMULATION, H5P_DEFAULT) != FALSE)
     {
         children = read_children_name(file_id, C_SIMULATION);
@@ -74,7 +75,9 @@ int main(argc, argv)
 
     // Meshes
     printf("\nReading Mesh ...\n");
-    free(children.childnames);
+    for (idel=0;idel<children.nbchild; idel++)
+      free(*(children.childnames + idel));
+ 
     if (H5Lexists(file_id, C_MESH, H5P_DEFAULT) != FALSE)
     {
         children = read_children_name(file_id, C_MESH);
@@ -115,7 +118,9 @@ int main(argc, argv)
                 }
                 free(path2);
             }
-            free(children2.childnames);
+            for (idel=0;idel<children2.nbchild; idel++)
+               free(*(children2.childnames + idel));
+ 
         }
     }
 
@@ -123,7 +128,8 @@ int main(argc, argv)
     printf("\nReading Physical models ...\n");
     if (H5Lexists(file_id, C_PHYSICAL_MODEL, H5P_DEFAULT) != FALSE)
     {
-        free(children.childnames);
+        for (idel=0;idel<children.nbchild; idel++)
+               free(*(children.childnames + idel));
         children = read_children_name(file_id, C_PHYSICAL_MODEL);
         for (i = 0; i < children.nbchild; i++)
             printf("Physical models : %s\n", children.childnames[i]);
@@ -132,7 +138,8 @@ int main(argc, argv)
     printf("\nReading Electromagnetic Source ...\n");
     if (H5Lexists(file_id, C_ELECTROMAGNETIC_SOURCE, H5P_DEFAULT) != FALSE)
     {
-        free(children.childnames);
+        for (idel=0;idel<children.nbchild; idel++)
+            free(*(children.childnames + idel));
         children = read_children_name(file_id, C_ELECTROMAGNETIC_SOURCE);
         path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
         for (i = 0; i < children.nbchild; i++)
@@ -178,7 +185,8 @@ int main(argc, argv)
                 }
 
             }
-            free(children2.childnames);
+            for (idel=0;idel<children2.nbchild; idel++)
+                free(*(children2.childnames + idel));
 
         }
     }
@@ -186,7 +194,8 @@ int main(argc, argv)
     printf("\nExternal elements ...\n");
     if (H5Lexists(file_id, "/externalElement", H5P_DEFAULT) != FALSE)
     {
-        free(children.childnames);
+        for (idel=0;idel<children.nbchild; idel++)
+            free(*(children.childnames + idel));
         children = read_children_name(file_id, "/externalElement");
         for (i = 0; i < children.nbchild; i++)
         {
@@ -207,7 +216,8 @@ int main(argc, argv)
     printf("\nReading label ...\n");
     if (H5Lexists(file_id, C_LABEL, H5P_DEFAULT) != FALSE)
     {
-        free(children.childnames);
+        for (idel=0;idel<children.nbchild; idel++)
+            free(*(children.childnames + idel));
         children = read_children_name(file_id, C_LABEL);
         for (i = 0; i < children.nbchild; i++)
         {
@@ -226,7 +236,8 @@ int main(argc, argv)
     printf("\nReading links ...\n");
     if (H5Lexists(file_id, C_LINK, H5P_DEFAULT) != FALSE)
     {
-        free(children.childnames);
+        for (idel=0;idel<children.nbchild; idel++)
+               free(*(children.childnames + idel));
         children = read_children_name(file_id, C_LINK);
         for (i = 0; i < children.nbchild; i++)
         {
@@ -249,7 +260,8 @@ int main(argc, argv)
                 printf("Is dataonmesh : %i\n", isdataonmesh(lnk));
                 free(path2);
             }
-            free(children2.childnames);
+            for (idel=0;idel<children2.nbchild; idel++)
+               free(*(children2.childnames + idel));
             children2.nbchild = 0;
         }
     }
@@ -258,7 +270,8 @@ int main(argc, argv)
     printf("\nReading output requests ...\n");
     if (H5Lexists(file_id, C_OUTPUT_REQUEST, H5P_DEFAULT) != FALSE)
     {
-        free(children.childnames);
+        for (idel=0;idel<children.nbchild; idel++)
+               free(*(children.childnames + idel));
         children = read_children_name(file_id, C_OUTPUT_REQUEST);
         for (i = 0; i < children.nbchild; i++)
         {
@@ -280,14 +293,16 @@ int main(argc, argv)
                 printf("Object : %s\n", lnk.object);
                 free(path2);
             }
-            free(children2.childnames);
+            for (idel=0;idel<children2.nbchild; idel++)
+               free(*(children2.childnames + idel));
             children2.nbchild = 0;
         }
     }
 
     free(path);
 
-    free(children.childnames);
+    for (idel=0;idel<children.nbchild; idel++)
+               free(*(children.childnames + idel));
 
     free(filename);
     status = H5Fclose(file_id);
