@@ -20,7 +20,7 @@ simulation_t read_simulation(hid_t file_id, const char* sim_path)
     {
         sim.nb_input = read_nb_inputs_outputs(file_id, path);
         sim.inputs = (char **) malloc(sim.nb_input[0] * sizeof(char*));
-        sim.inputs[0] = (char *) malloc(sim.nb_input[0] * sim.nb_input[1]
+        sim.inputs[0] = (char *) malloc(sim.nb_input[0] * (sim.nb_input[1]+1)
                 * sizeof(char));
         for (i = 1; i < sim.nb_input[0]; i++)
             sim.inputs[i] = sim.inputs[0] + sim.nb_input[1] * i;
@@ -34,7 +34,7 @@ simulation_t read_simulation(hid_t file_id, const char* sim_path)
     {
         sim.nb_output = read_nb_inputs_outputs(file_id, path);
         sim.outputs = (char **) malloc(sim.nb_output[0] * sizeof(char*));
-        sim.outputs[0] = (char *) malloc(sim.nb_output[0] * sim.nb_output[1]
+        sim.outputs[0] = (char *) malloc(sim.nb_output[0] * (sim.nb_output[1]+1)
                 * sizeof(char));
         for (i = 1; i < sim.nb_output[0]; i++)
             sim.outputs[i] = sim.outputs[0] + sim.nb_output[1] * i;
