@@ -9,8 +9,8 @@ extern "C" {
 #include <hdf5_hl.h>
 
 
-#define ABSOLUTE_PATH_NAME_LENGTH 100
-#define ELEMENT_NAME_LENGTH 30
+#define ABSOLUTE_PATH_NAME_LENGTH 101
+#define ELEMENT_NAME_LENGTH 21
 
 #define TRUE 1
 #define FALSE 0
