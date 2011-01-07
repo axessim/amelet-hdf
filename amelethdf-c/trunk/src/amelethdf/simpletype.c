@@ -11,7 +11,7 @@ single_t read_single(hid_t loc_id, const char* path)
     herr_t status;
     htri_t test;
 
-    single.label = (char*) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char*));
+    single.label = (char*) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     strcpy(single.label, "");
     test = H5Aexists_by_name(loc_id, path, A_LABEL, H5P_DEFAULT);
     if (test > 0)
@@ -20,7 +20,7 @@ single_t read_single(hid_t loc_id, const char* path)
     }
 
     single.physical_nature = (char*) malloc(ABSOLUTE_PATH_NAME_LENGTH
-            * sizeof(char*));
+            * sizeof(char));
     strcpy(single.physical_nature, "");
     test = H5Aexists_by_name(loc_id, path, A_PHYSICAL_NATURE, H5P_DEFAULT);
     if (test > 0)
@@ -29,7 +29,7 @@ single_t read_single(hid_t loc_id, const char* path)
                 A_PHYSICAL_NATURE));
     }
 
-    single.unit = (char*) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char*));
+    single.unit = (char*) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     strcpy(single.unit, "");
     test = H5Aexists_by_name(loc_id, path, A_UNIT, H5P_DEFAULT);
     if (test > 0)
@@ -37,7 +37,7 @@ single_t read_single(hid_t loc_id, const char* path)
         strcpy(single.unit, read_string_attribute(loc_id, path, A_UNIT));
     }
 
-    single.comment = (char*) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char*));
+    single.comment = (char*) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     strcpy(single.comment, "");
     test = H5Aexists_by_name(loc_id, path, A_COMMENT, H5P_DEFAULT);
     if (test > 0)
