@@ -57,7 +57,7 @@ vector_t read_vector(hid_t loc_id, const char* path)
                 vec.svalue[i] = vec.svalue[0] + i * type_size;
         }
         vec.svalue = (char **) read_string_dataset2(loc_id, path, type_size,
-                dims[0]);
+                                                    dims[0]);
     }
     //free(dims);
 

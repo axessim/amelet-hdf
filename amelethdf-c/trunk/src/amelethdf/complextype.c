@@ -137,7 +137,8 @@ complex float *read_complex_dataset(hid_t loc_id, const char* path)
     if (status < 0)
     {
         printf("Can't read dataset\n");
-    } values = (complex float *) malloc(length*sizeof(complex float));
+    } 
+    values = (complex float *) malloc(length*sizeof(complex float));
     int j = 0;
     for (i = 0; i < length; i++)
     {

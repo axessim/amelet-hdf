@@ -5,32 +5,26 @@
 #include "stringdataset.h"
 
 // Read a long string dataset
-char ** read_string_dataset2(hid_t file_id, const char * path, int l, int nb)
+char ** read_string_dataset2(hid_t file_id, const char * path, size_t length, hsize_t mn)
 {
-    char **buf;
+    char **rdata;
     herr_t status;
-    hid_t filetype, dset, space, memtype;
-    size_t sdim;
-    int i, ndims;
-    hsize_t *dims;
+    hid_t dset, memtype;
+    int i;
 
-    dims = (hsize_t *) malloc(sizeof(hsize_t));
+    length++; // make a space for the null terminator
     dset = H5Dopen(file_id, path, H5P_DEFAULT);
-    filetype = H5Dget_type(dset);
-    sdim = H5Tget_size(filetype);
-    sdim++;
-    space = H5Dget_space(dset);
-    ndims = H5Sget_simple_extent_dims(space, dims, NULL);
-    buf = (char **) malloc(nb * sizeof(char*));
-    buf[0] = (char *) malloc(nb * sdim * sizeof(char));
-    for (i = 1; i < nb; i++)
-        buf[i] = buf[0] + i * sdim;
+
+    rdata = (char **) malloc(mn * sizeof(char*));
+    rdata[0] = (char *) malloc(mn * length * sizeof(char));
+    for (i = 1; i < mn; i++)
+        rdata[i] = rdata[0] + i * length;
     memtype = H5Tcopy(H5T_C_S1);
-    status = H5Tset_size(memtype, sdim);
-    status = H5Dread(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf[0]);
+    status = H5Tset_size(memtype, length);
+    status = H5Dread(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, rdata[0]);
+    H5Tclose(memtype);
     H5Dclose(dset);
-    free(dims);
-    return buf;
+    return rdata;
 }
 
 // Read a (m x n) string datset (rows x columns) of l characters
@@ -90,6 +84,25 @@ int *get_dataset_lmn(hid_t file_id, char* path)
     lmn[2] = m;
     return lmn;
 }
+
+void get_dataset_dims(hid_t file_id, const char* path, hsize_t *m, hsize_t *n, size_t *l)
+{
+    H5T_class_t type_class;
+    herr_t status;
+    hsize_t dims[2] = {1, 1};
+
+    status = H5LTget_dataset_info(file_id, path, dims, &type_class, l);
+    *m = dims[0];
+    *n = dims[1];
+
+    if (status < 0)
+    {
+        *m = 0;
+        *n = 0;
+        *l = 0;
+    }
+}
+
 
 children_t read_string_vector(hid_t file_id, char* path)
 {

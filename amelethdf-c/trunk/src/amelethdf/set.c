@@ -19,12 +19,32 @@ int in(set_t aset, char* aelement)
 // Add aelement to aset
 set_t add(set_t aset, char* aelement)
 {
-    if (!(in(aset, aelement)))
+    hsize_t id = 0;
+    if (!index_in_set(aset, aelement, &id))
     {
-        aset.number_of_element = aset.number_of_element + 1;
         aset.array[aset.number_of_element] = strdup(aelement);
+        aset.number_of_element++;
     }
+    free(id);
     return aset;
+}
+
+// Return the index of first occurrence of an element^M
+int index_in_set(set_t aset, char *aelement, hsize_t *index)
+{
+    int present = FALSE;
+    hsize_t i;
+
+    for (i = 0; i < aset.number_of_element; i++)
+    {
+        if (strcmp(aelement, aset.array[i]) == 0)
+        {
+            *index = i;
+            present = TRUE;
+            break;
+        }
+    }
+    return present;
 }
 
 // Get ith from aset

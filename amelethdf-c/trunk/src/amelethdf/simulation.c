@@ -4,44 +4,35 @@
 
 simulation_t read_simulation(hid_t file_id, const char* sim_path)
 {
-    simulation_t sim;
+    simulation_t rdata;
     char* path;
-    int i;
+    hsize_t n;
+    size_t l;
 
     path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-    sim.nb_input = (int *) malloc(2 * sizeof(int));
-    sim.nb_output = (int *) malloc(2 * sizeof(int));
-    sim.name = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-    strcpy(sim.name, sim_path);
+
+    // inputs
+    rdata.name = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    strcpy(rdata.name, sim_path);
     strcpy(path, sim_path);
     strcat(path, INPUTS);
 
     if (H5LTfind_dataset(file_id, path) == 0)
     {
-        sim.nb_input = read_nb_inputs_outputs(file_id, path);
-        sim.inputs = (char **) malloc(sim.nb_input[0] * sizeof(char*));
-        sim.inputs[0] = (char *) malloc(sim.nb_input[0] * (sim.nb_input[1]+1)
-                * sizeof(char));
-        for (i = 1; i < sim.nb_input[0]; i++)
-            sim.inputs[i] = sim.inputs[0] + sim.nb_input[1] * i;
-        sim.inputs = read_inputs_outputs(file_id, path);
+        get_dataset_dims(file_id, path, &rdata.nb_input, &n, &l);
+        rdata.inputs = read_string_dataset2(file_id, path, l, rdata.nb_input);
     }
-    free(path);
-    path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+
+    // outputs
     strcpy(path, sim_path);
     strcat(path, OUTPUTS);
     if (H5LTfind_dataset(file_id, path) == 0)
     {
-        sim.nb_output = read_nb_inputs_outputs(file_id, path);
-        sim.outputs = (char **) malloc(sim.nb_output[0] * sizeof(char*));
-        sim.outputs[0] = (char *) malloc(sim.nb_output[0] * (sim.nb_output[1]+1)
-                * sizeof(char));
-        for (i = 1; i < sim.nb_output[0]; i++)
-            sim.outputs[i] = sim.outputs[0] + sim.nb_output[1] * i;
-        sim.outputs = read_inputs_outputs(file_id, path);
+        get_dataset_dims(file_id, path, &rdata.nb_output, &n, &l);
+        rdata.outputs = read_string_dataset2(file_id, path, l, rdata.nb_output);
     }
     free(path);
-    return sim;
+    return rdata;
 }
 
 // return the nb of input or output and the type_size
@@ -97,16 +88,16 @@ void print_simulation(simulation_t sim)
 {
     int i;
     printf("Name : %s\n", sim.name);
-    if (sim.nb_input[0] != 0)
+    if (sim.nb_input != 0)
     {
         printf("    Inputs :\n");
-        for (i = 0; i < sim.nb_input[0]; i++)
+        for (i = 0; i < sim.nb_input; i++)
             printf("        %s\n", sim.inputs[i]);
     }
-    if (sim.nb_output[0] != 0)
+    if (sim.nb_output != 0)
     {
         printf("    Outputs :\n");
-        for (i = 0; i < sim.nb_output[0]; i++)
+        for (i = 0; i < sim.nb_output; i++)
             printf("        %s\n", sim.outputs[i]);
     }
 

@@ -16,8 +16,8 @@ typedef struct
         char* name;
         char** inputs;
         char** outputs;
-        int* nb_input;
-        int* nb_output;
+        hsize_t nb_input;
+        hsize_t nb_output;
 } simulation_t;
 
 simulation_t read_simulation(hid_t file_id, const char* sim_path);
