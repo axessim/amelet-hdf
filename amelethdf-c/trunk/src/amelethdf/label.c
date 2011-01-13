@@ -10,7 +10,7 @@ label_t read_label(hid_t file_id, const char* path)
 
     rdata.name = strdup(path);
     get_dataset_dims(file_id, path, &rdata.nb, &n, &l);
-    rdata.values = read_string_dataset(file_id, path, rdata.nb, l);
+    rdata.values = read_string_dataset2(file_id, path,l, rdata.nb);
     return rdata;
 }
 
