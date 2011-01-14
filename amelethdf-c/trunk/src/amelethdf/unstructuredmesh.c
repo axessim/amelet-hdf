@@ -54,7 +54,7 @@ elttypes_t readElementTypes(hid_t eltypes_id)
     /*
      * Allocate array of pointers to rows.
      */
-    rdata.elttypes = (int *) malloc(dims[0] * sizeof(int *));
+    rdata.elttypes = (int *) malloc(dims[0] * sizeof(int));
     rdata.nbelttypes = dims[0];
     status = H5Dread(eltypes_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT,
             rdata.elttypes);
