@@ -25,7 +25,6 @@ set_t add(set_t aset, char* aelement)
         aset.array[aset.number_of_element] = strdup(aelement);
         aset.number_of_element++;
     }
-    free(id);
     return aset;
 }
 
