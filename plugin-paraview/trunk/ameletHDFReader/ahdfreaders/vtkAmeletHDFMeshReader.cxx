@@ -195,9 +195,11 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
                 groupId->InsertTuple1(nbcells,i);
             }
         }
+    
         H5Dclose(grp_id);
     }
-    H5Dclose(group_id);
+    
+    H5Gclose(group_id);
     //this->UpdateProgress(this->GetProgress()+0.5);
     ugrid->GetCellData()->AddArray(groupId);
     groupId->Delete();
