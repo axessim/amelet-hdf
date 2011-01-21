@@ -35,6 +35,42 @@ axis_t readAxis(hid_t loc_id, const char *axisname)
     return rdata;
 }
 
+ssemptsinelt_t readSSemPtInElt(hid_t file_id, const char *table_name)
+{
+    herr_t status;
+    hsize_t nfields_out;
+    hsize_t nrecords_out;
+    hid_t table_id;
+    ssemptsinelt_t rdata;
+
+    size_t dst_size = sizeof(ssemptinelt_t);
+    size_t dst_offset[10] =
+    { HOFFSET( ssemptinelt_t, imin ), HOFFSET( ssemptinelt_t, jmin ),
+      HOFFSET( ssemptinelt_t, kmin ), HOFFSET( ssemptinelt_t, imax ),
+      HOFFSET( ssemptinelt_t, jmax ), HOFFSET( ssemptinelt_t, kmax ),
+      HOFFSET( ssemptinelt_t, v1 ),   HOFFSET( ssemptinelt_t, v2 ), 
+      HOFFSET( ssemptinelt_t, v3 ) };
+
+    size_t dst_sizes[10] =
+    { sizeof(rdata.ssemptinelt[0].imin), sizeof(rdata.ssemptinelt[0].jmin),
+      sizeof(rdata.ssemptinelt[0].kmin), sizeof(rdata.ssemptinelt[0].imax),
+      sizeof(rdata.ssemptinelt[0].jmax), sizeof(rdata.ssemptinelt[0].kmax),
+      sizeof(rdata.ssemptinelt[0].v1),   sizeof(rdata.ssemptinelt[0].v2), 
+      sizeof(rdata.ssemptinelt[0].v3) };
+
+    table_id = H5TBget_table_info(file_id, table_name, &nfields_out,
+            &nrecords_out);
+
+    // Memory allocation for rdata before reading the table
+    rdata.ssemptinelt = (ssemptinelt_t *) malloc((int) nrecords_out * sizeof(ssemptinelt_t));
+    rdata.nb = nrecords_out;
+
+    // Read the table
+    status = H5TBread_table(file_id, table_name, dst_size, dst_offset,
+            dst_sizes, rdata.ssemptinelt);
+    return rdata;
+}
+
 sgroup_t readSGroup(hid_t group_id, const char* name)
 {
     hid_t space;
@@ -261,6 +297,35 @@ structured_mesh_t read_structured_mesh(hid_t file_id, const char* path)
         free(children.childnames);
     }
     free(bufpath);
+    
+    // read selectorOnMesh/ptinelements
+    bufpath = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    strcpy(bufpath, path);
+    strcat(bufpath, SELECTOR_ON_MESH);
+    smesh.som_ptsinelements.nb = 0;
+    
+    dimptsinelts_t dimsptelt;
+    if (H5Lexists(file_id, bufpath, H5P_DEFAULT) != FALSE)
+    {
+        dimsptelt = readNbSemPtInElt(file_id, bufpath);
+        int j;
+        smesh.som_ptsinelements.ptsinelt = (ssemptsinelt_t *) malloc(dimsptelt.nb * sizeof(ssemptsinelt_t));
+        for(j = 0; j < dimsptelt.nb ; j++)
+        {
+          smesh.som_ptsinelements.ptsinelt[j].ssemptinelt = malloc(dimsptelt.nbptinelt[j] * sizeof(ssemptinelt_t));
+          bufpath2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+          strcpy(bufpath2, bufpath);
+          strcat(bufpath2, "/");
+          strcat(bufpath2, dimsptelt.name[j]);
+          smesh.som_ptsinelements.ptsinelt[j] = readSSemPtInElt(file_id, bufpath2);
+          strcpy(smesh.som_ptsinelements.ptsinelt[j].name,dimsptelt.name[j]);
+          smesh.som_ptsinelements.ptsinelt[j].nb = dimsptelt.nbptinelt[j];
+          free(bufpath2);
+        }
+        smesh.som_ptsinelements.nb = dimsptelt.nb;
+    
+    }
+    free(bufpath);
 
     return smesh;
 }
@@ -282,5 +347,21 @@ void print_structured_mesh(structured_mesh_t smesh)
     for (i = 0; i < smesh.groupgroups.nbgroupGroup; i++)
     {
         printf("Name : %s\n", smesh.groupgroups.groupgroups[i].name);
+    }
+    printf("\nSelector on mesh / point in elements ...\n");
+    for (i = 0; i < smesh.som_ptsinelements.nb; i++){
+      printf("name = %s : \n", smesh.som_ptsinelements.ptsinelt[i].name);
+      int j;
+      for (j = 0; j < smesh.som_ptsinelements.ptsinelt[i].nb; j++)
+        printf("    imin = %i, jmin = %i, kmin = %i, imax = %i, jmax = %i, kmax = %i, v1 = %f, v2 = %f, v3 = %f\n",
+                smesh.som_ptsinelements.ptsinelt[i].ssemptinelt[j].imin,
+                smesh.som_ptsinelements.ptsinelt[i].ssemptinelt[j].jmin,
+                smesh.som_ptsinelements.ptsinelt[i].ssemptinelt[j].kmin,
+                smesh.som_ptsinelements.ptsinelt[i].ssemptinelt[j].imax,
+                smesh.som_ptsinelements.ptsinelt[i].ssemptinelt[j].jmax,
+                smesh.som_ptsinelements.ptsinelt[i].ssemptinelt[j].kmax,
+                smesh.som_ptsinelements.ptsinelt[i].ssemptinelt[j].v1,
+                smesh.som_ptsinelements.ptsinelt[i].ssemptinelt[j].v2,
+                smesh.som_ptsinelements.ptsinelt[i].ssemptinelt[j].v3);
     }
 }

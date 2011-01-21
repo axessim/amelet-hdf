@@ -81,3 +81,41 @@ groupgroup_t readGroupGroup(hid_t grpgrp_id, const char* name)
 
     return rdata;
 }
+
+dimptsinelts_t readNbSemPtInElt(hid_t file_id, const char *path)
+{
+    herr_t status;
+    dimptsinelts_t data;
+    hid_t table_id;
+    hsize_t nfields_out;
+    hsize_t nrecords_out;
+    int i;
+    children_t children;
+    char *bufpath;
+    
+    children = read_children_name(file_id, path);
+    data.nbptinelt = (hsize_t *) malloc(children.nbchild * sizeof(hsize_t));
+    data.name = (char **) malloc(children.nbchild * sizeof(char *));
+    data.nb = 0;
+    for(i = 0; i < children.nbchild; i++)
+    {
+        data.name[i] = (char *) malloc(ELEMENT_NAME_LENGTH * sizeof(char));
+        bufpath = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+        strcpy(bufpath, path);
+        strcat(bufpath, "/");
+        strcat(bufpath, children.childnames[i]);    
+        char * type;
+        type = malloc( ELEMENT_NAME_LENGTH * sizeof(char));
+        type = read_string_attribute(file_id, bufpath, A_TYPE);
+        
+        if(strcmp(type,"pointInElement")==0){
+          table_id = H5TBget_table_info(file_id, bufpath, &nfields_out,
+            &nrecords_out);
+          data.nbptinelt[data.nb]=nrecords_out;
+          strcpy(data.name[data.nb],children.childnames[i]);
+          data.nb++;
+        }
+        free(bufpath);
+    }    
+    return data;
+}

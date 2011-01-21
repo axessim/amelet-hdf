@@ -21,6 +21,7 @@ extern "C" {
 #define D_X                "/x"
 #define D_Y                "/y"
 #define D_Z                "/z"
+#define A_TYPE             "type"
 
 typedef struct
 {
@@ -35,8 +36,16 @@ typedef struct
         int nbgroupGroup;
 } groupgroups_t;
 
+typedef struct
+{
+  hsize_t* nbptinelt;
+  char** name;
+  int nb;
+} dimptsinelts_t;
+
 int meshtype(hid_t loc_id, const char * path);
 groupgroup_t readGroupGroup(hid_t grpgrp_id, const char* name);
+dimptsinelts_t readNbSemPtInElt(hid_t file_id, const char *path);
 
 #ifdef __cplusplus
 }

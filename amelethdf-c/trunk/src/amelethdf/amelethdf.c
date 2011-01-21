@@ -33,8 +33,7 @@ children_t read_children_name(hid_t loc_id, const char* path)
 char * read_string_attribute(hid_t loc_id, const char* path, char* attr)
 {
     herr_t status;
-    hsize_t dims[1] =
-    { 1 };
+    hsize_t dims[1] = { 1 };
     size_t sdim;
     char **rdata; /* Read buffer */
     int ndims, i;

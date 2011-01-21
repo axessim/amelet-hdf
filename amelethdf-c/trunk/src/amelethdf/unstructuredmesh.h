@@ -24,20 +24,27 @@ typedef struct
         int nbeltnodes;
 } eltnodes_t;
 
+
 typedef struct
 {
-        char shortname[30];
         int index;
         float v1;
         float v2;
         float v3;
-} semelt_t;
+} usemptinelt_t;
 
 typedef struct
 {
-        semelt_t *somelt;
-        int nbsomelt;
-} semelts_t;
+        usemptinelt_t *usemptinelt;
+        int nb;
+        char name[30];
+} usemptsinelt_t;
+
+typedef struct
+{
+       usemptsinelt_t *ptsinelt;
+       int nb;
+} usemptsinelts_t;
 
 typedef struct
 {
@@ -73,13 +80,13 @@ typedef struct
         ugroups_t groups;
         groupgroups_t groupgroups;
         semnodes_t som_nodes;
-        semelts_t som_elements;
+        usemptsinelts_t som_ptsinelements;
 } unstructured_mesh_t;
 
 nodes_t readNodes(hid_t node_id);
 elttypes_t readElementTypes(hid_t eltypes_id);
 eltnodes_t readElementNodes(hid_t elnodes_id);
-semelts_t readSemElt(hid_t file_id, const char *table_name);
+usemptsinelt_t readUSemPtInElt(hid_t file_id, const char *table_name);
 semnodes_t readSemNodes(hid_t file_id, const char *table_name);
 ugroup_t readUGroup(hid_t group_id, const char* name);
 unstructured_mesh_t read_unstructured_mesh(hid_t file_id, const char* path);

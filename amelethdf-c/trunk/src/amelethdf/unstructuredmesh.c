@@ -81,35 +81,34 @@ eltnodes_t readElementNodes(hid_t elnodes_id)
     return rdata;
 }
 
-semelts_t readSemElt(hid_t file_id, const char *table_name)
+
+usemptsinelt_t readUSemPtInElt(hid_t file_id, const char *table_name)
 {
     herr_t status;
     hsize_t nfields_out;
     hsize_t nrecords_out;
     hid_t table_id;
-    semelts_t rdata;
+    usemptsinelt_t rdata;
 
-    size_t dst_size = sizeof(semelt_t);
+    size_t dst_size = sizeof(usemptinelt_t);
     size_t dst_offset[5] =
-    { HOFFSET( semelt_t, shortname ), HOFFSET( semelt_t, index ),
-            HOFFSET( semelt_t, v1 ), HOFFSET( semelt_t, v2 ),
-            HOFFSET( semelt_t, v3 ) };
+    { HOFFSET( usemptinelt_t, index ), HOFFSET( usemptinelt_t, v1 ), 
+      HOFFSET( usemptinelt_t, v2 ), HOFFSET( usemptinelt_t, v3 ) };
 
     size_t dst_sizes[5] =
-    { sizeof(rdata.somelt[0].shortname), sizeof(rdata.somelt[0].index),
-            sizeof(rdata.somelt[0].v1), sizeof(rdata.somelt[0].v2),
-            sizeof(rdata.somelt[0].v3) };
+    { sizeof(rdata.usemptinelt[0].index), sizeof(rdata.usemptinelt[0].v1),
+      sizeof(rdata.usemptinelt[0].v2), sizeof(rdata.usemptinelt[0].v3) };
 
     table_id = H5TBget_table_info(file_id, table_name, &nfields_out,
             &nrecords_out);
 
     // Memory allocation for rdata before reading the table
-    rdata.somelt = (semelt_t *) malloc((int) nrecords_out * sizeof(semelt_t));
-    rdata.nbsomelt = nrecords_out;
+    rdata.usemptinelt = (usemptinelt_t *) malloc((int) nrecords_out * sizeof(usemptinelt_t));
+    rdata.nb = nrecords_out;
 
     // Read the table
     status = H5TBread_table(file_id, table_name, dst_size, dst_offset,
-            dst_sizes, rdata.somelt);
+            dst_sizes, rdata.usemptinelt);
     return rdata;
 }
 
@@ -217,7 +216,6 @@ unstructured_mesh_t read_unstructured_mesh(hid_t file_id, const char* path)
     umesh.groupgroups.nbgroupGroup = 0;
     if (H5Lexists(file_id, bufpath, H5P_DEFAULT) != FALSE)
     {
-        printf("Groupgroup exists\n");
         children = read_children_name(file_id, bufpath);
         umesh.groupgroups.groupgroups = (groupgroup_t *) malloc(
                 children.nbchild * sizeof(groupgroup_t));
@@ -260,36 +258,35 @@ unstructured_mesh_t read_unstructured_mesh(hid_t file_id, const char* path)
     }
     free(bufpath);
 
-    // read selectorOnMesh/elements
+    // read selectorOnMesh/ptinelements
     bufpath = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     strcpy(bufpath, path);
     strcat(bufpath, SELECTOR_ON_MESH);
-    umesh.som_elements.nbsomelt = 0;
+    umesh.som_ptsinelements.nb = 0;
     umesh.som_nodes.nbsomnodes = 0;
+    dimptsinelts_t dimsptelt;
     if (H5Lexists(file_id, bufpath, H5P_DEFAULT) != FALSE)
     {
-        strcat(bufpath, L_ELEMENTS);
-        if (H5Lexists(file_id, bufpath, H5P_DEFAULT) != FALSE)
+        dimsptelt = readNbSemPtInElt(file_id, bufpath);
+        int j;
+        umesh.som_ptsinelements.ptsinelt = (usemptsinelt_t *) malloc(dimsptelt.nb * sizeof(usemptsinelt_t));
+        for(j = 0; j < dimsptelt.nb ; j++)
         {
-            umesh.som_elements = readSemElt(file_id, bufpath);
+          umesh.som_ptsinelements.ptsinelt[j].usemptinelt = malloc(dimsptelt.nbptinelt[j] * sizeof(usemptinelt_t));
+          bufpath2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+          strcpy(bufpath2, bufpath);
+          strcat(bufpath2, "/");
+          strcat(bufpath2, dimsptelt.name[j]);
+          umesh.som_ptsinelements.ptsinelt[j] = readUSemPtInElt(file_id, bufpath2);
+          strcpy(umesh.som_ptsinelements.ptsinelt[j].name,dimsptelt.name[j]);
+          umesh.som_ptsinelements.ptsinelt[j].nb = dimsptelt.nbptinelt[j];
+          free(bufpath2);
         }
-        free(bufpath);
-
-        // read selectorOnMesh/nodes
-        bufpath = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-        strcpy(bufpath, path);
-        strcat(bufpath, SELECTOR_ON_MESH);
-        strcat(bufpath, NODES);
-        if (H5Lexists(file_id, bufpath, H5P_DEFAULT) != FALSE)
-        {
-            umesh.som_nodes = readSemNodes(file_id, bufpath);
-        }
-        free(bufpath);
+        umesh.som_ptsinelements.nb = dimsptelt.nb;
+    
     }
-    else
-    {
-        free(bufpath);
-    }
+    free(bufpath);
+    
 
     return umesh;
 }
@@ -401,13 +398,15 @@ void print_unstructured_mesh(unstructured_mesh_t umesh)
                 umesh.som_nodes.somnodes[i].shortname,
                 umesh.som_nodes.somnodes[i].index);
 
-    printf("\nSelector on mesh / elements ...\n");
-    for (i = 0; i < umesh.som_elements.nbsomelt; i++)
-        printf(" shortname = %s, index = %i, v1 = %f, v2 = %f, v3 = %f\n",
-                umesh.som_elements.somelt[i].shortname,
-                umesh.som_elements.somelt[i].index,
-                umesh.som_elements.somelt[i].v1,
-                umesh.som_elements.somelt[i].v2,
-                umesh.som_elements.somelt[i].v3);
+    printf("\nSelector on mesh / point in elements ...\n");
+    for (i = 0; i < umesh.som_ptsinelements.nb; i++){
+      printf("name = %s : \n", umesh.som_ptsinelements.ptsinelt[i].name);
+      for (j = 0; j < umesh.som_ptsinelements.ptsinelt[i].nb; j++)
+        printf("    index = %i, v1 = %f, v2 = %f, v3 = %f\n",
+                umesh.som_ptsinelements.ptsinelt[i].usemptinelt[j].index,
+                umesh.som_ptsinelements.ptsinelt[i].usemptinelt[j].v1,
+                umesh.som_ptsinelements.ptsinelt[i].usemptinelt[j].v2,
+                umesh.som_ptsinelements.ptsinelt[i].usemptinelt[j].v3);
+    }
 
 }

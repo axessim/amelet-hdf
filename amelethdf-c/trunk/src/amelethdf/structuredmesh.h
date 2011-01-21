@@ -38,6 +38,31 @@ typedef struct
         int nbgroup;
 } sgroups_t;
 
+typedef struct
+{
+        int imin;
+        int jmin;
+        int kmin;
+        int imax;
+        int jmax;
+        int kmax;
+        float v1;
+        float v2;
+        float v3;
+} ssemptinelt_t;
+
+typedef struct
+{
+        ssemptinelt_t *ssemptinelt;
+        int nb;
+        char name[30];
+} ssemptsinelt_t;
+
+typedef struct
+{
+       ssemptsinelt_t *ptsinelt;
+       int nb;
+} ssemptsinelts_t;
 
 typedef struct
 {
@@ -47,6 +72,7 @@ typedef struct
         axis_t z;
         sgroups_t groups;
         groupgroups_t groupgroups;
+        ssemptsinelts_t som_ptsinelements;
 } structured_mesh_t;
 
 axis_t readAxis(hid_t node_id, const char *axisname);
