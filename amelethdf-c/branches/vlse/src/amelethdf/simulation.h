@@ -5,25 +5,40 @@
 extern "C" {
 #endif
 
-#include "stringdataset.h"
-#define C_SIMULATION "/simulation"
-#define INPUTS "/inputs"
-#define OUTPUTS "/outputs"
-#define PARAMETERS "/parameters"
+#include "amelethdf.h"
 
-typedef struct
-{
-        char* name;
-        char** inputs;
-        char** outputs;
-        hsize_t nb_input;
-        hsize_t nb_output;
-} simulation_t;
+#define A_MODULE            "module"
+#define A_VERSION           "version"
+#define G_INPUTS            "/inputs"
+#define G_OUTPUTS           "/outputs"
+#define G_PARAMETER         "/parameter"
 
-simulation_t read_simulation(hid_t file_id, const char* sim_path);
-int* read_nb_inputs_outputs(hid_t file_id, const char* path);
-char ** read_inputs_outputs(hid_t file_id, const char* path);
-void print_simulation(simulation_t sim);
+    typedef struct simulation_instance_t
+    {
+        char        *name;
+        optional_attributes_t optional_attributes;
+        char        *module;
+        char        *version;
+        hsize_t     nb_inputs;
+        char        **inputs;
+        hsize_t     nb_outputs;
+        char        **outputs;
+    } simulation_instance_t;
+
+    typedef struct simulation_t
+    {
+        hsize_t     nb_simulation_instances;
+        simulation_instance_t *simulation_instances;
+    } simulation_t;
+
+    void read_simulation_instance(hid_t file_id, const char *path, simulation_instance_t *simulation_instance);
+    void read_simulation(hid_t file_id, simulation_t *simulation);
+
+    void print_simulation_instance(simulation_instance_t simulation_instance);
+    void print_simulation(simulation_t simulation);
+
+    void free_simulation_instance(simulation_instance_t *simulation_instance);
+    void free_simulation(simulation_t *simulation);
 
 #ifdef __cplusplus
 }

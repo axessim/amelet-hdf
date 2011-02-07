@@ -5,17 +5,29 @@
 extern "C" {
 #endif
 
-#include "stringdataset.h"
+#include "amelethdf.h"
 
-typedef struct
-{
-        char* name;
-        char** values;
-        hsize_t nb;
-} label_t;
+    typedef struct
+    {
+        char        *name;
+        hsize_t     nb_items;
+        char        **items;
+    } label_dataset_t;
 
-label_t read_label(hid_t file_id, const char* path);
-void print_label(label_t label);
+    typedef struct
+    {
+        hsize_t     nb_label_datasets;
+        label_dataset_t *label_datasets;
+    } label_t;
+
+    void read_label_dataset(hid_t file_id, const char *path, label_dataset_t *label_dataset);
+    void read_label(hid_t file_id, label_t *label);
+
+    void print_label_dataset (label_dataset_t label_dataset);
+    void print_label(label_t label);
+
+    void free_label_dataset (label_dataset_t *label_dataset);
+    void free_label (label_t *label);
 
 #ifdef __cplusplus
 }

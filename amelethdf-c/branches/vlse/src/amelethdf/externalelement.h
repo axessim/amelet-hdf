@@ -6,22 +6,38 @@ extern "C" {
 #endif
 
 #include "amelethdf.h"
-typedef struct
-{
-        char **internal_name;
-        char **file_name;
-        char **external_name;
-        int nb_ext_el;
-        hid_t *file_id;
-} external_element_t;
+#include <unistd.h>
 
-external_element_t read_external_elements(hid_t loc_id, char* path);
-int get_index_ext_elt(external_element_t ext_elt, char* path);
-char * get_file_ext_elt(external_element_t ext_elt, char* path);
-hid_t get_file_id_ext_elt(external_element_t ext_elt, char * path);
-char * get_external_name(external_element_t ext_elt, char* path);
-external_element_t open_external_files(external_element_t ext_elt);
-herr_t close_external_files(external_element_t ext_elt);
+#define EE_INTERNAL_NAME(id) 3*id
+#define EE_EXTERNAL_FILE_NAME(id) 3*id + 1
+#define EE_EXTERNAL_NAME(id) 3*id + 2
+
+    typedef struct
+    {
+        char        *name;
+        hid_t       *file_id;
+        hsize_t     nb_eed_items;
+        char        **eed_items;
+    } ee_dataset_t;
+
+    typedef struct
+    {
+        hsize_t     nb_ee_datasets;
+        ee_dataset_t *ee_datasets;
+    } external_element_t;
+
+
+    void read_external_element_dataset (hid_t file_id, const char *path, ee_dataset_t *ee_dataset);
+    void read_external_element (hid_t file_id, external_element_t *external_element);
+
+    void print_external_element_dataset (ee_dataset_t ee_dataset);
+    void print_external_element (external_element_t external_element);
+
+    void free_external_element_dataset (ee_dataset_t *ee_dataset);
+    void free_external_element (external_element_t *external_element);
+
+    char open_external_files(ee_dataset_t *ee_dataset);
+    char close_external_files(ee_dataset_t *ee_dataset);
 
 #ifdef __cplusplus
 }

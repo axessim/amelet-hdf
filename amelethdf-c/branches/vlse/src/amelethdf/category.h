@@ -9,12 +9,15 @@
 extern "C" {
 #endif
 
-#define C_LABEL "/label/"
+#define C_SIMULATION "/simulation"
+#define C_EXTERNAL_ELEMENT "/externalElement"
+#define C_LABEL "/label"
+#define C_LINK "/link"
+#define C_MESH "/mesh"
 #define C_ELECTROMAGNETIC_SOURCE "/electromagneticSource"
 #define C_GLOBAL_ENVIRONMENT "/globalEnvironment"
 #define C_PHYSICAL_MODEL "/physicalModel"
-#define C_LINK "/link/"
-#define C_OUTPUT_REQUEST "/outputRequest/"
+#define C_OUTPUT_REQUEST "/outputRequest"
 
 #ifdef __cplusplus
 }
