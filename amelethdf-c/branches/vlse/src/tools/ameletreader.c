@@ -124,7 +124,7 @@ char *argv[];
     }
     if(H5Lexists(file_id, C_MESH, H5P_DEFAULT) != FALSE)
     {
-//        print_mesh(mesh);
+        print_mesh(mesh);
         free_mesh(&mesh);
     }
 

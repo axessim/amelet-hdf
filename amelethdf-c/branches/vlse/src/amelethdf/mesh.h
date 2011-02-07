@@ -9,8 +9,9 @@ extern "C" {
 
 #define A_TYPE              "type"
 #define A_ENTITY_TYPE       "entityType"
-#define STRUCTURED          1
-#define UNSTRUCTURED        2
+#define A_MESH1             "mesh1"
+#define A_MESH2             "mesh2"
+
 #define G_NODES             "/nodes"
 #define G_ELEMENT_TYPES     "/elementTypes"
 #define G_ELEMENT_NODES     "/elementNodes"
@@ -22,9 +23,13 @@ extern "C" {
 #define G_X                 "/x"
 #define G_Y                 "/y"
 #define G_Z                 "/z"
+#define G_MESH_LINK         "/meshLink"
+
 #define V_POINT_IN_ELEMENT  "pointInElement"
+#define V_NODE              "node"
 #define V_EDGE              "edge"
 #define V_FACE              "face"
+#define V_VOLUME            "volume"
 #define V_UNSTRUCTURED      "unstructured"
 #define V_STRUCTURED        "structured"
 
@@ -32,7 +37,7 @@ extern "C" {
     typedef enum mesh_class_t {
         MSH_INVALID             = -1,
         MSH_STRUCTURED          = 1,
-        MSH_UNSTRUCTURED        = 2,
+        MSH_UNSTRUCTURED        = 2
     } mesh_class_t;
 
 
@@ -169,11 +174,33 @@ extern "C" {
     } mesh_instance_t;
 
 
+    typedef enum meshlink_class_t {
+        MSHLNK_INVALID          = -1,
+        MSHLNK_NODE             = 1,
+        MSHLNK_EDGE             = 2,
+        MSHLNK_FACE             = 3,
+        MSHLNK_VOLUME           = 4
+    } meshlink_class_t;
+
+
+    typedef struct meshlink_instance_t
+    {
+        char        *name;
+        meshlink_class_t type;
+        char        *mesh1;
+        char        *mesh2;
+        hsize_t     dims[2];
+        int         *data;
+    } meshlink_instance_t;
+
+
     typedef struct mesh_group_t
     {
         char        *name;
         hsize_t     nb_mesh_instances;
         mesh_instance_t *mesh_instances;
+        hsize_t     nb_meshlink_instances;
+        meshlink_instance_t *meshlink_instances;
     } mesh_group_t;
 
 
@@ -195,22 +222,23 @@ extern "C" {
     void read_umesh_som_table (hid_t file_id, const char *path, usom_table_t *usom_table);
     char read_umesh (hid_t file_id, const char* path, umesh_t *umesh);
     void read_mesh_instance (hid_t file_id, const char *path, mesh_instance_t *mesh_instance);
+    void read_meshlink_instance (hid_t file_id, const char *path, meshlink_instance_t *meshlink_instance);
     void read_mesh_group (hid_t file_id, const char *path, mesh_group_t *mesh_group);
     void read_mesh (hid_t file_id, mesh_t *mesh);
-
 
     void print_smesh (smesh_t smesh);
     void print_umesh_som_table (usom_table_t usom_table);
     void print_umesh (umesh_t umesh);
     void print_mesh_instance (mesh_instance_t mesh_instance);
+    void print_meshlink_instance (meshlink_instance_t meshlink_instance);
     void print_mesh_group (mesh_group_t mesh_group);
     void print_mesh (mesh_t mesh);
-
 
     void free_groupgroup (groupgroup_t *groupgroup);
     void free_smesh (smesh_t *smesh);
     void free_umesh (umesh_t *umesh);
     void free_mesh_instance (mesh_instance_t *mesh_instance);
+    void free_meshlink_instance (meshlink_instance_t *meshlink_instance);
     void free_mesh_group (mesh_group_t *mesh_group);
     void free_mesh (mesh_t *mesh);
 

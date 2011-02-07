@@ -23,13 +23,14 @@ void read_simulation_instance(hid_t file_id, const char *path, simulation_instan
     strcat(path2, G_PARAMETER);
 
     // inputs
+    simulation_instance->nb_inputs = 1;  // in case of single value
     strcpy(path2, path);
     strcat(path2, G_INPUTS);
     if (H5Lexists(file_id, path2, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
             if (nb_dims <= 1)
                 if (H5LTget_dataset_info(file_id, path2, &(simulation_instance->nb_inputs), &type_class, &length) >= 0)
-                    if (simulation_instance->nb_inputs > 0 && type_class == H5T_STRING)
+                    if (type_class == H5T_STRING)
                         if(read_string_dataset(file_id, path2, simulation_instance->nb_inputs, length, &(simulation_instance->inputs)))
                             success = TRUE;
     if (!success)
@@ -40,6 +41,7 @@ void read_simulation_instance(hid_t file_id, const char *path, simulation_instan
     }
 
     // outputs
+    simulation_instance->nb_outputs = 1;  // in case of single value
     success = FALSE;
     strcpy(path2, path);
     strcat(path2, G_OUTPUTS);
@@ -47,7 +49,7 @@ void read_simulation_instance(hid_t file_id, const char *path, simulation_instan
         if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
             if (nb_dims <= 1)
                 if (H5LTget_dataset_info(file_id, path2, &(simulation_instance->nb_outputs), &type_class, &length) >= 0)
-                    if (simulation_instance->nb_outputs > 0 && type_class == H5T_STRING)
+                    if (type_class == H5T_STRING)
                         if(read_string_dataset(file_id, path2, simulation_instance->nb_outputs, length, &(simulation_instance->outputs)))
                             success = TRUE;
     if (!success)

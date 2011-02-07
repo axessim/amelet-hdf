@@ -104,32 +104,32 @@ char read_ft_vector (hid_t file_id, const char *path, vector_t *vector)
     char success = FALSE;
     char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
 
+    vector->nb_values = 1;  // in case of single value
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims <= 1)
                 if (H5LTget_dataset_info(file_id, path, &(vector->nb_values), &(vector->type_class), &length) >= 0)
-                    if (vector->nb_values > 0)
-                        switch (vector->type_class)
-                        {
-                        case H5T_INTEGER:
-                            if (read_int_dataset(file_id, path, vector->nb_values, &(vector->values.i)))
-                                success = TRUE;
-                            break;
-                        case H5T_FLOAT:
-                            if (read_float_dataset(file_id, path, vector->nb_values, &(vector->values.f)))
-                                success = TRUE;
-                            break;
-                        case H5T_COMPOUND:
-                            if (read_complex_dataset(file_id, path, vector->nb_values, &(vector->values.c)))
-                                success = TRUE;
-                            break;
-                        case H5T_STRING:
-                            if (read_string_dataset(file_id, path, vector->nb_values, length, &(vector->values.s)))
-                                success = TRUE;
-                            break;
-                        default:
-                            break;
-                        }
+                    switch (vector->type_class)
+                    {
+                    case H5T_INTEGER:
+                        if (read_int_dataset(file_id, path, vector->nb_values, &(vector->values.i)))
+                            success = TRUE;
+                        break;
+                    case H5T_FLOAT:
+                        if (read_float_dataset(file_id, path, vector->nb_values, &(vector->values.f)))
+                            success = TRUE;
+                        break;
+                    case H5T_COMPOUND:
+                        if (read_complex_dataset(file_id, path, vector->nb_values, &(vector->values.c)))
+                            success = TRUE;
+                        break;
+                    case H5T_STRING:
+                        if (read_string_dataset(file_id, path, vector->nb_values, length, &(vector->values.s)))
+                            success = TRUE;
+                        break;
+                    default:
+                        break;
+                    }
     if (success)
     {
         vector->name = get_name_from_path(path);
@@ -549,11 +549,11 @@ char read_ft_arrayset (hid_t file_id, const char *path, arrayset_t *arrayset)
         {
             if (!invalid)
             {
-            strcpy(path2, path);
-            strcat(path2, "/ds");
-            strcat(path2, children.childnames[i]);
-            if(read_ft_vector(file_id, path2, arrayset->dims + i))
-                invalid = i;
+                strcpy(path2, path);
+                strcat(path2, "/ds");
+                strcat(path2, children.childnames[i]);
+                if(read_ft_vector(file_id, path2, arrayset->dims + i))
+                    invalid = i;
             }
             free(children.childnames[i]);
         }

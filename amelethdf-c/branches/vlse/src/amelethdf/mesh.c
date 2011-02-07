@@ -4,23 +4,20 @@
 // Read groupGroup (both the un/structured)
 void read_groupgroup (hid_t file_id, const char* path, groupgroup_t *groupgroup)
 {
-    hsize_t dim1;
     int nb_dims;
     H5T_class_t type_class;
     size_t length;
     char success = FALSE;
 
+    groupgroup->nb_groupgroupnames = 1;  // in case of single value
     groupgroup->name = get_name_from_path(path);
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims <= 1)
-                if (H5LTget_dataset_info(file_id, path, &dim1, &type_class, &length) >= 0)
-                    if (dim1 > 0 && type_class == H5T_STRING)
-                        if(read_string_dataset(file_id, path, dim1, length, &(groupgroup->groupgroupnames)))
-                        {
-                            groupgroup->nb_groupgroupnames = dim1;
+                if (H5LTget_dataset_info(file_id, path, &(groupgroup->nb_groupgroupnames), &type_class, &length) >= 0)
+                    if (type_class == H5T_STRING)
+                        if(read_string_dataset(file_id, path, groupgroup->nb_groupgroupnames, length, &(groupgroup->groupgroupnames)))
                             success = TRUE;
-                        }
     if (!success)
     {
         printf("***** ERROR(%s): Cannot read dataset \"%s\". *****\n\n", C_MESH, path);
@@ -33,25 +30,24 @@ void read_groupgroup (hid_t file_id, const char* path, groupgroup_t *groupgroup)
 // Read m x n dataset "/x, /y or /z" (32-bit signed float)
 void read_smesh_axis (hid_t file_id, const char* path, axis_t *axis)
 {
-    hsize_t dim1;
     H5T_class_t type_class;
     int nb_dims;
     size_t length;
     char success = FALSE;
     hid_t dset_id;
 
+    axis->nb_nodes = 1;
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims <= 1)
-                if (H5LTget_dataset_info(file_id, path, &dim1, &type_class, &length) >= 0)
-                    if (dim1 > 0 && type_class == H5T_FLOAT && length == 4)
+                if (H5LTget_dataset_info(file_id, path, &(axis->nb_nodes), &type_class, &length) >= 0)
+                    if (type_class == H5T_FLOAT && length == 4)
                     {
-                        axis->nodes = (float *) malloc((size_t) dim1 * sizeof(float));
+                        axis->nodes = (float *) malloc((size_t) axis->nb_nodes * sizeof(float));
                         dset_id = H5Dopen(file_id, path, H5P_DEFAULT);
                         if (H5Dread(dset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, axis->nodes) < 0)
                             printf("***** WARNING(%s): Data from dataset \"%s\" may be corrupted. *****\n\n", C_MESH, path);
                         H5Dclose(dset_id);
-                        axis->nb_nodes = dim1;
                         success = TRUE;
                     }
     if (!success)
@@ -343,25 +339,24 @@ void read_smesh(hid_t file_id, const char* path, smesh_t *smesh)
 void read_umesh_group (hid_t file_id, const char* path, ugroup_t *ugroup)
 {
     hid_t dset_id;
-    hsize_t dim1;
     int nb_dims;
     H5T_class_t type_class;
     size_t length;
     char success = FALSE;
 
+    ugroup->nb_groupelts = 1;
     ugroup->name = get_name_from_path(path);
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims <= 1)
-                if (H5LTget_dataset_info(file_id, path, &dim1, &type_class, &length) >= 0)
-                    if (dim1 > 0 &&type_class == H5T_INTEGER && length == 4)
+                if (H5LTget_dataset_info(file_id, path, &(ugroup->nb_groupelts), &type_class, &length) >= 0)
+                    if (type_class == H5T_INTEGER && length == 4)
                     {
-                        ugroup->groupelts = (int *) malloc((size_t) (dim1 * sizeof(int)));
+                        ugroup->groupelts = (int *) malloc((size_t) (ugroup->nb_groupelts * sizeof(int)));
                         dset_id = H5Dopen(file_id, path, H5P_DEFAULT);
                         if (H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, ugroup->groupelts) < 0)
                             printf("***** WARNING(%s): Data from dataset \"%s\" may be corrupted. *****\n\n", C_MESH, path);
                         H5Dclose(dset_id);
-                        ugroup->nb_groupelts = dim1;
                         success = TRUE;
                     }
     if (!success)
@@ -512,20 +507,20 @@ char read_umesh (hid_t file_id, const char* path, umesh_t *umesh)
     path3 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
 
     // Read m x 1 dataset "elementNodes" (32-bit signed integer)
+    umesh->nb_elementnodes = 1;
     strcpy(path2, path);
     strcat(path2, G_ELEMENT_NODES);
     if (H5Lexists(file_id, path2, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
             if (nb_dims <= 1)
-                if (H5LTget_dataset_info(file_id, path2, dims, &type_class, &length) >= 0)
-                    if (dims[0] > 0 && type_class == H5T_INTEGER && length == 4)
+                if (H5LTget_dataset_info(file_id, path2, &(umesh->nb_elementnodes), &type_class, &length) >= 0)
+                    if (type_class == H5T_INTEGER && length == 4)
                     {
-                        umesh->elementnodes = (int *) malloc((size_t) (dims[0] * sizeof(int)));
+                        umesh->elementnodes = (int *) malloc((size_t) (umesh->nb_elementnodes * sizeof(int)));
                         dset_id = H5Dopen(file_id, path2, H5P_DEFAULT);
                         if (H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, umesh->elementnodes) < 0)
                             printf("***** WARNING(%s): Data from dataset \"%s\" may be corrupted. *****\n\n", C_MESH, path2);
                         H5Dclose(dset_id);
-                        umesh->nb_elementnodes = dims[0];
                         success = TRUE;
                     }
     if (!success)
@@ -539,20 +534,20 @@ char read_umesh (hid_t file_id, const char* path, umesh_t *umesh)
     success = FALSE;
 
     // Read m x 1 dataset "elementTypes" (8-bit signed char)
+    umesh->nb_elementtypes = 1;
     strcpy(path2, path);
     strcat(path2, G_ELEMENT_TYPES);
     if (H5Lexists(file_id, path2, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
             if (nb_dims <= 1)
-                if (H5LTget_dataset_info(file_id, path2, dims, &type_class, &length) >= 0)
-                    if (dims[0] > 0 && type_class == H5T_INTEGER && length == 1)
+                if (H5LTget_dataset_info(file_id, path2, &(umesh->nb_elementtypes), &type_class, &length) >= 0)
+                    if (type_class == H5T_INTEGER && length == 1)
                     {
-                        umesh->elementtypes = (char *) malloc((size_t) (dims[0] * sizeof(char)));
+                        umesh->elementtypes = (char *) malloc((size_t) (umesh->nb_elementtypes * sizeof(char)));
                         dset_id = H5Dopen(file_id, path2, H5P_DEFAULT);
                         if (H5Dread(dset_id, H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, H5P_DEFAULT, umesh->elementtypes) < 0)
                             printf("***** WARNING(%s): Data from dataset \"%s\" may be corrupted. *****\n\n", C_MESH, path2);
                         H5Dclose(dset_id);
-                        umesh->nb_elementtypes = dims[0];
                         success = TRUE;
                     }
     if (!success)
@@ -660,19 +655,17 @@ char read_umesh (hid_t file_id, const char* path, umesh_t *umesh)
 // Read mesh instance
 void read_mesh_instance (hid_t file_id, const char *path, mesh_instance_t *mesh_instance)
 {
-    char *attr_value;
-
-    attr_value = (char *) malloc(ATTRIBUTE_LENGTH * sizeof(char));
+    char *type;
 
     mesh_instance->name = get_name_from_path(path);
-    if (read_string_attribute(file_id, path, A_TYPE, &attr_value))
+    if (read_string_attribute(file_id, path, A_TYPE, &type))
     {
-        if (strcmp(attr_value, V_STRUCTURED) == 0)
+        if (strcmp(type, V_STRUCTURED) == 0)
         {
             mesh_instance->type = MSH_STRUCTURED;
             read_smesh(file_id, path, &(mesh_instance->data.structured));
         }
-        else if (strcmp(attr_value, V_UNSTRUCTURED) == 0)
+        else if (strcmp(type, V_UNSTRUCTURED) == 0)
         {
             mesh_instance->type = MSH_UNSTRUCTURED;
             read_umesh(file_id, path, &(mesh_instance->data.unstructured));
@@ -682,41 +675,135 @@ void read_mesh_instance (hid_t file_id, const char *path, mesh_instance_t *mesh_
             mesh_instance->type = MSH_INVALID;
             printf("***** ERROR(%s): Unexpected attribute value of \"%s@%s\". *****\n\n", C_MESH, path, A_TYPE);
         }
+        free(type);
     }
     else
     {
         mesh_instance->type = MSH_INVALID;
         printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_TYPE);
     }
-    free(attr_value);
 }
+
+
+// Read meshLink instance
+void read_meshlink_instance (hid_t file_id, const char *path, meshlink_instance_t *meshlink_instance)
+{
+    char *path2, *type, success = TRUE, dataset_read = FALSE;
+    H5T_class_t type_class;
+    size_t length;
+    int nb_dims;
+
+    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    meshlink_instance->name = get_name_from_path(path);
+    if (!read_string_attribute(file_id, path, A_MESH1, &(meshlink_instance->mesh1)))
+    {
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_MESH1);
+        success = FALSE;
+    }
+    if (!read_string_attribute(file_id, path, A_MESH2, &(meshlink_instance->mesh2)))
+    {
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_MESH2);
+        success = FALSE;
+    }
+
+    if (!read_string_attribute(file_id, path, A_TYPE, &type))
+    {
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_TYPE);
+        success = FALSE;
+    }
+
+    if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
+        if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
+            if (nb_dims == 2)
+                if (H5LTget_dataset_info(file_id, path, meshlink_instance->dims, &type_class, &length) >= 0)
+                    if (type_class == H5T_INTEGER)
+                        if (read_int_dataset(file_id, path, meshlink_instance->dims[0] * meshlink_instance->dims[1], &(meshlink_instance->data)))
+                            dataset_read = TRUE;
+    if (!dataset_read)
+    {
+        printf("***** ERROR(%s): Cannot read dataset \"%s\". *****\n\n", C_MESH, path);
+        meshlink_instance->dims[0] = 0;
+        meshlink_instance->dims[1] = 0;
+        success = FALSE;
+    }
+
+    if (success)
+    {
+        if (strcmp(type, V_NODE))
+            meshlink_instance->type = MSHLNK_NODE;
+        else if (strcmp(type, V_EDGE))
+            meshlink_instance->type = MSHLNK_EDGE;
+        else if (strcmp(type, V_FACE))
+            meshlink_instance->type = MSHLNK_FACE;
+        else if (strcmp(type, V_VOLUME))
+            meshlink_instance->type = MSHLNK_VOLUME;
+        else
+            meshlink_instance->type = MSHLNK_INVALID;
+    }
+    else
+        meshlink_instance->type = MSHLNK_INVALID;
+    if (type != NULL)
+    {
+        free(type);
+        type = NULL;
+    }
+    free(path2);
+}
+
 
 
 // Read mesh group
 void read_mesh_group (hid_t file_id, const char *path, mesh_group_t *mesh_group)
 {
     children_t children;
-    hsize_t i;
-    char *path2;
+    hsize_t i, j = 0;
+    char *path2, *path3;
 
+    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     mesh_group->name = get_name_from_path(path);
     children = read_children_name(file_id, path);
     mesh_group->nb_mesh_instances = children.nb_children;
+    for (i = 0; i < children.nb_children; i++)
+        if (strcmp(children.childnames[i], G_MESH_LINK) == 0)
+            mesh_group->nb_mesh_instances--;    // do not count /meshLink
     mesh_group->mesh_instances = NULL;
     if (children.nb_children > 0)
     {
-        path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-        mesh_group->mesh_instances = (mesh_instance_t *) malloc((size_t) children.nb_children * sizeof(mesh_instance_t));
+        mesh_group->mesh_instances = (mesh_instance_t *) malloc((size_t) mesh_group->nb_mesh_instances * sizeof(mesh_instance_t));
         for (i = 0; i < children.nb_children; i++)
         {
-            strcpy(path2, path);
-            strcat(path2, children.childnames[i]);
-            read_mesh_instance(file_id, path2, mesh_group->mesh_instances + i);
+            if (strcmp(children.childnames[i], G_MESH_LINK) != 0)
+            {
+                strcpy(path2, path);
+                strcat(path2, children.childnames[i]);
+                read_mesh_instance(file_id, path2, mesh_group->mesh_instances + j++);
+            }
             free(children.childnames[i]);
         }
         free(children.childnames);
-        free(path2);
     }
+
+    strcpy(path2, path);
+    strcat(path2, G_MESH_LINK);
+    children = read_children_name(file_id, path2);
+    mesh_group->nb_meshlink_instances = children.nb_children;
+    mesh_group->meshlink_instances = NULL;
+    if (children.nb_children > 0)
+    {
+        path3 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+        mesh_group->meshlink_instances = (meshlink_instance_t *) malloc((size_t) children.nb_children * sizeof(meshlink_instance_t));
+        for (i = 0; i < children.nb_children; i++)
+        {
+            strcpy(path3, path2);
+            strcat(path3, children.childnames[i]);
+            read_meshlink_instance(file_id, path3, mesh_group->meshlink_instances + i);
+            free(children.childnames[i]);
+        }
+        free(children.childnames);
+        free(path3);
+    }
+
+    free(path2);
 }
 
 
@@ -774,7 +861,6 @@ void print_smesh (smesh_t smesh)
     if (smesh.nb_som_tables > 0)
     {
         printf("       -selector on mesh:\n");
-        printf("          -points:\n");
         for (i = 0; i < smesh.nb_som_tables; i++)
         {
             printf("             Name: %s\n", smesh.som_tables[i].name);
@@ -789,12 +875,10 @@ void print_umesh_som_table (usom_table_t usom_table)
     hsize_t k;
     char dim;
 
-    if (usom_table.name != NULL)
-        printf(usom_table.name);
     switch (usom_table.type)
     {
     case SOM_POINT_IN_ELEMENT:
-        printf("          -points:\n");
+        printf("          Name(points): %s\n", usom_table.name);
         for (k = 0; k < usom_table.data.pie.nb_points; k++)
         {
             dim = usom_table.data.pie.nb_dims;
@@ -820,14 +904,14 @@ void print_umesh_som_table (usom_table_t usom_table)
         }
         break;
     case SOM_EDGE:
-        printf("          -edges:\n");
+        printf("          Name(edges): %s\n", usom_table.name);
         for (k = 0; k < usom_table.data.ef.nb_items; k++)
         {
             printf("               Id %lu: element=%i, inner_id=%i\n", (long unsigned) k, usom_table.data.ef.items[k][0], usom_table.data.ef.items[k][1]);
         }
         break;
     case SOM_FACE:
-        printf("          -faces:\n");
+        printf("          Name(faces): %s\n", usom_table.name);
         for (k = 0; k < usom_table.data.ef.nb_items; k++)
         {
             printf("               Id %lu: element=%i, inner_id=%i\n", (long unsigned) k, usom_table.data.ef.items[k][0], usom_table.data.ef.items[k][1]);
@@ -941,6 +1025,15 @@ void print_mesh_instance (mesh_instance_t mesh_instance)
 }
 
 
+// Print meshLink instance
+void print_meshlink_instance (meshlink_instance_t meshlink_instance)
+{
+    printf("   MeshLink instance: %s\n", meshlink_instance.name);
+    printf("      -@mesh1: %s\n", meshlink_instance.mesh1);
+    printf("      -@mesh2: %s\n", meshlink_instance.mesh2);
+}
+
+
 // Print mesh group
 void print_mesh_group (mesh_group_t mesh_group)
 {
@@ -949,6 +1042,8 @@ void print_mesh_group (mesh_group_t mesh_group)
     printf("Mesh group: %s\n", mesh_group.name);
     for (i = 0; i < mesh_group.nb_mesh_instances; i++)
         print_mesh_instance(mesh_group.mesh_instances[i]);
+    for (i = 0; i < mesh_group.nb_meshlink_instances; i++)
+        print_meshlink_instance(mesh_group.meshlink_instances[i]);
 }
 
 
@@ -1182,6 +1277,35 @@ void free_mesh_instance (mesh_instance_t *mesh_instance)
     }
 }
 
+
+void free_meshlink_instance (meshlink_instance_t *meshlink_instance)
+{
+    if (meshlink_instance->name != NULL)
+    {
+        free(meshlink_instance->name);
+        meshlink_instance->name = NULL;
+    }
+    meshlink_instance->type = MSHLNK_INVALID;
+    if (meshlink_instance->mesh1 != NULL)
+    {
+        free(meshlink_instance->mesh1);
+        meshlink_instance->mesh1 = NULL;
+    }
+    if (meshlink_instance->mesh2 != NULL)
+    {
+        free(meshlink_instance->mesh2);
+        meshlink_instance->mesh2 = NULL;
+    }
+    if (meshlink_instance->data != NULL)
+    {
+        free(meshlink_instance->data);
+        meshlink_instance->data = NULL;
+        meshlink_instance->dims[0] = 0;
+        meshlink_instance->dims[1] = 0;
+    }
+}
+
+
 // Free memory used by mesh group
 void free_mesh_group (mesh_group_t *mesh_group)
 {
@@ -1200,6 +1324,14 @@ void free_mesh_group (mesh_group_t *mesh_group)
         free(mesh_group->mesh_instances);
         mesh_group->mesh_instances = NULL;
         mesh_group->nb_mesh_instances = 0;
+    }
+    if (mesh_group->nb_meshlink_instances > 0)
+    {
+        for (i = 0; i < mesh_group->nb_meshlink_instances; i++)
+            free_meshlink_instance(mesh_group->meshlink_instances + i);
+        free(mesh_group->meshlink_instances);
+        mesh_group->meshlink_instances = NULL;
+        mesh_group->nb_meshlink_instances = 0;
     }
 }
 

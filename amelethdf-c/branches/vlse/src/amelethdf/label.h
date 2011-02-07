@@ -7,14 +7,14 @@ extern "C" {
 
 #include "amelethdf.h"
 
-    typedef struct
+    typedef struct label_dataset_t
     {
         char        *name;
         hsize_t     nb_items;
         char        **items;
     } label_dataset_t;
 
-    typedef struct
+    typedef struct label_t
     {
         hsize_t     nb_label_datasets;
         label_dataset_t *label_datasets;

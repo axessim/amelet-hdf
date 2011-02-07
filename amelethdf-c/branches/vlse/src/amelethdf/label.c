@@ -10,11 +10,12 @@ void read_label_dataset(hid_t file_id, const char *path, label_dataset_t *label_
     size_t length;
     char success = FALSE;
 
+    label_dataset->nb_items = 1;  // in case of single value
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims <= 1)
                 if (H5LTget_dataset_info(file_id, path, &(label_dataset->nb_items), &type_class, &length) >= 0)
-                    if (label_dataset->nb_items > 0 && type_class == H5T_STRING)
+                    if (type_class == H5T_STRING)
                         if(read_string_dataset(file_id, path, label_dataset->nb_items, length, &(label_dataset->items)))
                             success = TRUE;
     if (success)

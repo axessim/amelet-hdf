@@ -12,7 +12,7 @@ extern "C" {
 #define A_OBJECT "object"
 #define A_OUTPUT "output"
 
-    typedef struct
+    typedef struct outputrequest_instance_t
     {
         char        *name;
         optional_attributes_t optional_attributes;
@@ -21,7 +21,7 @@ extern "C" {
         char        *output;
     } outputrequest_instance_t;
 
-    typedef struct
+    typedef struct outputrequest_group_t
     {
         char        *name;
         optional_attributes_t optional_attributes;
@@ -29,7 +29,7 @@ extern "C" {
         outputrequest_instance_t *outputrequest_instances;
     } outputrequest_group_t;
 
-    typedef struct
+    typedef struct outputrequest_t
     {
         hsize_t     nb_outputrequest_groups;
         outputrequest_group_t *outputrequest_groups;

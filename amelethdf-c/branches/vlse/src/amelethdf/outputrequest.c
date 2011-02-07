@@ -23,8 +23,10 @@ void read_outputrequest_group (hid_t file_id, const char *path, outputrequest_gr
     children_t children;
     hsize_t i;
     char *path2;
+    char mandatory[][ATTRIBUTE_LENGTH] = {};
 
     outputrequest_group->name = get_name_from_path(path);
+    read_optional_attributes(file_id, path, &(outputrequest_group->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
     children = read_children_name(file_id, path);
     outputrequest_group->nb_outputrequest_instances = children.nb_children;
     outputrequest_group->outputrequest_instances = NULL;

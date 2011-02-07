@@ -15,7 +15,7 @@ extern "C" {
 #define ES_SOURCE_ON_MESH "sourceOnMesh"
 
 
-typedef struct
+typedef struct planewave_t
 {
         char *name;
         float x0;
@@ -30,7 +30,7 @@ typedef struct
         //floatingtype_t magnitude;
 } planewave_t;
 
-typedef struct
+typedef struct sphericalwave_t
 {
         char *name;
         float x0;
@@ -39,28 +39,28 @@ typedef struct
 //        floatingtype_t magnitude;
 } sphericalwave_t;
 
-typedef struct
+typedef struct generator_t
 {
         char *name;
         char *type;
 } generator_t;
 
-typedef struct
+typedef struct dipole_t
 {
         char *name;
 } dipole_t;
 
-typedef struct
+typedef struct antenna_t
 {
         char *name;
 } antenna_t;
 
-typedef struct
+typedef struct sourceonmesh_t
 {
         char *name;
 } sourceonmesh_t;
 
-typedef struct
+typedef struct em_source_t
 {
         hsize_t nb_pw_sources;
         planewave_t *pw_sources;

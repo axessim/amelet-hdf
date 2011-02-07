@@ -10,7 +10,7 @@ extern "C" {
 #define A_SUBJECT "subject"
 #define A_OBJECT "object"
 
-    typedef struct
+    typedef struct link_instance_t
     {
         char        *name;
         optional_attributes_t optional_attributes;
@@ -18,7 +18,7 @@ extern "C" {
         char        *object;
     } link_instance_t;
 
-    typedef struct
+    typedef struct link_group_t
     {
         char        *name;
         optional_attributes_t optional_attributes;
@@ -26,7 +26,7 @@ extern "C" {
         link_instance_t *link_instances;
     } link_group_t;
 
-    typedef struct
+    typedef struct link_t
     {
         hsize_t     nb_link_groups;
         link_group_t *link_groups;

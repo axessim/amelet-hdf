@@ -12,7 +12,7 @@ extern "C" {
 #define EE_EXTERNAL_FILE_NAME(id) 3*id + 1
 #define EE_EXTERNAL_NAME(id) 3*id + 2
 
-    typedef struct
+    typedef struct ee_dataset_t
     {
         char        *name;
         hid_t       *file_id;
@@ -20,7 +20,7 @@ extern "C" {
         char        **eed_items;
     } ee_dataset_t;
 
-    typedef struct
+    typedef struct external_element_t
     {
         hsize_t     nb_ee_datasets;
         ee_dataset_t *ee_datasets;
