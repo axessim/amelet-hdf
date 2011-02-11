@@ -23,7 +23,7 @@ extern "C" {
     void read_label_dataset(hid_t file_id, const char *path, label_dataset_t *label_dataset);
     void read_label(hid_t file_id, label_t *label);
 
-    void print_label_dataset (label_dataset_t label_dataset);
+    void print_label_dataset (label_dataset_t label_dataset, int space);
     void print_label(label_t label);
 
     void free_label_dataset (label_dataset_t *label_dataset);

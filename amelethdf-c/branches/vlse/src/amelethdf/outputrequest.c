@@ -8,12 +8,12 @@ void read_outputrequest_instance (hid_t file_id, const char *path, outputrequest
 
     outputrequest_instance->name = get_name_from_path(path);
     read_optional_attributes(file_id, path, &(outputrequest_instance->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
-    if (!read_string_attribute(file_id, path, A_SUBJECT, &(outputrequest_instance->subject)))
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_OUTPUT_REQUEST, path, A_SUBJECT);
-    if (!read_string_attribute(file_id, path, A_OBJECT, &(outputrequest_instance->object)))
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_OUTPUT_REQUEST, path, A_OBJECT);
-    if (!read_string_attribute(file_id, path, A_OUTPUT, &(outputrequest_instance->output)))
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_OUTPUT_REQUEST, path, A_OUTPUT);
+    if (!read_str_attribute(file_id, path, A_SUBJECT, &(outputrequest_instance->subject)))
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_OUTPUT_REQUEST, path, A_SUBJECT);
+    if (!read_str_attribute(file_id, path, A_OBJECT, &(outputrequest_instance->object)))
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_OUTPUT_REQUEST, path, A_OBJECT);
+    if (!read_str_attribute(file_id, path, A_OUTPUT, &(outputrequest_instance->output)))
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_OUTPUT_REQUEST, path, A_OUTPUT);
 }
 
 
@@ -76,27 +76,25 @@ void read_outputrequest(hid_t file_id, outputrequest_t *outputrequest)
 
 
 // Print outputRequest instance
-void print_outputrequest_instance (outputrequest_instance_t outputrequest_instance)
+void print_outputrequest_instance (outputrequest_instance_t outputrequest_instance, int space)
 {
-    printf("  -instance name: %s\n", outputrequest_instance.name);
-    print_optional_attributes(outputrequest_instance.optional_attributes);
-    printf("     @subject: %s\n", outputrequest_instance.subject);
-    printf("     @object:  %s\n", outputrequest_instance.object);
-    printf("     @output:  %s\n", outputrequest_instance.output);
+    printf("%*sInstance: %s\n", space, "", outputrequest_instance.name);
+    print_optional_attributes(outputrequest_instance.optional_attributes, space + 3);
+    print_str_attribute(A_SUBJECT, outputrequest_instance.subject, space + 3);
+    print_str_attribute(A_OBJECT, outputrequest_instance.object, space + 3);
+    print_str_attribute(A_OUTPUT, outputrequest_instance.output, space + 3);
 }
 
 
 // Print outputRequest group (group of instances)
-void print_outputrequest_group (outputrequest_group_t outputrequest_group)
+void print_outputrequest_group (outputrequest_group_t outputrequest_group, int space)
 {
     hsize_t i;
 
-    printf("Group name: %s\n", outputrequest_group.name);
-    print_optional_attributes(outputrequest_group.optional_attributes);
+    printf("%*sGroup: %s\n", space, "", outputrequest_group.name);
+    print_optional_attributes(outputrequest_group.optional_attributes, space + 4);
     for (i = 0; i < outputrequest_group.nb_outputrequest_instances; i++)
-    {
-        print_outputrequest_instance(outputrequest_group.outputrequest_instances[i]);
-    }
+        print_outputrequest_instance(outputrequest_group.outputrequest_instances[i], space + 2);
     printf("\n");
 }
 
@@ -106,11 +104,9 @@ void print_outputrequest (outputrequest_t outputrequest)
 {
     hsize_t i;
 
-    printf("\n##############################  Output request  ##############################\n\n");
+    printf("##############################  Output request  ##############################\n\n");
     for (i = 0; i < outputrequest.nb_outputrequest_groups; i++)
-    {
-        print_outputrequest_group(outputrequest.outputrequest_groups[i]);
-    }
+        print_outputrequest_group(outputrequest.outputrequest_groups[i], 0);
     printf("\n");
 }
 

@@ -34,7 +34,7 @@ extern "C" {
     void read_simulation_instance(hid_t file_id, const char *path, simulation_instance_t *simulation_instance);
     void read_simulation(hid_t file_id, simulation_t *simulation);
 
-    void print_simulation_instance(simulation_instance_t simulation_instance);
+    void print_simulation_instance(simulation_instance_t simulation_instance, int space);
     void print_simulation(simulation_t simulation);
 
     void free_simulation_instance(simulation_instance_t *simulation_instance);

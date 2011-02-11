@@ -30,7 +30,7 @@ extern "C" {
     void read_external_element_dataset (hid_t file_id, const char *path, ee_dataset_t *ee_dataset);
     void read_external_element (hid_t file_id, external_element_t *external_element);
 
-    void print_external_element_dataset (ee_dataset_t ee_dataset);
+    void print_external_element_dataset (ee_dataset_t ee_dataset, int space);
     void print_external_element (external_element_t external_element);
 
     void free_external_element_dataset (ee_dataset_t *ee_dataset);

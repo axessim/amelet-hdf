@@ -9,10 +9,10 @@ void read_link_instance (hid_t file_id, const char *path, link_instance_t *link_
 
     link_instance->name = get_name_from_path(path);
     read_optional_attributes(file_id, path, &(link_instance->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
-    if (!read_string_attribute(file_id, path, A_SUBJECT, &(link_instance->subject)))
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_LINK, path, A_SUBJECT);
-    if (!read_string_attribute(file_id, path, A_OBJECT, &(link_instance->object)))
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_LINK, path, A_OBJECT);
+    if (!read_str_attribute(file_id, path, A_SUBJECT, &(link_instance->subject)))
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_LINK, path, A_SUBJECT);
+    if (!read_str_attribute(file_id, path, A_OBJECT, &(link_instance->object)))
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_LINK, path, A_OBJECT);
 }
 
 
@@ -76,26 +76,24 @@ void read_link (hid_t file_id, link_t *link)
 
 
 // Print link instance
-void print_link_instance (link_instance_t link_instance)
+void print_link_instance (link_instance_t link_instance, int space)
 {
-    printf("  -instance name: %s\n", link_instance.name);
-    printf("     @subject: %s\n", link_instance.subject);
-    printf("     @object:  %s\n", link_instance.object);
-    print_optional_attributes(link_instance.optional_attributes);
+    printf("%*sInstance: %s\n", space, "", link_instance.name);
+    print_str_attribute(A_SUBJECT, link_instance.subject, space + 3);
+    print_str_attribute(A_OBJECT, link_instance.object, space + 3);
+    print_optional_attributes(link_instance.optional_attributes, space + 3);
 }
 
 
 // Print link group (group of instances)
-void print_link_group (link_group_t link_group)
+void print_link_group (link_group_t link_group, int space)
 {
     hsize_t i;
 
-    printf("Group name: %s\n", link_group.name);
-    print_optional_attributes(link_group.optional_attributes);
+    printf("%*sGroup: %s\n", space, "", link_group.name);
+    print_optional_attributes(link_group.optional_attributes, space + 4);
     for (i = 0; i < link_group.nb_link_instances; i++)
-    {
-        print_link_instance(link_group.link_instances[i]);
-    }
+        print_link_instance(link_group.link_instances[i], space + 2);
     printf("\n");
 }
 
@@ -105,10 +103,10 @@ void print_link (link_t link)
 {
     hsize_t i;
 
-    printf("\n###################################  Link  ###################################\n\n");
+    printf("###################################  Link  ###################################\n\n");
     for (i = 0; i < link.nb_link_groups; i++)
     {
-        print_link_group(link.link_groups[i]);
+        print_link_group(link.link_groups[i], 0);
     }
     printf("\n");
 }

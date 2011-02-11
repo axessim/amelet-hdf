@@ -15,10 +15,10 @@ void read_simulation_instance(hid_t file_id, const char *path, simulation_instan
 
     simulation_instance->name = get_name_from_path(path);
     read_optional_attributes(file_id, path2, &(simulation_instance->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
-    if (!read_string_attribute(file_id, path, A_MODULE, &(simulation_instance->module)))
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_SIMULATION, path, A_MODULE);
-    if (!read_string_attribute(file_id, path, A_VERSION, &(simulation_instance->version)))
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_SIMULATION, path, A_VERSION);
+    if (!read_str_attribute(file_id, path, A_MODULE, &(simulation_instance->module)))
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_SIMULATION, path, A_MODULE);
+    if (!read_str_attribute(file_id, path, A_VERSION, &(simulation_instance->version)))
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_SIMULATION, path, A_VERSION);
     strcpy(path2, path);
     strcat(path2, G_PARAMETER);
 
@@ -92,30 +92,29 @@ void read_simulation(hid_t file_id, simulation_t *simulation)
 
 
 // Print simulation instance
-void print_simulation_instance(simulation_instance_t simulation_instance)
+void print_simulation_instance(simulation_instance_t simulation_instance, int space)
 {
     hsize_t i;
 
-    printf("Name: %s\n", simulation_instance.name);
-    print_optional_attributes(simulation_instance.optional_attributes);
-    if (strcmp(simulation_instance.module,"") != FALSE)
-        printf("      -@module: %s\n", simulation_instance.module);
-    if (strcmp(simulation_instance.version,"") != FALSE)
-        printf("      -@version: %s\n", simulation_instance.version);
+    printf("%*sInstance: %s\n", space, "", simulation_instance.name);
+    print_optional_attributes(simulation_instance.optional_attributes, space + 4);
+    print_str_attribute(A_MODULE, simulation_instance.module, space + 4);
+    print_str_attribute(A_VERSION, simulation_instance.version, space + 4);
 
     if (simulation_instance.nb_inputs > 0)
     {
-        printf("  -inputs:\n");
+        printf("%*sInputs:\n", space + 2, "");
         for (i = 0; i < simulation_instance.nb_inputs; i++)
-            printf("      %s\n", simulation_instance.inputs[i]);
+            printf("%*s%s\n", space + 5, " ", simulation_instance.inputs[i]);
     }
 
     if (simulation_instance.nb_outputs > 0)
     {
-        printf("  -outputs:\n");
+        printf("%*sOutputs:\n", space + 2, "");
         for (i = 0; i < simulation_instance.nb_outputs; i++)
-            printf("      %s\n", simulation_instance.outputs[i]);
+            printf("%*s%s\n", space + 5, "", simulation_instance.outputs[i]);
     }
+    printf("\n");
 }
 
 
@@ -124,10 +123,10 @@ void print_simulation(simulation_t simulation)
 {
     hsize_t i;
 
-    printf("\n################################  Simulation  ################################\n\n");
+    printf("################################  Simulation  ################################\n\n");
     for (i = 0; i < simulation.nb_simulation_instances; i++)
     {
-        print_simulation_instance(simulation.simulation_instances[i]);
+        print_simulation_instance(simulation.simulation_instances[i], 0);
     }
     printf("\n");
 }

@@ -62,13 +62,14 @@ void read_label(hid_t file_id, label_t *label)
 
 
 // Print label dataset
-void print_label_dataset (label_dataset_t label_dataset)
+void print_label_dataset (label_dataset_t label_dataset, int space)
 {
     hsize_t i;
 
-    printf("Name: %s\n", label_dataset.name);
+    printf("%*sName: %s\n", space, "", label_dataset.name);
     for (i = 0; i < label_dataset.nb_items; i++)
-        printf("  %s\n", label_dataset.items[i]);
+        printf("%*s%s\n", space + 3, "", label_dataset.items[i]);
+    printf("\n");
 }
 
 
@@ -77,10 +78,10 @@ void print_label(label_t label)
 {
     hsize_t i;
 
-    printf("\n##################################  Label  ###################################\n\n");
+    printf("##################################  Label  ###################################\n\n");
     for (i = 0; i < label.nb_label_datasets; i++)
     {
-        print_label_dataset(label.label_datasets[i]);
+        print_label_dataset(label.label_datasets[i], 0);
     }
     printf("\n");
 }

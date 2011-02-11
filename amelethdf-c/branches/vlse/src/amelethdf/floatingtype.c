@@ -8,14 +8,11 @@ char read_ft_singleinteger (hid_t file_id, const char *path, singleinteger_t *si
     char success = FALSE;
     char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
 
-    singleinteger->value = 0;
-    if (H5Aexists_by_name(file_id, path, A_VALUE, H5P_DEFAULT) > 0)
-        if (H5LTget_attribute_int(file_id, path, A_VALUE, &(singleinteger->value)) >= 0)
-            success = TRUE;
-    if (success)
+    if (read_int_attribute(file_id, path, A_VALUE, &(singleinteger->value)))
     {
         singleinteger->name = get_name_from_path(path);
         read_optional_attributes(file_id, path, &(singleinteger->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        success = TRUE;
     }
     else
         printf("***** ERROR: Cannot read mandatory attribute \"%s@%s\". *****\n\n", path, A_VALUE);
@@ -29,14 +26,11 @@ char read_ft_singlereal (hid_t file_id, const char *path, singlereal_t *singlere
     char success = FALSE;
     char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
 
-    singlereal->value = 0;
-    if (H5Aexists_by_name(file_id, path, A_VALUE, H5P_DEFAULT) > 0)
-        if (H5LTget_attribute_float(file_id, path, A_VALUE, &(singlereal->value)) >= 0)
-            success = TRUE;
-    if (success)
+    if (read_flt_attribute(file_id, path, A_VALUE, &(singlereal->value)))
     {
         singlereal->name = get_name_from_path(path);
         read_optional_attributes(file_id, path, &(singlereal->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        success = TRUE;
     }
     else
         printf("***** ERROR: Cannot read mandatory attribute \"%s@%s\". *****\n\n", path, A_VALUE);
@@ -48,29 +42,13 @@ char read_ft_singlereal (hid_t file_id, const char *path, singlereal_t *singlere
 char read_ft_singlecomplex (hid_t file_id, const char *path, singlecomplex_t *singlecomplex)
 {
     char success = FALSE;
-    hid_t attr_id, type_id;
-    float buf[2];
     char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
 
-    singlecomplex->value = 0 + 0 * _Complex_I;
-    if (H5Aexists_by_name(file_id, path, A_VALUE, H5P_DEFAULT) > 0)
-    {
-        attr_id = H5Aopen_by_name(file_id, path, A_VALUE, H5P_DEFAULT, H5P_DEFAULT);
-        type_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
-        H5Tinsert(type_id, "r", 0, H5T_NATIVE_FLOAT);
-        H5Tinsert(type_id, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
-        if (H5Aread(attr_id, type_id, buf) >= 0)
-        {
-            singlecomplex->value = buf[0] + buf[1] * _Complex_I;
-            success = TRUE;
-        }
-        H5Tclose(type_id);
-        H5Aclose(attr_id);
-    }
-    if (success)
+    if (read_cpx_attribute(file_id, path, A_VALUE, &(singlecomplex->value)))
     {
         singlecomplex->name = get_name_from_path(path);
         read_optional_attributes(file_id, path, &(singlecomplex->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        success = TRUE;
     }
     else
         printf("***** ERROR: Cannot read mandatory attribute \"%s@%s\". *****\n\n", path, A_VALUE);
@@ -84,7 +62,7 @@ char read_ft_singlestring (hid_t file_id, const char *path, singlestring_t *sing
     char success = FALSE;
     char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
 
-    if(read_string_attribute(file_id, path, A_VALUE, &(singlestring->value)))
+    if(read_str_attribute(file_id, path, A_VALUE, &(singlestring->value)))
     {
         singlestring->name = get_name_from_path(path);
         read_optional_attributes(file_id, path, &(singlestring->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
@@ -399,7 +377,7 @@ char read_ft_rational (hid_t file_id, const char *path, rational_t *rational)
                 strcpy(path2, path);
                 strcat(path2, G_FUNCTION);
                 strcat(path2, children.childnames[i]);
-                if (read_string_attribute(file_id, path2, A_FLOATING_TYPE, &buf))
+                if (read_str_attribute(file_id, path2, A_FLOATING_TYPE, &buf))
                 {
                     if (strcmp(buf, V_RATIONAL_FUNCTION) == 0)
                     {
@@ -579,13 +557,13 @@ char read_ft_arrayset (hid_t file_id, const char *path, arrayset_t *arrayset)
     return success;
 }
 
-
+// Read floatingType structure, return TRUE (all OK) or FALSE (no malloc)
 char read_floatingtype(hid_t file_id, const char *path, floatingtype_t *floatingtype)
 {
     char success = FALSE;
     char* buf;
 
-    if (read_string_attribute(file_id, path, A_FLOATING_TYPE, &buf))
+    if (read_str_attribute(file_id, path, A_FLOATING_TYPE, &buf))
     {
         if (strcmp(buf, V_SINGLE_INTEGER) == 0)
         {
@@ -683,7 +661,7 @@ char read_floatingtype(hid_t file_id, const char *path, floatingtype_t *floating
         buf = NULL;
     }
     else
-        printf("***** ERROR: Cannot find mandatory attribute \"%s@%s\". *****\n\n", path, A_FLOATING_TYPE);
+        printf("***** ERROR: Cannot read mandatory attribute \"%s@%s\". *****\n\n", path, A_FLOATING_TYPE);
     if (!success)
         floatingtype->type = FT_INVALID;
     return success;
@@ -692,142 +670,153 @@ char read_floatingtype(hid_t file_id, const char *path, floatingtype_t *floating
 
 
 
-void print_ft_singleinteger (singleinteger_t singleinteger)
+// Print singleInteger
+void print_ft_singleinteger (singleinteger_t singleinteger, int space)
 {
-    printf("   -%s: %i\n",singleinteger.name, singleinteger.value);
-    print_optional_attributes(singleinteger.optional_attributes);
+    printf("%*s-%s:\n", space, "", singleinteger.name);
+    print_int_attribute(A_VALUE, singleinteger.value, space + 3);
+    print_optional_attributes(singleinteger.optional_attributes, space + 3);
 }
 
 
-void print_ft_singlereal (singlereal_t singlereal)
+// Print singleReal
+void print_ft_singlereal (singlereal_t singlereal, int space)
 {
-    printf("   -%s: %g\n",singlereal.name, singlereal.value);
-    print_optional_attributes(singlereal.optional_attributes);
+    printf("%*s-%s:\n", space, "", singlereal.name);
+    print_flt_attribute(A_VALUE, singlereal.value, space + 3);
+    print_optional_attributes(singlereal.optional_attributes, space + 3);
 }
 
 
-void print_ft_singlecomplex (singlecomplex_t singlecomplex)
+// Print singleComplex
+void print_ft_singlecomplex (singlecomplex_t singlecomplex, int space)
 {
-    printf("   -%s: %g%+gi\n",singlecomplex.name, creal(singlecomplex.value), cimag(singlecomplex.value));
-    print_optional_attributes(singlecomplex.optional_attributes);
+    printf("%*s-%s:\n", space, "", singlecomplex.name);
+    print_cpx_attribute(A_VALUE, singlecomplex.value, space + 3);
+    print_optional_attributes(singlecomplex.optional_attributes, space + 3);
 }
 
 
-void print_ft_singlestring (singlestring_t singlestring)
+// Print singleString
+void print_ft_singlestring (singlestring_t singlestring, int space)
 {
-    printf("   -%s: \"%s\"\n",singlestring.name, singlestring.value);
-    print_optional_attributes(singlestring.optional_attributes);
+    printf("%*s-%s:\n", space, "", singlestring.name);
+    print_str_attribute(A_VALUE, singlestring.value, space + 3);
+    print_optional_attributes(singlestring.optional_attributes, space + 3);
 }
 
 
-void print_ft_vector (vector_t vector)
+// Print vector
+void print_ft_vector (vector_t vector, int space)
 {
     hsize_t i;
 
-    printf("   -%s [%lu]: {", vector.name,(long unsigned) vector.nb_values);
+    printf("%*s-%s [%lu]: {", space, "", vector.name,(long unsigned) vector.nb_values);
     switch (vector.type_class)
     {
     case H5T_INTEGER:
         for (i = 0; i < vector.nb_values - 1; i++)
-        {
             printf("%i, ", vector.values.i[i]);
-        }
         printf("%i}\n", vector.values.i[vector.nb_values - 1]);
         break;
     case H5T_FLOAT:
         for (i = 0; i < vector.nb_values - 1; i++)
-        {
             printf("%g, ", vector.values.f[i]);
-        }
         printf("%g}\n", vector.values.f[vector.nb_values - 1]);
         break;
     case H5T_COMPOUND:
         for (i = 0; i < vector.nb_values - 1; i++)
-        {
             printf("%g%+gi, ", creal(vector.values.c[i]), cimag(vector.values.c[i]));
-        }
         printf("%g%+gi}\n", creal(vector.values.c[vector.nb_values - 1]), cimag(vector.values.c[vector.nb_values - 1]));
         break;
     case H5T_STRING:
         for (i = 0; i < vector.nb_values - 1; i++)
-        {
             printf("\"%s\", ", vector.values.s[i]);
-        }
         printf("\"%s\"}\n", vector.values.s[vector.nb_values - 1]);
         break;
     default:
         break;
     }
-    print_optional_attributes(vector.optional_attributes);
+    print_optional_attributes(vector.optional_attributes, space + 3);
 }
 
 
-void print_ft_linearlistofreal1 (linearlistofreal1_t linearlistofreal1)
+// Print linearListOfReal1
+void print_ft_linearlistofreal1 (linearlistofreal1_t linearlistofreal1, int space)
 {
-    printf("   -%s: first=%g, last=%g, numberOfValues=%i\n",linearlistofreal1.name, linearlistofreal1.first, linearlistofreal1.last, linearlistofreal1.number_of_values);
-    print_optional_attributes(linearlistofreal1.optional_attributes);
+    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",linearlistofreal1.name, A_FIRST, linearlistofreal1.first, A_LAST, linearlistofreal1.last, A_NUMBER_OF_VALUES, linearlistofreal1.number_of_values);
+    print_optional_attributes(linearlistofreal1.optional_attributes, space + 3);
 }
 
 
-void print_ft_linearlistofreal2 (linearlistofreal2_t linearlistofreal2)
+// Print linearListOfReal2
+void print_ft_linearlistofreal2 (linearlistofreal2_t linearlistofreal2, int space)
 {
-    printf("   -%s: first=%g, step=%g, numberOfValues=%i\n",linearlistofreal2.name, linearlistofreal2.first, linearlistofreal2.step, linearlistofreal2.number_of_values);
-    print_optional_attributes(linearlistofreal2.optional_attributes);
+    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",linearlistofreal2.name, A_FIRST, linearlistofreal2.first, A_STEP, linearlistofreal2.step, A_NUMBER_OF_VALUES, linearlistofreal2.number_of_values);
+    print_optional_attributes(linearlistofreal2.optional_attributes, space + 3);
 }
 
 
-void print_ft_logarithmlistofreal (logarithmlistofreal_t logarithmlistofreal)
+// Print logarithmListOfReal
+void print_ft_logarithmlistofreal (logarithmlistofreal_t logarithmlistofreal, int space)
 {
-    printf("   -%s: first=%g, last=%g, numberOfValues=%i\n",logarithmlistofreal.name, logarithmlistofreal.first, logarithmlistofreal.last, logarithmlistofreal.number_of_values);
-    print_optional_attributes(logarithmlistofreal.optional_attributes);
+    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "", logarithmlistofreal.name, A_FIRST, logarithmlistofreal.first, A_LAST, logarithmlistofreal.last, A_NUMBER_OF_VALUES, logarithmlistofreal.number_of_values);
+    print_optional_attributes(logarithmlistofreal.optional_attributes, space + 3);
 }
 
 
-void print_ft_perdecadelistofreal (perdecadelistofreal_t perdecadelistofreal)
+// Print perDecadeListOfReal
+void print_ft_perdecadelistofreal (perdecadelistofreal_t perdecadelistofreal, int space)
 {
-    printf("   -%s: first=%g, numberOfDecades=%i, numberOfValuesPerDecade=%i\n",perdecadelistofreal.name, perdecadelistofreal.first, perdecadelistofreal.number_of_decades, perdecadelistofreal.number_of_values_per_decade);
-    print_optional_attributes(perdecadelistofreal.optional_attributes);
+    printf("%*s-%s: %s=%g, %s=%i, %s=%i\n", space, "", perdecadelistofreal.name, A_FIRST, perdecadelistofreal.first, A_NUMBER_OF_DECADES, perdecadelistofreal.number_of_decades, A_NUMBER_OF_VALUES_PER_DECADE, perdecadelistofreal.number_of_values_per_decade);
+    print_optional_attributes(perdecadelistofreal.optional_attributes, space + 3);
 }
 
 
-void print_ft_linearlistofinteger2 (linearlistofinteger2_t linearlistofinteger2)
+// Print linearListOfInteger2
+void print_ft_linearlistofinteger2 (linearlistofinteger2_t linearlistofinteger2, int space)
 {
-    printf("   -%s: first=%i, step=%i, numberOfValues=%i\n",linearlistofinteger2.name, linearlistofinteger2.first, linearlistofinteger2.step, linearlistofinteger2.number_of_values);
-    print_optional_attributes(linearlistofinteger2.optional_attributes);
+    printf("%*s-%s: %s=%i, %s=%i, %s=%i\n", space, "",linearlistofinteger2.name, A_FIRST, linearlistofinteger2.first, A_STEP, linearlistofinteger2.step, A_NUMBER_OF_VALUES, linearlistofinteger2.number_of_values);
+    print_optional_attributes(linearlistofinteger2.optional_attributes, space + 3);
 }
 
 
-void print_ft_rationalfunction (rationalfunction_t rationalfunction)
+// Print rationalFunction
+void print_ft_rationalfunction (rationalfunction_t rationalfunction, int space)
 {
     hsize_t i;
 
-    printf("   -%s [%lu]: ",rationalfunction.name, (long unsigned) rationalfunction.nb_types);
+    printf("%*s-%s [%lu]: ", space, "",rationalfunction.name, (long unsigned) rationalfunction.nb_types);
     for (i = 0; i < rationalfunction.nb_types - 1; i++)
     {
         printf("type%i=%g|%g|%g, ", rationalfunction.types[i], rationalfunction.a[i], rationalfunction.b[i], rationalfunction.f[i]);
     }
     printf("type%i=%g|%g|%g\n", rationalfunction.types[rationalfunction.nb_types - 1], rationalfunction.a[rationalfunction.nb_types - 1], rationalfunction.b[rationalfunction.nb_types - 1], rationalfunction.f[rationalfunction.nb_types - 1]);
-    print_optional_attributes(rationalfunction.optional_attributes);
+    print_optional_attributes(rationalfunction.optional_attributes, space + 3);
 }
 
 
-void print_ft_generalrationalfunction (generalrationalfunction_t generalrationalfunction)
+// Print generalRationalFunction
+void print_ft_generalrationalfunction (generalrationalfunction_t generalrationalfunction, int space)
 {
     int i;
 
-    printf("   -%s [%i]:\n",generalrationalfunction.name, generalrationalfunction.nb_degrees);
+    printf("%*s-%s [%i]:\n", space, "",generalrationalfunction.name, generalrationalfunction.nb_degrees);
     for (i = 0; i < generalrationalfunction.nb_degrees; i++)
-        printf("   -degree %i: numerator=%g%+gi, denominator=%g%+gi\n", i, creal(generalrationalfunction.numerator[i]), cimag(generalrationalfunction.numerator[i]), creal(generalrationalfunction.denominator[i]), cimag(generalrationalfunction.denominator[i]));
-    print_optional_attributes(generalrationalfunction.optional_attributes);
+        printf("%*s-degree %i: numerator=%g%+gi, denominator=%g%+gi\n", space + 3, "", i, creal(generalrationalfunction.numerator[i]), cimag(generalrationalfunction.numerator[i]), creal(generalrationalfunction.denominator[i]), cimag(generalrationalfunction.denominator[i]));
+    print_optional_attributes(generalrationalfunction.optional_attributes, space + 3);
 }
 
 
-void print_ft_rational (rational_t rational)
+// Print rational
+void print_ft_rational (rational_t rational, int space)
 {
     hsize_t i, total;
     int j;
 
-    printf("   -%s [%lux%lu]: {", rational.name, (long unsigned) rational.dims[0], (long unsigned) rational.dims[1]);
+    printf("%*s-%s:\n", space, "", rational.name);
+    print_optional_attributes(rational.optional_attributes, space + 3);
+    printf("%*s-@%s [%lux%lu]: {", space + 3, "", A_VALUE, (long unsigned) rational.dims[0], (long unsigned) rational.dims[1]);
     if (rational.data != NULL)
     {
         total = (rational.dims[0]) * (rational.dims[1]);
@@ -838,29 +827,32 @@ void print_ft_rational (rational_t rational)
         printf("\"%s\"", rational.data[total - 1]);
     }
     printf("}\n");
-
+    // Print functions inside rational
     for (j = 0; j < rational.nb_functions; j++)
     {
         switch (rational.functions[j].type)
         {
         case FT_RATIONAL_FUNCTION:
-            print_ft_rationalfunction(rational.functions[j].data.rf);
+            print_ft_rationalfunction(rational.functions[j].data.rf, space + 6);
             break;
         case FT_GENERAL_RATIONAL_FUNCTION:
-            print_ft_generalrationalfunction(rational.functions[j].data.grf);
+            print_ft_generalrationalfunction(rational.functions[j].data.grf, space + 6);
             break;
         default:
             break;
         }
     }
+
 }
 
-void print_ft_dataset (dataset_t dataset)
+
+// Print dataset
+void print_ft_dataset (dataset_t dataset, int space)
 {
     hsize_t i, total = 1;
     int j;
 
-    printf("   -%s [", dataset.name);
+    printf("%*s-%s [", space, "", dataset.name);
     for (j = 0; j < dataset.nb_dims - 1; j++)
     {
         printf("%lux", (long unsigned) dataset.dims[j]);
@@ -905,75 +897,72 @@ void print_ft_dataset (dataset_t dataset)
     default:
         break;
     }
-    print_optional_attributes(dataset.optional_attributes);
+    print_optional_attributes(dataset.optional_attributes, space + 3);
 }
 
 
-void print_ft_arrayset (arrayset_t arrayset)
+// Print arrayset
+void print_ft_arrayset (arrayset_t arrayset, int space)
 {
     hsize_t i;
 
-    printf("   -%s:\n", arrayset.name);
-    printf("   ");
-    print_ft_dataset(arrayset.data);
+    printf("%*s-%s:\n", space, "", arrayset.name);
+    print_optional_attributes(arrayset.optional_attributes, space + 4);
+    print_ft_dataset(arrayset.data, space + 2);
     for (i = 0; i < arrayset.nb_dims; i++)
-    {
-        printf("   ");
-        print_ft_vector (arrayset.dims[i]);
-    }
-    print_optional_attributes(arrayset.optional_attributes);
-    printf("\n");
+        print_ft_vector(arrayset.dims[i], space + 2);
 }
 
 
-void print_floatingtype (floatingtype_t floatingtype)
+// Print floatingType structure
+void print_floatingtype (floatingtype_t floatingtype, int space)
 {
     switch(floatingtype.type)
     {
     case FT_SINGLE_INTEGER:
-        print_ft_singleinteger(floatingtype.data.singleinteger);
+        print_ft_singleinteger(floatingtype.data.singleinteger, space);
         break;
     case FT_SINGLE_REAL:
-        print_ft_singlereal(floatingtype.data.singlereal);
+        print_ft_singlereal(floatingtype.data.singlereal, space);
         break;
     case FT_SINGLE_COMPLEX:
-        print_ft_singlecomplex(floatingtype.data.singlecomplex);
+        print_ft_singlecomplex(floatingtype.data.singlecomplex, space);
         break;
     case FT_SINGLE_STRING:
-        print_ft_singlestring(floatingtype.data.singlestring);
+        print_ft_singlestring(floatingtype.data.singlestring, space);
         break;
     case FT_VECTOR:
-        print_ft_vector(floatingtype.data.vector);
+        print_ft_vector(floatingtype.data.vector, space);
         break;
     case FT_LINEARLISTOFREAL1:
-        print_ft_linearlistofreal1(floatingtype.data.linearlistofreal1);
+        print_ft_linearlistofreal1(floatingtype.data.linearlistofreal1, space);
         break;
     case FT_LINEARLISTOFREAL2:
-        print_ft_linearlistofreal2(floatingtype.data.linearlistofreal2);
+        print_ft_linearlistofreal2(floatingtype.data.linearlistofreal2, space);
         break;
     case FT_LOGARITHMLISTOFREAL:
-        print_ft_logarithmlistofreal(floatingtype.data.logarithmlistofreal);
+        print_ft_logarithmlistofreal(floatingtype.data.logarithmlistofreal, space);
         break;
     case FT_PERDECADELISTOFREAL:
-        print_ft_perdecadelistofreal(floatingtype.data.perdecadelistofreal);
+        print_ft_perdecadelistofreal(floatingtype.data.perdecadelistofreal, space);
         break;
     case FT_LINEARLISTOFINTEGER2:
-        print_ft_linearlistofinteger2(floatingtype.data.linearlistofinteger2);
+        print_ft_linearlistofinteger2(floatingtype.data.linearlistofinteger2, space);
         break;
     case FT_RATIONAL_FUNCTION:
-        print_ft_rationalfunction(floatingtype.data.rationalfunction);
+        print_ft_rationalfunction(floatingtype.data.rationalfunction, space);
         break;
     case FT_GENERAL_RATIONAL_FUNCTION:
-        print_ft_generalrationalfunction(floatingtype.data.generalrationalfunction);
+        print_ft_generalrationalfunction(floatingtype.data.generalrationalfunction, space);
         break;
     case FT_RATIONAL:
-        print_ft_rational(floatingtype.data.rational);
+        print_ft_rational(floatingtype.data.rational, space);
         break;
     case FT_DATASET:
-        print_ft_dataset(floatingtype.data.dataset);
+        print_ft_dataset(floatingtype.data.dataset, space);
         break;
     case FT_ARRAYSET:
-        print_ft_arrayset(floatingtype.data.arrayset);
+        print_ft_arrayset(floatingtype.data.arrayset, space);
         break;
     default:
         break;
@@ -982,6 +971,8 @@ void print_floatingtype (floatingtype_t floatingtype)
 
 
 
+
+// Free memory used by singleInteger
 void free_ft_singleinteger (singleinteger_t *singleinteger)
 {
     if (singleinteger->name != NULL)
@@ -993,6 +984,7 @@ void free_ft_singleinteger (singleinteger_t *singleinteger)
 }
 
 
+// Free memory used by singleReal
 void free_ft_singlereal (singlereal_t *singlereal)
 {
     if (singlereal->name != NULL)
@@ -1004,6 +996,7 @@ void free_ft_singlereal (singlereal_t *singlereal)
 }
 
 
+// Free memory used by singleComplex
 void free_ft_singlecomplex (singlecomplex_t *singlecomplex)
 {
     if (singlecomplex->name != NULL)
@@ -1015,6 +1008,7 @@ void free_ft_singlecomplex (singlecomplex_t *singlecomplex)
 }
 
 
+// Free memory used by singleString
 void free_ft_singlestring (singlestring_t *singlestring)
 {
     if (singlestring->name != NULL)
@@ -1031,6 +1025,7 @@ void free_ft_singlestring (singlestring_t *singlestring)
 }
 
 
+// Free memory used by vector
 void free_ft_vector (vector_t *vector)
 {
     if (vector->name != NULL)
@@ -1076,6 +1071,7 @@ void free_ft_vector (vector_t *vector)
 }
 
 
+// Free memory used by linearListOfReal1
 void free_ft_linearlistofreal1 (linearlistofreal1_t *linearlistofreal1)
 {
     if (linearlistofreal1->name != NULL)
@@ -1087,6 +1083,7 @@ void free_ft_linearlistofreal1 (linearlistofreal1_t *linearlistofreal1)
 }
 
 
+// Free memory used by linearListOfReal2
 void free_ft_linearlistofreal2 (linearlistofreal2_t *linearlistofreal2)
 {
     if (linearlistofreal2->name != NULL)
@@ -1098,6 +1095,7 @@ void free_ft_linearlistofreal2 (linearlistofreal2_t *linearlistofreal2)
 }
 
 
+// Free memory used by logarithmListOfReal
 void free_ft_logarithmlistofreal (logarithmlistofreal_t *logarithmlistofreal)
 {
     if (logarithmlistofreal->name != NULL)
@@ -1109,6 +1107,7 @@ void free_ft_logarithmlistofreal (logarithmlistofreal_t *logarithmlistofreal)
 }
 
 
+// Free memory used by perDecadeListOfReal
 void free_ft_perdecadelistofreal (perdecadelistofreal_t *perdecadelistofreal)
 {
     if (perdecadelistofreal->name != NULL)
@@ -1120,6 +1119,7 @@ void free_ft_perdecadelistofreal (perdecadelistofreal_t *perdecadelistofreal)
 }
 
 
+// Free memory used by linearListOfInteger2
 void free_ft_linearlistofinteger2 (linearlistofinteger2_t *linearlistofinteger2)
 {
     if (linearlistofinteger2->name != NULL)
@@ -1131,6 +1131,7 @@ void free_ft_linearlistofinteger2 (linearlistofinteger2_t *linearlistofinteger2)
 }
 
 
+// Free memory used by rationalFunction
 void free_ft_rationalfunction (rationalfunction_t *rationalfunction)
 {
     if (rationalfunction->name != NULL)
@@ -1163,6 +1164,7 @@ void free_ft_rationalfunction (rationalfunction_t *rationalfunction)
 }
 
 
+// Free memory used by generalRationalFunction
 void free_ft_generalrationalfunction (generalrationalfunction_t *generalrationalfunction)
 {
     if (generalrationalfunction->name != NULL)
@@ -1186,6 +1188,8 @@ void free_ft_generalrationalfunction (generalrationalfunction_t *generalrational
     free_optional_attributes(&(generalrationalfunction->optional_attributes));
 }
 
+
+// Free memory used by rational
 void free_ft_rational (rational_t *rational)
 {
     int j;
@@ -1226,6 +1230,8 @@ void free_ft_rational (rational_t *rational)
     }
 }
 
+
+// Free memory used by dataset
 void free_ft_dataset (dataset_t *dataset)
 {
     if (dataset->name != NULL)
@@ -1276,6 +1282,7 @@ void free_ft_dataset (dataset_t *dataset)
 }
 
 
+// Free memory used by arrayset
 void free_ft_arrayset (arrayset_t *arrayset)
 {
     hsize_t i;
@@ -1297,6 +1304,7 @@ void free_ft_arrayset (arrayset_t *arrayset)
 }
 
 
+// Free memory used by floatingType structure
 void free_floatingtype (floatingtype_t *floatingtype)
 {
     switch(floatingtype->type)
@@ -1350,3 +1358,4 @@ void free_floatingtype (floatingtype_t *floatingtype)
         break;
     }
 }
+

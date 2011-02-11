@@ -68,17 +68,17 @@ void read_external_element (hid_t file_id, external_element_t *external_element)
 
 
 // Print dataset in externalElement
-void print_external_element_dataset (ee_dataset_t ee_dataset)
+void print_external_element_dataset (ee_dataset_t ee_dataset, int space)
 {
     hsize_t i;
 
-    printf("Name: %s\n", ee_dataset.name);
+    printf("%*sInstance: %s\n", space, "", ee_dataset.name);
     for (i = 0; i < ee_dataset.nb_eed_items; i++)
     {
-        printf("  Id %lu:\n", (long unsigned) i);
-        printf("    -internal: %s\n", ee_dataset.eed_items[EE_INTERNAL_NAME(i)]);
-        printf("    -external: %s:%s\n", ee_dataset.eed_items[EE_EXTERNAL_FILE_NAME(i)], ee_dataset.eed_items[EE_EXTERNAL_NAME(i)]);
-        printf("    -file_id:  %i\n\n",ee_dataset.file_id[i]);
+        printf("%*sId %lu:\n", space + 3, "", (long unsigned) i);
+        printf("%*s-internal: %s\n", space + 6, "", ee_dataset.eed_items[EE_INTERNAL_NAME(i)]);
+        printf("%*s-external: %s:%s\n", space + 6, "", ee_dataset.eed_items[EE_EXTERNAL_FILE_NAME(i)], ee_dataset.eed_items[EE_EXTERNAL_NAME(i)]);
+        printf("%*s-file_id:  %i\n\n", space + 6, "",ee_dataset.file_id[i]);
     }
 }
 
@@ -88,11 +88,10 @@ void print_external_element (external_element_t external_element)
 {
     hsize_t i;
 
-    printf("\n#############################  External element  #############################\n\n");
+    printf("#############################  External element  #############################\n\n");
     for (i = 0; i < external_element.nb_ee_datasets; i++)
-    {
-        print_external_element_dataset(external_element.ee_datasets[i]);
-    }
+        print_external_element_dataset(external_element.ee_datasets[i], 0);
+    printf("\n");
 }
 
 

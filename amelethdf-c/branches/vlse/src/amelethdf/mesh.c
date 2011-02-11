@@ -76,10 +76,10 @@ void read_smesh_group (hid_t file_id, const char *path, sgroup_t *sgroup)
     normalpath = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
 
     sgroup->name = get_name_from_path(path);
-    if (!read_string_attribute(file_id, path, A_TYPE, &(sgroup->type)))
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_TYPE);
-    if (!read_string_attribute(file_id, path, A_ENTITY_TYPE, &(sgroup->entitytype)))
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_ENTITY_TYPE);
+    if (!read_str_attribute(file_id, path, A_TYPE, &(sgroup->type)))
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_TYPE);
+    if (!read_str_attribute(file_id, path, A_ENTITY_TYPE, &(sgroup->entitytype)))
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_ENTITY_TYPE);
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims == 2)
@@ -307,7 +307,7 @@ void read_smesh(hid_t file_id, const char* path, smesh_t *smesh)
             success = FALSE;
             strcpy(path3, path2);
             strcat(path3, children.childnames[i]);
-            if (read_string_attribute(file_id, path3, A_TYPE, &type))
+            if (read_str_attribute(file_id, path3, A_TYPE, &type))
             {
                 if (strcmp(type,V_POINT_IN_ELEMENT) == 0)
                 {
@@ -318,7 +318,7 @@ void read_smesh(hid_t file_id, const char* path, smesh_t *smesh)
             }
             if (!success)
             {
-                printf("***** ERROR(%s): Cannot find mandatory attribute \"%s\" in \"%s\". *****\n\n", C_MESH, A_TYPE, path3);
+                printf("***** ERROR(%s): Cannot read mandatory attribute \"%s\" in \"%s\". *****\n\n", C_MESH, A_TYPE, path3);
                 smesh->som_tables[i].name = NULL;
                 smesh->som_tables[i].nb_dims = 0;
                 smesh->som_tables[i].nb_points = 0;
@@ -466,7 +466,7 @@ void read_umesh_som_table (hid_t file_id, const char *path, usom_table_t *usom_t
     char *type;
 
     usom_table->name = get_name_from_path(path);
-    if (read_string_attribute(file_id, path, A_TYPE, &type))
+    if (read_str_attribute(file_id, path, A_TYPE, &type))
     {
         if (strcmp(type, V_POINT_IN_ELEMENT) == 0)
         {
@@ -487,7 +487,7 @@ void read_umesh_som_table (hid_t file_id, const char *path, usom_table_t *usom_t
         free(type);
     }
     else
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_TYPE);
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_TYPE);
 }
 
 
@@ -658,7 +658,7 @@ void read_mesh_instance (hid_t file_id, const char *path, mesh_instance_t *mesh_
     char *type;
 
     mesh_instance->name = get_name_from_path(path);
-    if (read_string_attribute(file_id, path, A_TYPE, &type))
+    if (read_str_attribute(file_id, path, A_TYPE, &type))
     {
         if (strcmp(type, V_STRUCTURED) == 0)
         {
@@ -680,7 +680,7 @@ void read_mesh_instance (hid_t file_id, const char *path, mesh_instance_t *mesh_
     else
     {
         mesh_instance->type = MSH_INVALID;
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_TYPE);
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_TYPE);
     }
 }
 
@@ -695,18 +695,18 @@ void read_meshlink_instance (hid_t file_id, const char *path, meshlink_instance_
 
     path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     meshlink_instance->name = get_name_from_path(path);
-    if (!read_string_attribute(file_id, path, A_MESH1, &(meshlink_instance->mesh1)))
+    if (!read_str_attribute(file_id, path, A_MESH1, &(meshlink_instance->mesh1)))
     {
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_MESH1);
         success = FALSE;
     }
-    if (!read_string_attribute(file_id, path, A_MESH2, &(meshlink_instance->mesh2)))
+    if (!read_str_attribute(file_id, path, A_MESH2, &(meshlink_instance->mesh2)))
     {
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_MESH2);
         success = FALSE;
     }
 
-    if (!read_string_attribute(file_id, path, A_TYPE, &type))
+    if (!read_str_attribute(file_id, path, A_TYPE, &type))
     {
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_MESH, path, A_TYPE);
         success = FALSE;
@@ -837,40 +837,39 @@ void read_mesh (hid_t file_id, mesh_t *mesh)
 
 
 // Print structured mesh
-void print_smesh (smesh_t smesh)
+void print_smesh (smesh_t smesh, int space)
 {
     hsize_t i;
-
-    printf("       -groups:\n");
-    printf("          Number of groups: %lu\n", (long unsigned) smesh.nb_groups);
+    print_str_attribute(A_TYPE, V_STRUCTURED, space + 4);
+    printf("%*s-groups: %lu\n", space + 2, "", (long unsigned) smesh.nb_groups);
     for (i = 0; i < smesh.nb_groups; i++)
     {
-        printf("           Name: %s\n", smesh.groups[i].name);
+        printf("%*sName: %s\n", space + 5, "", smesh.groups[i].name);
         if (smesh.groups[i].type != NULL)
-            printf("             @type: %s\n", smesh.groups[i].type);
+            print_str_attribute(A_TYPE, smesh.groups[i].type, space + 8);
         if (smesh.groups[i].entitytype != NULL)
-            printf("             @entityType: %s\n", smesh.groups[i].entitytype);
+            print_str_attribute(A_ENTITY_TYPE, smesh.groups[i].entitytype, space + 8);
         if (smesh.groups[i].normals != NULL)
-            printf("             -normals: yes\n");
+            printf("%*s-normals: yes\n", space + 8, "");
     }
-    printf("       -groupgroups:\n");
-    printf("          Number of groupGroups: %lu\n", (unsigned long) smesh.nb_groupgroups);
+    printf("%*s-groupgroups: %lu\n", space + 2, "", (unsigned long) smesh.nb_groupgroups);
     for (i = 0; i < smesh.nb_groupgroups; i++)
-        printf("           Name: %s\n", smesh.groupgroups[i].name);
+        printf("%*sName: %s\n", space + 5, "", smesh.groupgroups[i].name);
 
     if (smesh.nb_som_tables > 0)
     {
-        printf("       -selector on mesh:\n");
+        printf("%*s-selector on mesh: %lu\n", space + 2, "", (unsigned long) smesh.nb_som_tables);
         for (i = 0; i < smesh.nb_som_tables; i++)
         {
-            printf("             Name: %s\n", smesh.som_tables[i].name);
-            printf("               -number of points: %lu\n", (long unsigned) smesh.som_tables[i].nb_points);
+            printf("%*sName: %s\n", space + 5, "", smesh.som_tables[i].name);
+            print_str_attribute(A_TYPE, V_POINT_IN_ELEMENT, space + 9);
+            printf("%*s-number of points: %lu\n", space + 7, "", (long unsigned) smesh.som_tables[i].nb_points);
         }
     }
 
 }
 
-void print_umesh_som_table (usom_table_t usom_table)
+void print_umesh_som_table (usom_table_t usom_table, int space)
 {
     hsize_t k;
     char dim;
@@ -878,7 +877,8 @@ void print_umesh_som_table (usom_table_t usom_table)
     switch (usom_table.type)
     {
     case SOM_POINT_IN_ELEMENT:
-        printf("          Name(points): %s\n", usom_table.name);
+        printf("%*sInstance: %s\n", space + 5, "", usom_table.name);
+        print_str_attribute(A_TYPE, V_POINT_IN_ELEMENT, space + 9);
         for (k = 0; k < usom_table.data.pie.nb_points; k++)
         {
             dim = usom_table.data.pie.nb_dims;
@@ -892,30 +892,30 @@ void print_umesh_som_table (usom_table_t usom_table)
             switch (dim)
             {
             case 1:
-                printf("               Point %lu: index=%i, v1=%f\n", (long unsigned) k, usom_table.data.pie.indices[k], usom_table.data.pie.vectors[k][0]);
+                printf("%*sPoint %lu: index=%i, v1=%f\n", space + 7, "", (long unsigned) k, usom_table.data.pie.indices[k], usom_table.data.pie.vectors[k][0]);
                 break;
             case 2:
-                printf("               Point %lu: index=%i, v1=%f, v2=%f\n", (long unsigned) k, usom_table.data.pie.indices[k], usom_table.data.pie.vectors[k][0], usom_table.data.pie.vectors[k][1]);
+                printf("%*sPoint %lu: index=%i, v1=%f, v2=%f\n", space + 7, "", (long unsigned) k, usom_table.data.pie.indices[k], usom_table.data.pie.vectors[k][0], usom_table.data.pie.vectors[k][1]);
                 break;
             case 3:
-                printf("               Point %lu: index=%i, v1=%f, v2=%f, v3=%f\n", (long unsigned) k, usom_table.data.pie.indices[k], usom_table.data.pie.vectors[k][0], usom_table.data.pie.vectors[k][1], usom_table.data.pie.vectors[k][2]);
+                printf("%*sPoint %lu: index=%i, v1=%f, v2=%f, v3=%f\n", space + 7, "", (long unsigned) k, usom_table.data.pie.indices[k], usom_table.data.pie.vectors[k][0], usom_table.data.pie.vectors[k][1], usom_table.data.pie.vectors[k][2]);
                 break;
             }
         }
         break;
     case SOM_EDGE:
-        printf("          Name(edges): %s\n", usom_table.name);
+        printf("%*sInstance: %s\n", space + 5, "", usom_table.name);
+        print_str_attribute(A_TYPE, V_EDGE, space + 9);
         for (k = 0; k < usom_table.data.ef.nb_items; k++)
         {
-            printf("               Id %lu: element=%i, inner_id=%i\n", (long unsigned) k, usom_table.data.ef.items[k][0], usom_table.data.ef.items[k][1]);
+            printf("%*sId %lu: element=%i, inner_id=%i\n", space + 7, "", (long unsigned) k, usom_table.data.ef.items[k][0], usom_table.data.ef.items[k][1]);
         }
         break;
     case SOM_FACE:
-        printf("          Name(faces): %s\n", usom_table.name);
+        printf("%*sInstance: %s\n", space + 5, "", usom_table.name);
+        print_str_attribute(A_TYPE, V_FACE, space + 9);
         for (k = 0; k < usom_table.data.ef.nb_items; k++)
-        {
-            printf("               Id %lu: element=%i, inner_id=%i\n", (long unsigned) k, usom_table.data.ef.items[k][0], usom_table.data.ef.items[k][1]);
-        }
+            printf("%*sId %lu: element=%i, inner_id=%i\n", space + 7, "", (long unsigned) k, usom_table.data.ef.items[k][0], usom_table.data.ef.items[k][1]);
         break;
     default:
         break;
@@ -924,18 +924,18 @@ void print_umesh_som_table (usom_table_t usom_table)
 
 
 // Print unstructured mesh
-void print_umesh (umesh_t umesh)
+void print_umesh (umesh_t umesh, int space)
 {
     hsize_t i, offset = 0;
     int j, element_type;
 
+    print_str_attribute(A_TYPE, V_UNSTRUCTURED, space + 4);
     if (umesh.nb_nodes[0] > 0)
     {
-        printf("       -nodes:\n");
-        printf("          Number of nodes: %lu\n", (unsigned long) umesh.nb_nodes[0]);
+        printf("%*s-nodes: %lu\n", space + 2, "", (unsigned long) umesh.nb_nodes[0]);
         for (i = 0; i < umesh.nb_nodes[0]; i++)
         {
-            printf("           Node n°%lu: ", (unsigned long) i);
+            printf("%*sNode n°%lu: ", space + 5, "", (unsigned long) i);
             for (j = 0; j < (int) umesh.nb_nodes[1]; j++)
                 printf("%f ", umesh.nodes[i][j]);
             printf("\n");
@@ -943,11 +943,10 @@ void print_umesh (umesh_t umesh)
     }
     if (umesh.nb_elementtypes > 0 && umesh.nb_elementnodes > 0)
     {
-        printf("       -elements:\n");
-        printf("          Number of elements : %lu\n", (unsigned long) umesh.nb_elementtypes);
+        printf("%*s-elements: %lu\n", space + 2, "", (unsigned long) umesh.nb_elementtypes);
         for (i = 0; i < umesh.nb_elementtypes; i++)
         {
-            printf("           Element %lu: type=%i", (unsigned long) i, umesh.elementtypes[i]);
+            printf("%*sElement %lu: type=%i", space + 5, "", (unsigned long) i, umesh.elementtypes[i]);
             element_type = umesh.elementtypes[i];
             if (element_type == 1)
                 for (j = 0; j < 2; j++)
@@ -982,42 +981,33 @@ void print_umesh (umesh_t umesh)
             printf("\n");
         }
     }
-    printf("       -groups:\n");
-    printf("          Number of groups: %lu\n", (unsigned long) umesh.nb_groups);
+    printf("%*s-groups: %lu\n", space + 2, "", (unsigned long) umesh.nb_groups);
     for (i = 0; i < umesh.nb_groups; i++)
-        printf("           Name: %s\n", umesh.groups[i].name);
-    printf("       -groupgroups:\n");
-    printf("          Number of groupGroups: %lu\n", (unsigned long) umesh.nb_groupgroups);
+        printf("%*sName: %s\n", space + 5, "", umesh.groups[i].name);
+    printf("%*s-groupgroups: %lu\n", space + 2, "", (unsigned long) umesh.nb_groupgroups);
     for (i = 0; i < umesh.nb_groupgroups; i++)
-        printf("           Name : %s\n", umesh.groupgroups[i].name);
+        printf("%*sName : %s\n", space + 5, "", umesh.groupgroups[i].name);
 
     if (umesh.nb_som_tables > 0)
     {
-        printf("       -selector on mesh:\n");
+        printf("%*s-selector on mesh: %lu\n", space + 2, "", (unsigned long) umesh.nb_som_tables);
         for (i = 0; i < umesh.nb_som_tables; i++)
-        {
-            print_umesh_som_table(umesh.som_tables[i]);
-        }
+            print_umesh_som_table(umesh.som_tables[i], space);
     }
-
-
-
-
-
 }
 
 
 // Print mesh instance
-void print_mesh_instance (mesh_instance_t mesh_instance)
+void print_mesh_instance (mesh_instance_t mesh_instance, int space)
 {
-    printf("   Mesh instance: %s\n", mesh_instance.name);
+    printf("%*sInstance: %s\n", space, "", mesh_instance.name);
     switch (mesh_instance.type)
     {
     case MSH_STRUCTURED:
-        print_smesh(mesh_instance.data.structured);
+        print_smesh(mesh_instance.data.structured, space);
         break;
     case MSH_UNSTRUCTURED:
-        print_umesh(mesh_instance.data.unstructured);
+        print_umesh(mesh_instance.data.unstructured, space);
         break;
     default:
         break;
@@ -1026,24 +1016,25 @@ void print_mesh_instance (mesh_instance_t mesh_instance)
 
 
 // Print meshLink instance
-void print_meshlink_instance (meshlink_instance_t meshlink_instance)
+void print_meshlink_instance (meshlink_instance_t meshlink_instance, int space)
 {
-    printf("   MeshLink instance: %s\n", meshlink_instance.name);
-    printf("      -@mesh1: %s\n", meshlink_instance.mesh1);
-    printf("      -@mesh2: %s\n", meshlink_instance.mesh2);
+    printf("%*sMeshLink instance: %s\n", space, "", meshlink_instance.name);
+    print_str_attribute(A_MESH1, meshlink_instance.mesh1, space + 3);
+    print_str_attribute(A_MESH2, meshlink_instance.mesh2, space + 3);
 }
 
 
 // Print mesh group
-void print_mesh_group (mesh_group_t mesh_group)
+void print_mesh_group (mesh_group_t mesh_group, int space)
 {
     hsize_t i;
 
-    printf("Mesh group: %s\n", mesh_group.name);
+    printf("%*sGroup: %s\n", space, "", mesh_group.name);
     for (i = 0; i < mesh_group.nb_mesh_instances; i++)
-        print_mesh_instance(mesh_group.mesh_instances[i]);
+        print_mesh_instance(mesh_group.mesh_instances[i], space + 2);
     for (i = 0; i < mesh_group.nb_meshlink_instances; i++)
-        print_meshlink_instance(mesh_group.meshlink_instances[i]);
+        print_meshlink_instance(mesh_group.meshlink_instances[i], space + 2);
+    printf("\n");
 }
 
 
@@ -1052,9 +1043,9 @@ void print_mesh (mesh_t mesh)
 {
     hsize_t i;
 
-    printf("\n###################################  Mesh  ###################################\n\n");
+    printf("###################################  Mesh  ###################################\n\n");
     for (i = 0; i < mesh.nb_mesh_groups; i++)
-        print_mesh_group(mesh.mesh_groups[i]);
+        print_mesh_group(mesh.mesh_groups[i], 0);
     printf("\n");
 }
 

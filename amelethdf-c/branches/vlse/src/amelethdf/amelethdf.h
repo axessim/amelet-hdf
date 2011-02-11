@@ -59,17 +59,23 @@ extern "C" {
     children_t read_children_name (hid_t file_id, const char *path);
     char *get_name_from_path (const char *path);
 
-    char read_string_attribute (hid_t file_id, const char *path, char *attr_name, char **rdata);
-    char read_float_attribute (hid_t file_id, const char *path, char* attr_name, float *rdata);
     char read_int_attribute (hid_t file_id, const char *path, char* attr, int *rdata);
+    char read_flt_attribute (hid_t file_id, const char *path, char* attr_name, float *rdata);
+    char read_cpx_attribute (hid_t file_id, const char* path, char* attr_name, complex float *rdata);
+    char read_str_attribute (hid_t file_id, const char *path, char *attr_name, char **rdata);
 
-    char read_string_dataset (hid_t file_id, const char *path, hsize_t mn, size_t length, char ***rdata);
+    void print_int_attribute (char *name, int value, int space);
+    void print_flt_attribute (char *name, float value, int space);
+    void print_cpx_attribute (char *name, complex float value, int space);
+    void print_str_attribute (char *name, char *value, int space);
+
     char read_int_dataset (hid_t file_id, const char *path, const hsize_t mn, int **rdata);
     char read_float_dataset (hid_t file_id, const char *path, const hsize_t mn, float **rdata);
     char read_complex_dataset (hid_t file_id, const char *path, const hsize_t mn, complex float **rdata);
+    char read_string_dataset (hid_t file_id, const char *path, hsize_t mn, size_t length, char ***rdata);
 
     char read_optional_attributes (hid_t file_id, const char *path, optional_attributes_t *optional_attributes, char mandatory_attributes[][ATTRIBUTE_LENGTH], size_t nb_mandatory_attributes);
-    void print_optional_attributes (optional_attributes_t optional_attributes);
+    void print_optional_attributes (optional_attributes_t optional_attributes, int space);
     void free_optional_attributes(optional_attributes_t *optional_attributes);
 
 #ifdef __cplusplus

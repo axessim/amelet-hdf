@@ -32,9 +32,9 @@ void read_physicalmodel_surface_instance_tdl (hid_t file_id, const char *path, s
     char mandatory[][ATTRIBUTE_LENGTH] = {A_PHYSICAL_MODEL, A_THICKNESS};
 
     surface_instance->type = S_THIN_DIELECTRIC_LAYER;
-    if(!read_string_attribute(file_id, path, A_PHYSICAL_MODEL, &(surface_instance->physicalmodel)))
+    if(!read_str_attribute(file_id, path, A_PHYSICAL_MODEL, &(surface_instance->physicalmodel)))
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_PHYSICAL_MODEL);
-    if(!read_float_attribute(file_id, path, A_THICKNESS, &(surface_instance->thickness)))
+    if(!read_flt_attribute(file_id, path, A_THICKNESS, &(surface_instance->thickness)))
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_THICKNESS);
     read_optional_attributes(file_id, path, &(surface_instance->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
 }
@@ -46,9 +46,9 @@ void read_physicalmodel_surface_instance_sibc (hid_t file_id, const char *path, 
     char mandatory[][ATTRIBUTE_LENGTH] = {A_PHYSICAL_MODEL, A_THICKNESS};
 
     surface_instance->type = S_SIBC;
-    if(!read_string_attribute(file_id, path, A_PHYSICAL_MODEL, &(surface_instance->physicalmodel)))
+    if(!read_str_attribute(file_id, path, A_PHYSICAL_MODEL, &(surface_instance->physicalmodel)))
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_PHYSICAL_MODEL);
-    if(!read_float_attribute(file_id, path, A_THICKNESS, &(surface_instance->thickness)))
+    if(!read_flt_attribute(file_id, path, A_THICKNESS, &(surface_instance->thickness)))
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_THICKNESS);
     read_optional_attributes(file_id, path, &(surface_instance->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
 }
@@ -60,7 +60,7 @@ void read_physicalmodel_surface_instance_zs (hid_t file_id, const char *path, su
     char mandatory[][ATTRIBUTE_LENGTH] = {A_ZS};
 
     surface_instance->type = S_ZS;
-    if(!read_string_attribute(file_id, path, A_ZS, &(surface_instance->zs)))
+    if(!read_str_attribute(file_id, path, A_ZS, &(surface_instance->zs)))
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_ZS);
     read_optional_attributes(file_id, path, &(surface_instance->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
 }
@@ -72,9 +72,9 @@ void read_physicalmodel_surface_instance_zszt (hid_t file_id, const char *path, 
     char mandatory[][ATTRIBUTE_LENGTH] = {A_ZS, A_ZT};
 
     surface_instance->type = S_ZSZT;
-    if(!read_string_attribute(file_id, path, A_ZS, &(surface_instance->zs)))
+    if(!read_str_attribute(file_id, path, A_ZS, &(surface_instance->zs)))
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_ZS);
-    if(!read_string_attribute(file_id, path, A_ZT, &(surface_instance->zt)))
+    if(!read_str_attribute(file_id, path, A_ZT, &(surface_instance->zt)))
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_ZT);
     read_optional_attributes(file_id, path, &(surface_instance->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
 }
@@ -86,13 +86,13 @@ void read_physicalmodel_surface_instance_zszt2 (hid_t file_id, const char *path,
     char mandatory[][ATTRIBUTE_LENGTH] = {A_ZS1, A_ZT1, A_ZS2, A_ZT2};
 
     surface_instance->type = S_ZSZT2;
-    if(!read_string_attribute(file_id, path, A_ZS1, &(surface_instance->zs1)))
+    if(!read_str_attribute(file_id, path, A_ZS1, &(surface_instance->zs1)))
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_ZS1);
-    if(!read_string_attribute(file_id, path, A_ZT1, &(surface_instance->zt1)))
+    if(!read_str_attribute(file_id, path, A_ZT1, &(surface_instance->zt1)))
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_ZT1);
-    if(!read_string_attribute(file_id, path, A_ZS2, &(surface_instance->zs2)))
+    if(!read_str_attribute(file_id, path, A_ZS2, &(surface_instance->zs2)))
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_ZS2);
-    if(!read_string_attribute(file_id, path, A_ZT2, &(surface_instance->zt2)))
+    if(!read_str_attribute(file_id, path, A_ZT2, &(surface_instance->zt2)))
         printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_ZT2);
     read_optional_attributes(file_id, path, &(surface_instance->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
 }
@@ -112,7 +112,7 @@ void read_physicalmodel_surface_instance (hid_t file_id, const char *path, surfa
     surface_instance->zt1 = NULL;
     surface_instance->zt2 = NULL;
     surface_instance->name = get_name_from_path(path);
-    if (read_string_attribute(file_id, path, A_TYPE, &temp))
+    if (read_str_attribute(file_id, path, A_TYPE, &temp))
     {
         if (strcmp(temp, V_THIN_DIELECTRIC_LAYER) == 0)
             read_physicalmodel_surface_instance_tdl(file_id, path, surface_instance);
@@ -134,7 +134,7 @@ void read_physicalmodel_surface_instance (hid_t file_id, const char *path, surfa
     else
     {
         surface_instance->type = S_INVALID;
-        printf("***** ERROR: Cannot find mandatory attribute \"%s@%s\". *****\n\n", path, A_TYPE);
+        printf("***** ERROR: Cannot read mandatory attribute \"%s@%s\". *****\n\n", path, A_TYPE);
     }
 }
 
@@ -145,10 +145,10 @@ void read_physicalmodel_interface_instance (hid_t file_id, const char *path, int
     char mandatory[][ATTRIBUTE_LENGTH] = {A_MEDIUM1, A_MEDIUM2};
 
     interface_instance->name = get_name_from_path(path);
-    if (!read_string_attribute(file_id, path, A_MEDIUM1, &(interface_instance->medium1)))
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_MEDIUM1);
-    if (!read_string_attribute(file_id, path, A_MEDIUM2, &(interface_instance->medium2)))
-        printf("***** ERROR(%s): Cannot find mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_MEDIUM2);
+    if (!read_str_attribute(file_id, path, A_MEDIUM1, &(interface_instance->medium1)))
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_MEDIUM1);
+    if (!read_str_attribute(file_id, path, A_MEDIUM2, &(interface_instance->medium2)))
+        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_PHYSICAL_MODEL, path, A_MEDIUM2);
     read_optional_attributes(file_id, path, &(interface_instance->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
 }
 
@@ -226,60 +226,63 @@ void read_physicalmodel (hid_t file_id, physicalmodel_t *physicalmodel)
 
 
 // Print instance in physicalModel/volume
-void print_physicalmodel_volume_instance (volume_instance_t volume_instance)
+void print_physicalmodel_volume_instance (volume_instance_t volume_instance, int space)
 {
-    printf("-name: %s\n", volume_instance.name);
-    print_optional_attributes(volume_instance.optional_attributes);
-    print_floatingtype(volume_instance.relative_permittivity);
-    print_floatingtype(volume_instance.relative_permeability);
-    print_floatingtype(volume_instance.electric_conductivity);
-    print_floatingtype(volume_instance.magnetic_conductivity);
+    printf("%*sInstance: %s\n", space, "", volume_instance.name);
+    print_optional_attributes(volume_instance.optional_attributes, space + 3);
+    print_floatingtype(volume_instance.relative_permittivity, space + 3);
+    print_floatingtype(volume_instance.relative_permeability, space + 3);
+    print_floatingtype(volume_instance.electric_conductivity, space + 3);
+    print_floatingtype(volume_instance.magnetic_conductivity, space + 3);
+    printf("\n");
 }
 
 
 // Print instance in physicalModel/surface
-void print_physicalmodel_surface_instance (surface_instance_t surface_instance)
+void print_physicalmodel_surface_instance (surface_instance_t surface_instance, int space)
 {
-    printf("-name: %s\n", surface_instance.name);
-    print_optional_attributes(surface_instance.optional_attributes);
+    printf("%*sInstance: %s\n", space, "", surface_instance.name);
+    print_optional_attributes(surface_instance.optional_attributes, space + 3);
     switch (surface_instance.type)
     {
     case S_THIN_DIELECTRIC_LAYER:
-        printf("   -physicalModel: %s\n", surface_instance.physicalmodel);
-        printf("   -thickness: %g\n",surface_instance.thickness);
+        print_str_attribute(A_PHYSICAL_MODEL, surface_instance.physicalmodel, space + 3);
+        print_flt_attribute(A_THICKNESS, surface_instance.thickness, space + 3);
         break;
     case S_SIBC:
-        printf("   -physicalModel: %s\n", surface_instance.physicalmodel);
-        printf("   -thickness: %g\n",surface_instance.thickness);
+        print_str_attribute(A_PHYSICAL_MODEL, surface_instance.physicalmodel, space + 3);
+        print_flt_attribute(A_THICKNESS, surface_instance.thickness, space + 3);
         break;
     case S_ZS:
-        printf("   -Zs: %s\n", surface_instance.zs);
+        print_str_attribute(A_ZS, surface_instance.zs, space + 3);
         break;
     case S_ZSZT:
-        printf("   -Zs: %s\n", surface_instance.zs);
-        printf("   -Zt: %s\n", surface_instance.zt);
+        print_str_attribute(A_ZS, surface_instance.zs, space + 3);
+        print_str_attribute(A_ZT, surface_instance.zt, space + 3);
         break;
     case S_ZSZT2:
-        printf("   -Zs1: %s\n", surface_instance.zs1);
-        printf("   -Zt1: %s\n", surface_instance.zt1);
-        printf("   -Zs2: %s\n", surface_instance.zs2);
-        printf("   -Zt2: %s\n", surface_instance.zt2);
+        print_str_attribute(A_ZS1, surface_instance.zs1, space + 3);
+        print_str_attribute(A_ZT1, surface_instance.zt1, space + 3);
+        print_str_attribute(A_ZS2, surface_instance.zs2, space + 3);
+        print_str_attribute(A_ZT2, surface_instance.zt2, space + 3);
         break;
     default:
         break;
     }
+    printf("\n");
 }
 
 
 // Print instance in physicalModel/interface
-void print_physicalmodel_interface_instance (interface_instance_t interface_instance)
+void print_physicalmodel_interface_instance (interface_instance_t interface_instance, int space)
 {
-    printf("-name: %s\n", interface_instance.name);
-    print_optional_attributes(interface_instance.optional_attributes);
+    printf("%*sInstance: %s\n", space, "", interface_instance.name);
+    print_optional_attributes(interface_instance.optional_attributes, space + 3);
     if (interface_instance.medium1 != NULL)
-        printf("      -medium1: %s\n", interface_instance.medium1);
+        print_str_attribute(A_MEDIUM1, interface_instance.medium1, space + 3);
     if (interface_instance.medium2 != NULL)
-        printf("      -medium2: %s\n", interface_instance.medium2);
+        print_str_attribute(A_MEDIUM2, interface_instance.medium2, space + 3);
+    printf("\n");
 }
 
 
@@ -288,22 +291,17 @@ void print_physicalmodel (physicalmodel_t physicalmodel)
 {
     hsize_t i;
 
-    printf("\n##############################  Physical model  ##############################\n\n");
-    printf("Volume instances:\n");
+    printf("##############################  Physical model  ##############################\n\n");
+    printf("Volume:\n");
     for (i = 0; i < physicalmodel.nb_volume_instances; i++)
-    {
-        print_physicalmodel_volume_instance(physicalmodel.volume_instances[i]);
-    }
-    printf("\nSurface instances:\n");
+        print_physicalmodel_volume_instance(physicalmodel.volume_instances[i], 3);
+    printf("Surface:\n");
     for (i = 0; i < physicalmodel.nb_surface_instances; i++)
-    {
-        print_physicalmodel_surface_instance(physicalmodel.surface_instances[i]);
-    }
-    printf("\nInterface instances:\n");
+        print_physicalmodel_surface_instance(physicalmodel.surface_instances[i], 3);
+    printf("Interface:\n");
     for (i = 0; i < physicalmodel.nb_interface_instances; i++)
-    {
-        print_physicalmodel_interface_instance(physicalmodel.interface_instances[i]);
-    }
+        print_physicalmodel_interface_instance(physicalmodel.interface_instances[i], 3);
+    printf("\n");
 }
 
 

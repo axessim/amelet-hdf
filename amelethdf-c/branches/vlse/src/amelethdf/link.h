@@ -36,8 +36,8 @@ extern "C" {
     void read_link_group (hid_t file_id, const char *path, link_group_t *link_group);
     void read_link (hid_t file_id, link_t *link);
 
-    void print_link_instance (link_instance_t link_instance);
-    void print_link_group (link_group_t link_group);
+    void print_link_instance (link_instance_t link_instance, int space);
+    void print_link_group (link_group_t link_group, int space);
     void print_link (link_t link);
 
     void free_link_instance(link_instance_t *link_instance);

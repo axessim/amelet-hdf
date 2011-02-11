@@ -39,8 +39,8 @@ extern "C" {
     void read_outputrequest_group (hid_t file_id, const char *path, outputrequest_group_t *outputrequest_group);
     void read_outputrequest(hid_t file_id, outputrequest_t *outputrequest);
 
-    void print_outputrequest_instance (outputrequest_instance_t outputrequest_instance);
-    void print_outputrequest_group (outputrequest_group_t outputrequest_group);
+    void print_outputrequest_instance (outputrequest_instance_t outputrequest_instance, int space);
+    void print_outputrequest_group (outputrequest_group_t outputrequest_group, int space);
     void print_outputrequest (outputrequest_t outputrequest);
 
     void free_outputrequest_instance (outputrequest_instance_t *outputrequest_instance);
