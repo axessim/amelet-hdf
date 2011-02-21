@@ -1,4 +1,4 @@
-#summary Amelet-HDF build on win64.
+#summary Amelet-HDF win64 build.
 
 Instruction to build the fortran library AmeletHDf with ifort v11.1
 
