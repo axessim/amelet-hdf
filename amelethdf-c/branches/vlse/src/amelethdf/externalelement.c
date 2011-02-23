@@ -1,39 +1,38 @@
 #include "externalelement.h"
-// Revision: 7.2.2011
 
 
 // Read dataset in externalElement and open external files
-void read_external_element_dataset (hid_t file_id, const char *path, ee_dataset_t *ee_dataset)
+void read_eet_dataset (hid_t file_id, const char *path, eet_dataset_t *eet_dataset)
 {
-    hsize_t dims[2], i;
     H5T_class_t type_class;
+    char success = FALSE;
+    hsize_t dims[2], i;
     size_t length;
     int nb_dims;
-    char success = FALSE;
 
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims == 2)
                 if (H5LTget_dataset_info(file_id, path, dims, &type_class, &length) >= 0)
                     if (dims[0] > 0 && dims[1] == 3 && type_class == H5T_STRING)
-                        if(read_string_dataset(file_id, path, dims[0] * dims[1], length, &(ee_dataset->eed_items)))
+                        if(read_string_dataset(file_id, path, dims[0] * dims[1], length, &(eet_dataset->eed_items)))
                         {
-                            ee_dataset->nb_eed_items = dims[0];
+                            eet_dataset->nb_eed_items = dims[0];
                             success = TRUE;
-                            ee_dataset->file_id = (hid_t *) malloc((size_t) ee_dataset->nb_eed_items * sizeof(hid_t));
-                            for (i = 0; i < ee_dataset->nb_eed_items; i++)
-                                ee_dataset->file_id[i] = -1;
-                            open_external_files(ee_dataset);
+                            eet_dataset->file_id = (hid_t *) malloc(eet_dataset->nb_eed_items * sizeof(hid_t));
+                            for (i = 0; i < eet_dataset->nb_eed_items; i++)
+                                eet_dataset->file_id[i] = -1;
+                            open_external_files(eet_dataset);
                         }
     if (success)
-        ee_dataset->name = get_name_from_path(path);
+        eet_dataset->name = get_name_from_path(path);
     else
     {
-        printf("***** ERROR(%s): Cannot read dataset \"%s\". *****\n\n", C_EXTERNAL_ELEMENT, path);
-        ee_dataset->name = NULL;
-        ee_dataset->file_id = NULL;
-        ee_dataset->nb_eed_items = 0;
-        ee_dataset->eed_items = NULL;
+        print_err_dset(C_EXTERNAL_ELEMENT, path);
+        eet_dataset->name = NULL;
+        eet_dataset->file_id = NULL;
+        eet_dataset->nb_eed_items = 0;
+        eet_dataset->eed_items = NULL;
     }
 }
 
@@ -41,26 +40,24 @@ void read_external_element_dataset (hid_t file_id, const char *path, ee_dataset_
 // Read externalElement category (all datasets)
 void read_external_element (hid_t file_id, external_element_t *external_element)
 {
+    char path[ABSOLUTE_PATH_NAME_LENGTH];
     children_t children;
     hsize_t i;
-    char *path;
 
     children = read_children_name(file_id, C_EXTERNAL_ELEMENT);
-    external_element->nb_ee_datasets = children.nb_children;
-    external_element->ee_datasets = NULL;
+    external_element->nb_datasets = children.nb_children;
+    external_element->datasets = NULL;
     if (children.nb_children > 0)
     {
-        path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-        external_element->ee_datasets = (ee_dataset_t *) malloc((size_t) children.nb_children * sizeof(ee_dataset_t));
+        external_element->datasets = (eet_dataset_t *) malloc(children.nb_children * sizeof(eet_dataset_t));
         for (i = 0; i < children.nb_children; i++)
         {
             strcpy(path, C_EXTERNAL_ELEMENT);
             strcat(path, children.childnames[i]);
-            read_external_element_dataset(file_id, path, external_element->ee_datasets + i);
+            read_eet_dataset(file_id, path, external_element->datasets + i);
             free(children.childnames[i]);
         }
         free(children.childnames);
-        free(path);
     }
 }
 
@@ -68,17 +65,17 @@ void read_external_element (hid_t file_id, external_element_t *external_element)
 
 
 // Print dataset in externalElement
-void print_external_element_dataset (ee_dataset_t ee_dataset, int space)
+void print_eet_dataset (eet_dataset_t eet_dataset, int space)
 {
     hsize_t i;
 
-    printf("%*sInstance: %s\n", space, "", ee_dataset.name);
-    for (i = 0; i < ee_dataset.nb_eed_items; i++)
+    printf("%*sInstance: %s\n", space, "", eet_dataset.name);
+    for (i = 0; i < eet_dataset.nb_eed_items; i++)
     {
         printf("%*sId %lu:\n", space + 3, "", (long unsigned) i);
-        printf("%*s-internal: %s\n", space + 6, "", ee_dataset.eed_items[EE_INTERNAL_NAME(i)]);
-        printf("%*s-external: %s:%s\n", space + 6, "", ee_dataset.eed_items[EE_EXTERNAL_FILE_NAME(i)], ee_dataset.eed_items[EE_EXTERNAL_NAME(i)]);
-        printf("%*s-file_id:  %i\n\n", space + 6, "",ee_dataset.file_id[i]);
+        printf("%*s-internal: %s\n", space + 6, "", eet_dataset.eed_items[EE_INTERNAL_NAME(i)]);
+        printf("%*s-external: %s:%s\n", space + 6, "", eet_dataset.eed_items[EE_EXTERNAL_FILE_NAME(i)], eet_dataset.eed_items[EE_EXTERNAL_NAME(i)]);
+        printf("%*s-file_id:  %i\n\n", space + 6, "",eet_dataset.file_id[i]);
     }
 }
 
@@ -89,8 +86,8 @@ void print_external_element (external_element_t external_element)
     hsize_t i;
 
     printf("#############################  External element  #############################\n\n");
-    for (i = 0; i < external_element.nb_ee_datasets; i++)
-        print_external_element_dataset(external_element.ee_datasets[i], 0);
+    for (i = 0; i < external_element.nb_datasets; i++)
+        print_eet_dataset(external_element.datasets[i], 0);
     printf("\n");
 }
 
@@ -98,24 +95,24 @@ void print_external_element (external_element_t external_element)
 
 
 // Close external files and free memory used by dataset in externalElement
-void free_external_element_dataset (ee_dataset_t *ee_dataset)
+void free_eet_dataset (eet_dataset_t *eet_dataset)
 {
-    if (ee_dataset->name != NULL)
+    if (eet_dataset->name != NULL)
     {
-        free(ee_dataset->name);
-        ee_dataset->name = NULL;
+        free(eet_dataset->name);
+        eet_dataset->name = NULL;
     }
-    if (ee_dataset->nb_eed_items > 0)
+    if (eet_dataset->nb_eed_items > 0)
     {
-        close_external_files(ee_dataset);
-        free(ee_dataset->eed_items[0]);
-        free(ee_dataset->eed_items);
-        ee_dataset->nb_eed_items = 0;
+        close_external_files(eet_dataset);
+        free(eet_dataset->eed_items[0]);
+        free(eet_dataset->eed_items);
+        eet_dataset->nb_eed_items = 0;
     }
-    if (ee_dataset->file_id != NULL)
+    if (eet_dataset->file_id != NULL)
     {
-        free(ee_dataset->file_id);
-        ee_dataset->file_id = NULL;
+        free(eet_dataset->file_id);
+        eet_dataset->file_id = NULL;
     }
 }
 
@@ -125,13 +122,13 @@ void free_external_element (external_element_t *external_element)
 {
     hsize_t i;
 
-    if (external_element->nb_ee_datasets > 0)
+    if (external_element->nb_datasets > 0)
     {
-        for (i = 0; i < external_element->nb_ee_datasets; i++)
-            free_external_element_dataset(external_element->ee_datasets + i);
-        free(external_element->ee_datasets);
-        external_element->ee_datasets = NULL;
-        external_element->nb_ee_datasets = 0;
+        for (i = 0; i < external_element->nb_datasets; i++)
+            free_eet_dataset(external_element->datasets + i);
+        free(external_element->datasets);
+        external_element->datasets = NULL;
+        external_element->nb_datasets = 0;
     }
 }
 
@@ -139,7 +136,7 @@ void free_external_element (external_element_t *external_element)
 
 
 // Open all external files and store the id
-char open_external_files(ee_dataset_t *ee_dataset)
+char open_external_files(eet_dataset_t *eet_dataset)
 {
     char success = TRUE;
     hid_t file_id;
@@ -149,11 +146,11 @@ char open_external_files(ee_dataset_t *ee_dataset)
     char *name;
     hsize_t id = 0;
 
-    buf_id = (hid_t*) malloc((size_t) ee_dataset->nb_eed_items * sizeof(hid_t));  // temporary buffer containing file_id
-    buf.values = (char **) malloc((size_t) ee_dataset->nb_eed_items * sizeof(char*));  // temporary buffer containing paths
-    for (i = 0; i < ee_dataset->nb_eed_items; i++)
+    buf_id = (hid_t*) malloc(eet_dataset->nb_eed_items * sizeof(hid_t));  // temporary buffer containing file_id
+    buf.values = (char **) malloc(eet_dataset->nb_eed_items * sizeof(char*));  // temporary buffer containing paths
+    for (i = 0; i < eet_dataset->nb_eed_items; i++)
     {
-        name = ee_dataset->eed_items[EE_EXTERNAL_FILE_NAME(i)]; // copy of the pointer (shorter expression)
+        name = eet_dataset->eed_items[EE_EXTERNAL_FILE_NAME(i)]; // copy of the pointer (shorter expression)
         if (!index_in_set(buf, name, &id))  // avoid multiple opening
         {
             if (access(name, R_OK) != -1 )
@@ -166,7 +163,7 @@ char open_external_files(ee_dataset_t *ee_dataset)
             }
             buf = add_to_set(buf, name);  // new memory allocation!!!
             buf_id[buf.nb_values - 1] = file_id;
-            ee_dataset->file_id[i] = file_id;  // write new file_id into the ext_elt structure
+            eet_dataset->file_id[i] = file_id;  // write new file_id into the ext_elt structure
             if (file_id < 0)
             {
                 printf("***** ERROR(%s): Cannot open file \"%s\". *****\n\n", C_EXTERNAL_ELEMENT, name);
@@ -175,7 +172,7 @@ char open_external_files(ee_dataset_t *ee_dataset)
         }
         else
         {
-            ee_dataset->file_id[i] = buf_id[id];  // write existing file_id into the ext_elt structure
+            eet_dataset->file_id[i] = buf_id[id];  // write existing file_id into the ext_elt structure
         }
     }
 
@@ -190,24 +187,24 @@ char open_external_files(ee_dataset_t *ee_dataset)
 
 
 // Close all external files and set their id to -1
-char close_external_files(ee_dataset_t *ee_dataset)
+char close_external_files(eet_dataset_t *eet_dataset)
 {
     char success = TRUE;
     hsize_t i, j;
     hid_t file_id;
 
-    for (i = 0; i < ee_dataset->nb_eed_items; i++)
+    for (i = 0; i < eet_dataset->nb_eed_items; i++)
     {
-        file_id = ee_dataset->file_id[i];
+        file_id = eet_dataset->file_id[i];
         if (file_id != -1)  // find opened file handles...
         {
             if(H5Fclose(file_id) >= 0)  // ...close file...
             {
-                for (j = i; j < ee_dataset->nb_eed_items; j++)  // ...and delete handles of same name in ext_elt
+                for (j = i; j < eet_dataset->nb_eed_items; j++)  // ...and delete handles of same name in ext_elt
                 {
-                    if (ee_dataset->file_id[j] == file_id)
+                    if (eet_dataset->file_id[j] == file_id)
                     {
-                        ee_dataset->file_id[j] = -1;
+                        eet_dataset->file_id[j] = -1;
                     }
                 }
             }

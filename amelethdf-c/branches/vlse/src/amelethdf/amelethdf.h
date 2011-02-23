@@ -13,10 +13,12 @@ extern "C" {
 
 #include "category.h"
 
-#define ABSOLUTE_PATH_NAME_LENGTH 101
-#define ELEMENT_NAME_LENGTH 21
-#define ATTRIBUTE_LENGTH 31
+#define ABSOLUTE_PATH_NAME_LENGTH 101  // length in C (incl. '\0')
+#define ELEMENT_NAME_LENGTH 21 // length in C (incl. '\0')
+#define ATTR_LENGTH 31
 #define TABLE_FIELD_NAME_LENGTH 31
+
+#define V_INVALID "INVALID"
 
 #define TRUE 1
 #define FALSE 0
@@ -41,43 +43,46 @@ extern "C" {
         char        *s;
     } value_t;
 
-    typedef struct attribute_instance_t
+    typedef struct attr_instance_t
     {
         char        *name;
         H5T_class_t type;
         value_t     value;
-    } attribute_instance_t;
+    } attr_instance_t;
 
-    typedef struct optional_attributes_t
+    typedef struct opt_attrs_t
     {
-        hsize_t     nb_attribute_instances;
-        attribute_instance_t *attribute_instances;
-    } optional_attributes_t;
+        hsize_t     nb_instances;
+        attr_instance_t *instances;
+    } opt_attrs_t;
 
     set_t add_to_set (set_t aset, char *aelement);
     int index_in_set (set_t aset, char *aelement, hsize_t *index);
     children_t read_children_name (hid_t file_id, const char *path);
     char *get_name_from_path (const char *path);
 
-    char read_int_attribute (hid_t file_id, const char *path, char* attr, int *rdata);
-    char read_flt_attribute (hid_t file_id, const char *path, char* attr_name, float *rdata);
-    char read_cpx_attribute (hid_t file_id, const char* path, char* attr_name, complex float *rdata);
-    char read_str_attribute (hid_t file_id, const char *path, char *attr_name, char **rdata);
+    char read_int_attr (hid_t file_id, const char *path, char* attr, int *rdata);
+    char read_flt_attr (hid_t file_id, const char *path, char* attr_name, float *rdata);
+    char read_cpx_attr (hid_t file_id, const char* path, char* attr_name, complex float *rdata);
+    char read_str_attr (hid_t file_id, const char *path, char *attr_name, char **rdata);
 
-    void print_int_attribute (char *name, int value, int space);
-    void print_flt_attribute (char *name, float value, int space);
-    void print_cpx_attribute (char *name, complex float value, int space);
-    void print_str_attribute (char *name, char *value, int space);
+    void print_int_attr (char *name, int value, int space);
+    void print_flt_attr (char *name, float value, int space);
+    void print_cpx_attr (char *name, complex float value, int space);
+    void print_str_attr (char *name, char *value, int space);
 
     char read_int_dataset (hid_t file_id, const char *path, const hsize_t mn, int **rdata);
     char read_float_dataset (hid_t file_id, const char *path, const hsize_t mn, float **rdata);
     char read_complex_dataset (hid_t file_id, const char *path, const hsize_t mn, complex float **rdata);
     char read_string_dataset (hid_t file_id, const char *path, hsize_t mn, size_t length, char ***rdata);
 
-    char read_optional_attributes (hid_t file_id, const char *path, optional_attributes_t *optional_attributes, char mandatory_attributes[][ATTRIBUTE_LENGTH], size_t nb_mandatory_attributes);
-    void print_optional_attributes (optional_attributes_t optional_attributes, int space);
-    void free_optional_attributes(optional_attributes_t *optional_attributes);
+    char read_opt_attrs (hid_t file_id, const char *path, opt_attrs_t *opt_attrs, char mandatory_attrs[][ATTR_LENGTH], size_t nb_mandatory_attrs);
+    void print_opt_attrs (opt_attrs_t opt_attrs, int space);
+    void free_opt_attrs(opt_attrs_t *opt_attrs);
 
+    void print_err_dset (const char *category, const char *path);
+    void print_err_attr (const char *category, const char *path, const char *attr_name);
+    void print_wrn_attr (const char *category, const char *path, const char *attr_name);
 #ifdef __cplusplus
 }
 #endif

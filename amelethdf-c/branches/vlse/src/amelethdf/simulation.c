@@ -1,90 +1,85 @@
 #include "simulation.h"
-// Revision: 7.2.2011
+
 
 // Read simulation instance
-void read_simulation_instance(hid_t file_id, const char *path, simulation_instance_t *simulation_instance)
+void read_sim_instance(hid_t file_id, const char *path, sim_instance_t *sim_instance)
 {
+    char mandatory[][ATTR_LENGTH] = {A_MODULE, A_VERSION};
+    char path2[ABSOLUTE_PATH_NAME_LENGTH];
     H5T_class_t type_class;
-    size_t length;
     char success = FALSE;
-    char *path2;
+    size_t length;
     int nb_dims;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_MODULE, A_VERSION};
 
-    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-
-    simulation_instance->name = get_name_from_path(path);
-    read_optional_attributes(file_id, path2, &(simulation_instance->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
-    if (!read_str_attribute(file_id, path, A_MODULE, &(simulation_instance->module)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_SIMULATION, path, A_MODULE);
-    if (!read_str_attribute(file_id, path, A_VERSION, &(simulation_instance->version)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_SIMULATION, path, A_VERSION);
+    sim_instance->name = get_name_from_path(path);
+    read_opt_attrs(file_id, path2, &(sim_instance->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
+    if (!read_str_attr(file_id, path, A_MODULE, &(sim_instance->module)))
+        print_err_attr(C_SIMULATION, path, A_MODULE);
+    if (!read_str_attr(file_id, path, A_VERSION, &(sim_instance->version)))
+        print_err_attr(C_SIMULATION, path, A_VERSION);
     strcpy(path2, path);
     strcat(path2, G_PARAMETER);
 
     // inputs
-    simulation_instance->nb_inputs = 1;  // in case of single value
+    sim_instance->nb_inputs = 1;  // in case of single value
     strcpy(path2, path);
     strcat(path2, G_INPUTS);
     if (H5Lexists(file_id, path2, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
             if (nb_dims <= 1)
-                if (H5LTget_dataset_info(file_id, path2, &(simulation_instance->nb_inputs), &type_class, &length) >= 0)
+                if (H5LTget_dataset_info(file_id, path2, &(sim_instance->nb_inputs), &type_class, &length) >= 0)
                     if (type_class == H5T_STRING)
-                        if(read_string_dataset(file_id, path2, simulation_instance->nb_inputs, length, &(simulation_instance->inputs)))
+                        if(read_string_dataset(file_id, path2, sim_instance->nb_inputs, length, &(sim_instance->inputs)))
                             success = TRUE;
     if (!success)
     {
-        printf("***** ERROR(%s): Cannot read dataset \"%s\". *****\n\n", C_SIMULATION, path2);
-        simulation_instance->nb_inputs = 0;
-        simulation_instance->inputs = NULL;
+        print_err_dset(C_SIMULATION, path2);
+        sim_instance->nb_inputs = 0;
+        sim_instance->inputs = NULL;
     }
 
     // outputs
-    simulation_instance->nb_outputs = 1;  // in case of single value
+    sim_instance->nb_outputs = 1;  // in case of single value
     success = FALSE;
     strcpy(path2, path);
     strcat(path2, G_OUTPUTS);
     if (H5Lexists(file_id, path2, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
             if (nb_dims <= 1)
-                if (H5LTget_dataset_info(file_id, path2, &(simulation_instance->nb_outputs), &type_class, &length) >= 0)
+                if (H5LTget_dataset_info(file_id, path2, &(sim_instance->nb_outputs), &type_class, &length) >= 0)
                     if (type_class == H5T_STRING)
-                        if(read_string_dataset(file_id, path2, simulation_instance->nb_outputs, length, &(simulation_instance->outputs)))
+                        if(read_string_dataset(file_id, path2, sim_instance->nb_outputs, length, &(sim_instance->outputs)))
                             success = TRUE;
     if (!success)
     {
-        printf("***** ERROR(%s): Cannot read dataset \"%s\". *****\n\n", C_SIMULATION, path2);
-        simulation_instance->nb_outputs = 0;
-        simulation_instance->outputs = NULL;
+        print_err_dset(C_SIMULATION, path2);
+        sim_instance->nb_outputs = 0;
+        sim_instance->outputs = NULL;
     }
-    free(path2);
 }
 
 
 // Read simulation category (all instances)
 void read_simulation(hid_t file_id, simulation_t *simulation)
 {
+    char path[ABSOLUTE_PATH_NAME_LENGTH];
     children_t children;
     hsize_t i;
-    char *path;
 
     children = read_children_name(file_id, C_SIMULATION);
-    simulation->nb_simulation_instances = children.nb_children;
-    simulation->simulation_instances = NULL;
+    simulation->nb_instances = children.nb_children;
+    simulation->instances = NULL;
     if (children.nb_children > 0)
     {
-        path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-        simulation->simulation_instances = (simulation_instance_t *) malloc((size_t) children.nb_children * sizeof(simulation_instance_t));
+        simulation->instances = (sim_instance_t *) malloc(children.nb_children * sizeof(sim_instance_t));
         for (i = 0; i < children.nb_children; i++)
         {
             strcpy(path, C_SIMULATION);
             strcat(path, children.childnames[i]);
-            read_simulation_instance(file_id, path, simulation->simulation_instances + i);
+            read_sim_instance(file_id, path, simulation->instances + i);
             free(children.childnames[i]);
         }
         free(children.childnames);
-        free(path);
     }
 }
 
@@ -92,27 +87,27 @@ void read_simulation(hid_t file_id, simulation_t *simulation)
 
 
 // Print simulation instance
-void print_simulation_instance(simulation_instance_t simulation_instance, int space)
+void print_sim_instance(sim_instance_t sim_instance, int space)
 {
     hsize_t i;
 
-    printf("%*sInstance: %s\n", space, "", simulation_instance.name);
-    print_optional_attributes(simulation_instance.optional_attributes, space + 4);
-    print_str_attribute(A_MODULE, simulation_instance.module, space + 4);
-    print_str_attribute(A_VERSION, simulation_instance.version, space + 4);
+    printf("%*sInstance: %s\n", space, "", sim_instance.name);
+    print_opt_attrs(sim_instance.opt_attrs, space + 4);
+    print_str_attr(A_MODULE, sim_instance.module, space + 4);
+    print_str_attr(A_VERSION, sim_instance.version, space + 4);
 
-    if (simulation_instance.nb_inputs > 0)
+    if (sim_instance.nb_inputs > 0)
     {
         printf("%*sInputs:\n", space + 2, "");
-        for (i = 0; i < simulation_instance.nb_inputs; i++)
-            printf("%*s%s\n", space + 5, " ", simulation_instance.inputs[i]);
+        for (i = 0; i < sim_instance.nb_inputs; i++)
+            printf("%*s%s\n", space + 5, " ", sim_instance.inputs[i]);
     }
 
-    if (simulation_instance.nb_outputs > 0)
+    if (sim_instance.nb_outputs > 0)
     {
         printf("%*sOutputs:\n", space + 2, "");
-        for (i = 0; i < simulation_instance.nb_outputs; i++)
-            printf("%*s%s\n", space + 5, "", simulation_instance.outputs[i]);
+        for (i = 0; i < sim_instance.nb_outputs; i++)
+            printf("%*s%s\n", space + 5, "", sim_instance.outputs[i]);
     }
     printf("\n");
 }
@@ -124,9 +119,9 @@ void print_simulation(simulation_t simulation)
     hsize_t i;
 
     printf("################################  Simulation  ################################\n\n");
-    for (i = 0; i < simulation.nb_simulation_instances; i++)
+    for (i = 0; i < simulation.nb_instances; i++)
     {
-        print_simulation_instance(simulation.simulation_instances[i], 0);
+        print_sim_instance(simulation.instances[i], 0);
     }
     printf("\n");
 }
@@ -134,38 +129,38 @@ void print_simulation(simulation_t simulation)
 
 
 
-// Free memory used by structure simulation_instance
-void free_simulation_instance(simulation_instance_t *simulation_instance)
+// Free memory used by structure sim_instance
+void free_sim_instance(sim_instance_t *sim_instance)
 {
-    if (simulation_instance->name != NULL)
+    if (sim_instance->name != NULL)
     {
-        free(simulation_instance->name);
-        simulation_instance->name = NULL;
+        free(sim_instance->name);
+        sim_instance->name = NULL;
     }
-    free_optional_attributes(&(simulation_instance->optional_attributes));
-    if (simulation_instance->module != NULL)
+    free_opt_attrs(&(sim_instance->opt_attrs));
+    if (sim_instance->module != NULL)
     {
-        free(simulation_instance->module);
-        simulation_instance->module = NULL;
+        free(sim_instance->module);
+        sim_instance->module = NULL;
     }
-    if (simulation_instance->version != NULL)
+    if (sim_instance->version != NULL)
     {
-        free(simulation_instance->version);
-        simulation_instance->version = NULL;
+        free(sim_instance->version);
+        sim_instance->version = NULL;
     }
-    if (simulation_instance->nb_inputs > 0)
+    if (sim_instance->nb_inputs > 0)
     {
-        free(simulation_instance->inputs[0]);
-        free(simulation_instance->inputs);
-        simulation_instance->inputs = NULL;
-        simulation_instance->nb_inputs = 0;
+        free(sim_instance->inputs[0]);
+        free(sim_instance->inputs);
+        sim_instance->inputs = NULL;
+        sim_instance->nb_inputs = 0;
     }
-    if (simulation_instance->nb_outputs > 0)
+    if (sim_instance->nb_outputs > 0)
     {
-        free(simulation_instance->outputs[0]);
-        free(simulation_instance->outputs);
-        simulation_instance->outputs = NULL;
-        simulation_instance->nb_outputs = 0;
+        free(sim_instance->outputs[0]);
+        free(sim_instance->outputs);
+        sim_instance->outputs = NULL;
+        sim_instance->nb_outputs = 0;
     }
 }
 
@@ -175,10 +170,10 @@ void free_simulation(simulation_t *simulation)
 {
     hsize_t i;
 
-    for (i = 0; i < simulation->nb_simulation_instances; i++)
+    for (i = 0; i < simulation->nb_instances; i++)
     {
-        free_simulation_instance(simulation->simulation_instances + i);
+        free_sim_instance(simulation->instances + i);
     }
-    free(simulation->simulation_instances);
-    simulation->simulation_instances = NULL;
+    free(simulation->instances);
+    simulation->instances = NULL;
 }

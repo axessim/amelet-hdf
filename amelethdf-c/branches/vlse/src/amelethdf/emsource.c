@@ -2,60 +2,57 @@
 
 
 // Read instance in /electromagneticSource/planeWave
-void read_es_planewave (hid_t file_id, const char *path, planewave_t *planewave)
+void read_els_planewave (hid_t file_id, const char *path, planewave_t *planewave)
 {
-    char *path2, mandatory[][ATTRIBUTE_LENGTH] = {A_X0, A_Y0, A_Z0, A_THETA, A_PHI};
+    char mandatory[][ATTR_LENGTH] = {A_XO, A_YO, A_ZO, A_THETA, A_PHI};
+    char path2[ABSOLUTE_PATH_NAME_LENGTH];
 
-    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     planewave->name = get_name_from_path(path);
-    read_optional_attributes(file_id, path, &(planewave->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
-    if (!read_flt_attribute(file_id, path, A_X0, &(planewave->x0)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_X0);
-    if (!read_flt_attribute(file_id, path, A_Y0, &(planewave->y0)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_Y0);
-    if (!read_flt_attribute(file_id, path, A_Z0, &(planewave->z0)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_Z0);
-    if (!read_flt_attribute(file_id, path, A_THETA, &(planewave->theta)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_THETA);
-    if (!read_flt_attribute(file_id, path, A_PHI, &(planewave->phi)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_PHI);
+    read_opt_attrs(file_id, path, &(planewave->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
+    if (!read_flt_attr(file_id, path, A_XO, &(planewave->xo)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_XO);
+    if (!read_flt_attr(file_id, path, A_YO, &(planewave->yo)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_YO);
+    if (!read_flt_attr(file_id, path, A_ZO, &(planewave->zo)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_ZO);
+    if (!read_flt_attr(file_id, path, A_THETA, &(planewave->theta)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_THETA);
+    if (!read_flt_attr(file_id, path, A_PHI, &(planewave->phi)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_PHI);
     strcpy(path2, path);
     strcat(path2, G_MAGNITUDE);
     read_floatingtype(file_id, path2, &(planewave->magnitude));
-    free(path2);
 }
 
 
 // Read instance in /electromagneticSource/sphericalWave
-void read_es_sphericalwave (hid_t file_id, const char *path, sphericalwave_t *sphericalwave)
+void read_els_sphericalwave (hid_t file_id, const char *path, sphericalwave_t *sphericalwave)
 {
-    char *path2;
+    char path2[ABSOLUTE_PATH_NAME_LENGTH];
 
-    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     sphericalwave->name = get_name_from_path(path);
-    if (!read_flt_attribute(file_id, path, A_X0, &(sphericalwave->x0)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_X0);
-    if (!read_flt_attribute(file_id, path, A_Y0, &(sphericalwave->y0)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_Y0);
-    if (!read_flt_attribute(file_id, path, A_Z0, &(sphericalwave->z0)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_Z0);
+    if (!read_flt_attr(file_id, path, A_XO, &(sphericalwave->xo)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_XO);
+    if (!read_flt_attr(file_id, path, A_YO, &(sphericalwave->yo)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_YO);
+    if (!read_flt_attr(file_id, path, A_ZO, &(sphericalwave->zo)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_ZO);
     strcpy(path2, path);
     strcat(path2, G_MAGNITUDE);
     read_floatingtype(file_id, path2, &(sphericalwave->magnitude));
-    free(path2);
 }
 
 
 // Read instance in /electromagneticSource/generator
-void read_es_generator (hid_t file_id, const char *path, generator_t *generator)
+void read_els_generator (hid_t file_id, const char *path, generator_t *generator)
 {
-    char *type, *path2, mandatory[][ATTRIBUTE_LENGTH] = {A_TYPE};
+    char *type, path2[ABSOLUTE_PATH_NAME_LENGTH];
+    char mandatory[][ATTR_LENGTH] = {A_TYPE};
 
-    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     generator->name = get_name_from_path(path);
-    read_optional_attributes(file_id, path, &(generator->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+    read_opt_attrs(file_id, path, &(generator->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     generator->type = GEN_INVALID;
-    if (read_str_attribute(file_id, path, A_TYPE, &type))
+    if (read_str_attr(file_id, path, A_TYPE, &type))
     {
         if (strcmp(type, V_VOLTAGE) == 0)
             generator->type = GEN_VOLTAGE;
@@ -68,27 +65,26 @@ void read_es_generator (hid_t file_id, const char *path, generator_t *generator)
         free(type);
     }
     else
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_TYPE);
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_TYPE);
     strcpy(path2, path);
     strcat(path2, G_INNER_IMPEDANCE);
     read_floatingtype(file_id, path2, &(generator->inner_impedance));
     strcpy(path2, path);
     strcat(path2, G_MAGNITUDE);
     read_floatingtype(file_id, path2, &(generator->magnitude));
-    free(path2);
 }
 
 
 // Read instance in /electromagneticSource/dipole
-void read_es_dipole (hid_t file_id, const char *path, dipole_t *dipole)
+void read_els_dipole (hid_t file_id, const char *path, dipole_t *dipole)
 {
-    char *type, *path2, mandatory[][ATTRIBUTE_LENGTH] = {A_TYPE, A_X, A_Y, A_Z, A_THETA, A_PHI, A_WIRE_RADIUS};
+    char mandatory[][ATTR_LENGTH] = {A_TYPE, A_X, A_Y, A_Z, A_THETA, A_PHI, A_WIRE_RADIUS};
+    char *type, path2[ABSOLUTE_PATH_NAME_LENGTH];
 
-    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     dipole->name = get_name_from_path(path);
-    read_optional_attributes(file_id, path, &(dipole->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+    read_opt_attrs(file_id, path, &(dipole->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     dipole->type = DIPOLE_INVALID;
-    if (read_str_attribute(file_id, path, A_TYPE, &type))
+    if (read_str_attr(file_id, path, A_TYPE, &type))
     {
         if (strcmp(type, V_ELECTRIC) == 0)
             dipole->type = DIPOLE_ELECTRIC;
@@ -97,38 +93,37 @@ void read_es_dipole (hid_t file_id, const char *path, dipole_t *dipole)
         free(type);
     }
     else
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_TYPE);
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_TYPE);
 
-    if (!read_flt_attribute(file_id, path, A_X, &(dipole->x)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_X);
-    if (!read_flt_attribute(file_id, path, A_Y, &(dipole->y)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_Y);
-    if (!read_flt_attribute(file_id, path, A_Z, &(dipole->z)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_Z);
-    if (!read_flt_attribute(file_id, path, A_THETA, &(dipole->theta)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_THETA);
-    if (!read_flt_attribute(file_id, path, A_PHI, &(dipole->phi)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_PHI);
-    if (!read_flt_attribute(file_id, path, A_WIRE_RADIUS, &(dipole->wire_radius)))
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_WIRE_RADIUS);
+    if (!read_flt_attr(file_id, path, A_X, &(dipole->x)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_X);
+    if (!read_flt_attr(file_id, path, A_Y, &(dipole->y)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_Y);
+    if (!read_flt_attr(file_id, path, A_Z, &(dipole->z)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_Z);
+    if (!read_flt_attr(file_id, path, A_THETA, &(dipole->theta)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_THETA);
+    if (!read_flt_attr(file_id, path, A_PHI, &(dipole->phi)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_PHI);
+    if (!read_flt_attr(file_id, path, A_WIRE_RADIUS, &(dipole->wire_radius)))
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_WIRE_RADIUS);
     strcpy(path2, path);
     strcat(path2, G_INNER_IMPEDANCE);
     read_floatingtype(file_id, path2, &(dipole->inner_impedance));
     strcpy(path2, path);
     strcat(path2, G_MAGNITUDE);
     read_floatingtype(file_id, path2, &(dipole->magnitude));
-    free(path2);
 }
 
 
 // Read instance in /electromagneticSource/antenna
-void read_es_antenna (hid_t file_id, const char *path, antenna_t *antenna)
+void read_els_antenna (hid_t file_id, const char *path, antenna_t *antenna)
 {
-    char *path2, mandatory[][ATTRIBUTE_LENGTH] = {};
+    char mandatory[][ATTR_LENGTH] = {}, model_man[][ATTR_LENGTH] = {A_TYPE};
+    char path2[ABSOLUTE_PATH_NAME_LENGTH], *type;
 
-    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     antenna->name = get_name_from_path(path);
-    read_optional_attributes(file_id, path, &(antenna->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+    read_opt_attrs(file_id, path, &(antenna->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
 
     strcpy(path2, path);
     strcat(path2, G_INPUT_IMPEDANCE);
@@ -145,18 +140,67 @@ void read_es_antenna (hid_t file_id, const char *path, antenna_t *antenna)
     strcpy(path2, path);
     strcat(path2, G_MAGNITUDE);
     read_floatingtype(file_id, path2, &(antenna->magnitude));
-    free(path2);
+
+    strcpy(path2, path);
+    strcat(path2, G_MODEL);
+    read_opt_attrs(file_id, path2, &(antenna->model.opt_attrs), model_man, sizeof(model_man)/ATTR_LENGTH);
+    if (read_str_attr(file_id, path2, A_TYPE, &type))
+    {
+        if (strcmp(type, V_GAIN) == 0)
+        {
+            antenna->model.type = ANT_GAIN;
+            strcat(path2, G_GAIN);
+            read_floatingtype(file_id, path2, &(antenna->model.data.gain));
+        }
+        else if (strcmp(type, V_EFFECTIVE_AREA) == 0)
+        {
+            antenna->model.type = ANT_EFFECTIVE_AREA;
+            strcat(path2, G_EFFECTIVE_AREA);
+            read_floatingtype(file_id, path2, &(antenna->model.data.effarea));
+        }
+        else if (strcmp(type, V_FAR_FIELD) == 0)
+        {
+            antenna->model.type = ANT_FAR_FIELD;
+            strcat(path2, G_FAR_FIELD);
+            read_floatingtype(file_id, path2, &(antenna->model.data.farfield));
+        }
+        else if (strcmp(type, V_RECTANGULAR_HORN) == 0)
+        {
+            antenna->model.type = ANT_RECTANGULAR_HORN;
+            strcat(path2, G_PARABOLIC_REFLECTOR);
+            read_opt_attrs(file_id, path2, &(antenna->model.data.parreflct), mandatory, sizeof(mandatory)/ATTR_LENGTH);
+        }
+        else if (strcmp(type, V_CIRCULAR_HORN) == 0)
+        {
+            antenna->model.type = ANT_CIRCULAR_HORN;
+            strcat(path2, G_PARABOLIC_REFLECTOR);
+            read_opt_attrs(file_id, path2, &(antenna->model.data.parreflct), mandatory, sizeof(mandatory)/ATTR_LENGTH);
+        }
+        else if (strcmp(type, V_LOG_PERIODIC) == 0)
+            antenna->model.type = ANT_LOG_PERIODIC;
+        else if (strcmp(type, V_WHIP) == 0)
+            antenna->model.type = ANT_WHIP;
+        else if (strcmp(type, V_GENERIC) == 0)
+            antenna->model.type = ANT_GENERIC;
+        else if (strcmp(type, V_EXCHANGE_SURFACE) == 0)
+            antenna->model.type = ANT_EXCHANGE_SURFACE;
+        else
+            antenna->model.type = ANT_INVALID;
+        free(type);
+    }
+    else
+        antenna->model.type = ANT_INVALID;
 }
 
 
 // Read instance in /electromagneticSource/sourceOnMesh
-void read_es_sourceonmesh (hid_t file_id, const char *path, sourceonmesh_t *sourceonmesh)
+void read_els_sourceonmesh (hid_t file_id, const char *path, sourceonmesh_t *sourceonmesh)
 {
     char *type;
 
     sourceonmesh->name = get_name_from_path(path);
     sourceonmesh->type = SCOM_INVALID;
-    if (read_str_attribute(file_id, path, A_TYPE, &type))
+    if (read_str_attr(file_id, path, A_TYPE, &type))
     {
         if (strcmp(type, V_ARRAYSET) == 0)
         {
@@ -166,24 +210,21 @@ void read_es_sourceonmesh (hid_t file_id, const char *path, sourceonmesh_t *sour
         else if (strcmp(type, V_EXCHANGE_SURFACE) == 0)
         {
             sourceonmesh->type = SCOM_EXCHANGE_SURFACE;
-            read_str_attribute(file_id, path, A_EXCHANGE_SURFACE, &(sourceonmesh->data.exchange_surface));
+            read_str_attr(file_id, path, A_EXCHANGE_SURFACE, &(sourceonmesh->data.exchange_surface));
         }
         free(type);
     }
     else
-        printf("***** ERROR(%s): Cannot read mandatory attribute \"%s@%s\". *****\n\n", C_ELECTROMAGNETIC_SOURCE, path, A_TYPE);
+        print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_TYPE);
 }
 
 
 // Read electromagneticSource category
 void read_electromagnetic_source (hid_t file_id, em_source_t *em_source)
 {
-    hsize_t i, j;
+    char path[ABSOLUTE_PATH_NAME_LENGTH], path2[ABSOLUTE_PATH_NAME_LENGTH];
     children_t children, children2;
-    char *path, *path2;
-
-    path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    hsize_t i, j;
 
     em_source->nb_pw_sources = 0;
     em_source->nb_sw_sources = 0;
@@ -209,32 +250,32 @@ void read_electromagnetic_source (hid_t file_id, em_source_t *em_source)
             if (strcmp(children.childnames[i], G_PLANE_WAVE) == 0)
             {
                 em_source->nb_pw_sources = children2.nb_children;
-                em_source->pw_sources = (planewave_t *) malloc((size_t) children2.nb_children * sizeof(planewave_t));
+                em_source->pw_sources = (planewave_t *) malloc(children2.nb_children * sizeof(planewave_t));
             }
             else if (strcmp(children.childnames[i], G_SPHERICAL_WAVE) == 0)
             {
                 em_source->nb_sw_sources = children2.nb_children;
-                em_source->sw_sources = (sphericalwave_t *) malloc((size_t) children2.nb_children * sizeof(sphericalwave_t));
+                em_source->sw_sources = (sphericalwave_t *) malloc(children2.nb_children * sizeof(sphericalwave_t));
             }
             else if (strcmp(children.childnames[i], G_GENERATOR) == 0)
             {
                 em_source->nb_ge_sources = children2.nb_children;
-                em_source->ge_sources = (generator_t *) malloc((size_t) children2.nb_children * sizeof(generator_t));
+                em_source->ge_sources = (generator_t *) malloc(children2.nb_children * sizeof(generator_t));
             }
             else if (strcmp(children.childnames[i], G_DIPOLE) == 0)
             {
                 em_source->nb_di_sources = children2.nb_children;
-                em_source->di_sources = (dipole_t *) malloc((size_t) children2.nb_children * sizeof(dipole_t));
+                em_source->di_sources = (dipole_t *) malloc(children2.nb_children * sizeof(dipole_t));
             }
             else if (strcmp(children.childnames[i], G_ANTENNA) == 0)
             {
                 em_source->nb_an_sources = children2.nb_children;
-                em_source->an_sources = (antenna_t *) malloc((size_t) children2.nb_children * sizeof(antenna_t));
+                em_source->an_sources = (antenna_t *) malloc(children2.nb_children * sizeof(antenna_t));
             }
             else if (strcmp(children.childnames[i], G_SOURCE_ON_MESH) == 0)
             {
                 em_source->nb_sm_sources = children2.nb_children;
-                em_source->sm_sources = (sourceonmesh_t *) malloc((size_t) children2.nb_children * sizeof(sourceonmesh_t));
+                em_source->sm_sources = (sourceonmesh_t *) malloc(children2.nb_children * sizeof(sourceonmesh_t));
             }
             if (children2.nb_children > 0)
             {
@@ -243,17 +284,17 @@ void read_electromagnetic_source (hid_t file_id, em_source_t *em_source)
                     strcpy(path2, path);
                     strcat(path2, children2.childnames[j]);
                     if (strcmp(children.childnames[i], G_PLANE_WAVE) == 0)
-                        read_es_planewave(file_id, path2, em_source->pw_sources +j);
+                        read_els_planewave(file_id, path2, em_source->pw_sources +j);
                     else if (strcmp(children.childnames[i], G_SPHERICAL_WAVE) == 0)
-                        read_es_sphericalwave(file_id, path2, em_source->sw_sources +j);
+                        read_els_sphericalwave(file_id, path2, em_source->sw_sources +j);
                     else if (strcmp(children.childnames[i], G_GENERATOR) == 0)
-                        read_es_generator(file_id, path2, em_source->ge_sources +j);
+                        read_els_generator(file_id, path2, em_source->ge_sources +j);
                     else if (strcmp(children.childnames[i], G_DIPOLE) == 0)
-                        read_es_dipole(file_id, path2, em_source->di_sources +j);
+                        read_els_dipole(file_id, path2, em_source->di_sources +j);
                     else if (strcmp(children.childnames[i], G_ANTENNA) == 0)
-                        read_es_antenna(file_id, path2, em_source->an_sources +j);
+                        read_els_antenna(file_id, path2, em_source->an_sources +j);
                     else if (strcmp(children.childnames[i], G_SOURCE_ON_MESH) == 0)
-                        read_es_sourceonmesh(file_id, path2, em_source->sm_sources +j);
+                        read_els_sourceonmesh(file_id, path2, em_source->sm_sources +j);
                     free(children2.childnames[j]);
                 }
                 free(children2.childnames);
@@ -262,61 +303,59 @@ void read_electromagnetic_source (hid_t file_id, em_source_t *em_source)
         }
         free(children.childnames);
     }
-    free(path2);
-    free(path);
 }
 
 
 
 
 // Print instance in /electromagneticSource/planeWave
-void print_es_planewave (planewave_t planewave, int space)
+void print_els_planewave (planewave_t planewave, int space)
 {
     printf("%*sName: %s\n", space, "", planewave.name);
-    print_optional_attributes(planewave.optional_attributes, space + 4);
-    print_flt_attribute(A_X0, planewave.x0, space + 4);
-    print_flt_attribute(A_Y0, planewave.y0, space + 4);
-    print_flt_attribute(A_Z0, planewave.z0, space + 4);
-    print_flt_attribute(A_THETA, planewave.theta, space + 4);
-    print_flt_attribute(A_PHI, planewave.phi, space + 4);
+    print_opt_attrs(planewave.opt_attrs, space + 4);
+    print_flt_attr(A_XO, planewave.xo, space + 4);
+    print_flt_attr(A_YO, planewave.yo, space + 4);
+    print_flt_attr(A_ZO, planewave.zo, space + 4);
+    print_flt_attr(A_THETA, planewave.theta, space + 4);
+    print_flt_attr(A_PHI, planewave.phi, space + 4);
     print_floatingtype(planewave.magnitude, space + 2);
     printf("\n");
 }
 
 
 // Print instance in /electromagneticSource/sphericalWave
-void print_es_sphericalwave (sphericalwave_t sphericalwave, int space)
+void print_els_sphericalwave (sphericalwave_t sphericalwave, int space)
 {
     printf("%*sName: %s\n", space, "", sphericalwave.name);
-    print_flt_attribute(A_X0, sphericalwave.x0, space + 4);
-    print_flt_attribute(A_Y0, sphericalwave.y0, space + 4);
-    print_flt_attribute(A_Z0, sphericalwave.z0, space + 4);
+    print_flt_attr(A_XO, sphericalwave.xo, space + 4);
+    print_flt_attr(A_YO, sphericalwave.yo, space + 4);
+    print_flt_attr(A_ZO, sphericalwave.zo, space + 4);
     print_floatingtype(sphericalwave.magnitude, space + 2);
     printf("\n");
 }
 
 
 // Print instance in /electromagneticSource/generator
-void print_es_generator (generator_t generator, int space)
+void print_els_generator (generator_t generator, int space)
 {
     printf("%*sName: %s\n", space, "", generator.name);
-    print_optional_attributes(generator.optional_attributes, space + 4);
+    print_opt_attrs(generator.opt_attrs, space + 4);
     switch (generator.type)
     {
-        case GEN_VOLTAGE:
-            print_str_attribute(A_TYPE, V_VOLTAGE, space + 4);
+    case GEN_VOLTAGE:
+        print_str_attr(A_TYPE, V_VOLTAGE, space + 4);
         break;
-        case GEN_CURRENT:
-            print_str_attribute(A_TYPE, V_CURRENT, space + 4);
+    case GEN_CURRENT:
+        print_str_attr(A_TYPE, V_CURRENT, space + 4);
         break;
-        case GEN_POWER:
-            print_str_attribute(A_TYPE, V_POWER, space + 4);
+    case GEN_POWER:
+        print_str_attr(A_TYPE, V_POWER, space + 4);
         break;
-        case GEN_POWER_DENSITY:
-            print_str_attribute(A_TYPE, V_POWER_DENSITY, space + 4);
+    case GEN_POWER_DENSITY:
+        print_str_attr(A_TYPE, V_POWER_DENSITY, space + 4);
         break;
-        case GEN_INVALID:
-            print_str_attribute(A_TYPE, "INVALID", space + 4);
+    case GEN_INVALID:
+        print_str_attr(A_TYPE, "INVALID", space + 4);
         break;
     }
     print_floatingtype(generator.inner_impedance, space + 2);
@@ -326,65 +365,121 @@ void print_es_generator (generator_t generator, int space)
 
 
 // Print instance in /electromagneticSource/dipole
-void print_es_dipole (dipole_t dipole, int space)
+void print_els_dipole (dipole_t dipole, int space)
 {
     printf("%*sName: %s\n", space, "", dipole.name);
     switch (dipole.type)
     {
-        case DIPOLE_ELECTRIC:
-            print_str_attribute(A_TYPE, V_ELECTRIC, space + 4);
+    case DIPOLE_ELECTRIC:
+        print_str_attr(A_TYPE, V_ELECTRIC, space + 4);
         break;
-        case DIPOLE_MAGNETIC:
-            print_str_attribute(A_TYPE, V_MAGNETIC, space + 4);
+    case DIPOLE_MAGNETIC:
+        print_str_attr(A_TYPE, V_MAGNETIC, space + 4);
         break;
-        case DIPOLE_INVALID:
-            print_str_attribute(A_TYPE, "INVALID", space + 4);
+    case DIPOLE_INVALID:
+        print_str_attr(A_TYPE, "INVALID", space + 4);
         break;
     }
-    print_optional_attributes(dipole.optional_attributes, space + 4);
-    print_flt_attribute(A_X, dipole.x, space + 4);
-    print_flt_attribute(A_Y, dipole.y, space + 4);
-    print_flt_attribute(A_Z, dipole.z, space + 4);
-    print_flt_attribute(A_THETA, dipole.theta, space + 4);
-    print_flt_attribute(A_PHI, dipole.phi, space + 4);
-    print_flt_attribute(A_WIRE_RADIUS, dipole.wire_radius, space + 4);
+    print_opt_attrs(dipole.opt_attrs, space + 4);
+    print_flt_attr(A_X, dipole.x, space + 4);
+    print_flt_attr(A_Y, dipole.y, space + 4);
+    print_flt_attr(A_Z, dipole.z, space + 4);
+    print_flt_attr(A_THETA, dipole.theta, space + 4);
+    print_flt_attr(A_PHI, dipole.phi, space + 4);
+    print_flt_attr(A_WIRE_RADIUS, dipole.wire_radius, space + 4);
     printf("\n");
 }
 
 
 // Print instance in /electromagneticSource/antenna
-void print_es_antenna (antenna_t antenna, int space)
+void print_els_antenna (antenna_t antenna, int space)
 {
     printf("%*sName: %s\n", space, "", antenna.name);
-    print_optional_attributes(antenna.optional_attributes, space + 4);
+    print_opt_attrs(antenna.opt_attrs, space + 5);
     print_floatingtype(antenna.input_impedance, space + 2);
     print_floatingtype(antenna.load_impedance, space + 2);
     print_floatingtype(antenna.feeder_impedance, space + 2);
     print_floatingtype(antenna.magnitude, space + 2);
+    printf("%*s-model:\n", space + 2, "");
+    switch (antenna.model.type)
+    {
+    case ANT_GAIN:
+        print_str_attr(A_TYPE, V_GAIN, space + 6);
+        print_opt_attrs(antenna.model.opt_attrs, space + 6);
+        print_floatingtype(antenna.model.data.gain, space + 4);
+        break;
+    case ANT_EFFECTIVE_AREA:
+        print_str_attr(A_TYPE, V_EFFECTIVE_AREA, space + 6);
+        print_opt_attrs(antenna.model.opt_attrs, space + 6);
+        print_floatingtype(antenna.model.data.effarea, space + 4);
+        break;
+    case ANT_FAR_FIELD:
+        print_str_attr(A_TYPE, V_FAR_FIELD, space + 6);
+        print_opt_attrs(antenna.model.opt_attrs, space + 6);
+        print_floatingtype(antenna.model.data.farfield, space + 4);
+        break;
+    case ANT_RECTANGULAR_HORN:
+        print_str_attr(A_TYPE, V_RECTANGULAR_HORN, space + 6);
+        print_opt_attrs(antenna.model.opt_attrs, space + 6);
+        if (antenna.model.data.parreflct.nb_instances > 0)
+        {
+            printf("%*s-parabolicReflector:\n", space + 4, "");
+            print_opt_attrs(antenna.model.data.parreflct, space + 7);
+        }
+        break;
+    case ANT_CIRCULAR_HORN:
+        print_str_attr(A_TYPE, V_CIRCULAR_HORN, space + 6);
+        print_opt_attrs(antenna.model.opt_attrs, space + 6);
+        if (antenna.model.data.parreflct.nb_instances > 0)
+        {
+            printf("%*s-parabolicReflector:\n", space + 4, "");
+            print_opt_attrs(antenna.model.data.parreflct, space + 7);
+        }
+        break;
+    case ANT_LOG_PERIODIC:
+        print_str_attr(A_TYPE, V_LOG_PERIODIC, space + 5);
+        print_opt_attrs(antenna.model.opt_attrs, space + 5);
+        break;
+    case ANT_WHIP:
+        print_str_attr(A_TYPE, V_WHIP, space + 5);
+        print_opt_attrs(antenna.model.opt_attrs, space + 5);
+        break;
+    case ANT_GENERIC:
+        print_str_attr(A_TYPE, V_GENERIC, space + 5);
+        print_opt_attrs(antenna.model.opt_attrs, space + 5);
+        break;
+    case ANT_EXCHANGE_SURFACE:
+        print_str_attr(A_TYPE, V_EXCHANGE_SURFACE, space + 5);
+        print_opt_attrs(antenna.model.opt_attrs, space + 5);
+    break;
+    default:
+        print_str_attr(A_TYPE, "INVALID", space + 5);
+        break;
+    }
     printf("\n");
 }
 
 
 // Print instance in /electromagneticSource/sourceOnMesh
-void print_es_sourceonmesh (sourceonmesh_t sourceonmesh, int space)
+void print_els_sourceonmesh (sourceonmesh_t sourceonmesh, int space)
 {
     hsize_t i;
 
     printf("%*sName: %s\n", space, "", sourceonmesh.name);
     switch (sourceonmesh.type)
     {
-        case SCOM_ARRAYSET:
-            print_str_attribute(A_TYPE, V_ARRAYSET, space + 4);
-            print_ft_dataset(sourceonmesh.data.arrayset.data, space + 2);
-            for (i = 0; i < sourceonmesh.data.arrayset.nb_dims; i++)
-                print_ft_vector(sourceonmesh.data.arrayset.dims[i], space + 2);
+    case SCOM_ARRAYSET:
+        print_str_attr(A_TYPE, V_ARRAYSET, space + 4);
+        print_ft_dataset(sourceonmesh.data.arrayset.data, space + 2);
+        for (i = 0; i < sourceonmesh.data.arrayset.nb_dims; i++)
+            print_ft_vector(sourceonmesh.data.arrayset.dims[i], space + 2);
         break;
-        case SCOM_EXCHANGE_SURFACE:
-            print_str_attribute(A_TYPE, V_EXCHANGE_SURFACE, space + 3);
-            print_str_attribute(A_EXCHANGE_SURFACE, sourceonmesh.data.exchange_surface, space + 3);
+    case SCOM_EXCHANGE_SURFACE:
+        print_str_attr(A_TYPE, V_EXCHANGE_SURFACE, space + 3);
+        print_str_attr(A_EXCHANGE_SURFACE, sourceonmesh.data.exchange_surface, space + 3);
         break;
-        case SCOM_INVALID:
-            print_str_attribute(A_TYPE, "INVALID", space + 3);
+    case SCOM_INVALID:
+        print_str_attr(A_TYPE, "INVALID", space + 3);
         break;
     }
     printf("\n");
@@ -399,32 +494,32 @@ void print_electromagnetic_source (em_source_t em_source)
     if (em_source.nb_pw_sources)
         printf("Plane wave:\n");
     for (i = 0; i < em_source.nb_pw_sources; i++)
-        print_es_planewave(em_source.pw_sources[i], 3);
+        print_els_planewave(em_source.pw_sources[i], 3);
 
     if (em_source.nb_sw_sources)
         printf("Spherical wave:\n");
     for (i = 0; i < em_source.nb_sw_sources; i++)
-        print_es_sphericalwave(em_source.sw_sources[i], 3);
+        print_els_sphericalwave(em_source.sw_sources[i], 3);
 
     if (em_source.nb_ge_sources)
         printf("Generator:\n");
     for (i = 0; i < em_source.nb_ge_sources; i++)
-        print_es_generator(em_source.ge_sources[i], 3);
+        print_els_generator(em_source.ge_sources[i], 3);
 
     if (em_source.nb_di_sources)
         printf("Dipole:\n");
     for (i = 0; i < em_source.nb_di_sources; i++)
-        print_es_dipole(em_source.di_sources[i], 3);
+        print_els_dipole(em_source.di_sources[i], 3);
 
     if (em_source.nb_an_sources)
         printf("Antenna:\n");
     for (i = 0; i < em_source.nb_an_sources; i++)
-        print_es_antenna(em_source.an_sources[i], 3);
+        print_els_antenna(em_source.an_sources[i], 3);
 
     if (em_source.nb_sm_sources)
         printf("Source on mesh:\n");
     for (i = 0; i < em_source.nb_sm_sources; i++)
-        print_es_sourceonmesh(em_source.sm_sources[i], 3);
+        print_els_sourceonmesh(em_source.sm_sources[i], 3);
     printf("\n");
 }
 
@@ -432,20 +527,20 @@ void print_electromagnetic_source (em_source_t em_source)
 
 
 // Free memory used by planeWave instance
-void free_es_planewave (planewave_t *planewave)
+void free_els_planewave (planewave_t *planewave)
 {
     if (planewave->name != NULL)
     {
         free(planewave->name);
         planewave->name = NULL;
     }
-    free_optional_attributes(&(planewave->optional_attributes));
+    free_opt_attrs(&(planewave->opt_attrs));
     free_floatingtype(&(planewave->magnitude));
 }
 
 
 // Free memory used by sphericalWave instance
-void free_es_sphericalwave (sphericalwave_t *sphericalwave)
+void free_els_sphericalwave (sphericalwave_t *sphericalwave)
 {
     if (sphericalwave->name != NULL)
     {
@@ -457,51 +552,72 @@ void free_es_sphericalwave (sphericalwave_t *sphericalwave)
 
 
 // Free memory used by planeWave instance
-void free_es_generator (generator_t *generator)
+void free_els_generator (generator_t *generator)
 {
     if (generator->name != NULL)
     {
         free(generator->name);
         generator->name = NULL;
     }
-    free_optional_attributes(&(generator->optional_attributes));
+    free_opt_attrs(&(generator->opt_attrs));
     free_floatingtype(&(generator->inner_impedance));
     free_floatingtype(&(generator->magnitude));
 }
 
 
 // Free memory used by dipole instance
-void free_es_dipole (dipole_t *dipole)
+void free_els_dipole (dipole_t *dipole)
 {
     if (dipole->name != NULL)
     {
         free(dipole->name);
         dipole->name = NULL;
     }
-    free_optional_attributes(&(dipole->optional_attributes));
+    free_opt_attrs(&(dipole->opt_attrs));
     free_floatingtype(&(dipole->inner_impedance));
     free_floatingtype(&(dipole->magnitude));
 }
 
 
 // Free memory used by antenna instance
-void free_es_antenna (antenna_t *antenna)
+void free_els_antenna (antenna_t *antenna)
 {
     if (antenna->name != NULL)
     {
         free(antenna->name);
         antenna->name = NULL;
     }
-    free_optional_attributes(&(antenna->optional_attributes));
+    free_opt_attrs(&(antenna->opt_attrs));
     free_floatingtype(&(antenna->input_impedance));
     free_floatingtype(&(antenna->load_impedance));
     free_floatingtype(&(antenna->feeder_impedance));
     free_floatingtype(&(antenna->magnitude));
+    free_opt_attrs(&(antenna->model.opt_attrs));
+    switch (antenna->model.type)
+    {
+    case ANT_GAIN:
+        free_floatingtype(&(antenna->model.data.gain));
+        break;
+    case ANT_EFFECTIVE_AREA:
+        free_floatingtype(&(antenna->model.data.effarea));
+        break;
+    case ANT_FAR_FIELD:
+        free_floatingtype(&(antenna->model.data.farfield));
+        break;
+    case ANT_RECTANGULAR_HORN:
+        free_opt_attrs(&(antenna->model.data.parreflct));
+        break;
+    case ANT_CIRCULAR_HORN:
+        free_opt_attrs(&(antenna->model.data.parreflct));
+        break;
+    default:
+        break;
+    }
 }
 
 
 // Free memory used by sourceOnMesh instance
-void free_es_sourceonmesh (sourceonmesh_t *sourceonmesh)
+void free_els_sourceonmesh (sourceonmesh_t *sourceonmesh)
 {
     if (sourceonmesh->name != NULL)
     {
@@ -530,37 +646,37 @@ void free_electromagnetic_source (em_source_t *em_source)
     if (em_source->nb_pw_sources > 0)
     {
         for (i = 0; i < em_source->nb_pw_sources; i++)
-            free_es_planewave(em_source->pw_sources + i);
+            free_els_planewave(em_source->pw_sources + i);
         free(em_source->pw_sources);
     }
     if (em_source->nb_sw_sources > 0)
     {
         for (i = 0; i < em_source->nb_sw_sources; i++)
-            free_es_sphericalwave(em_source->sw_sources + i);
+            free_els_sphericalwave(em_source->sw_sources + i);
         free(em_source->sw_sources);
     }
     if (em_source->nb_ge_sources > 0)
     {
         for (i = 0; i < em_source->nb_ge_sources; i++)
-            free_es_generator(em_source->ge_sources + i);
+            free_els_generator(em_source->ge_sources + i);
         free(em_source->ge_sources);
     }
     if (em_source->nb_di_sources > 0)
     {
         for (i = 0; i < em_source->nb_di_sources; i++)
-            free_es_dipole(em_source->di_sources + i);
+            free_els_dipole(em_source->di_sources + i);
         free(em_source->di_sources);
     }
     if (em_source->nb_an_sources > 0)
     {
         for (i = 0; i < em_source->nb_an_sources; i++)
-            free_es_antenna(em_source->an_sources + i);
+            free_els_antenna(em_source->an_sources + i);
         free(em_source->an_sources);
     }
     if (em_source->nb_sm_sources > 0)
     {
         for (i = 0; i < em_source->nb_sm_sources; i++)
-            free_es_sourceonmesh(em_source->sm_sources + i);
+            free_els_sourceonmesh(em_source->sm_sources + i);
         free(em_source->sm_sources);
     }
 }

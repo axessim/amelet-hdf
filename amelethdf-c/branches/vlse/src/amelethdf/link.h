@@ -10,38 +10,38 @@ extern "C" {
 #define A_SUBJECT "subject"
 #define A_OBJECT "object"
 
-    typedef struct link_instance_t
+    typedef struct lnk_instance_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         char        *subject;
         char        *object;
-    } link_instance_t;
+    } lnk_instance_t;
 
-    typedef struct link_group_t
+    typedef struct lnk_group_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
-        hsize_t     nb_link_instances;
-        link_instance_t *link_instances;
-    } link_group_t;
+        opt_attrs_t opt_attrs;
+        hsize_t     nb_instances;
+        lnk_instance_t *instances;
+    } lnk_group_t;
 
     typedef struct link_t
     {
-        hsize_t     nb_link_groups;
-        link_group_t *link_groups;
+        hsize_t     nb_groups;
+        lnk_group_t *groups;
     } link_t;
 
-    void read_link_instance (hid_t file_id, const char *path, link_instance_t *link_instance);
-    void read_link_group (hid_t file_id, const char *path, link_group_t *link_group);
+    void read_lnk_instance (hid_t file_id, const char *path, lnk_instance_t *lnk_instance);
+    void read_lnk_group (hid_t file_id, const char *path, lnk_group_t *lnk_group);
     void read_link (hid_t file_id, link_t *link);
 
-    void print_link_instance (link_instance_t link_instance, int space);
-    void print_link_group (link_group_t link_group, int space);
+    void print_lnk_instance (lnk_instance_t lnk_instance, int space);
+    void print_lnk_group (lnk_group_t lnk_group, int space);
     void print_link (link_t link);
 
-    void free_link_instance(link_instance_t *link_instance);
-    void free_link_group(link_group_t *link_group);
+    void free_lnk_instance (lnk_instance_t *lnk_instance);
+    void free_lnk_group (lnk_group_t *lnk_group);
     void free_link (link_t *link);
 
 #ifdef __cplusplus

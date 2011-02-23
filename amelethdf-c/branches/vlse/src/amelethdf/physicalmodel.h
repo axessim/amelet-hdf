@@ -54,7 +54,7 @@ extern "C" {
     typedef struct volume_instance_t
     {
         char *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         floatingtype_t relative_permittivity;
         floatingtype_t relative_permeability;
         floatingtype_t electric_conductivity;
@@ -65,7 +65,7 @@ extern "C" {
     typedef struct surface_instance_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         surface_class_t type;
         char        *physicalmodel;
         float       thickness;
@@ -80,7 +80,7 @@ extern "C" {
     typedef struct interface_instance_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         char        *medium1;
         char        *medium2;
     } interface_instance_t;

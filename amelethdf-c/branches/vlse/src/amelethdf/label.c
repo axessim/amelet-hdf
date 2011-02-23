@@ -1,33 +1,30 @@
 #include "label.h"
-// Revision: 7.2.2011
 
 
 // Read label dataset
-void read_label_dataset(hid_t file_id, const char *path, label_dataset_t *label_dataset)
+void read_lbl_dataset(hid_t file_id, const char *path, lbl_dataset_t *lbl_dataset)
 {
     H5T_class_t type_class;
-    int nb_dims;
-    size_t length;
     char success = FALSE;
+    size_t length;
+    int nb_dims;
 
-    label_dataset->nb_items = 1;  // in case of single value
+    lbl_dataset->nb_items = 1;  // in case of single value
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims <= 1)
-                if (H5LTget_dataset_info(file_id, path, &(label_dataset->nb_items), &type_class, &length) >= 0)
+                if (H5LTget_dataset_info(file_id, path, &(lbl_dataset->nb_items), &type_class, &length) >= 0)
                     if (type_class == H5T_STRING)
-                        if(read_string_dataset(file_id, path, label_dataset->nb_items, length, &(label_dataset->items)))
+                        if(read_string_dataset(file_id, path, lbl_dataset->nb_items, length, &(lbl_dataset->items)))
                             success = TRUE;
     if (success)
-    {
-        label_dataset->name = get_name_from_path(path);
-    }
+        lbl_dataset->name = get_name_from_path(path);
     else
     {
-        printf("***** ERROR(%s): Cannot read dataset \"%s\". *****\n\n", C_LABEL, path);
-        label_dataset->name = NULL;
-        label_dataset->nb_items = 0;
-        label_dataset->items = NULL;
+        print_err_dset(C_LABEL, path);
+        lbl_dataset->name = NULL;
+        lbl_dataset->nb_items = 0;
+        lbl_dataset->items = NULL;
     }
 }
 
@@ -35,26 +32,24 @@ void read_label_dataset(hid_t file_id, const char *path, label_dataset_t *label_
 // Read label category (all datasets)
 void read_label(hid_t file_id, label_t *label)
 {
+    char path[ABSOLUTE_PATH_NAME_LENGTH];
     children_t children;
     hsize_t i;
-    char *path;
 
     children = read_children_name(file_id, C_LABEL);
-    label->nb_label_datasets = children.nb_children;
-    label->label_datasets = NULL;
+    label->nb_datasets = children.nb_children;
+    label->datasets = NULL;
     if (children.nb_children > 0)
     {
-        path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-        label->label_datasets = (label_dataset_t *) malloc((size_t) children.nb_children * sizeof(label_dataset_t));
+        label->datasets = (lbl_dataset_t *) malloc(children.nb_children * sizeof(lbl_dataset_t));
         for (i = 0; i < children.nb_children; i++)
         {
             strcpy(path, C_LABEL);
             strcat(path, children.childnames[i]);
-            read_label_dataset(file_id, path, label->label_datasets + i);
+            read_lbl_dataset(file_id, path, label->datasets + i);
             free(children.childnames[i]);
         }
         free(children.childnames);
-        free(path);
     }
 }
 
@@ -62,13 +57,13 @@ void read_label(hid_t file_id, label_t *label)
 
 
 // Print label dataset
-void print_label_dataset (label_dataset_t label_dataset, int space)
+void print_lbl_dataset (lbl_dataset_t lbl_dataset, int space)
 {
     hsize_t i;
 
-    printf("%*sName: %s\n", space, "", label_dataset.name);
-    for (i = 0; i < label_dataset.nb_items; i++)
-        printf("%*s%s\n", space + 3, "", label_dataset.items[i]);
+    printf("%*sName: %s\n", space, "", lbl_dataset.name);
+    for (i = 0; i < lbl_dataset.nb_items; i++)
+        printf("%*s%s\n", space + 3, "", lbl_dataset.items[i]);
     printf("\n");
 }
 
@@ -79,47 +74,45 @@ void print_label(label_t label)
     hsize_t i;
 
     printf("##################################  Label  ###################################\n\n");
-    for (i = 0; i < label.nb_label_datasets; i++)
-    {
-        print_label_dataset(label.label_datasets[i], 0);
-    }
+    for (i = 0; i < label.nb_datasets; i++)
+        print_lbl_dataset(label.datasets[i], 0);
     printf("\n");
 }
 
 
 
 
-// Free memory used by structure label_dataset
-void free_label_dataset (label_dataset_t *label_dataset)
+// Free memory used by structure lbl_dataset
+void free_lbl_dataset (lbl_dataset_t *lbl_dataset)
 {
-    if (label_dataset->name != NULL)
+    if (lbl_dataset->name != NULL)
     {
-        free(label_dataset->name);
-        label_dataset->name = NULL;
+        free(lbl_dataset->name);
+        lbl_dataset->name = NULL;
     }
 
-    if (label_dataset->nb_items > 0)
+    if (lbl_dataset->nb_items > 0)
     {
-        free(label_dataset->items[0]);
-        free(label_dataset->items);
-        label_dataset->items = NULL;
-        label_dataset->nb_items = 0;
+        free(lbl_dataset->items[0]);
+        free(lbl_dataset->items);
+        lbl_dataset->items = NULL;
+        lbl_dataset->nb_items = 0;
     }
 
 }
 
 
-// Free memory used by structure label (including label_datasets)
+// Free memory used by structure label (including datasets)
 void free_label (label_t *label)
 {
     hsize_t i;
 
-    if (label->nb_label_datasets > 0)
+    if (label->nb_datasets > 0)
     {
-        for (i = 0; i < label->nb_label_datasets; i++)
-            free_label_dataset(label->label_datasets + i);
-        free(label->label_datasets);
-        label->label_datasets = NULL;
-        label->nb_label_datasets = 0;
+        for (i = 0; i < label->nb_datasets; i++)
+            free_lbl_dataset(label->datasets + i);
+        free(label->datasets);
+        label->datasets = NULL;
+        label->nb_datasets = 0;
     }
 }

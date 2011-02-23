@@ -1,21 +1,20 @@
 #include "floatingtype.h"
-// Revision: 6.2.2011
 
 
 // Read singleInteger, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_singleinteger (hid_t file_id, const char *path, singleinteger_t *singleinteger)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
     char success = FALSE;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
 
-    if (read_int_attribute(file_id, path, A_VALUE, &(singleinteger->value)))
+    if (read_int_attr(file_id, path, A_VALUE, &(singleinteger->value)))
     {
         singleinteger->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(singleinteger->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(singleinteger->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
         success = TRUE;
     }
     else
-        printf("***** ERROR: Cannot read mandatory attribute \"%s@%s\". *****\n\n", path, A_VALUE);
+        print_err_attr("", path, A_VALUE);
     return success;
 }
 
@@ -23,17 +22,17 @@ char read_ft_singleinteger (hid_t file_id, const char *path, singleinteger_t *si
 // Read singleReal, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_singlereal (hid_t file_id, const char *path, singlereal_t *singlereal)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
     char success = FALSE;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
 
-    if (read_flt_attribute(file_id, path, A_VALUE, &(singlereal->value)))
+    if (read_flt_attr(file_id, path, A_VALUE, &(singlereal->value)))
     {
         singlereal->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(singlereal->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(singlereal->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
         success = TRUE;
     }
     else
-        printf("***** ERROR: Cannot read mandatory attribute \"%s@%s\". *****\n\n", path, A_VALUE);
+        print_err_attr("", path, A_VALUE);
     return success;
 }
 
@@ -41,17 +40,17 @@ char read_ft_singlereal (hid_t file_id, const char *path, singlereal_t *singlere
 // Read singleComplex, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_singlecomplex (hid_t file_id, const char *path, singlecomplex_t *singlecomplex)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
     char success = FALSE;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
 
-    if (read_cpx_attribute(file_id, path, A_VALUE, &(singlecomplex->value)))
+    if (read_cpx_attr(file_id, path, A_VALUE, &(singlecomplex->value)))
     {
         singlecomplex->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(singlecomplex->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(singlecomplex->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
         success = TRUE;
     }
     else
-        printf("***** ERROR: Cannot read mandatory attribute \"%s@%s\". *****\n\n", path, A_VALUE);
+        print_err_attr("", path, A_VALUE);
     return success;
 }
 
@@ -59,17 +58,17 @@ char read_ft_singlecomplex (hid_t file_id, const char *path, singlecomplex_t *si
 // Read singleString, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_singlestring (hid_t file_id, const char *path, singlestring_t *singlestring)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
     char success = FALSE;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE, A_VALUE};
 
-    if(read_str_attribute(file_id, path, A_VALUE, &(singlestring->value)))
+    if(read_str_attr(file_id, path, A_VALUE, &(singlestring->value)))
     {
         singlestring->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(singlestring->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(singlestring->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
         success = TRUE;
     }
     else
-        printf("***** ERROR: Cannot read mandatory attribute \"%s@%s\". *****\n\n", path, A_VALUE);
+        print_err_attr("", path, A_VALUE);
     return success;
 }
 
@@ -77,10 +76,10 @@ char read_ft_singlestring (hid_t file_id, const char *path, singlestring_t *sing
 // Read vector, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_vector (hid_t file_id, const char *path, vector_t *vector)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE};
+    char success = FALSE;
     size_t length;
     int nb_dims;
-    char success = FALSE;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
 
     vector->nb_values = 1;  // in case of single value
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
@@ -111,7 +110,7 @@ char read_ft_vector (hid_t file_id, const char *path, vector_t *vector)
     if (success)
     {
         vector->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(vector->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(vector->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
     {
@@ -125,8 +124,8 @@ char read_ft_vector (hid_t file_id, const char *path, vector_t *vector)
 // Read linearListOfReal1, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_linearlistofreal1 (hid_t file_id, const char *path, linearlistofreal1_t *linearlistofreal1)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE, A_FIRST, A_LAST, A_NUMBER_OF_VALUES};
     char success = FALSE;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
 
     linearlistofreal1->first = 0;
     linearlistofreal1->last = 0;
@@ -140,7 +139,7 @@ char read_ft_linearlistofreal1 (hid_t file_id, const char *path, linearlistofrea
     if (success)
     {
         linearlistofreal1->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(linearlistofreal1->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(linearlistofreal1->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
         printf("***** ERROR: Cannot read mandatory attributes in \"%s\". *****\n\n", path);
@@ -151,19 +150,27 @@ char read_ft_linearlistofreal1 (hid_t file_id, const char *path, linearlistofrea
 // Read linearListOfReal2, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_linearlistofreal2 (hid_t file_id, const char *path, linearlistofreal2_t *linearlistofreal2)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE, A_FIRST, A_STEP, A_NUMBER_OF_VALUES};
     char success = FALSE;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
 
     linearlistofreal2->first = 0;
     linearlistofreal2->step = 0;
     linearlistofreal2->number_of_values = 0;
-    if (H5Aexists_by_name(file_id, path, A_FIRST, H5P_DEFAULT) > 0 && H5Aexists_by_name(file_id, path, A_STEP, H5P_DEFAULT) > 0 && H5Aexists_by_name(file_id, path, A_NUMBER_OF_VALUES, H5P_DEFAULT) > 0)
-        if (H5LTget_attribute_float(file_id, path, A_FIRST, &(linearlistofreal2->first)) >= 0 && H5LTget_attribute_float(file_id, path, A_STEP, &(linearlistofreal2->step)) >= 0 && H5LTget_attribute_int(file_id, path, A_NUMBER_OF_VALUES, &(linearlistofreal2->number_of_values)) >= 0)
+    if (H5Aexists_by_name(file_id, path, A_FIRST, H5P_DEFAULT) > 0
+        &&
+        H5Aexists_by_name(file_id, path, A_STEP, H5P_DEFAULT) > 0
+        &&
+        H5Aexists_by_name(file_id, path, A_NUMBER_OF_VALUES, H5P_DEFAULT) > 0)
+        if (H5LTget_attribute_float(file_id, path, A_FIRST, &(linearlistofreal2->first)) >= 0
+            &&
+            H5LTget_attribute_float(file_id, path, A_STEP, &(linearlistofreal2->step)) >= 0
+            &&
+            H5LTget_attribute_int(file_id, path, A_NUMBER_OF_VALUES, &(linearlistofreal2->number_of_values)) >= 0)
             success = TRUE;
     if (success)
     {
         linearlistofreal2->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(linearlistofreal2->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(linearlistofreal2->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
         printf("***** ERROR: Cannot read mandatory attributes in \"%s\". *****\n\n", path);
@@ -174,19 +181,27 @@ char read_ft_linearlistofreal2 (hid_t file_id, const char *path, linearlistofrea
 // Read logarithmListOfReal, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_logarithmlistofreal (hid_t file_id, const char *path, logarithmlistofreal_t *logarithmlistofreal)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE, A_FIRST, A_LAST, A_NUMBER_OF_VALUES};
     char success = FALSE;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
 
     logarithmlistofreal->first = 0;
     logarithmlistofreal->last = 0;
     logarithmlistofreal->number_of_values = 0;
-    if (H5Aexists_by_name(file_id, path, A_FIRST, H5P_DEFAULT) > 0 && H5Aexists_by_name(file_id, path, A_LAST, H5P_DEFAULT) > 0 && H5Aexists_by_name(file_id, path, A_NUMBER_OF_VALUES, H5P_DEFAULT) > 0)
-        if (H5LTget_attribute_float(file_id, path, A_FIRST, &(logarithmlistofreal->first)) >= 0 && H5LTget_attribute_float(file_id, path, A_LAST, &(logarithmlistofreal->last)) >= 0 && H5LTget_attribute_int(file_id, path, A_NUMBER_OF_VALUES, &(logarithmlistofreal->number_of_values)) >= 0)
+    if (H5Aexists_by_name(file_id, path, A_FIRST, H5P_DEFAULT) > 0
+        &&
+        H5Aexists_by_name(file_id, path, A_LAST, H5P_DEFAULT) > 0
+        &&
+        H5Aexists_by_name(file_id, path, A_NUMBER_OF_VALUES, H5P_DEFAULT) > 0)
+        if (H5LTget_attribute_float(file_id, path, A_FIRST, &(logarithmlistofreal->first)) >= 0
+            &&
+            H5LTget_attribute_float(file_id, path, A_LAST, &(logarithmlistofreal->last)) >= 0
+            &&
+            H5LTget_attribute_int(file_id, path, A_NUMBER_OF_VALUES, &(logarithmlistofreal->number_of_values)) >= 0)
             success = TRUE;
     if (success)
     {
         logarithmlistofreal->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(logarithmlistofreal->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(logarithmlistofreal->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
         printf("***** ERROR: Cannot read mandatory attributes in \"%s\". *****\n\n", path);
@@ -197,19 +212,27 @@ char read_ft_logarithmlistofreal (hid_t file_id, const char *path, logarithmlist
 // Read perDecadeListOfReal, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_perdecadelistofreal (hid_t file_id, const char *path, perdecadelistofreal_t *perdecadelistofreal)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE, A_NUMBER_OF_DECADES, A_NUMBER_OF_VALUES_PER_DECADE};
     char success = FALSE;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
 
     perdecadelistofreal->first = 0;
     perdecadelistofreal->number_of_decades = 0;
     perdecadelistofreal->number_of_values_per_decade = 0;
-    if (H5Aexists_by_name(file_id, path, A_FIRST, H5P_DEFAULT) > 0 && H5Aexists_by_name(file_id, path, A_NUMBER_OF_DECADES, H5P_DEFAULT) > 0 && H5Aexists_by_name(file_id, path, A_NUMBER_OF_VALUES_PER_DECADE, H5P_DEFAULT) > 0)
-        if (H5LTget_attribute_float(file_id, path, A_FIRST, &(perdecadelistofreal->first)) >= 0 && H5LTget_attribute_int(file_id, path, A_NUMBER_OF_DECADES, &(perdecadelistofreal->number_of_decades)) >= 0 && H5LTget_attribute_int(file_id, path, A_NUMBER_OF_VALUES_PER_DECADE, &(perdecadelistofreal->number_of_values_per_decade)) >= 0)
+    if (H5Aexists_by_name(file_id, path, A_FIRST, H5P_DEFAULT) > 0
+        &&
+        H5Aexists_by_name(file_id, path, A_NUMBER_OF_DECADES, H5P_DEFAULT) > 0
+        &&
+        H5Aexists_by_name(file_id, path, A_NUMBER_OF_VALUES_PER_DECADE, H5P_DEFAULT) > 0)
+        if (H5LTget_attribute_float(file_id, path, A_FIRST, &(perdecadelistofreal->first)) >= 0
+            &&
+            H5LTget_attribute_int(file_id, path, A_NUMBER_OF_DECADES, &(perdecadelistofreal->number_of_decades)) >= 0
+            &&
+            H5LTget_attribute_int(file_id, path, A_NUMBER_OF_VALUES_PER_DECADE, &(perdecadelistofreal->number_of_values_per_decade)) >= 0)
             success = TRUE;
     if (success)
     {
         perdecadelistofreal->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(perdecadelistofreal->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(perdecadelistofreal->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
         printf("***** ERROR: Cannot read mandatory attributes in \"%s\". *****\n\n", path);
@@ -220,19 +243,27 @@ char read_ft_perdecadelistofreal (hid_t file_id, const char *path, perdecadelist
 // Read linearListOfInteger2, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_linearlistofinteger2 (hid_t file_id, const char *path, linearlistofinteger2_t *linearlistofinteger2)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE, A_FIRST, A_STEP, A_NUMBER_OF_VALUES};
     char success = FALSE;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
 
     linearlistofinteger2->first = 0;
     linearlistofinteger2->step = 0;
     linearlistofinteger2->number_of_values = 0;
-    if (H5Aexists_by_name(file_id, path, A_FIRST, H5P_DEFAULT) > 0 && H5Aexists_by_name(file_id, path, A_STEP, H5P_DEFAULT) > 0 && H5Aexists_by_name(file_id, path, A_NUMBER_OF_VALUES, H5P_DEFAULT) > 0)
-        if (H5LTget_attribute_int(file_id, path, A_FIRST, &(linearlistofinteger2->first)) >= 0 && H5LTget_attribute_int(file_id, path, A_STEP, &(linearlistofinteger2->step)) >= 0 && H5LTget_attribute_int(file_id, path, A_NUMBER_OF_VALUES, &(linearlistofinteger2->number_of_values)) >= 0)
+    if (H5Aexists_by_name(file_id, path, A_FIRST, H5P_DEFAULT) > 0
+        &&
+        H5Aexists_by_name(file_id, path, A_STEP, H5P_DEFAULT) > 0
+        &&
+        H5Aexists_by_name(file_id, path, A_NUMBER_OF_VALUES, H5P_DEFAULT) > 0)
+        if (H5LTget_attribute_int(file_id, path, A_FIRST, &(linearlistofinteger2->first)) >= 0
+            &&
+            H5LTget_attribute_int(file_id, path, A_STEP, &(linearlistofinteger2->step)) >= 0
+            &&
+            H5LTget_attribute_int(file_id, path, A_NUMBER_OF_VALUES, &(linearlistofinteger2->number_of_values)) >= 0)
             success = TRUE;
     if (success)
     {
         linearlistofinteger2->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(linearlistofinteger2->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(linearlistofinteger2->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
         printf("***** ERROR: Cannot read mandatory attributes in \"%s\". *****\n\n", path);
@@ -243,14 +274,14 @@ char read_ft_linearlistofinteger2 (hid_t file_id, const char *path, linearlistof
 // Read rationalFunction, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_rationalfunction (hid_t file_id, const char *path, rationalfunction_t *rationalfunction)
 {
-    hsize_t nfields, i;
-    char success = FALSE;
-    char **field_names;
-    size_t *field_sizes;
-    size_t *field_offsets;
-    size_t type_size;
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE};
     int type = 0, a = 1, b = 2, f = 3;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
+    size_t *field_offsets;
+    char success = FALSE;
+    size_t *field_sizes;
+    char **field_names;
+    hsize_t nfields, i;
+    size_t type_size;
 
     if (H5Lexists(file_id, path, H5P_DEFAULT) != FALSE)
         if (H5TBget_table_info(file_id, path, &nfields, &(rationalfunction->nb_types)) >= 0)
@@ -260,16 +291,16 @@ char read_ft_rationalfunction (hid_t file_id, const char *path, rationalfunction
                 field_names[0] = (char *) malloc(TABLE_FIELD_NAME_LENGTH * nfields * sizeof(char));
                 for (i = 0; i < nfields; i++)
                     field_names[i] = field_names[0] + i * TABLE_FIELD_NAME_LENGTH;
-                field_sizes = (size_t *) malloc((size_t) sizeof(size_t *) * nfields);
-                field_offsets = (size_t *) malloc((size_t) sizeof(size_t *) * nfields);
+                field_sizes = (size_t *) malloc(sizeof(size_t *) * nfields);
+                field_offsets = (size_t *) malloc(sizeof(size_t *) * nfields);
 
                 if (H5TBget_field_info(file_id, path, field_names, field_sizes, field_offsets, &type_size) >= 0)
                     if (strcmp(field_names[0], F_TYPE) == 0 && strcmp(field_names[1], F_A) == 0 && strcmp(field_names[2], F_B) == 0 && strcmp(field_names[3], F_F) == 0)
                     {
-                        rationalfunction->types = (int *) malloc((size_t) rationalfunction->nb_types * sizeof(int));
-                        rationalfunction->a = (float *) malloc((size_t) rationalfunction->nb_types * sizeof(float));
-                        rationalfunction->b = (float *) malloc((size_t) rationalfunction->nb_types * sizeof(float));
-                        rationalfunction->f = (float *) malloc((size_t) rationalfunction->nb_types * sizeof(float));
+                        rationalfunction->types = (int *) malloc(rationalfunction->nb_types * sizeof(int));
+                        rationalfunction->a = (float *) malloc(rationalfunction->nb_types * sizeof(float));
+                        rationalfunction->b = (float *) malloc(rationalfunction->nb_types * sizeof(float));
+                        rationalfunction->f = (float *) malloc(rationalfunction->nb_types * sizeof(float));
                         if (H5TBread_fields_index(file_id, path, 1, &type, 0, rationalfunction->nb_types, sizeof(int), field_offsets, field_sizes, rationalfunction->types) >= 0
                                 &&
                                 H5TBread_fields_index(file_id, path, 1, &a, 0, rationalfunction->nb_types, sizeof(float), field_offsets, field_sizes, rationalfunction->a) >= 0
@@ -294,7 +325,7 @@ char read_ft_rationalfunction (hid_t file_id, const char *path, rationalfunction
     if (success)
     {
         rationalfunction->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(rationalfunction->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(rationalfunction->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
         printf("***** ERROR: Cannot read table \"%s\". *****\n\n", path);
@@ -305,13 +336,13 @@ char read_ft_rationalfunction (hid_t file_id, const char *path, rationalfunction
 // Read generalRationalFunction, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_generalrationalfunction (hid_t file_id, const char *path, generalrationalfunction_t *generalrationalfunction)
 {
-    hsize_t dims[2], i;
-    int nb_dims;
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE};
     H5T_class_t type_class;
-    size_t length;
     char success = FALSE;
     complex float *buf;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
+    hsize_t dims[2], i;
+    size_t length;
+    int nb_dims;
 
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
@@ -319,8 +350,8 @@ char read_ft_generalrationalfunction (hid_t file_id, const char *path, generalra
                 if (H5LTget_dataset_info(file_id, path, dims, &type_class, &length) >= 0)
                     if (dims[0] > 0 && dims[1] == 2 && type_class == H5T_COMPOUND)
                     {
-                        generalrationalfunction->numerator = (complex float *) malloc((size_t) dims[0] * sizeof(complex float));
-                        generalrationalfunction->denominator = (complex float *) malloc((size_t) dims[0] * sizeof(complex float));
+                        generalrationalfunction->numerator = (complex float *) malloc(dims[0] * sizeof(complex float));
+                        generalrationalfunction->denominator = (complex float *) malloc(dims[0] * sizeof(complex float));
                         if (read_complex_dataset(file_id, path, dims[0] * dims[1], &(buf)))
                         {
                             for (i = 0; i < dims[0]; i++)
@@ -341,7 +372,7 @@ char read_ft_generalrationalfunction (hid_t file_id, const char *path, generalra
     {
         generalrationalfunction->nb_degrees = dims[0];
         generalrationalfunction->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(generalrationalfunction->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(generalrationalfunction->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
         printf("***** ERROR: Cannot read dataset \"%s\". *****\n\n", path);
@@ -352,15 +383,14 @@ char read_ft_generalrationalfunction (hid_t file_id, const char *path, generalra
 // Read rational, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_rational (hid_t file_id, const char *path, rational_t *rational)
 {
-    char *path2, *buf, success = FALSE;
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE};
+    char path2[ABSOLUTE_PATH_NAME_LENGTH];
+    char *buf, success = FALSE;
     hsize_t i, invalid = 0;
-    int nb_dims;
-    size_t length;
     H5T_class_t type_class;
     children_t children;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
-
-    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    size_t length;
+    int nb_dims;
 
     strcpy(path2, path);
     strcat(path2, G_FUNCTION);
@@ -369,7 +399,7 @@ char read_ft_rational (hid_t file_id, const char *path, rational_t *rational)
     if (children.nb_children > 0)
     {
         // Read rational/function until error
-        rational->functions = (floatingtyper_t *) malloc((size_t) children.nb_children * sizeof(floatingtyper_t));
+        rational->functions = (floatingtyper_t *) malloc(children.nb_children * sizeof(floatingtyper_t));
         for (i = 0; i < children.nb_children; i++)
         {
             if (!invalid)
@@ -377,7 +407,7 @@ char read_ft_rational (hid_t file_id, const char *path, rational_t *rational)
                 strcpy(path2, path);
                 strcat(path2, G_FUNCTION);
                 strcat(path2, children.childnames[i]);
-                if (read_str_attribute(file_id, path2, A_FLOATING_TYPE, &buf))
+                if (read_str_attr(file_id, path2, A_FLOATING_TYPE, &buf))
                 {
                     if (strcmp(buf, V_RATIONAL_FUNCTION) == 0)
                     {
@@ -437,11 +467,10 @@ char read_ft_rational (hid_t file_id, const char *path, rational_t *rational)
                                     success = TRUE;
         }
     }
-    free(path2);
     if (success)
     {
         rational->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(rational->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(rational->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
         printf("***** ERROR: Cannot read dataset \"%s\". *****\n\n", path2);
@@ -452,17 +481,17 @@ char read_ft_rational (hid_t file_id, const char *path, rational_t *rational)
 // Read dataset, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_dataset (hid_t file_id, const char *path, dataset_t *dataset)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE};
+    hsize_t total_size = 1;
     char success = FALSE;
     size_t length;
-    hsize_t total_size = 1;
     int i;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
 
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &(dataset->nb_dims)) >= 0)
             if (dataset->nb_dims > 0)
             {
-                dataset->dims = (hsize_t *) malloc((size_t) (dataset->nb_dims * sizeof(hsize_t)));
+                dataset->dims = (hsize_t *) malloc((dataset->nb_dims * sizeof(hsize_t)));
                 if (H5LTget_dataset_info(file_id, path, dataset->dims, &(dataset->type_class), &length) >= 0)
                 {
                     for (i = 0; i < dataset->nb_dims; i++)
@@ -495,7 +524,7 @@ char read_ft_dataset (hid_t file_id, const char *path, dataset_t *dataset)
     if (success)
     {
         dataset->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(dataset->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(dataset->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
         printf("***** ERROR: Cannot read dataset \"%s\". *****\n\n", path);
@@ -506,13 +535,11 @@ char read_ft_dataset (hid_t file_id, const char *path, dataset_t *dataset)
 // Read arraySet, return TRUE (all OK) or FALSE (no malloc)
 char read_ft_arrayset (hid_t file_id, const char *path, arrayset_t *arrayset)
 {
+    char mandatory[][ATTR_LENGTH] = {A_FLOATING_TYPE};
+    char path2[ABSOLUTE_PATH_NAME_LENGTH];
+    hsize_t i, invalid = 0;
     char success = FALSE;
     children_t children;
-    char *path2;
-    hsize_t i, invalid = 0;
-    char mandatory[][ATTRIBUTE_LENGTH] = {A_FLOATING_TYPE};
-
-    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
 
     strcpy(path2, path);
     strcat(path2, "/data");
@@ -522,7 +549,7 @@ char read_ft_arrayset (hid_t file_id, const char *path, arrayset_t *arrayset)
         strcat(path2, "/ds");
         children = read_children_name(file_id, path2);
         arrayset->nb_dims = children.nb_children;
-        arrayset->dims = (vector_t *) malloc((size_t) children.nb_children * sizeof(vector_t));
+        arrayset->dims = (vector_t *) malloc(children.nb_children * sizeof(vector_t));
         for (i = 0; i < children.nb_children; i++)
         {
             if (!invalid)
@@ -546,11 +573,10 @@ char read_ft_arrayset (hid_t file_id, const char *path, arrayset_t *arrayset)
         else
             success = TRUE;
     }
-    free(path2);
     if (success)
     {
         arrayset->name = get_name_from_path(path);
-        read_optional_attributes(file_id, path, &(arrayset->optional_attributes), mandatory, sizeof(mandatory)/ATTRIBUTE_LENGTH);
+        read_opt_attrs(file_id, path, &(arrayset->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
         printf("***** ERROR: Cannot read arraySet \"%s\". *****\n\n", path);
@@ -563,7 +589,7 @@ char read_floatingtype(hid_t file_id, const char *path, floatingtype_t *floating
     char success = FALSE;
     char* buf;
 
-    if (read_str_attribute(file_id, path, A_FLOATING_TYPE, &buf))
+    if (read_str_attr(file_id, path, A_FLOATING_TYPE, &buf))
     {
         if (strcmp(buf, V_SINGLE_INTEGER) == 0)
         {
@@ -661,7 +687,7 @@ char read_floatingtype(hid_t file_id, const char *path, floatingtype_t *floating
         buf = NULL;
     }
     else
-        printf("***** ERROR: Cannot read mandatory attribute \"%s@%s\". *****\n\n", path, A_FLOATING_TYPE);
+        print_err_attr("", path, A_FLOATING_TYPE);
     if (!success)
         floatingtype->type = FT_INVALID;
     return success;
@@ -674,8 +700,8 @@ char read_floatingtype(hid_t file_id, const char *path, floatingtype_t *floating
 void print_ft_singleinteger (singleinteger_t singleinteger, int space)
 {
     printf("%*s-%s:\n", space, "", singleinteger.name);
-    print_int_attribute(A_VALUE, singleinteger.value, space + 3);
-    print_optional_attributes(singleinteger.optional_attributes, space + 3);
+    print_int_attr(A_VALUE, singleinteger.value, space + 3);
+    print_opt_attrs(singleinteger.opt_attrs, space + 3);
 }
 
 
@@ -683,8 +709,8 @@ void print_ft_singleinteger (singleinteger_t singleinteger, int space)
 void print_ft_singlereal (singlereal_t singlereal, int space)
 {
     printf("%*s-%s:\n", space, "", singlereal.name);
-    print_flt_attribute(A_VALUE, singlereal.value, space + 3);
-    print_optional_attributes(singlereal.optional_attributes, space + 3);
+    print_flt_attr(A_VALUE, singlereal.value, space + 3);
+    print_opt_attrs(singlereal.opt_attrs, space + 3);
 }
 
 
@@ -692,8 +718,8 @@ void print_ft_singlereal (singlereal_t singlereal, int space)
 void print_ft_singlecomplex (singlecomplex_t singlecomplex, int space)
 {
     printf("%*s-%s:\n", space, "", singlecomplex.name);
-    print_cpx_attribute(A_VALUE, singlecomplex.value, space + 3);
-    print_optional_attributes(singlecomplex.optional_attributes, space + 3);
+    print_cpx_attr(A_VALUE, singlecomplex.value, space + 3);
+    print_opt_attrs(singlecomplex.opt_attrs, space + 3);
 }
 
 
@@ -701,8 +727,8 @@ void print_ft_singlecomplex (singlecomplex_t singlecomplex, int space)
 void print_ft_singlestring (singlestring_t singlestring, int space)
 {
     printf("%*s-%s:\n", space, "", singlestring.name);
-    print_str_attribute(A_VALUE, singlestring.value, space + 3);
-    print_optional_attributes(singlestring.optional_attributes, space + 3);
+    print_str_attr(A_VALUE, singlestring.value, space + 3);
+    print_opt_attrs(singlestring.opt_attrs, space + 3);
 }
 
 
@@ -737,7 +763,7 @@ void print_ft_vector (vector_t vector, int space)
     default:
         break;
     }
-    print_optional_attributes(vector.optional_attributes, space + 3);
+    print_opt_attrs(vector.opt_attrs, space + 3);
 }
 
 
@@ -745,7 +771,7 @@ void print_ft_vector (vector_t vector, int space)
 void print_ft_linearlistofreal1 (linearlistofreal1_t linearlistofreal1, int space)
 {
     printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",linearlistofreal1.name, A_FIRST, linearlistofreal1.first, A_LAST, linearlistofreal1.last, A_NUMBER_OF_VALUES, linearlistofreal1.number_of_values);
-    print_optional_attributes(linearlistofreal1.optional_attributes, space + 3);
+    print_opt_attrs(linearlistofreal1.opt_attrs, space + 3);
 }
 
 
@@ -753,7 +779,7 @@ void print_ft_linearlistofreal1 (linearlistofreal1_t linearlistofreal1, int spac
 void print_ft_linearlistofreal2 (linearlistofreal2_t linearlistofreal2, int space)
 {
     printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",linearlistofreal2.name, A_FIRST, linearlistofreal2.first, A_STEP, linearlistofreal2.step, A_NUMBER_OF_VALUES, linearlistofreal2.number_of_values);
-    print_optional_attributes(linearlistofreal2.optional_attributes, space + 3);
+    print_opt_attrs(linearlistofreal2.opt_attrs, space + 3);
 }
 
 
@@ -761,7 +787,7 @@ void print_ft_linearlistofreal2 (linearlistofreal2_t linearlistofreal2, int spac
 void print_ft_logarithmlistofreal (logarithmlistofreal_t logarithmlistofreal, int space)
 {
     printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "", logarithmlistofreal.name, A_FIRST, logarithmlistofreal.first, A_LAST, logarithmlistofreal.last, A_NUMBER_OF_VALUES, logarithmlistofreal.number_of_values);
-    print_optional_attributes(logarithmlistofreal.optional_attributes, space + 3);
+    print_opt_attrs(logarithmlistofreal.opt_attrs, space + 3);
 }
 
 
@@ -769,7 +795,7 @@ void print_ft_logarithmlistofreal (logarithmlistofreal_t logarithmlistofreal, in
 void print_ft_perdecadelistofreal (perdecadelistofreal_t perdecadelistofreal, int space)
 {
     printf("%*s-%s: %s=%g, %s=%i, %s=%i\n", space, "", perdecadelistofreal.name, A_FIRST, perdecadelistofreal.first, A_NUMBER_OF_DECADES, perdecadelistofreal.number_of_decades, A_NUMBER_OF_VALUES_PER_DECADE, perdecadelistofreal.number_of_values_per_decade);
-    print_optional_attributes(perdecadelistofreal.optional_attributes, space + 3);
+    print_opt_attrs(perdecadelistofreal.opt_attrs, space + 3);
 }
 
 
@@ -777,7 +803,7 @@ void print_ft_perdecadelistofreal (perdecadelistofreal_t perdecadelistofreal, in
 void print_ft_linearlistofinteger2 (linearlistofinteger2_t linearlistofinteger2, int space)
 {
     printf("%*s-%s: %s=%i, %s=%i, %s=%i\n", space, "",linearlistofinteger2.name, A_FIRST, linearlistofinteger2.first, A_STEP, linearlistofinteger2.step, A_NUMBER_OF_VALUES, linearlistofinteger2.number_of_values);
-    print_optional_attributes(linearlistofinteger2.optional_attributes, space + 3);
+    print_opt_attrs(linearlistofinteger2.opt_attrs, space + 3);
 }
 
 
@@ -792,7 +818,7 @@ void print_ft_rationalfunction (rationalfunction_t rationalfunction, int space)
         printf("type%i=%g|%g|%g, ", rationalfunction.types[i], rationalfunction.a[i], rationalfunction.b[i], rationalfunction.f[i]);
     }
     printf("type%i=%g|%g|%g\n", rationalfunction.types[rationalfunction.nb_types - 1], rationalfunction.a[rationalfunction.nb_types - 1], rationalfunction.b[rationalfunction.nb_types - 1], rationalfunction.f[rationalfunction.nb_types - 1]);
-    print_optional_attributes(rationalfunction.optional_attributes, space + 3);
+    print_opt_attrs(rationalfunction.opt_attrs, space + 3);
 }
 
 
@@ -804,7 +830,7 @@ void print_ft_generalrationalfunction (generalrationalfunction_t generalrational
     printf("%*s-%s [%i]:\n", space, "",generalrationalfunction.name, generalrationalfunction.nb_degrees);
     for (i = 0; i < generalrationalfunction.nb_degrees; i++)
         printf("%*s-degree %i: numerator=%g%+gi, denominator=%g%+gi\n", space + 3, "", i, creal(generalrationalfunction.numerator[i]), cimag(generalrationalfunction.numerator[i]), creal(generalrationalfunction.denominator[i]), cimag(generalrationalfunction.denominator[i]));
-    print_optional_attributes(generalrationalfunction.optional_attributes, space + 3);
+    print_opt_attrs(generalrationalfunction.opt_attrs, space + 3);
 }
 
 
@@ -815,7 +841,7 @@ void print_ft_rational (rational_t rational, int space)
     int j;
 
     printf("%*s-%s:\n", space, "", rational.name);
-    print_optional_attributes(rational.optional_attributes, space + 3);
+    print_opt_attrs(rational.opt_attrs, space + 3);
     printf("%*s-@%s [%lux%lu]: {", space + 3, "", A_VALUE, (long unsigned) rational.dims[0], (long unsigned) rational.dims[1]);
     if (rational.data != NULL)
     {
@@ -897,7 +923,7 @@ void print_ft_dataset (dataset_t dataset, int space)
     default:
         break;
     }
-    print_optional_attributes(dataset.optional_attributes, space + 3);
+    print_opt_attrs(dataset.opt_attrs, space + 3);
 }
 
 
@@ -907,7 +933,7 @@ void print_ft_arrayset (arrayset_t arrayset, int space)
     hsize_t i;
 
     printf("%*s-%s:\n", space, "", arrayset.name);
-    print_optional_attributes(arrayset.optional_attributes, space + 4);
+    print_opt_attrs(arrayset.opt_attrs, space + 4);
     print_ft_dataset(arrayset.data, space + 2);
     for (i = 0; i < arrayset.nb_dims; i++)
         print_ft_vector(arrayset.dims[i], space + 2);
@@ -980,7 +1006,7 @@ void free_ft_singleinteger (singleinteger_t *singleinteger)
         free(singleinteger->name);
         singleinteger->name = NULL;
     }
-    free_optional_attributes(&(singleinteger->optional_attributes));
+    free_opt_attrs(&(singleinteger->opt_attrs));
 }
 
 
@@ -992,7 +1018,7 @@ void free_ft_singlereal (singlereal_t *singlereal)
         free(singlereal->name);
         singlereal->name = NULL;
     }
-    free_optional_attributes(&(singlereal->optional_attributes));
+    free_opt_attrs(&(singlereal->opt_attrs));
 }
 
 
@@ -1004,7 +1030,7 @@ void free_ft_singlecomplex (singlecomplex_t *singlecomplex)
         free(singlecomplex->name);
         singlecomplex->name = NULL;
     }
-    free_optional_attributes(&(singlecomplex->optional_attributes));
+    free_opt_attrs(&(singlecomplex->opt_attrs));
 }
 
 
@@ -1021,7 +1047,7 @@ void free_ft_singlestring (singlestring_t *singlestring)
         free(singlestring->value);
         singlestring->value = NULL;
     }
-    free_optional_attributes(&(singlestring->optional_attributes));
+    free_opt_attrs(&(singlestring->opt_attrs));
 }
 
 
@@ -1033,7 +1059,7 @@ void free_ft_vector (vector_t *vector)
         free(vector->name);
         vector->name = NULL;
     }
-    free_optional_attributes(&(vector->optional_attributes));
+    free_opt_attrs(&(vector->opt_attrs));
     switch (vector->type_class)
     {
     case H5T_INTEGER:
@@ -1079,7 +1105,7 @@ void free_ft_linearlistofreal1 (linearlistofreal1_t *linearlistofreal1)
         free(linearlistofreal1->name);
         linearlistofreal1->name = NULL;
     }
-    free_optional_attributes(&(linearlistofreal1->optional_attributes));
+    free_opt_attrs(&(linearlistofreal1->opt_attrs));
 }
 
 
@@ -1091,7 +1117,7 @@ void free_ft_linearlistofreal2 (linearlistofreal2_t *linearlistofreal2)
         free(linearlistofreal2->name);
         linearlistofreal2->name = NULL;
     }
-    free_optional_attributes(&(linearlistofreal2->optional_attributes));
+    free_opt_attrs(&(linearlistofreal2->opt_attrs));
 }
 
 
@@ -1103,7 +1129,7 @@ void free_ft_logarithmlistofreal (logarithmlistofreal_t *logarithmlistofreal)
         free(logarithmlistofreal->name);
         logarithmlistofreal->name = NULL;
     }
-    free_optional_attributes(&(logarithmlistofreal->optional_attributes));
+    free_opt_attrs(&(logarithmlistofreal->opt_attrs));
 }
 
 
@@ -1115,7 +1141,7 @@ void free_ft_perdecadelistofreal (perdecadelistofreal_t *perdecadelistofreal)
         free(perdecadelistofreal->name);
         perdecadelistofreal->name = NULL;
     }
-    free_optional_attributes(&(perdecadelistofreal->optional_attributes));
+    free_opt_attrs(&(perdecadelistofreal->opt_attrs));
 }
 
 
@@ -1127,7 +1153,7 @@ void free_ft_linearlistofinteger2 (linearlistofinteger2_t *linearlistofinteger2)
         free(linearlistofinteger2->name);
         linearlistofinteger2->name = NULL;
     }
-    free_optional_attributes(&(linearlistofinteger2->optional_attributes));
+    free_opt_attrs(&(linearlistofinteger2->opt_attrs));
 }
 
 
@@ -1160,7 +1186,7 @@ void free_ft_rationalfunction (rationalfunction_t *rationalfunction)
         rationalfunction->f = NULL;
     }
     rationalfunction->nb_types = 0;
-    free_optional_attributes(&(rationalfunction->optional_attributes));
+    free_opt_attrs(&(rationalfunction->opt_attrs));
 }
 
 
@@ -1185,7 +1211,7 @@ void free_ft_generalrationalfunction (generalrationalfunction_t *generalrational
         generalrationalfunction->denominator = NULL;
     }
     generalrationalfunction->nb_degrees = 0;
-    free_optional_attributes(&(generalrationalfunction->optional_attributes));
+    free_opt_attrs(&(generalrationalfunction->opt_attrs));
 }
 
 
@@ -1199,7 +1225,7 @@ void free_ft_rational (rational_t *rational)
         free(rational->name);
         rational->name = NULL;
     }
-    free_optional_attributes(&(rational->optional_attributes));
+    free_opt_attrs(&(rational->opt_attrs));
 
     if (rational->nb_functions > 0)
     {
@@ -1239,7 +1265,7 @@ void free_ft_dataset (dataset_t *dataset)
         free(dataset->name);
         dataset->name = NULL;
     }
-    free_optional_attributes(&(dataset->optional_attributes));
+    free_opt_attrs(&(dataset->opt_attrs));
     if (dataset->dims != NULL)
     {
         free(dataset->dims);
@@ -1292,7 +1318,7 @@ void free_ft_arrayset (arrayset_t *arrayset)
         free(arrayset->name);
         arrayset->name = NULL;
     }
-    free_optional_attributes(&(arrayset->optional_attributes));
+    free_opt_attrs(&(arrayset->opt_attrs));
     if (arrayset->nb_dims > 0)
     {
         free_ft_dataset(&(arrayset->data));

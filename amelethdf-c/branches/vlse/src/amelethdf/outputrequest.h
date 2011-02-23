@@ -12,39 +12,39 @@ extern "C" {
 #define A_OBJECT "object"
 #define A_OUTPUT "output"
 
-    typedef struct outputrequest_instance_t
+    typedef struct ort_instance_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         char        *subject;
         char        *object;
         char        *output;
-    } outputrequest_instance_t;
+    } ort_instance_t;
 
-    typedef struct outputrequest_group_t
+    typedef struct ort_group_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
-        hsize_t     nb_outputrequest_instances;
-        outputrequest_instance_t *outputrequest_instances;
-    } outputrequest_group_t;
+        opt_attrs_t opt_attrs;
+        hsize_t     nb_instances;
+        ort_instance_t *instances;
+    } ort_group_t;
 
     typedef struct outputrequest_t
     {
-        hsize_t     nb_outputrequest_groups;
-        outputrequest_group_t *outputrequest_groups;
+        hsize_t     nb_groups;
+        ort_group_t *groups;
     } outputrequest_t;
 
-    void read_outputrequest_instance (hid_t file_id, const char *path, outputrequest_instance_t *outputrequest_instance);
-    void read_outputrequest_group (hid_t file_id, const char *path, outputrequest_group_t *outputrequest_group);
+    void read_ort_instance (hid_t file_id, const char *path, ort_instance_t *ort_instance);
+    void read_ort_group (hid_t file_id, const char *path, ort_group_t *ort_group);
     void read_outputrequest(hid_t file_id, outputrequest_t *outputrequest);
 
-    void print_outputrequest_instance (outputrequest_instance_t outputrequest_instance, int space);
-    void print_outputrequest_group (outputrequest_group_t outputrequest_group, int space);
+    void print_ort_instance (ort_instance_t ort_instance, int space);
+    void print_ort_group (ort_group_t ort_group, int space);
     void print_outputrequest (outputrequest_t outputrequest);
 
-    void free_outputrequest_instance (outputrequest_instance_t *outputrequest_instance);
-    void free_outputrequest_group (outputrequest_group_t *outputrequest_group);
+    void free_ort_instance (ort_instance_t *ort_instance);
+    void free_ort_group (ort_group_t *ort_group);
     void free_outputrequest (outputrequest_t *outputrequest);
 
 #ifdef __cplusplus

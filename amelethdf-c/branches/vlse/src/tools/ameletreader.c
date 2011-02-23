@@ -2,6 +2,9 @@
 
 #include "category.h"
 #include "simulation.h"
+#include "exsurf.h"
+#include "globenv.h"
+#include "locsys.h"
 #include "mesh.h"
 #include "physicalmodel.h"
 #include "externalelement.h"
@@ -9,6 +12,7 @@
 #include "link.h"
 #include "emsource.h"
 #include "outputrequest.h"
+#include "exsurf.h"
 
 #define FALSE 0
 #define TRUE 1
@@ -20,8 +24,6 @@ char *argv[];
     hid_t file_id;
 //    hsize_t i;
 //    children_t children;
-    char *path;
-    char *path2;
     simulation_t simulation;
     mesh_t mesh;
     external_element_t external_element;
@@ -30,25 +32,26 @@ char *argv[];
     outputrequest_t outputrequest;
     physicalmodel_t physicalmodel;
     em_source_t em_source;
+    global_environment_t global_environment;
+    localization_system_t localization_system;
+    exchange_surface_t exchange_surface;
 
-    // Init
-    H5open();
+
     if (argc < 2)
     {
         printf("***** ERROR: Missing input filename. *****\n\n");
         return -1;
     }
 
-    // Read for the HDF5 file
-    file_id = H5Fopen(argv[1], H5F_ACC_RDWR, H5P_DEFAULT);
+    // Init
+    H5open();
+    file_id = H5Fopen(argv[1], H5F_ACC_RDWR, H5P_DEFAULT);  // Read for the HDF5 file
     if (file_id < 0)
     {
         printf("***** ERROR: Cannot open file %s. *****\n\n", argv[1]);
+        H5close();
         return -1;
     }
-
-    path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-    path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
 
     printf("\n#############################  Amelet-HDF Reader  ############################\n");
     printf("##############################################################################\n\n");
@@ -76,6 +79,16 @@ char *argv[];
     printf("Reading simulations ...\n");
     if(H5Lexists(file_id, C_SIMULATION, H5P_DEFAULT) != FALSE)
         read_simulation(file_id, &simulation);
+
+    // Global environment
+    printf("Reading global environment ...\n");
+    if(H5Lexists(file_id, C_GLOBAL_ENVIRONMENT, H5P_DEFAULT) != FALSE)
+        read_global_environment(file_id, &global_environment);
+
+    // Localization system
+    printf("Reading localization system ...\n");
+    if(H5Lexists(file_id, C_LOCALIZATION_SYSTEM, H5P_DEFAULT) != FALSE)
+        read_localization_system(file_id, &localization_system);
 
     // Mesh
     printf("Reading meshes ...\n");
@@ -112,6 +125,11 @@ char *argv[];
     if (H5Lexists(file_id, C_OUTPUT_REQUEST, H5P_DEFAULT) != FALSE)
         read_outputrequest(file_id, &outputrequest);
 
+    // Exchange surface
+    printf("Reading exchange surface ...\n");
+    if (H5Lexists(file_id, C_EXCHANGE_SURFACE, H5P_DEFAULT) != FALSE)
+        read_exchange_surface(file_id, &exchange_surface);
+
     printf("\n\n");
 
 
@@ -124,6 +142,20 @@ char *argv[];
     {
         print_simulation(simulation);
         free_simulation(&simulation);
+    }
+
+    // Global environment
+    if(H5Lexists(file_id, C_GLOBAL_ENVIRONMENT, H5P_DEFAULT) != FALSE)
+    {
+        print_global_environment(global_environment);
+        free_global_environment(&global_environment);
+    }
+
+    // Localization system
+    if(H5Lexists(file_id, C_LOCALIZATION_SYSTEM, H5P_DEFAULT) != FALSE)
+    {
+        print_localization_system(localization_system);
+        free_localization_system(&localization_system);
     }
 
     // Mesh
@@ -175,10 +207,14 @@ char *argv[];
         free_outputrequest(&outputrequest);
     }
 
+    // Exchange surface
+    if (H5Lexists(file_id, C_EXCHANGE_SURFACE, H5P_DEFAULT) != FALSE)
+    {
+        print_exchange_surface(exchange_surface);
+        free_exchange_surface(&exchange_surface);
+    }
 
 
-    free(path2);
-    free(path);
     H5Fclose(file_id);
     H5close();
     return 0;

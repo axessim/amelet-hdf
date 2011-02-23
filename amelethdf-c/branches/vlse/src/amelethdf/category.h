@@ -18,6 +18,8 @@ extern "C" {
 #define C_GLOBAL_ENVIRONMENT "/globalEnvironment"
 #define C_PHYSICAL_MODEL "/physicalModel"
 #define C_OUTPUT_REQUEST "/outputRequest"
+#define C_LOCALIZATION_SYSTEM "/localizationSystem"
+#define C_EXCHANGE_SURFACE "/exchangeSurface"
 
 #ifdef __cplusplus
 }

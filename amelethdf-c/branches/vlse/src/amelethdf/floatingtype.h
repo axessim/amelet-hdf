@@ -68,28 +68,28 @@ extern "C" {
     typedef struct singleinteger_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         int         value;
     } singleinteger_t;
 
     typedef struct singlereal_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         float       value;
     } singlereal_t;
 
     typedef struct singlecomplex_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         complex float value;
     } singlecomplex_t;
 
     typedef struct singlestring_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         char        *value;
     } singlestring_t;
 
@@ -104,7 +104,7 @@ extern "C" {
     typedef struct vector_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         hsize_t     nb_values;
         H5T_class_t type_class;
         datasetx_t  values;
@@ -113,7 +113,7 @@ extern "C" {
     typedef struct linearlistofreal1_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         float       first;
         float       last;
         int         number_of_values;
@@ -122,7 +122,7 @@ extern "C" {
     typedef struct linearlistofreal2_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         float       first;
         float       step;
         int         number_of_values;
@@ -131,7 +131,7 @@ extern "C" {
     typedef struct logarithmlistofreal_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         float       first;
         float       last;
         int         number_of_values;
@@ -140,7 +140,7 @@ extern "C" {
     typedef struct perdecadelistofreal_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         float       first;
         int         number_of_decades;
         int         number_of_values_per_decade;
@@ -149,7 +149,7 @@ extern "C" {
     typedef struct linearlistofinteger2_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         int         first;
         int         step;
         int         number_of_values;
@@ -158,7 +158,7 @@ extern "C" {
     typedef struct rationalfunction_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         hsize_t     nb_types;
         int         *types;
         float       *a;
@@ -169,7 +169,7 @@ extern "C" {
     typedef struct generalrationalfunction_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         int         nb_degrees;
         complex float *numerator;
         complex float *denominator;
@@ -190,7 +190,7 @@ extern "C" {
     typedef struct rational_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         int         nb_functions;
         floatingtyper_t *functions;
         hsize_t     dims[2];
@@ -200,7 +200,7 @@ extern "C" {
     typedef struct dataset_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         int         nb_dims;
         hsize_t     *dims;
         H5T_class_t type_class;
@@ -210,7 +210,7 @@ extern "C" {
     typedef struct arrayset_t
     {
         char        *name;
-        optional_attributes_t optional_attributes;
+        opt_attrs_t opt_attrs;
         dataset_t   data;
         hsize_t     nb_dims;
         vector_t    *dims;

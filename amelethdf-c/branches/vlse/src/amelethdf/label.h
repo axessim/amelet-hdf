@@ -7,26 +7,26 @@ extern "C" {
 
 #include "amelethdf.h"
 
-    typedef struct label_dataset_t
+    typedef struct lbl_dataset_t
     {
         char        *name;
         hsize_t     nb_items;
         char        **items;
-    } label_dataset_t;
+    } lbl_dataset_t;
 
     typedef struct label_t
     {
-        hsize_t     nb_label_datasets;
-        label_dataset_t *label_datasets;
+        hsize_t     nb_datasets;
+        lbl_dataset_t *datasets;
     } label_t;
 
-    void read_label_dataset(hid_t file_id, const char *path, label_dataset_t *label_dataset);
-    void read_label(hid_t file_id, label_t *label);
+    void read_lbl_dataset (hid_t file_id, const char *path, lbl_dataset_t *lbl_dataset);
+    void read_label (hid_t file_id, label_t *label);
 
-    void print_label_dataset (label_dataset_t label_dataset, int space);
-    void print_label(label_t label);
+    void print_lbl_dataset (lbl_dataset_t lbl_dataset, int space);
+    void print_label (label_t label);
 
-    void free_label_dataset (label_dataset_t *label_dataset);
+    void free_lbl_dataset (lbl_dataset_t *lbl_dataset);
     void free_label (label_t *label);
 
 #ifdef __cplusplus
