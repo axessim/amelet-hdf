@@ -146,9 +146,9 @@ extern "C" {
         hsize_t     nb_elementnodes;
         int         *elementnodes;
         hsize_t     nb_elementtypes;
-        char         *elementtypes;
+        char        *elementtypes;
         hsize_t     nb_nodes[2];
-        float       **nodes;
+        float       *nodes;
         hsize_t     nb_groups;
         ugroup_t    *groups;
         hsize_t     nb_groupgroups;

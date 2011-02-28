@@ -452,7 +452,7 @@ char read_umesh (hid_t file_id, const char* path, umesh_t *umesh)
 {
     char path2[ABSOLUTE_PATH_NAME_LENGTH], path3[ABSOLUTE_PATH_NAME_LENGTH];
     char rdata = TRUE, success = FALSE;
-    hsize_t dims[2] = {1, 1}, i;
+    hsize_t i;
     int nb_dims;
     H5T_class_t type_class;
     size_t length;
@@ -510,28 +510,18 @@ char read_umesh (hid_t file_id, const char* path, umesh_t *umesh)
     }
 
     success = FALSE;
-
+    umesh->nb_nodes[0] = 1;
+    umesh->nb_nodes[1] = 1;
     // Read m x n dataset "nodes" (32-bit signed float)
     strcpy(path2, path);
     strcat(path2, G_NODES);
     if (H5Lexists(file_id, path2, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
             if (nb_dims == 2)
-                if (H5LTget_dataset_info(file_id, path2, dims, &type_class, &length) >= 0)
-                    if (dims[1] <= 3 && type_class == H5T_FLOAT && length == 4)
-                    {
-                        umesh->nodes = (float **) malloc((dims[0] * sizeof(float *)));
-                        umesh->nodes[0] = (float *) malloc(dims[0] * dims[1] * sizeof(float));
-                        for (i = 1; i < dims[0]; i++)
-                            umesh->nodes[i] = umesh->nodes[0] + i * dims[1];
-                        dset_id = H5Dopen(file_id, path2, H5P_DEFAULT);
-                        if (H5Dread(dset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, umesh->nodes[0]) < 0)
-                            printf("***** WARNING(%s): Data from dataset \"%s\" may be corrupted. *****\n\n", C_MESH, path2);
-                        H5Dclose(dset_id);
-                        umesh->nb_nodes[0] = dims[0];
-                        umesh->nb_nodes[1] = dims[1];
-                        success = TRUE;
-                    }
+                if (H5LTget_dataset_info(file_id, path2, umesh->nb_nodes, &type_class, &length) >= 0)
+                    if (umesh->nb_nodes[1] <= 3 && type_class == H5T_FLOAT && length == 4)
+                        if (read_float_dataset(file_id, path2, umesh->nb_nodes[0] * umesh->nb_nodes[1], &(umesh->nodes)))
+                            success = TRUE;
     if (!success)
     {
         print_err_dset(C_MESH, path2);
@@ -880,7 +870,7 @@ void print_umesh (umesh_t umesh, int space)
         {
             printf("%*sNode n°%lu: ", space + 5, "", (unsigned long) i);
             for (j = 0; j < (int) umesh.nb_nodes[1]; j++)
-                printf("%f ", umesh.nodes[i][j]);
+                printf("%f ", umesh.nodes[i * umesh.nb_nodes[1] + j]);
             printf("\n");
         }
     }
@@ -1116,7 +1106,6 @@ void free_umesh (umesh_t *umesh)
 
     if (umesh->nb_nodes[0] > 0)  // if any nodes...
     {
-        free(*(umesh->nodes));
         free(umesh->nodes);
         umesh->nodes = NULL;
         umesh->nb_nodes[0] = 0;
