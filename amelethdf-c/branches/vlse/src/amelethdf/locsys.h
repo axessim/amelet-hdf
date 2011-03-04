@@ -25,14 +25,14 @@ extern "C" {
 
     typedef struct lsm_transformation_t
     {
-        char        *name;
+        char        *path;
         lsm_transf_class_t type;
         int         rank;
     } lsm_transformation_t;
 
     typedef struct lsm_instance_t
     {
-        char        *name;
+        char        *path;
         opt_attrs_t opt_attrs;
         int         dimension;
         hsize_t     nb_transformations;

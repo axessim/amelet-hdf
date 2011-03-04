@@ -1,6 +1,93 @@
 #include "amelethdf.h"
 
 
+/*
+    FALSE = version_minimum("0.5", "0.1");
+    FALSE = version_minimum("3.5", "2");
+    FALSE = version_minimum("3.1", "2.186");
+
+    TRUE = version_minimum("1.2.3.4", "1.2.3.4");
+    TRUE = version_minimum("0.5", "0.6");
+    TRUE = version_minimum("0.5", "1.8.6");
+    TRUE = version_minimum("0.5.5", "1");
+    TRUE = version_minimum("2", "2.5");
+    TRUE = version_minimum("2.0.5.0", "2.1");
+*/
+char version_minimum (const char *required_version, const char *sim_version)
+{
+    char rdata = FALSE;
+    char *a, *b, *atemp, *btemp, *temp;
+    int ai = 0, bi = 0;  // storage for version numbers
+
+    // cannot use 2x strtok
+    a = trim_zeros(required_version);  // original pointers
+    b = trim_zeros(sim_version);  //  to be used in free()
+    atemp = a;  // creatin working pointers
+    btemp = b;  //  (that will be destroyed)
+
+    while (atemp != NULL && btemp != NULL && bi == ai)
+    {
+        temp = strstr(atemp, ".");  // pointer to dot in solver_version
+        if (temp != NULL)
+        {
+            *temp = '\0';
+            ai = atoi(atemp);
+            atemp = temp + 1;  // pointer to the rest of the string
+        }
+        else
+        {
+            // no dot is present -> make last check
+            ai = atoi(atemp);
+            atemp = NULL;
+        }
+
+        temp = strstr(btemp, ".");  // pointer to dot in sim_version
+        if (temp != NULL)
+        {
+            *temp = '\0';
+            bi = atoi(btemp);
+            btemp = temp + 1;  // pointer to the rest of the string
+        }
+        else
+        {
+            // no dot is present -> make last check
+            bi = atoi(btemp);
+            btemp = NULL;
+        }
+
+        if (bi > ai)
+            rdata = TRUE;
+    }
+    if (atemp == NULL && bi == ai)
+        rdata = TRUE;
+
+    free(b);
+    free(a);
+    return rdata;
+}
+
+char *trim_zeros (const char *version)
+{
+    int i, number = 0;
+    char *rdata;
+
+    rdata = strdup(version);
+
+    while (1)
+    {
+        for (i = strlen(rdata); i > -1; i--)
+            if (rdata[i] == '.')
+                break;
+        number = atoi(rdata + i + 1);
+        if (number == 0 && i > -1)
+            rdata[i] = '\0';
+        else
+            break;
+    }
+    return rdata;
+}
+
+
 // Add aelement to aset
 set_t add_to_set(set_t aset, char *aelement)
 {
@@ -45,14 +132,14 @@ children_t read_children_name (hid_t file_id, const char* path)
     char temp[ELEMENT_NAME_LENGTH], *temp2;
 
     children.childnames = NULL;
-/*
-    - path must exist
-    - number of children must be greater than zero
-    - element name
-        - must be readable
-        - must be shorter than ELEMENT_NAME_LENGTH
-        - must NOT be same as "_param"
-*/
+    /*
+        - path must exist
+        - number of children must be greater than zero
+        - element name
+            - must be readable
+            - must be shorter than ELEMENT_NAME_LENGTH
+            - must NOT be same as "_param"
+    */
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0 || strcmp(path, "/") == 0)
     {
         group_id = H5Gopen1(file_id, path);
@@ -93,16 +180,30 @@ children_t read_children_name (hid_t file_id, const char* path)
 }
 
 
-// Get last part of a path
+// Get last part of a path; does not allocate new memory
 char *get_name_from_path (const char *path)
 {
-    size_t i;
-    char *rdata;
+    int i;
 
-    i = strlen(path);
-    while (path[i] != '/')
-        i--;
-    rdata = strdup((char *) path + i + 1);
+    for (i = strlen(path); i > -1; i--)
+        if (path[i] == '/')
+            break;
+    return (char *) path + i + 1;
+}
+
+// Get base part of a path; allocates new memory!
+char *get_base_from_path (const char *path)
+{
+    int i;
+    char *rdata, *temp;
+
+    temp = strdup(path);
+    for (i = strlen(temp); i > 0; i--)
+        if (temp[i] == '/')
+            break;
+    temp[i] = '\0';
+    rdata = strdup(temp);  // strndup wasn't available
+    free(temp);
     return rdata;
 }
 

@@ -14,7 +14,7 @@ extern "C" {
 
     typedef struct ort_instance_t
     {
-        char        *name;
+        char        *path;
         opt_attrs_t opt_attrs;
         char        *subject;
         char        *object;
@@ -23,7 +23,7 @@ extern "C" {
 
     typedef struct ort_group_t
     {
-        char        *name;
+        char        *path;
         opt_attrs_t opt_attrs;
         hsize_t     nb_instances;
         ort_instance_t *instances;

@@ -7,7 +7,7 @@ void read_global_environment_instance (hid_t file_id, const char *path, gle_inst
     char path2[ABSOLUTE_PATH_NAME_LENGTH], path3[ABSOLUTE_PATH_NAME_LENGTH];
     char mandatory[][ATTR_LENGTH] = {};
 
-    gle_instance->name = get_name_from_path(path);
+    gle_instance->path = strdup(path);
     strcpy(path2, path);
     strcat(path2, G_LIMIT_CONDITIONS);
     read_opt_attrs(file_id, path2, &(gle_instance->limit_conditions), mandatory, sizeof(mandatory)/ATTR_LENGTH);
@@ -60,7 +60,7 @@ void read_global_environment (hid_t file_id, global_environment_t *global_enviro
 // Print globalEnvironment instance
 void print_global_environment_instance (gle_instance_t gle_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", gle_instance.name);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(gle_instance.path));
     print_floatingtype(gle_instance.data, space + 3);
     print_opt_attrs(gle_instance.limit_conditions, space + 6);
 }
@@ -83,10 +83,10 @@ void print_global_environment (global_environment_t global_environment)
 // Free memory used by globalEnvironment instance
 void free_global_environment_instance (gle_instance_t *gle_instance)
 {
-    if (gle_instance->name != NULL)
+    if (gle_instance->path != NULL)
     {
-        free(gle_instance->name);
-        gle_instance->name = NULL;
+        free(gle_instance->path);
+        gle_instance->path = NULL;
     }
     if (gle_instance->type != GE_INVALID)
         free_floatingtype(&(gle_instance->data));

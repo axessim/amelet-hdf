@@ -9,7 +9,7 @@ char read_ft_singleinteger (hid_t file_id, const char *path, singleinteger_t *si
 
     if (read_int_attr(file_id, path, A_VALUE, &(singleinteger->value)))
     {
-        singleinteger->name = get_name_from_path(path);
+        singleinteger->path = strdup(path);
         read_opt_attrs(file_id, path, &(singleinteger->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
         success = TRUE;
     }
@@ -27,7 +27,7 @@ char read_ft_singlereal (hid_t file_id, const char *path, singlereal_t *singlere
 
     if (read_flt_attr(file_id, path, A_VALUE, &(singlereal->value)))
     {
-        singlereal->name = get_name_from_path(path);
+        singlereal->path = strdup(path);
         read_opt_attrs(file_id, path, &(singlereal->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
         success = TRUE;
     }
@@ -45,7 +45,7 @@ char read_ft_singlecomplex (hid_t file_id, const char *path, singlecomplex_t *si
 
     if (read_cpx_attr(file_id, path, A_VALUE, &(singlecomplex->value)))
     {
-        singlecomplex->name = get_name_from_path(path);
+        singlecomplex->path = strdup(path);
         read_opt_attrs(file_id, path, &(singlecomplex->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
         success = TRUE;
     }
@@ -63,7 +63,7 @@ char read_ft_singlestring (hid_t file_id, const char *path, singlestring_t *sing
 
     if(read_str_attr(file_id, path, A_VALUE, &(singlestring->value)))
     {
-        singlestring->name = get_name_from_path(path);
+        singlestring->path = strdup(path);
         read_opt_attrs(file_id, path, &(singlestring->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
         success = TRUE;
     }
@@ -109,7 +109,7 @@ char read_ft_vector (hid_t file_id, const char *path, vector_t *vector)
                     }
     if (success)
     {
-        vector->name = get_name_from_path(path);
+        vector->path = strdup(path);
         read_opt_attrs(file_id, path, &(vector->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
@@ -138,7 +138,7 @@ char read_ft_linearlistofreal1 (hid_t file_id, const char *path, linearlistofrea
             success = FALSE;
     if (success)
     {
-        linearlistofreal1->name = get_name_from_path(path);
+        linearlistofreal1->path = strdup(path);
         read_opt_attrs(file_id, path, &(linearlistofreal1->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
@@ -169,7 +169,7 @@ char read_ft_linearlistofreal2 (hid_t file_id, const char *path, linearlistofrea
             success = TRUE;
     if (success)
     {
-        linearlistofreal2->name = get_name_from_path(path);
+        linearlistofreal2->path = strdup(path);
         read_opt_attrs(file_id, path, &(linearlistofreal2->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
@@ -200,7 +200,7 @@ char read_ft_logarithmlistofreal (hid_t file_id, const char *path, logarithmlist
             success = TRUE;
     if (success)
     {
-        logarithmlistofreal->name = get_name_from_path(path);
+        logarithmlistofreal->path = strdup(path);
         read_opt_attrs(file_id, path, &(logarithmlistofreal->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
@@ -231,7 +231,7 @@ char read_ft_perdecadelistofreal (hid_t file_id, const char *path, perdecadelist
             success = TRUE;
     if (success)
     {
-        perdecadelistofreal->name = get_name_from_path(path);
+        perdecadelistofreal->path = strdup(path);
         read_opt_attrs(file_id, path, &(perdecadelistofreal->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
@@ -262,7 +262,7 @@ char read_ft_linearlistofinteger2 (hid_t file_id, const char *path, linearlistof
             success = TRUE;
     if (success)
     {
-        linearlistofinteger2->name = get_name_from_path(path);
+        linearlistofinteger2->path = strdup(path);
         read_opt_attrs(file_id, path, &(linearlistofinteger2->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
@@ -324,7 +324,7 @@ char read_ft_rationalfunction (hid_t file_id, const char *path, rationalfunction
             }
     if (success)
     {
-        rationalfunction->name = get_name_from_path(path);
+        rationalfunction->path = strdup(path);
         read_opt_attrs(file_id, path, &(rationalfunction->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
@@ -371,7 +371,7 @@ char read_ft_generalrationalfunction (hid_t file_id, const char *path, generalra
     if (success)
     {
         generalrationalfunction->nb_degrees = dims[0];
-        generalrationalfunction->name = get_name_from_path(path);
+        generalrationalfunction->path = strdup(path);
         read_opt_attrs(file_id, path, &(generalrationalfunction->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
@@ -469,7 +469,7 @@ char read_ft_rational (hid_t file_id, const char *path, rational_t *rational)
     }
     if (success)
     {
-        rational->name = get_name_from_path(path);
+        rational->path = strdup(path);
         read_opt_attrs(file_id, path, &(rational->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
@@ -523,7 +523,7 @@ char read_ft_dataset (hid_t file_id, const char *path, dataset_t *dataset)
             }
     if (success)
     {
-        dataset->name = get_name_from_path(path);
+        dataset->path = strdup(path);
         read_opt_attrs(file_id, path, &(dataset->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
@@ -575,7 +575,7 @@ char read_ft_arrayset (hid_t file_id, const char *path, arrayset_t *arrayset)
     }
     if (success)
     {
-        arrayset->name = get_name_from_path(path);
+        arrayset->path = strdup(path);
         read_opt_attrs(file_id, path, &(arrayset->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     }
     else
@@ -699,7 +699,7 @@ char read_floatingtype(hid_t file_id, const char *path, floatingtype_t *floating
 // Print singleInteger
 void print_ft_singleinteger (singleinteger_t singleinteger, int space)
 {
-    printf("%*s-%s:\n", space, "", singleinteger.name);
+    printf("%*s-%s:\n", space, "", get_name_from_path(singleinteger.path));
     print_int_attr(A_VALUE, singleinteger.value, space + 3);
     print_opt_attrs(singleinteger.opt_attrs, space + 3);
 }
@@ -708,7 +708,7 @@ void print_ft_singleinteger (singleinteger_t singleinteger, int space)
 // Print singleReal
 void print_ft_singlereal (singlereal_t singlereal, int space)
 {
-    printf("%*s-%s:\n", space, "", singlereal.name);
+    printf("%*s-%s:\n", space, "", get_name_from_path(singlereal.path));
     print_flt_attr(A_VALUE, singlereal.value, space + 3);
     print_opt_attrs(singlereal.opt_attrs, space + 3);
 }
@@ -717,7 +717,7 @@ void print_ft_singlereal (singlereal_t singlereal, int space)
 // Print singleComplex
 void print_ft_singlecomplex (singlecomplex_t singlecomplex, int space)
 {
-    printf("%*s-%s:\n", space, "", singlecomplex.name);
+    printf("%*s-%s:\n", space, "", get_name_from_path(singlecomplex.path));
     print_cpx_attr(A_VALUE, singlecomplex.value, space + 3);
     print_opt_attrs(singlecomplex.opt_attrs, space + 3);
 }
@@ -726,7 +726,7 @@ void print_ft_singlecomplex (singlecomplex_t singlecomplex, int space)
 // Print singleString
 void print_ft_singlestring (singlestring_t singlestring, int space)
 {
-    printf("%*s-%s:\n", space, "", singlestring.name);
+    printf("%*s-%s:\n", space, "", get_name_from_path(singlestring.path));
     print_str_attr(A_VALUE, singlestring.value, space + 3);
     print_opt_attrs(singlestring.opt_attrs, space + 3);
 }
@@ -737,7 +737,7 @@ void print_ft_vector (vector_t vector, int space)
 {
     hsize_t i;
 
-    printf("%*s-%s [%lu]: {", space, "", vector.name,(long unsigned) vector.nb_values);
+    printf("%*s-%s [%lu]: {", space, "", get_name_from_path(vector.path),(long unsigned) vector.nb_values);
     switch (vector.type_class)
     {
     case H5T_INTEGER:
@@ -770,7 +770,7 @@ void print_ft_vector (vector_t vector, int space)
 // Print linearListOfReal1
 void print_ft_linearlistofreal1 (linearlistofreal1_t linearlistofreal1, int space)
 {
-    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",linearlistofreal1.name, A_FIRST, linearlistofreal1.first, A_LAST, linearlistofreal1.last, A_NUMBER_OF_VALUES, linearlistofreal1.number_of_values);
+    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",get_name_from_path(linearlistofreal1.path), A_FIRST, linearlistofreal1.first, A_LAST, linearlistofreal1.last, A_NUMBER_OF_VALUES, linearlistofreal1.number_of_values);
     print_opt_attrs(linearlistofreal1.opt_attrs, space + 3);
 }
 
@@ -778,7 +778,7 @@ void print_ft_linearlistofreal1 (linearlistofreal1_t linearlistofreal1, int spac
 // Print linearListOfReal2
 void print_ft_linearlistofreal2 (linearlistofreal2_t linearlistofreal2, int space)
 {
-    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",linearlistofreal2.name, A_FIRST, linearlistofreal2.first, A_STEP, linearlistofreal2.step, A_NUMBER_OF_VALUES, linearlistofreal2.number_of_values);
+    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",get_name_from_path(linearlistofreal2.path), A_FIRST, linearlistofreal2.first, A_STEP, linearlistofreal2.step, A_NUMBER_OF_VALUES, linearlistofreal2.number_of_values);
     print_opt_attrs(linearlistofreal2.opt_attrs, space + 3);
 }
 
@@ -786,7 +786,7 @@ void print_ft_linearlistofreal2 (linearlistofreal2_t linearlistofreal2, int spac
 // Print logarithmListOfReal
 void print_ft_logarithmlistofreal (logarithmlistofreal_t logarithmlistofreal, int space)
 {
-    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "", logarithmlistofreal.name, A_FIRST, logarithmlistofreal.first, A_LAST, logarithmlistofreal.last, A_NUMBER_OF_VALUES, logarithmlistofreal.number_of_values);
+    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "", get_name_from_path(logarithmlistofreal.path), A_FIRST, logarithmlistofreal.first, A_LAST, logarithmlistofreal.last, A_NUMBER_OF_VALUES, logarithmlistofreal.number_of_values);
     print_opt_attrs(logarithmlistofreal.opt_attrs, space + 3);
 }
 
@@ -794,7 +794,7 @@ void print_ft_logarithmlistofreal (logarithmlistofreal_t logarithmlistofreal, in
 // Print perDecadeListOfReal
 void print_ft_perdecadelistofreal (perdecadelistofreal_t perdecadelistofreal, int space)
 {
-    printf("%*s-%s: %s=%g, %s=%i, %s=%i\n", space, "", perdecadelistofreal.name, A_FIRST, perdecadelistofreal.first, A_NUMBER_OF_DECADES, perdecadelistofreal.number_of_decades, A_NUMBER_OF_VALUES_PER_DECADE, perdecadelistofreal.number_of_values_per_decade);
+    printf("%*s-%s: %s=%g, %s=%i, %s=%i\n", space, "", get_name_from_path(perdecadelistofreal.path), A_FIRST, perdecadelistofreal.first, A_NUMBER_OF_DECADES, perdecadelistofreal.number_of_decades, A_NUMBER_OF_VALUES_PER_DECADE, perdecadelistofreal.number_of_values_per_decade);
     print_opt_attrs(perdecadelistofreal.opt_attrs, space + 3);
 }
 
@@ -802,7 +802,7 @@ void print_ft_perdecadelistofreal (perdecadelistofreal_t perdecadelistofreal, in
 // Print linearListOfInteger2
 void print_ft_linearlistofinteger2 (linearlistofinteger2_t linearlistofinteger2, int space)
 {
-    printf("%*s-%s: %s=%i, %s=%i, %s=%i\n", space, "",linearlistofinteger2.name, A_FIRST, linearlistofinteger2.first, A_STEP, linearlistofinteger2.step, A_NUMBER_OF_VALUES, linearlistofinteger2.number_of_values);
+    printf("%*s-%s: %s=%i, %s=%i, %s=%i\n", space, "",get_name_from_path(linearlistofinteger2.path), A_FIRST, linearlistofinteger2.first, A_STEP, linearlistofinteger2.step, A_NUMBER_OF_VALUES, linearlistofinteger2.number_of_values);
     print_opt_attrs(linearlistofinteger2.opt_attrs, space + 3);
 }
 
@@ -812,7 +812,7 @@ void print_ft_rationalfunction (rationalfunction_t rationalfunction, int space)
 {
     hsize_t i;
 
-    printf("%*s-%s [%lu]: ", space, "",rationalfunction.name, (long unsigned) rationalfunction.nb_types);
+    printf("%*s-%s [%lu]: ", space, "", get_name_from_path(rationalfunction.path), (long unsigned) rationalfunction.nb_types);
     for (i = 0; i < rationalfunction.nb_types - 1; i++)
     {
         printf("type%i=%g|%g|%g, ", rationalfunction.types[i], rationalfunction.a[i], rationalfunction.b[i], rationalfunction.f[i]);
@@ -827,7 +827,7 @@ void print_ft_generalrationalfunction (generalrationalfunction_t generalrational
 {
     int i;
 
-    printf("%*s-%s [%i]:\n", space, "",generalrationalfunction.name, generalrationalfunction.nb_degrees);
+    printf("%*s-%s [%i]:\n", space, "", get_name_from_path(generalrationalfunction.path), generalrationalfunction.nb_degrees);
     for (i = 0; i < generalrationalfunction.nb_degrees; i++)
         printf("%*s-degree %i: numerator=%g%+gi, denominator=%g%+gi\n", space + 3, "", i, creal(generalrationalfunction.numerator[i]), cimag(generalrationalfunction.numerator[i]), creal(generalrationalfunction.denominator[i]), cimag(generalrationalfunction.denominator[i]));
     print_opt_attrs(generalrationalfunction.opt_attrs, space + 3);
@@ -840,7 +840,7 @@ void print_ft_rational (rational_t rational, int space)
     hsize_t i, total;
     int j;
 
-    printf("%*s-%s:\n", space, "", rational.name);
+    printf("%*s-%s:\n", space, "", get_name_from_path(rational.path));
     print_opt_attrs(rational.opt_attrs, space + 3);
     printf("%*s-@%s [%lux%lu]: {", space + 3, "", A_VALUE, (long unsigned) rational.dims[0], (long unsigned) rational.dims[1]);
     if (rational.data != NULL)
@@ -878,7 +878,7 @@ void print_ft_dataset (dataset_t dataset, int space)
     hsize_t i, total = 1;
     int j;
 
-    printf("%*s-%s [", space, "", dataset.name);
+    printf("%*s-%s [", space, "", get_name_from_path(dataset.path));
     for (j = 0; j < dataset.nb_dims - 1; j++)
     {
         printf("%lux", (long unsigned) dataset.dims[j]);
@@ -932,7 +932,7 @@ void print_ft_arrayset (arrayset_t arrayset, int space)
 {
     hsize_t i;
 
-    printf("%*s-%s:\n", space, "", arrayset.name);
+    printf("%*s-%s:\n", space, "", get_name_from_path(arrayset.path));
     print_opt_attrs(arrayset.opt_attrs, space + 4);
     print_ft_dataset(arrayset.data, space + 2);
     for (i = 0; i < arrayset.nb_dims; i++)
@@ -1001,10 +1001,10 @@ void print_floatingtype (floatingtype_t floatingtype, int space)
 // Free memory used by singleInteger
 void free_ft_singleinteger (singleinteger_t *singleinteger)
 {
-    if (singleinteger->name != NULL)
+    if (singleinteger->path != NULL)
     {
-        free(singleinteger->name);
-        singleinteger->name = NULL;
+        free(singleinteger->path);
+        singleinteger->path = NULL;
     }
     free_opt_attrs(&(singleinteger->opt_attrs));
 }
@@ -1013,10 +1013,10 @@ void free_ft_singleinteger (singleinteger_t *singleinteger)
 // Free memory used by singleReal
 void free_ft_singlereal (singlereal_t *singlereal)
 {
-    if (singlereal->name != NULL)
+    if (singlereal->path != NULL)
     {
-        free(singlereal->name);
-        singlereal->name = NULL;
+        free(singlereal->path);
+        singlereal->path = NULL;
     }
     free_opt_attrs(&(singlereal->opt_attrs));
 }
@@ -1025,10 +1025,10 @@ void free_ft_singlereal (singlereal_t *singlereal)
 // Free memory used by singleComplex
 void free_ft_singlecomplex (singlecomplex_t *singlecomplex)
 {
-    if (singlecomplex->name != NULL)
+    if (singlecomplex->path != NULL)
     {
-        free(singlecomplex->name);
-        singlecomplex->name = NULL;
+        free(singlecomplex->path);
+        singlecomplex->path = NULL;
     }
     free_opt_attrs(&(singlecomplex->opt_attrs));
 }
@@ -1037,10 +1037,10 @@ void free_ft_singlecomplex (singlecomplex_t *singlecomplex)
 // Free memory used by singleString
 void free_ft_singlestring (singlestring_t *singlestring)
 {
-    if (singlestring->name != NULL)
+    if (singlestring->path != NULL)
     {
-        free(singlestring->name);
-        singlestring->name = NULL;
+        free(singlestring->path);
+        singlestring->path = NULL;
     }
     if (singlestring->value != NULL)
     {
@@ -1054,10 +1054,10 @@ void free_ft_singlestring (singlestring_t *singlestring)
 // Free memory used by vector
 void free_ft_vector (vector_t *vector)
 {
-    if (vector->name != NULL)
+    if (vector->path != NULL)
     {
-        free(vector->name);
-        vector->name = NULL;
+        free(vector->path);
+        vector->path = NULL;
     }
     free_opt_attrs(&(vector->opt_attrs));
     switch (vector->type_class)
@@ -1100,10 +1100,10 @@ void free_ft_vector (vector_t *vector)
 // Free memory used by linearListOfReal1
 void free_ft_linearlistofreal1 (linearlistofreal1_t *linearlistofreal1)
 {
-    if (linearlistofreal1->name != NULL)
+    if (linearlistofreal1->path != NULL)
     {
-        free(linearlistofreal1->name);
-        linearlistofreal1->name = NULL;
+        free(linearlistofreal1->path);
+        linearlistofreal1->path = NULL;
     }
     free_opt_attrs(&(linearlistofreal1->opt_attrs));
 }
@@ -1112,10 +1112,10 @@ void free_ft_linearlistofreal1 (linearlistofreal1_t *linearlistofreal1)
 // Free memory used by linearListOfReal2
 void free_ft_linearlistofreal2 (linearlistofreal2_t *linearlistofreal2)
 {
-    if (linearlistofreal2->name != NULL)
+    if (linearlistofreal2->path != NULL)
     {
-        free(linearlistofreal2->name);
-        linearlistofreal2->name = NULL;
+        free(linearlistofreal2->path);
+        linearlistofreal2->path = NULL;
     }
     free_opt_attrs(&(linearlistofreal2->opt_attrs));
 }
@@ -1124,10 +1124,10 @@ void free_ft_linearlistofreal2 (linearlistofreal2_t *linearlistofreal2)
 // Free memory used by logarithmListOfReal
 void free_ft_logarithmlistofreal (logarithmlistofreal_t *logarithmlistofreal)
 {
-    if (logarithmlistofreal->name != NULL)
+    if (logarithmlistofreal->path != NULL)
     {
-        free(logarithmlistofreal->name);
-        logarithmlistofreal->name = NULL;
+        free(logarithmlistofreal->path);
+        logarithmlistofreal->path = NULL;
     }
     free_opt_attrs(&(logarithmlistofreal->opt_attrs));
 }
@@ -1136,10 +1136,10 @@ void free_ft_logarithmlistofreal (logarithmlistofreal_t *logarithmlistofreal)
 // Free memory used by perDecadeListOfReal
 void free_ft_perdecadelistofreal (perdecadelistofreal_t *perdecadelistofreal)
 {
-    if (perdecadelistofreal->name != NULL)
+    if (perdecadelistofreal->path != NULL)
     {
-        free(perdecadelistofreal->name);
-        perdecadelistofreal->name = NULL;
+        free(perdecadelistofreal->path);
+        perdecadelistofreal->path = NULL;
     }
     free_opt_attrs(&(perdecadelistofreal->opt_attrs));
 }
@@ -1148,10 +1148,10 @@ void free_ft_perdecadelistofreal (perdecadelistofreal_t *perdecadelistofreal)
 // Free memory used by linearListOfInteger2
 void free_ft_linearlistofinteger2 (linearlistofinteger2_t *linearlistofinteger2)
 {
-    if (linearlistofinteger2->name != NULL)
+    if (linearlistofinteger2->path != NULL)
     {
-        free(linearlistofinteger2->name);
-        linearlistofinteger2->name = NULL;
+        free(linearlistofinteger2->path);
+        linearlistofinteger2->path = NULL;
     }
     free_opt_attrs(&(linearlistofinteger2->opt_attrs));
 }
@@ -1160,10 +1160,10 @@ void free_ft_linearlistofinteger2 (linearlistofinteger2_t *linearlistofinteger2)
 // Free memory used by rationalFunction
 void free_ft_rationalfunction (rationalfunction_t *rationalfunction)
 {
-    if (rationalfunction->name != NULL)
+    if (rationalfunction->path != NULL)
     {
-        free(rationalfunction->name);
-        rationalfunction->name = NULL;
+        free(rationalfunction->path);
+        rationalfunction->path = NULL;
     }
     if (rationalfunction->types != NULL)
     {
@@ -1193,10 +1193,10 @@ void free_ft_rationalfunction (rationalfunction_t *rationalfunction)
 // Free memory used by generalRationalFunction
 void free_ft_generalrationalfunction (generalrationalfunction_t *generalrationalfunction)
 {
-    if (generalrationalfunction->name != NULL)
+    if (generalrationalfunction->path != NULL)
     {
-        free(generalrationalfunction->name);
-        generalrationalfunction->name = NULL;
+        free(generalrationalfunction->path);
+        generalrationalfunction->path = NULL;
     }
 
     if (generalrationalfunction->numerator != NULL)
@@ -1220,10 +1220,10 @@ void free_ft_rational (rational_t *rational)
 {
     int j;
 
-    if (rational->name != NULL)
+    if (rational->path != NULL)
     {
-        free(rational->name);
-        rational->name = NULL;
+        free(rational->path);
+        rational->path = NULL;
     }
     free_opt_attrs(&(rational->opt_attrs));
 
@@ -1260,10 +1260,10 @@ void free_ft_rational (rational_t *rational)
 // Free memory used by dataset
 void free_ft_dataset (dataset_t *dataset)
 {
-    if (dataset->name != NULL)
+    if (dataset->path != NULL)
     {
-        free(dataset->name);
-        dataset->name = NULL;
+        free(dataset->path);
+        dataset->path = NULL;
     }
     free_opt_attrs(&(dataset->opt_attrs));
     if (dataset->dims != NULL)
@@ -1313,10 +1313,10 @@ void free_ft_arrayset (arrayset_t *arrayset)
 {
     hsize_t i;
 
-    if (arrayset->name != NULL)
+    if (arrayset->path != NULL)
     {
-        free(arrayset->name);
-        arrayset->name = NULL;
+        free(arrayset->path);
+        arrayset->path = NULL;
     }
     free_opt_attrs(&(arrayset->opt_attrs));
     if (arrayset->nb_dims > 0)

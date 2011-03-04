@@ -43,7 +43,7 @@ extern "C" {
 
     typedef struct groupgroup_t
     {
-        char*       name;
+        char*       path;
         hsize_t     nb_groupgroupnames;
         char**      groupgroupnames;
     } groupgroup_t;
@@ -51,7 +51,7 @@ extern "C" {
 
     typedef struct ssom_pie_table_t
     {
-        char        *name;
+        char        *path;
         char        nb_dims;
         hsize_t     nb_points;
         unsigned int **elements;
@@ -68,7 +68,7 @@ extern "C" {
 
     typedef struct sgroup_t
     {
-        char        *name;
+        char        *path;
         char        *type;
         char        *entitytype;
         hsize_t     dims[2];
@@ -95,7 +95,7 @@ extern "C" {
 
     typedef struct ugroup_t
     {
-        char        *name;
+        char        *path;
         hsize_t     nb_groupelts;
         int         *groupelts;
     } ugroup_t;
@@ -135,7 +135,7 @@ extern "C" {
 
     typedef struct usom_table_t
     {
-        char        *name;
+        char        *path;
         usom_class_t type;
         usomx_t     data;
     } usom_table_t;
@@ -167,7 +167,7 @@ extern "C" {
 
     typedef struct msh_instance_t
     {
-        char        *name;
+        char        *path;
         mesh_class_t type;
         meshx_t     data;
     } msh_instance_t;
@@ -184,7 +184,7 @@ extern "C" {
 
     typedef struct mlk_instance_t
     {
-        char        *name;
+        char        *path;
         meshlink_class_t type;
         char        *mesh1;
         char        *mesh2;
@@ -195,7 +195,7 @@ extern "C" {
 
     typedef struct msh_group_t
     {
-        char        *name;
+        char        *path;
         hsize_t     nb_msh_instances;
         msh_instance_t *msh_instances;
         hsize_t     nb_mlk_instances;

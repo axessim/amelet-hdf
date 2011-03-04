@@ -12,7 +12,7 @@ extern "C" {
 
     typedef struct lnk_instance_t
     {
-        char        *name;
+        char        *path;
         opt_attrs_t opt_attrs;
         char        *subject;
         char        *object;
@@ -20,7 +20,7 @@ extern "C" {
 
     typedef struct lnk_group_t
     {
-        char        *name;
+        char        *path;
         opt_attrs_t opt_attrs;
         hsize_t     nb_instances;
         lnk_instance_t *instances;

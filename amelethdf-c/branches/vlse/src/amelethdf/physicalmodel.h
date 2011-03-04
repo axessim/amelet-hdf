@@ -48,12 +48,11 @@ extern "C" {
         S_ZS                    = 3,
         S_ZSZT                  = 4,
         S_ZSZT2                 = 5
-    }
-                                                                        surface_class_t;
+    } surface_class_t;
 
     typedef struct volume_instance_t
     {
-        char *name;
+        char *path;
         opt_attrs_t opt_attrs;
         floatingtype_t relative_permittivity;
         floatingtype_t relative_permeability;
@@ -64,7 +63,7 @@ extern "C" {
 
     typedef struct surface_instance_t
     {
-        char        *name;
+        char        *path;
         opt_attrs_t opt_attrs;
         surface_class_t type;
         char        *physicalmodel;
@@ -79,7 +78,7 @@ extern "C" {
 
     typedef struct interface_instance_t
     {
-        char        *name;
+        char        *path;
         opt_attrs_t opt_attrs;
         char        *medium1;
         char        *medium2;

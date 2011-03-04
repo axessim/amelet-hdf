@@ -25,11 +25,11 @@ void read_eet_dataset (hid_t file_id, const char *path, eet_dataset_t *eet_datas
                             open_external_files(eet_dataset);
                         }
     if (success)
-        eet_dataset->name = get_name_from_path(path);
+        eet_dataset->path = strdup(path);
     else
     {
         print_err_dset(C_EXTERNAL_ELEMENT, path);
-        eet_dataset->name = NULL;
+        eet_dataset->path = NULL;
         eet_dataset->file_id = NULL;
         eet_dataset->nb_eed_items = 0;
         eet_dataset->eed_items = NULL;
@@ -69,7 +69,7 @@ void print_eet_dataset (eet_dataset_t eet_dataset, int space)
 {
     hsize_t i;
 
-    printf("%*sInstance: %s\n", space, "", eet_dataset.name);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(eet_dataset.path));
     for (i = 0; i < eet_dataset.nb_eed_items; i++)
     {
         printf("%*sId %lu:\n", space + 3, "", (long unsigned) i);
@@ -97,10 +97,10 @@ void print_external_element (external_element_t external_element)
 // Close external files and free memory used by dataset in externalElement
 void free_eet_dataset (eet_dataset_t *eet_dataset)
 {
-    if (eet_dataset->name != NULL)
+    if (eet_dataset->path != NULL)
     {
-        free(eet_dataset->name);
-        eet_dataset->name = NULL;
+        free(eet_dataset->path);
+        eet_dataset->path = NULL;
     }
     if (eet_dataset->nb_eed_items > 0)
     {

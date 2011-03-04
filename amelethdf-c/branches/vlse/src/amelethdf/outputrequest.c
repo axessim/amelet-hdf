@@ -6,7 +6,7 @@ void read_ort_instance (hid_t file_id, const char *path, ort_instance_t *ort_ins
 {
     char mandatory[][ATTR_LENGTH] = {A_SUBJECT, A_OBJECT, A_OUTPUT};
 
-    ort_instance->name = get_name_from_path(path);
+    ort_instance->path = strdup(path);
     read_opt_attrs(file_id, path, &(ort_instance->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     if (!read_str_attr(file_id, path, A_SUBJECT, &(ort_instance->subject)))
         print_err_attr(C_OUTPUT_REQUEST, path, A_SUBJECT);
@@ -25,7 +25,7 @@ void read_ort_group (hid_t file_id, const char *path, ort_group_t *ort_group)
     char path2[ABSOLUTE_PATH_NAME_LENGTH];
     char mandatory[][ATTR_LENGTH] = {};
 
-    ort_group->name = get_name_from_path(path);
+    ort_group->path = strdup(path);
     read_opt_attrs(file_id, path, &(ort_group->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     children = read_children_name(file_id, path);
     ort_group->nb_instances = children.nb_children;
@@ -74,7 +74,7 @@ void read_outputrequest(hid_t file_id, outputrequest_t *outputrequest)
 // Print outputRequest instance
 void print_ort_instance (ort_instance_t ort_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", ort_instance.name);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(ort_instance.path));
     print_opt_attrs(ort_instance.opt_attrs, space + 3);
     print_str_attr(A_SUBJECT, ort_instance.subject, space + 3);
     print_str_attr(A_OBJECT, ort_instance.object, space + 3);
@@ -87,7 +87,7 @@ void print_ort_group (ort_group_t ort_group, int space)
 {
     hsize_t i;
 
-    printf("%*sGroup: %s\n", space, "", ort_group.name);
+    printf("%*sGroup: %s\n", space, "", get_name_from_path(ort_group.path));
     print_opt_attrs(ort_group.opt_attrs, space + 4);
     for (i = 0; i < ort_group.nb_instances; i++)
         print_ort_instance(ort_group.instances[i], space + 2);
@@ -112,10 +112,10 @@ void print_outputrequest (outputrequest_t outputrequest)
 // Free memory used by structure ort_instance
 void free_ort_instance (ort_instance_t *ort_instance)
 {
-    if (ort_instance->name != NULL)
+    if (ort_instance->path != NULL)
     {
-        free(ort_instance->name);
-        ort_instance->name = NULL;
+        free(ort_instance->path);
+        ort_instance->path = NULL;
     }
     free_opt_attrs(&(ort_instance->opt_attrs));
     if (ort_instance->subject != NULL)
@@ -141,10 +141,10 @@ void free_ort_group (ort_group_t *ort_group)
 {
     hsize_t i;
 
-    if (ort_group->name != NULL)
+    if (ort_group->path != NULL)
     {
-        free(ort_group->name);
-        ort_group->name = NULL;
+        free(ort_group->path);
+        ort_group->path = NULL;
     }
     free_opt_attrs(&(ort_group->opt_attrs));
     if (ort_group->nb_instances > 0)

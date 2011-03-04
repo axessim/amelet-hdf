@@ -6,7 +6,7 @@ void read_lnk_instance (hid_t file_id, const char *path, lnk_instance_t *lnk_ins
 {
     char mandatory[][ATTR_LENGTH] = {A_SUBJECT, A_OBJECT};
 
-    lnk_instance->name = get_name_from_path(path);
+    lnk_instance->path = strdup(path);
     read_opt_attrs(file_id, path, &(lnk_instance->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     if (!read_str_attr(file_id, path, A_SUBJECT, &(lnk_instance->subject)))
         print_err_attr(C_LINK, path, A_SUBJECT);
@@ -23,7 +23,7 @@ void read_lnk_group (hid_t file_id, const char *path, lnk_group_t *lnk_group)
     children_t children;
     hsize_t i;
 
-    lnk_group->name = get_name_from_path(path);
+    lnk_group->path = strdup(path);
     read_opt_attrs(file_id, path, &(lnk_group->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     children = read_children_name(file_id, path);
     lnk_group->nb_instances = children.nb_children;
@@ -73,7 +73,7 @@ void read_link (hid_t file_id, link_t *link)
 // Print link instance
 void print_lnk_instance (lnk_instance_t lnk_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", lnk_instance.name);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(lnk_instance.path));
     print_str_attr(A_SUBJECT, lnk_instance.subject, space + 3);
     print_str_attr(A_OBJECT, lnk_instance.object, space + 3);
     print_opt_attrs(lnk_instance.opt_attrs, space + 3);
@@ -85,7 +85,7 @@ void print_lnk_group (lnk_group_t lnk_group, int space)
 {
     hsize_t i;
 
-    printf("%*sGroup: %s\n", space, "", lnk_group.name);
+    printf("%*sGroup: %s\n", space, "", get_name_from_path(lnk_group.path));
     print_opt_attrs(lnk_group.opt_attrs, space + 4);
     for (i = 0; i < lnk_group.nb_instances; i++)
         print_lnk_instance(lnk_group.instances[i], space + 2);
@@ -110,10 +110,10 @@ void print_link (link_t link)
 // Free memory used by structure lnk_instance
 void free_lnk_instance (lnk_instance_t *lnk_instance)
 {
-    if (lnk_instance->name != NULL)
+    if (lnk_instance->path != NULL)
     {
-        free(lnk_instance->name);
-        lnk_instance->name = NULL;
+        free(lnk_instance->path);
+        lnk_instance->path = NULL;
     }
     free_opt_attrs(&(lnk_instance->opt_attrs));
     if (lnk_instance->subject != NULL)
@@ -134,10 +134,10 @@ void free_lnk_group (lnk_group_t *lnk_group)
 {
     hsize_t i;
 
-    if (lnk_group->name != NULL)
+    if (lnk_group->path != NULL)
     {
-        free(lnk_group->name);
-        lnk_group->name = NULL;
+        free(lnk_group->path);
+        lnk_group->path = NULL;
     }
     free_opt_attrs(&(lnk_group->opt_attrs));
     if (lnk_group->nb_instances > 0)

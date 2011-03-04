@@ -6,7 +6,7 @@ void read_lsm_transformation (hid_t file_id, const char *path, lsm_transformatio
 {
     char *type;
 
-    lsm_transformation->name = get_name_from_path(path);
+    lsm_transformation->path = strdup(path);
     lsm_transformation->type = TRF_INVALID;
     if (read_str_attr(file_id, path, A_TYPE, &type))
     {
@@ -30,7 +30,7 @@ void read_lsm_instance (hid_t file_id, const char *path, lsm_instance_t *lsm_ins
     children_t children;
     hsize_t i;
 
-    lsm_instance->name = get_name_from_path(path);
+    lsm_instance->path = strdup(path);
     read_opt_attrs(file_id, path, &(lsm_instance->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     read_int_attr(file_id, path, A_DIMENSION, &(lsm_instance->dimension));
 
@@ -83,7 +83,7 @@ void read_localization_system (hid_t file_id, localization_system_t *localizatio
 // Print localizationSystem transformation
 void print_lsm_transformation (lsm_transformation_t lsm_transformation, int space)
 {
-    printf("%*sTransformation: %s\n", space, "", lsm_transformation.name);
+    printf("%*sTransformation: %s\n", space, "", get_name_from_path(lsm_transformation.path));
     print_int_attr(A_RANK, lsm_transformation.rank, space + 3);
     switch (lsm_transformation.type)
     {
@@ -108,7 +108,7 @@ void print_lsm_instance (lsm_instance_t lsm_instance, int space)
 {
     hsize_t i;
 
-    printf("%*sInstance: %s\n", space, "", lsm_instance.name);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(lsm_instance.path));
     print_int_attr(A_DIMENSION, lsm_instance.dimension, space + 4);
     print_opt_attrs(lsm_instance.opt_attrs, space + 4);
     for (i = 0; i < lsm_instance.nb_transformations; i++)
@@ -133,10 +133,10 @@ void print_localization_system (localization_system_t localization_system)
 // Free memory used by localizationSystem transformation
 void free_lsm_transformation (lsm_transformation_t *lsm_transformation)
 {
-    if (lsm_transformation->name != NULL)
+    if (lsm_transformation->path != NULL)
     {
-        free(lsm_transformation->name);
-        lsm_transformation->name = NULL;
+        free(lsm_transformation->path);
+        lsm_transformation->path = NULL;
     }
 }
 
@@ -146,10 +146,10 @@ void free_lsm_instance (lsm_instance_t *lsm_instance)
 {
     hsize_t i;
 
-    if (lsm_instance->name != NULL)
+    if (lsm_instance->path != NULL)
     {
-        free(lsm_instance->name);
-        lsm_instance->name = NULL;
+        free(lsm_instance->path);
+        lsm_instance->path = NULL;
     }
     free_opt_attrs(&(lsm_instance->opt_attrs));
     if (lsm_instance->nb_transformations > 0)

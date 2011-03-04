@@ -54,7 +54,7 @@ extern "C" {
 
     typedef struct planewave_t
     {
-        char        *name;
+        char        *path;
         opt_attrs_t opt_attrs;
         float       xo;
         float       yo;
@@ -66,7 +66,7 @@ extern "C" {
 
     typedef struct sphericalwave_t
     {
-        char        *name;
+        char        *path;
         float       xo;
         float       yo;
         float       zo;
@@ -84,7 +84,7 @@ extern "C" {
 
     typedef struct generator_t
     {
-        char        *name;
+        char        *path;
         opt_attrs_t opt_attrs;
         generator_class_t type;
         floatingtype_t inner_impedance;
@@ -100,7 +100,7 @@ extern "C" {
 
     typedef struct dipole_t
     {
-        char        *name;
+        char        *path;
         opt_attrs_t opt_attrs;
         dipole_class_t type;
         float       x;
@@ -145,7 +145,7 @@ extern "C" {
 
     typedef struct antenna_t
     {
-        char *name;
+        char *path;
         opt_attrs_t opt_attrs;
         floatingtype_t input_impedance;
         floatingtype_t load_impedance;
@@ -169,7 +169,7 @@ extern "C" {
 
     typedef struct sourceonmesh_t
     {
-        char        *name;
+        char        *path;
         sourceonmesh_class_t type;
         sourceonmeshx_t data;
     } sourceonmesh_t;

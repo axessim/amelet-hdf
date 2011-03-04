@@ -56,10 +56,13 @@ extern "C" {
         attr_instance_t *instances;
     } opt_attrs_t;
 
+    char version_minimum (const char *required_version, const char *sim_version);
+    char *trim_zeros (const char *version);
     set_t add_to_set (set_t aset, char *aelement);
     int index_in_set (set_t aset, char *aelement, hsize_t *index);
     children_t read_children_name (hid_t file_id, const char *path);
     char *get_name_from_path (const char *path);
+    char *get_base_from_path (const char *path);
 
     char read_int_attr (hid_t file_id, const char *path, char* attr, int *rdata);
     char read_flt_attr (hid_t file_id, const char *path, char* attr_name, float *rdata);

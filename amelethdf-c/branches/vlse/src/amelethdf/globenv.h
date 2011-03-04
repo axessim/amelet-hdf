@@ -20,7 +20,7 @@ extern "C" {
 
     typedef struct gle_instance_t
     {
-        char        *name;
+        char        *path;
         gle_class_t type;
         floatingtype_t data;
         opt_attrs_t limit_conditions;

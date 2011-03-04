@@ -9,7 +9,7 @@ extern "C" {
 
     typedef struct lbl_dataset_t
     {
-        char        *name;
+        char        *path;
         hsize_t     nb_items;
         char        **items;
     } lbl_dataset_t;

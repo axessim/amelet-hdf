@@ -18,11 +18,11 @@ void read_lbl_dataset(hid_t file_id, const char *path, lbl_dataset_t *lbl_datase
                         if(read_string_dataset(file_id, path, lbl_dataset->nb_items, length, &(lbl_dataset->items)))
                             success = TRUE;
     if (success)
-        lbl_dataset->name = get_name_from_path(path);
+        lbl_dataset->path = strdup(path);
     else
     {
         print_err_dset(C_LABEL, path);
-        lbl_dataset->name = NULL;
+        lbl_dataset->path = NULL;
         lbl_dataset->nb_items = 0;
         lbl_dataset->items = NULL;
     }
@@ -61,7 +61,7 @@ void print_lbl_dataset (lbl_dataset_t lbl_dataset, int space)
 {
     hsize_t i;
 
-    printf("%*sName: %s\n", space, "", lbl_dataset.name);
+    printf("%*sName: %s\n", space, "", get_name_from_path(lbl_dataset.path));
     for (i = 0; i < lbl_dataset.nb_items; i++)
         printf("%*s%s\n", space + 3, "", lbl_dataset.items[i]);
     printf("\n");
@@ -85,10 +85,10 @@ void print_label(label_t label)
 // Free memory used by structure lbl_dataset
 void free_lbl_dataset (lbl_dataset_t *lbl_dataset)
 {
-    if (lbl_dataset->name != NULL)
+    if (lbl_dataset->path != NULL)
     {
-        free(lbl_dataset->name);
-        lbl_dataset->name = NULL;
+        free(lbl_dataset->path);
+        lbl_dataset->path = NULL;
     }
 
     if (lbl_dataset->nb_items > 0)

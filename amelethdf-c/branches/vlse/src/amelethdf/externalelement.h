@@ -14,7 +14,7 @@ extern "C" {
 
     typedef struct eet_dataset_t
     {
-        char        *name;
+        char        *path;
         hid_t       *file_id;
         hsize_t     nb_eed_items;
         char        **eed_items;

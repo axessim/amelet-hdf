@@ -8,7 +8,7 @@ void read_exs_group (hid_t file_id, const char *path, exs_group_t *exs_group)
     children_t children;
     hsize_t i;
 
-    exs_group->name = get_name_from_path(path);
+    exs_group->path = strdup(path);
     if (read_str_attr(file_id, path, A_TYPE, &temp))
     {
         if (strcmp(temp, V_RECIPROCITY) == 0)
@@ -99,7 +99,7 @@ void print_exs_group (exs_group_t exs_group, int space)
 {
     hsize_t i;
 
-    printf("%*sGroup: %s\n", space, "", exs_group.name);
+    printf("%*sGroup: %s\n", space, "", get_name_from_path(exs_group.path));
     switch (exs_group.type)
     {
     case EXS_TYPE_RECIPROCITY:
@@ -152,10 +152,10 @@ void free_exs_group (exs_group_t *exs_group)
 {
     hsize_t i;
 
-    if (exs_group->name != NULL)
+    if (exs_group->path != NULL)
     {
-        free(exs_group->name);
-        exs_group->name = NULL;
+        free(exs_group->path);
+        exs_group->path = NULL;
     }
     if (exs_group->nb_instances > 0)
     {

@@ -15,7 +15,7 @@ extern "C" {
 
     typedef struct sim_instance_t
     {
-        char        *name;
+        char        *path;
         opt_attrs_t opt_attrs;
         char        *module;
         char        *version;

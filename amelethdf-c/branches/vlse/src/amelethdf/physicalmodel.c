@@ -7,7 +7,7 @@ void read_physicalmodel_volume_instance (hid_t file_id, const char *path, volume
     char path2[ABSOLUTE_PATH_NAME_LENGTH];
     char mandatory[][ATTR_LENGTH] = {};
 
-    volume_instance->name = get_name_from_path(path);
+    volume_instance->path = strdup(path);
     read_opt_attrs(file_id, path, &(volume_instance->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     strcpy(path2, path);
     strcat(path2, G_RELATIVE_PERMITTIVITY);
@@ -109,7 +109,7 @@ void read_physicalmodel_surface_instance (hid_t file_id, const char *path, surfa
     surface_instance->zs2 = NULL;
     surface_instance->zt1 = NULL;
     surface_instance->zt2 = NULL;
-    surface_instance->name = get_name_from_path(path);
+    surface_instance->path = strdup(path);
     if (read_str_attr(file_id, path, A_TYPE, &temp))
     {
         if (strcmp(temp, V_THIN_DIELECTRIC_LAYER) == 0)
@@ -143,7 +143,7 @@ void read_physicalmodel_interface_instance (hid_t file_id, const char *path, int
 {
     char mandatory[][ATTR_LENGTH] = {A_MEDIUM1, A_MEDIUM2};
 
-    interface_instance->name = get_name_from_path(path);
+    interface_instance->path = strdup(path);
     if (!read_str_attr(file_id, path, A_MEDIUM1, &(interface_instance->medium1)))
         print_err_attr(C_PHYSICAL_MODEL, path, A_MEDIUM1);
     if (!read_str_attr(file_id, path, A_MEDIUM2, &(interface_instance->medium2)))
@@ -223,7 +223,7 @@ void read_physicalmodel (hid_t file_id, physicalmodel_t *physicalmodel)
 // Print instance in physicalModel/volume
 void print_physicalmodel_volume_instance (volume_instance_t volume_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", volume_instance.name);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(volume_instance.path));
     print_opt_attrs(volume_instance.opt_attrs, space + 3);
     print_floatingtype(volume_instance.relative_permittivity, space + 3);
     print_floatingtype(volume_instance.relative_permeability, space + 3);
@@ -236,7 +236,7 @@ void print_physicalmodel_volume_instance (volume_instance_t volume_instance, int
 // Print instance in physicalModel/surface
 void print_physicalmodel_surface_instance (surface_instance_t surface_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", surface_instance.name);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(surface_instance.path));
     print_opt_attrs(surface_instance.opt_attrs, space + 3);
     switch (surface_instance.type)
     {
@@ -271,7 +271,7 @@ void print_physicalmodel_surface_instance (surface_instance_t surface_instance, 
 // Print instance in physicalModel/interface
 void print_physicalmodel_interface_instance (interface_instance_t interface_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", interface_instance.name);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(interface_instance.path));
     print_opt_attrs(interface_instance.opt_attrs, space + 3);
     if (interface_instance.medium1 != NULL)
         print_str_attr(A_MEDIUM1, interface_instance.medium1, space + 3);
@@ -317,10 +317,10 @@ void print_physicalmodel (physicalmodel_t physicalmodel)
 // Free memory used by instance in physicalModel/volume
 void free_physicalmodel_volume_instance (volume_instance_t *volume_instance)
 {
-    if (volume_instance->name != NULL)
+    if (volume_instance->path != NULL)
     {
-        free(volume_instance->name);
-        volume_instance->name = NULL;
+        free(volume_instance->path);
+        volume_instance->path = NULL;
     }
     free_opt_attrs(&(volume_instance->opt_attrs));
     free_floatingtype(&(volume_instance->relative_permittivity));
@@ -332,10 +332,10 @@ void free_physicalmodel_volume_instance (volume_instance_t *volume_instance)
 // Free memory used by instance in physicalModel/surface
 void free_physicalmodel_surface_instance (surface_instance_t *surface_instance)
 {
-    if (surface_instance->name != NULL)
+    if (surface_instance->path != NULL)
     {
-        free(surface_instance->name);
-        surface_instance->name = NULL;
+        free(surface_instance->path);
+        surface_instance->path = NULL;
     }
     free_opt_attrs(&(surface_instance->opt_attrs));
     if (surface_instance->physicalmodel != NULL)
@@ -379,10 +379,10 @@ void free_physicalmodel_surface_instance (surface_instance_t *surface_instance)
 // Free memory used by instance in physicalModel/interface
 void free_physicalmodel_interface_instance (interface_instance_t *interface_instance)
 {
-    if (interface_instance->name != NULL)
+    if (interface_instance->path != NULL)
     {
-        free(interface_instance->name);
-        interface_instance->name = NULL;
+        free(interface_instance->path);
+        interface_instance->path = NULL;
     }
     free_opt_attrs(&(interface_instance->opt_attrs));
     if (interface_instance->medium1 != NULL)

@@ -11,7 +11,7 @@ void read_sim_instance(hid_t file_id, const char *path, sim_instance_t *sim_inst
     size_t length;
     int nb_dims;
 
-    sim_instance->name = get_name_from_path(path);
+    sim_instance->path = strdup(path);
     read_opt_attrs(file_id, path2, &(sim_instance->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     if (!read_str_attr(file_id, path, A_MODULE, &(sim_instance->module)))
         print_err_attr(C_SIMULATION, path, A_MODULE);
@@ -91,7 +91,7 @@ void print_sim_instance(sim_instance_t sim_instance, int space)
 {
     hsize_t i;
 
-    printf("%*sInstance: %s\n", space, "", sim_instance.name);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(sim_instance.path));
     print_opt_attrs(sim_instance.opt_attrs, space + 4);
     print_str_attr(A_MODULE, sim_instance.module, space + 4);
     print_str_attr(A_VERSION, sim_instance.version, space + 4);
@@ -132,10 +132,10 @@ void print_simulation(simulation_t simulation)
 // Free memory used by structure sim_instance
 void free_sim_instance(sim_instance_t *sim_instance)
 {
-    if (sim_instance->name != NULL)
+    if (sim_instance->path != NULL)
     {
-        free(sim_instance->name);
-        sim_instance->name = NULL;
+        free(sim_instance->path);
+        sim_instance->path = NULL;
     }
     free_opt_attrs(&(sim_instance->opt_attrs));
     if (sim_instance->module != NULL)

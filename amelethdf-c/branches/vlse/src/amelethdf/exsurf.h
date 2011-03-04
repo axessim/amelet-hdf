@@ -33,7 +33,7 @@ extern "C" {
 
     typedef struct exs_group_t
     {
-        char        *name;
+        char        *path;
         exs_type_class_t type;
         exs_nature_class_t nature;
         hsize_t     nb_instances;

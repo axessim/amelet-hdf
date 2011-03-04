@@ -10,7 +10,7 @@ void read_groupgroup (hid_t file_id, const char* path, groupgroup_t *groupgroup)
     char success = FALSE;
 
     groupgroup->nb_groupgroupnames = 1;  // in case of single value
-    groupgroup->name = get_name_from_path(path);
+    groupgroup->path = strdup(path);
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims <= 1)
@@ -65,7 +65,7 @@ void read_smsh_group (hid_t file_id, const char *path, sgroup_t *sgroup)
 
     sgroup->dims[0] = 1;
     sgroup->dims[1] = 1;
-    sgroup->name = get_name_from_path(path);
+    sgroup->path = strdup(path);
     if (!read_str_attr(file_id, path, A_TYPE, &(sgroup->type)))
         print_err_attr(C_MESH, path, A_TYPE);
     if (!read_str_attr(file_id, path, A_ENTITY_TYPE, &(sgroup->entitytype)))
@@ -87,7 +87,6 @@ void read_smsh_group (hid_t file_id, const char *path, sgroup_t *sgroup)
         strcat(normalpath, G_NORMAL);
         strcat(normalpath, "/");
         strcat(normalpath, temp);
-        free(temp);
 
         if (H5Lexists(file_id, normalpath, H5P_DEFAULT) > 0)
             if (H5LTget_dataset_ndims(file_id, normalpath, &nb_dims) >= 0)
@@ -121,7 +120,7 @@ void read_ssom_pie_table (hid_t file_id, const char *path, ssom_pie_table_t *sso
     int field_index1[] = {0, 1, 2, 3, 4, 5};
     int field_index2[3];
 
-    ssom_pie_table->name = get_name_from_path(path);
+    ssom_pie_table->path = strdup(path);
     if (H5Lexists(file_id, path, H5P_DEFAULT) != FALSE)
         if (H5TBget_table_info(file_id, path, &nfields, &nrecords) >= 0)
             if ((nfields == 3 || nfields == 6 || nfields == 9) && nrecords > 0)
@@ -293,7 +292,7 @@ void read_smesh(hid_t file_id, const char* path, smesh_t *smesh)
             if (!success)
             {
                 print_err_attr(C_MESH, A_TYPE, path3);
-                smesh->som_tables[i].name = NULL;
+                smesh->som_tables[i].path = NULL;
                 smesh->som_tables[i].nb_dims = 0;
                 smesh->som_tables[i].nb_points = 0;
                 smesh->som_tables[i].elements = NULL;
@@ -315,7 +314,7 @@ void read_umsh_group (hid_t file_id, const char* path, ugroup_t *ugroup)
     int nb_dims;
 
     ugroup->nb_groupelts = 1;
-    ugroup->name = get_name_from_path(path);
+    ugroup->path = strdup(path);
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims <= 1)
@@ -421,7 +420,7 @@ void read_umesh_som_table (hid_t file_id, const char *path, usom_table_t *usom_t
 {
     char *type;
 
-    usom_table->name = get_name_from_path(path);
+    usom_table->path = strdup(path);
     if (read_str_attr(file_id, path, A_TYPE, &type))
     {
         if (strcmp(type, V_POINT_IN_ELEMENT) == 0)
@@ -598,7 +597,7 @@ void read_msh_instance (hid_t file_id, const char *path, msh_instance_t *msh_ins
 
     if (H5Lexists(file_id, path, H5P_DEFAULT) <= 0)
         printf("***** ERROR(%s): Cannot read mesh instance \"%s\". *****\n\n", C_MESH, path);
-    msh_instance->name = get_name_from_path(path);
+    msh_instance->path = strdup(path);
     if (read_str_attr(file_id, path, A_TYPE, &type))
     {
         if (strcmp(type, V_STRUCTURED) == 0)
@@ -634,7 +633,7 @@ void read_mlk_instance (hid_t file_id, const char *path, mlk_instance_t *mlk_ins
     size_t length;
     int nb_dims;
 
-    mlk_instance->name = get_name_from_path(path);
+    mlk_instance->path = strdup(path);
     if (!read_str_attr(file_id, path, A_MESH1, &(mlk_instance->mesh1)))
     {
         print_err_attr(C_MESH, path, A_MESH1);
@@ -700,7 +699,7 @@ void read_msh_group (hid_t file_id, const char *path, msh_group_t *msh_group)
 
     if (H5Lexists(file_id, path, H5P_DEFAULT) <= 0)
         printf("***** ERROR(%s): Cannot read mesh group \"%s\". *****\n\n", C_MESH, path);
-    msh_group->name = get_name_from_path(path);
+    msh_group->path = strdup(path);
     children = read_children_name(file_id, path);
     msh_group->nb_msh_instances = children.nb_children;
     for (i = 0; i < children.nb_children; i++)
@@ -779,7 +778,7 @@ void print_smesh (smesh_t smesh, int space)
     printf("%*s-groups: %lu\n", space + 2, "", (long unsigned) smesh.nb_groups);
     for (i = 0; i < smesh.nb_groups; i++)
     {
-        printf("%*sName: %s\n", space + 5, "", smesh.groups[i].name);
+        printf("%*sName: %s\n", space + 5, "", get_name_from_path(smesh.groups[i].path));
         if (smesh.groups[i].type != NULL)
             print_str_attr(A_TYPE, smesh.groups[i].type, space + 8);
         if (smesh.groups[i].entitytype != NULL)
@@ -789,14 +788,14 @@ void print_smesh (smesh_t smesh, int space)
     }
     printf("%*s-groupgroups: %lu\n", space + 2, "", (unsigned long) smesh.nb_groupgroups);
     for (i = 0; i < smesh.nb_groupgroups; i++)
-        printf("%*sName: %s\n", space + 5, "", smesh.groupgroups[i].name);
+        printf("%*sName: %s\n", space + 5, "", get_name_from_path(smesh.groupgroups[i].path));
 
     if (smesh.nb_som_tables > 0)
     {
         printf("%*s-selector on mesh: %lu\n", space + 2, "", (unsigned long) smesh.nb_som_tables);
         for (i = 0; i < smesh.nb_som_tables; i++)
         {
-            printf("%*sName: %s\n", space + 5, "", smesh.som_tables[i].name);
+            printf("%*sName: %s\n", space + 5, "", get_name_from_path(smesh.som_tables[i].path));
             print_str_attr(A_TYPE, V_POINT_IN_ELEMENT, space + 9);
             printf("%*s-number of points: %lu\n", space + 7, "", (long unsigned) smesh.som_tables[i].nb_points);
         }
@@ -812,7 +811,7 @@ void print_umesh_som_table (usom_table_t usom_table, int space)
     switch (usom_table.type)
     {
     case SOM_POINT_IN_ELEMENT:
-        printf("%*sInstance: %s\n", space + 5, "", usom_table.name);
+        printf("%*sInstance: %s\n", space + 5, "", get_name_from_path(usom_table.path));
         print_str_attr(A_TYPE, V_POINT_IN_ELEMENT, space + 9);
         for (k = 0; k < usom_table.data.pie.nb_points; k++)
         {
@@ -839,13 +838,13 @@ void print_umesh_som_table (usom_table_t usom_table, int space)
         }
         break;
     case SOM_EDGE:
-        printf("%*sInstance: %s\n", space + 5, "", usom_table.name);
+        printf("%*sInstance: %s\n", space + 5, "", get_name_from_path(usom_table.path));
         print_str_attr(A_TYPE, V_EDGE, space + 9);
         for (k = 0; k < usom_table.data.ef.dims[0]; k++)
             printf("%*sId %lu: element=%i, inner_id=%i\n", space + 7, "", (long unsigned) k, usom_table.data.ef.items[2*k], usom_table.data.ef.items[2*k+1]);
         break;
     case SOM_FACE:
-        printf("%*sInstance: %s\n", space + 5, "", usom_table.name);
+        printf("%*sInstance: %s\n", space + 5, "", get_name_from_path(usom_table.path));
         print_str_attr(A_TYPE, V_FACE, space + 9);
         for (k = 0; k < usom_table.data.ef.dims[0]; k++)
             printf("%*sId %lu: element=%i, inner_id=%i\n", space + 7, "", (long unsigned) k, usom_table.data.ef.items[2*k], usom_table.data.ef.items[2*k+1]);
@@ -916,10 +915,10 @@ void print_umesh (umesh_t umesh, int space)
     }
     printf("%*s-groups: %lu\n", space + 2, "", (unsigned long) umesh.nb_groups);
     for (i = 0; i < umesh.nb_groups; i++)
-        printf("%*sName: %s\n", space + 5, "", umesh.groups[i].name);
+        printf("%*sName: %s\n", space + 5, "", get_name_from_path(umesh.groups[i].path));
     printf("%*s-groupgroups: %lu\n", space + 2, "", (unsigned long) umesh.nb_groupgroups);
     for (i = 0; i < umesh.nb_groupgroups; i++)
-        printf("%*sName : %s\n", space + 5, "", umesh.groupgroups[i].name);
+        printf("%*sName : %s\n", space + 5, "", get_name_from_path(umesh.groupgroups[i].path));
 
     if (umesh.nb_som_tables > 0)
     {
@@ -933,7 +932,7 @@ void print_umesh (umesh_t umesh, int space)
 // Print mesh instance
 void print_msh_instance (msh_instance_t msh_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", msh_instance.name);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(msh_instance.path));
     switch (msh_instance.type)
     {
     case MSH_STRUCTURED:
@@ -951,7 +950,7 @@ void print_msh_instance (msh_instance_t msh_instance, int space)
 // Print meshLink instance
 void print_mlk_instance (mlk_instance_t mlk_instance, int space)
 {
-    printf("%*sMeshLink instance: %s\n", space, "", mlk_instance.name);
+    printf("%*sMeshLink instance: %s\n", space, "", get_name_from_path(mlk_instance.path));
     print_str_attr(A_MESH1, mlk_instance.mesh1, space + 3);
     print_str_attr(A_MESH2, mlk_instance.mesh2, space + 3);
 }
@@ -962,7 +961,7 @@ void print_msh_group (msh_group_t msh_group, int space)
 {
     hsize_t i;
 
-    printf("%*sGroup: %s\n", space, "", msh_group.name);
+    printf("%*sGroup: %s\n", space, "", get_name_from_path(msh_group.path));
     for (i = 0; i < msh_group.nb_msh_instances; i++)
         print_msh_instance(msh_group.msh_instances[i], space + 2);
     for (i = 0; i < msh_group.nb_mlk_instances; i++)
@@ -988,10 +987,10 @@ void print_mesh (mesh_t mesh)
 // Free memory used by grouGgroup
 void free_groupgroup (groupgroup_t *groupgroup)
 {
-    if (groupgroup->name != NULL)
+    if (groupgroup->path != NULL)
     {
-        free(groupgroup->name);  // free groupGroup name
-        groupgroup->name = NULL;
+        free(groupgroup->path);  // free groupGroup name
+        groupgroup->path = NULL;
     }
 
     if (groupgroup->nb_groupgroupnames > 0)  // if groupGroup is not empty...
@@ -1041,7 +1040,7 @@ void free_smesh (smesh_t *smesh)
                 free(smesh->groups[i].normals);
             }
 
-            free(smesh->groups[i].name);  // free group name
+            free(smesh->groups[i].path);  // free group name
 
             if (smesh->groups[i].type != NULL)
                 free(smesh->groups[i].type);  // free group type
@@ -1067,8 +1066,8 @@ void free_smesh (smesh_t *smesh)
     {
         for (i = 0; i < smesh->nb_som_tables; i++)
         {
-            if (smesh->som_tables[i].name != NULL)
-                free(smesh->som_tables[i].name);
+            if (smesh->som_tables[i].path != NULL)
+                free(smesh->som_tables[i].path);
             if (smesh->som_tables[i].nb_points > 0)
             {
                 free(*(smesh->som_tables[i].elements));
@@ -1116,8 +1115,8 @@ void free_umesh (umesh_t *umesh)
     {
         for (i = 0; i < umesh->nb_groups; i++)    // for each group...
         {
-            if (umesh->groups[i].name != NULL)
-                free(umesh->groups[i].name);  // free group name
+            if (umesh->groups[i].path != NULL)
+                free(umesh->groups[i].path);  // free group name
             if (umesh->groups[i].nb_groupelts > 0)  // if group is not empty...
                 free(umesh->groups[i].groupelts);  // free group values (no need to assign NULL & set nb_groupelts to 0
         }
@@ -1139,8 +1138,8 @@ void free_umesh (umesh_t *umesh)
     {
         for (i = 0; i < umesh->nb_som_tables; i++)
         {
-            if (umesh->som_tables[i].name != NULL)
-                free(umesh->som_tables[i].name);
+            if (umesh->som_tables[i].path != NULL)
+                free(umesh->som_tables[i].path);
             switch (umesh->som_tables[i].type)
             {
             case SOM_POINT_IN_ELEMENT:
@@ -1172,10 +1171,10 @@ void free_umesh (umesh_t *umesh)
 // Free memory used by mesh instance
 void free_msh_instance (msh_instance_t *msh_instance)
 {
-    if (msh_instance->name != NULL)
+    if (msh_instance->path != NULL)
     {
-        free(msh_instance->name);
-        msh_instance->name = NULL;
+        free(msh_instance->path);
+        msh_instance->path = NULL;
     }
 
     switch (msh_instance->type)
@@ -1194,10 +1193,10 @@ void free_msh_instance (msh_instance_t *msh_instance)
 
 void free_mlk_instance (mlk_instance_t *mlk_instance)
 {
-    if (mlk_instance->name != NULL)
+    if (mlk_instance->path != NULL)
     {
-        free(mlk_instance->name);
-        mlk_instance->name = NULL;
+        free(mlk_instance->path);
+        mlk_instance->path = NULL;
     }
     mlk_instance->type = MSHLNK_INVALID;
     if (mlk_instance->mesh1 != NULL)
@@ -1225,10 +1224,10 @@ void free_msh_group (msh_group_t *msh_group)
 {
     hsize_t i;
 
-    if (msh_group->name != NULL)
+    if (msh_group->path != NULL)
     {
-        free(msh_group->name);
-        msh_group->name = NULL;
+        free(msh_group->path);
+        msh_group->path = NULL;
     }
 
     if (msh_group->nb_msh_instances > 0)

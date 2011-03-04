@@ -7,7 +7,7 @@ void read_els_planewave (hid_t file_id, const char *path, planewave_t *planewave
     char mandatory[][ATTR_LENGTH] = {A_XO, A_YO, A_ZO, A_THETA, A_PHI};
     char path2[ABSOLUTE_PATH_NAME_LENGTH];
 
-    planewave->name = get_name_from_path(path);
+    planewave->path = strdup(path);
     read_opt_attrs(file_id, path, &(planewave->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     if (!read_flt_attr(file_id, path, A_XO, &(planewave->xo)))
         print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_XO);
@@ -30,7 +30,7 @@ void read_els_sphericalwave (hid_t file_id, const char *path, sphericalwave_t *s
 {
     char path2[ABSOLUTE_PATH_NAME_LENGTH];
 
-    sphericalwave->name = get_name_from_path(path);
+    sphericalwave->path = strdup(path);
     if (!read_flt_attr(file_id, path, A_XO, &(sphericalwave->xo)))
         print_err_attr(C_ELECTROMAGNETIC_SOURCE, path, A_XO);
     if (!read_flt_attr(file_id, path, A_YO, &(sphericalwave->yo)))
@@ -49,7 +49,7 @@ void read_els_generator (hid_t file_id, const char *path, generator_t *generator
     char *type, path2[ABSOLUTE_PATH_NAME_LENGTH];
     char mandatory[][ATTR_LENGTH] = {A_TYPE};
 
-    generator->name = get_name_from_path(path);
+    generator->path = strdup(path);
     read_opt_attrs(file_id, path, &(generator->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     generator->type = GEN_INVALID;
     if (read_str_attr(file_id, path, A_TYPE, &type))
@@ -81,7 +81,7 @@ void read_els_dipole (hid_t file_id, const char *path, dipole_t *dipole)
     char mandatory[][ATTR_LENGTH] = {A_TYPE, A_X, A_Y, A_Z, A_THETA, A_PHI, A_WIRE_RADIUS};
     char *type, path2[ABSOLUTE_PATH_NAME_LENGTH];
 
-    dipole->name = get_name_from_path(path);
+    dipole->path = strdup(path);
     read_opt_attrs(file_id, path, &(dipole->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
     dipole->type = DIPOLE_INVALID;
     if (read_str_attr(file_id, path, A_TYPE, &type))
@@ -122,7 +122,7 @@ void read_els_antenna (hid_t file_id, const char *path, antenna_t *antenna)
     char mandatory[][ATTR_LENGTH] = {}, model_man[][ATTR_LENGTH] = {A_TYPE};
     char path2[ABSOLUTE_PATH_NAME_LENGTH], *type;
 
-    antenna->name = get_name_from_path(path);
+    antenna->path = strdup(path);
     read_opt_attrs(file_id, path, &(antenna->opt_attrs), mandatory, sizeof(mandatory)/ATTR_LENGTH);
 
     strcpy(path2, path);
@@ -198,7 +198,7 @@ void read_els_sourceonmesh (hid_t file_id, const char *path, sourceonmesh_t *sou
 {
     char *type;
 
-    sourceonmesh->name = get_name_from_path(path);
+    sourceonmesh->path = strdup(path);
     sourceonmesh->type = SCOM_INVALID;
     if (read_str_attr(file_id, path, A_TYPE, &type))
     {
@@ -311,7 +311,7 @@ void read_electromagnetic_source (hid_t file_id, em_source_t *em_source)
 // Print instance in /electromagneticSource/planeWave
 void print_els_planewave (planewave_t planewave, int space)
 {
-    printf("%*sName: %s\n", space, "", planewave.name);
+    printf("%*sName: %s\n", space, "", get_name_from_path(planewave.path));
     print_opt_attrs(planewave.opt_attrs, space + 4);
     print_flt_attr(A_XO, planewave.xo, space + 4);
     print_flt_attr(A_YO, planewave.yo, space + 4);
@@ -326,7 +326,7 @@ void print_els_planewave (planewave_t planewave, int space)
 // Print instance in /electromagneticSource/sphericalWave
 void print_els_sphericalwave (sphericalwave_t sphericalwave, int space)
 {
-    printf("%*sName: %s\n", space, "", sphericalwave.name);
+    printf("%*sName: %s\n", space, "", get_name_from_path(sphericalwave.path));
     print_flt_attr(A_XO, sphericalwave.xo, space + 4);
     print_flt_attr(A_YO, sphericalwave.yo, space + 4);
     print_flt_attr(A_ZO, sphericalwave.zo, space + 4);
@@ -338,7 +338,7 @@ void print_els_sphericalwave (sphericalwave_t sphericalwave, int space)
 // Print instance in /electromagneticSource/generator
 void print_els_generator (generator_t generator, int space)
 {
-    printf("%*sName: %s\n", space, "", generator.name);
+    printf("%*sName: %s\n", space, "", get_name_from_path(generator.path));
     print_opt_attrs(generator.opt_attrs, space + 4);
     switch (generator.type)
     {
@@ -367,7 +367,7 @@ void print_els_generator (generator_t generator, int space)
 // Print instance in /electromagneticSource/dipole
 void print_els_dipole (dipole_t dipole, int space)
 {
-    printf("%*sName: %s\n", space, "", dipole.name);
+    printf("%*sName: %s\n", space, "", get_name_from_path(dipole.path));
     switch (dipole.type)
     {
     case DIPOLE_ELECTRIC:
@@ -394,7 +394,7 @@ void print_els_dipole (dipole_t dipole, int space)
 // Print instance in /electromagneticSource/antenna
 void print_els_antenna (antenna_t antenna, int space)
 {
-    printf("%*sName: %s\n", space, "", antenna.name);
+    printf("%*sName: %s\n", space, "", get_name_from_path(antenna.path));
     print_opt_attrs(antenna.opt_attrs, space + 5);
     print_floatingtype(antenna.input_impedance, space + 2);
     print_floatingtype(antenna.load_impedance, space + 2);
@@ -465,7 +465,7 @@ void print_els_sourceonmesh (sourceonmesh_t sourceonmesh, int space)
 {
     hsize_t i;
 
-    printf("%*sName: %s\n", space, "", sourceonmesh.name);
+    printf("%*sName: %s\n", space, "", get_name_from_path(sourceonmesh.path));
     switch (sourceonmesh.type)
     {
     case SCOM_ARRAYSET:
@@ -529,10 +529,10 @@ void print_electromagnetic_source (em_source_t em_source)
 // Free memory used by planeWave instance
 void free_els_planewave (planewave_t *planewave)
 {
-    if (planewave->name != NULL)
+    if (planewave->path != NULL)
     {
-        free(planewave->name);
-        planewave->name = NULL;
+        free(planewave->path);
+        planewave->path = NULL;
     }
     free_opt_attrs(&(planewave->opt_attrs));
     free_floatingtype(&(planewave->magnitude));
@@ -542,10 +542,10 @@ void free_els_planewave (planewave_t *planewave)
 // Free memory used by sphericalWave instance
 void free_els_sphericalwave (sphericalwave_t *sphericalwave)
 {
-    if (sphericalwave->name != NULL)
+    if (sphericalwave->path != NULL)
     {
-        free(sphericalwave->name);
-        sphericalwave->name = NULL;
+        free(sphericalwave->path);
+        sphericalwave->path = NULL;
     }
     free_floatingtype(&(sphericalwave->magnitude));
 }
@@ -554,10 +554,10 @@ void free_els_sphericalwave (sphericalwave_t *sphericalwave)
 // Free memory used by planeWave instance
 void free_els_generator (generator_t *generator)
 {
-    if (generator->name != NULL)
+    if (generator->path != NULL)
     {
-        free(generator->name);
-        generator->name = NULL;
+        free(generator->path);
+        generator->path = NULL;
     }
     free_opt_attrs(&(generator->opt_attrs));
     free_floatingtype(&(generator->inner_impedance));
@@ -568,10 +568,10 @@ void free_els_generator (generator_t *generator)
 // Free memory used by dipole instance
 void free_els_dipole (dipole_t *dipole)
 {
-    if (dipole->name != NULL)
+    if (dipole->path != NULL)
     {
-        free(dipole->name);
-        dipole->name = NULL;
+        free(dipole->path);
+        dipole->path = NULL;
     }
     free_opt_attrs(&(dipole->opt_attrs));
     free_floatingtype(&(dipole->inner_impedance));
@@ -582,10 +582,10 @@ void free_els_dipole (dipole_t *dipole)
 // Free memory used by antenna instance
 void free_els_antenna (antenna_t *antenna)
 {
-    if (antenna->name != NULL)
+    if (antenna->path != NULL)
     {
-        free(antenna->name);
-        antenna->name = NULL;
+        free(antenna->path);
+        antenna->path = NULL;
     }
     free_opt_attrs(&(antenna->opt_attrs));
     free_floatingtype(&(antenna->input_impedance));
@@ -619,10 +619,10 @@ void free_els_antenna (antenna_t *antenna)
 // Free memory used by sourceOnMesh instance
 void free_els_sourceonmesh (sourceonmesh_t *sourceonmesh)
 {
-    if (sourceonmesh->name != NULL)
+    if (sourceonmesh->path != NULL)
     {
-        free(sourceonmesh->name);
-        sourceonmesh->name = NULL;
+        free(sourceonmesh->path);
+        sourceonmesh->path = NULL;
     }
     switch (sourceonmesh->type)
     {
