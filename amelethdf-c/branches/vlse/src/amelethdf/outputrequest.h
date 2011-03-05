@@ -39,9 +39,9 @@ extern "C" {
     void read_ort_group (hid_t file_id, const char *path, ort_group_t *ort_group);
     void read_outputrequest(hid_t file_id, outputrequest_t *outputrequest);
 
-    void print_ort_instance (ort_instance_t ort_instance, int space);
-    void print_ort_group (ort_group_t ort_group, int space);
-    void print_outputrequest (outputrequest_t outputrequest);
+    void print_ort_instance (const ort_instance_t *ort_instance, int space);
+    void print_ort_group (const ort_group_t *ort_group, int space);
+    void print_outputrequest (const outputrequest_t *outputrequest);
 
     void free_ort_instance (ort_instance_t *ort_instance);
     void free_ort_group (ort_group_t *ort_group);

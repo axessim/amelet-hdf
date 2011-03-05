@@ -697,172 +697,172 @@ char read_floatingtype(hid_t file_id, const char *path, floatingtype_t *floating
 
 
 // Print singleInteger
-void print_ft_singleinteger (singleinteger_t singleinteger, int space)
+void print_ft_singleinteger (const singleinteger_t *singleinteger, int space)
 {
-    printf("%*s-%s:\n", space, "", get_name_from_path(singleinteger.path));
-    print_int_attr(A_VALUE, singleinteger.value, space + 3);
-    print_opt_attrs(singleinteger.opt_attrs, space + 3);
+    printf("%*s-%s:\n", space, "", get_name_from_path(singleinteger->path));
+    print_int_attr(A_VALUE, singleinteger->value, space + 3);
+    print_opt_attrs(&(singleinteger->opt_attrs), space + 3);
 }
 
 
 // Print singleReal
-void print_ft_singlereal (singlereal_t singlereal, int space)
+void print_ft_singlereal (const singlereal_t *singlereal, int space)
 {
-    printf("%*s-%s:\n", space, "", get_name_from_path(singlereal.path));
-    print_flt_attr(A_VALUE, singlereal.value, space + 3);
-    print_opt_attrs(singlereal.opt_attrs, space + 3);
+    printf("%*s-%s:\n", space, "", get_name_from_path(singlereal->path));
+    print_flt_attr(A_VALUE, singlereal->value, space + 3);
+    print_opt_attrs(&(singlereal->opt_attrs), space + 3);
 }
 
 
 // Print singleComplex
-void print_ft_singlecomplex (singlecomplex_t singlecomplex, int space)
+void print_ft_singlecomplex (const singlecomplex_t *singlecomplex, int space)
 {
-    printf("%*s-%s:\n", space, "", get_name_from_path(singlecomplex.path));
-    print_cpx_attr(A_VALUE, singlecomplex.value, space + 3);
-    print_opt_attrs(singlecomplex.opt_attrs, space + 3);
+    printf("%*s-%s:\n", space, "", get_name_from_path(singlecomplex->path));
+    print_cpx_attr(A_VALUE, singlecomplex->value, space + 3);
+    print_opt_attrs(&(singlecomplex->opt_attrs), space + 3);
 }
 
 
 // Print singleString
-void print_ft_singlestring (singlestring_t singlestring, int space)
+void print_ft_singlestring (const singlestring_t *singlestring, int space)
 {
-    printf("%*s-%s:\n", space, "", get_name_from_path(singlestring.path));
-    print_str_attr(A_VALUE, singlestring.value, space + 3);
-    print_opt_attrs(singlestring.opt_attrs, space + 3);
+    printf("%*s-%s:\n", space, "", get_name_from_path(singlestring->path));
+    print_str_attr(A_VALUE, singlestring->value, space + 3);
+    print_opt_attrs(&(singlestring->opt_attrs), space + 3);
 }
 
 
 // Print vector
-void print_ft_vector (vector_t vector, int space)
+void print_ft_vector (const vector_t *vector, int space)
 {
     hsize_t i;
 
-    printf("%*s-%s [%lu]: {", space, "", get_name_from_path(vector.path),(long unsigned) vector.nb_values);
-    switch (vector.type_class)
+    printf("%*s-%s [%lu]: {", space, "", get_name_from_path(vector->path),(long unsigned) vector->nb_values);
+    switch (vector->type_class)
     {
     case H5T_INTEGER:
-        for (i = 0; i < vector.nb_values - 1; i++)
-            printf("%i, ", vector.values.i[i]);
-        printf("%i}\n", vector.values.i[vector.nb_values - 1]);
+        for (i = 0; i < vector->nb_values - 1; i++)
+            printf("%i, ", vector->values.i[i]);
+        printf("%i}\n", vector->values.i[vector->nb_values - 1]);
         break;
     case H5T_FLOAT:
-        for (i = 0; i < vector.nb_values - 1; i++)
-            printf("%g, ", vector.values.f[i]);
-        printf("%g}\n", vector.values.f[vector.nb_values - 1]);
+        for (i = 0; i < vector->nb_values - 1; i++)
+            printf("%g, ", vector->values.f[i]);
+        printf("%g}\n", vector->values.f[vector->nb_values - 1]);
         break;
     case H5T_COMPOUND:
-        for (i = 0; i < vector.nb_values - 1; i++)
-            printf("%g%+gi, ", creal(vector.values.c[i]), cimag(vector.values.c[i]));
-        printf("%g%+gi}\n", creal(vector.values.c[vector.nb_values - 1]), cimag(vector.values.c[vector.nb_values - 1]));
+        for (i = 0; i < vector->nb_values - 1; i++)
+            printf("%g%+gi, ", creal(vector->values.c[i]), cimag(vector->values.c[i]));
+        printf("%g%+gi}\n", creal(vector->values.c[vector->nb_values - 1]), cimag(vector->values.c[vector->nb_values - 1]));
         break;
     case H5T_STRING:
-        for (i = 0; i < vector.nb_values - 1; i++)
-            printf("\"%s\", ", vector.values.s[i]);
-        printf("\"%s\"}\n", vector.values.s[vector.nb_values - 1]);
+        for (i = 0; i < vector->nb_values - 1; i++)
+            printf("\"%s\", ", vector->values.s[i]);
+        printf("\"%s\"}\n", vector->values.s[vector->nb_values - 1]);
         break;
     default:
         break;
     }
-    print_opt_attrs(vector.opt_attrs, space + 3);
+    print_opt_attrs(&(vector->opt_attrs), space + 3);
 }
 
 
 // Print linearListOfReal1
-void print_ft_linearlistofreal1 (linearlistofreal1_t linearlistofreal1, int space)
+void print_ft_linearlistofreal1 (const linearlistofreal1_t *linearlistofreal1, int space)
 {
-    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",get_name_from_path(linearlistofreal1.path), A_FIRST, linearlistofreal1.first, A_LAST, linearlistofreal1.last, A_NUMBER_OF_VALUES, linearlistofreal1.number_of_values);
-    print_opt_attrs(linearlistofreal1.opt_attrs, space + 3);
+    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",get_name_from_path(linearlistofreal1->path), A_FIRST, linearlistofreal1->first, A_LAST, linearlistofreal1->last, A_NUMBER_OF_VALUES, linearlistofreal1->number_of_values);
+    print_opt_attrs(&(linearlistofreal1->opt_attrs), space + 3);
 }
 
 
 // Print linearListOfReal2
-void print_ft_linearlistofreal2 (linearlistofreal2_t linearlistofreal2, int space)
+void print_ft_linearlistofreal2 (const linearlistofreal2_t *linearlistofreal2, int space)
 {
-    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",get_name_from_path(linearlistofreal2.path), A_FIRST, linearlistofreal2.first, A_STEP, linearlistofreal2.step, A_NUMBER_OF_VALUES, linearlistofreal2.number_of_values);
-    print_opt_attrs(linearlistofreal2.opt_attrs, space + 3);
+    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "",get_name_from_path(linearlistofreal2->path), A_FIRST, linearlistofreal2->first, A_STEP, linearlistofreal2->step, A_NUMBER_OF_VALUES, linearlistofreal2->number_of_values);
+    print_opt_attrs(&(linearlistofreal2->opt_attrs), space + 3);
 }
 
 
 // Print logarithmListOfReal
-void print_ft_logarithmlistofreal (logarithmlistofreal_t logarithmlistofreal, int space)
+void print_ft_logarithmlistofreal (const logarithmlistofreal_t *logarithmlistofreal, int space)
 {
-    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "", get_name_from_path(logarithmlistofreal.path), A_FIRST, logarithmlistofreal.first, A_LAST, logarithmlistofreal.last, A_NUMBER_OF_VALUES, logarithmlistofreal.number_of_values);
-    print_opt_attrs(logarithmlistofreal.opt_attrs, space + 3);
+    printf("%*s-%s: %s=%g, %s=%g, %s=%i\n", space, "", get_name_from_path(logarithmlistofreal->path), A_FIRST, logarithmlistofreal->first, A_LAST, logarithmlistofreal->last, A_NUMBER_OF_VALUES, logarithmlistofreal->number_of_values);
+    print_opt_attrs(&(logarithmlistofreal->opt_attrs), space + 3);
 }
 
 
 // Print perDecadeListOfReal
-void print_ft_perdecadelistofreal (perdecadelistofreal_t perdecadelistofreal, int space)
+void print_ft_perdecadelistofreal (const perdecadelistofreal_t *perdecadelistofreal, int space)
 {
-    printf("%*s-%s: %s=%g, %s=%i, %s=%i\n", space, "", get_name_from_path(perdecadelistofreal.path), A_FIRST, perdecadelistofreal.first, A_NUMBER_OF_DECADES, perdecadelistofreal.number_of_decades, A_NUMBER_OF_VALUES_PER_DECADE, perdecadelistofreal.number_of_values_per_decade);
-    print_opt_attrs(perdecadelistofreal.opt_attrs, space + 3);
+    printf("%*s-%s: %s=%g, %s=%i, %s=%i\n", space, "", get_name_from_path(perdecadelistofreal->path), A_FIRST, perdecadelistofreal->first, A_NUMBER_OF_DECADES, perdecadelistofreal->number_of_decades, A_NUMBER_OF_VALUES_PER_DECADE, perdecadelistofreal->number_of_values_per_decade);
+    print_opt_attrs(&(perdecadelistofreal->opt_attrs), space + 3);
 }
 
 
 // Print linearListOfInteger2
-void print_ft_linearlistofinteger2 (linearlistofinteger2_t linearlistofinteger2, int space)
+void print_ft_linearlistofinteger2 (const linearlistofinteger2_t *linearlistofinteger2, int space)
 {
-    printf("%*s-%s: %s=%i, %s=%i, %s=%i\n", space, "",get_name_from_path(linearlistofinteger2.path), A_FIRST, linearlistofinteger2.first, A_STEP, linearlistofinteger2.step, A_NUMBER_OF_VALUES, linearlistofinteger2.number_of_values);
-    print_opt_attrs(linearlistofinteger2.opt_attrs, space + 3);
+    printf("%*s-%s: %s=%i, %s=%i, %s=%i\n", space, "",get_name_from_path(linearlistofinteger2->path), A_FIRST, linearlistofinteger2->first, A_STEP, linearlistofinteger2->step, A_NUMBER_OF_VALUES, linearlistofinteger2->number_of_values);
+    print_opt_attrs(&(linearlistofinteger2->opt_attrs), space + 3);
 }
 
 
 // Print rationalFunction
-void print_ft_rationalfunction (rationalfunction_t rationalfunction, int space)
+void print_ft_rationalfunction (const rationalfunction_t *rationalfunction, int space)
 {
     hsize_t i;
 
-    printf("%*s-%s [%lu]: ", space, "", get_name_from_path(rationalfunction.path), (long unsigned) rationalfunction.nb_types);
-    for (i = 0; i < rationalfunction.nb_types - 1; i++)
+    printf("%*s-%s [%lu]: ", space, "", get_name_from_path(rationalfunction->path), (long unsigned) rationalfunction->nb_types);
+    for (i = 0; i < rationalfunction->nb_types - 1; i++)
     {
-        printf("type%i=%g|%g|%g, ", rationalfunction.types[i], rationalfunction.a[i], rationalfunction.b[i], rationalfunction.f[i]);
+        printf("type%i=%g|%g|%g, ", rationalfunction->types[i], rationalfunction->a[i], rationalfunction->b[i], rationalfunction->f[i]);
     }
-    printf("type%i=%g|%g|%g\n", rationalfunction.types[rationalfunction.nb_types - 1], rationalfunction.a[rationalfunction.nb_types - 1], rationalfunction.b[rationalfunction.nb_types - 1], rationalfunction.f[rationalfunction.nb_types - 1]);
-    print_opt_attrs(rationalfunction.opt_attrs, space + 3);
+    printf("type%i=%g|%g|%g\n", rationalfunction->types[rationalfunction->nb_types - 1], rationalfunction->a[rationalfunction->nb_types - 1], rationalfunction->b[rationalfunction->nb_types - 1], rationalfunction->f[rationalfunction->nb_types - 1]);
+    print_opt_attrs(&(rationalfunction->opt_attrs), space + 3);
 }
 
 
 // Print generalRationalFunction
-void print_ft_generalrationalfunction (generalrationalfunction_t generalrationalfunction, int space)
+void print_ft_generalrationalfunction (const generalrationalfunction_t *generalrationalfunction, int space)
 {
     int i;
 
-    printf("%*s-%s [%i]:\n", space, "", get_name_from_path(generalrationalfunction.path), generalrationalfunction.nb_degrees);
-    for (i = 0; i < generalrationalfunction.nb_degrees; i++)
-        printf("%*s-degree %i: numerator=%g%+gi, denominator=%g%+gi\n", space + 3, "", i, creal(generalrationalfunction.numerator[i]), cimag(generalrationalfunction.numerator[i]), creal(generalrationalfunction.denominator[i]), cimag(generalrationalfunction.denominator[i]));
-    print_opt_attrs(generalrationalfunction.opt_attrs, space + 3);
+    printf("%*s-%s [%i]:\n", space, "", get_name_from_path(generalrationalfunction->path), generalrationalfunction->nb_degrees);
+    for (i = 0; i < generalrationalfunction->nb_degrees; i++)
+        printf("%*s-degree %i: numerator=%g%+gi, denominator=%g%+gi\n", space + 3, "", i, creal(generalrationalfunction->numerator[i]), cimag(generalrationalfunction->numerator[i]), creal(generalrationalfunction->denominator[i]), cimag(generalrationalfunction->denominator[i]));
+    print_opt_attrs(&(generalrationalfunction->opt_attrs), space + 3);
 }
 
 
 // Print rational
-void print_ft_rational (rational_t rational, int space)
+void print_ft_rational (const rational_t *rational, int space)
 {
     hsize_t i, total;
     int j;
 
-    printf("%*s-%s:\n", space, "", get_name_from_path(rational.path));
-    print_opt_attrs(rational.opt_attrs, space + 3);
-    printf("%*s-@%s [%lux%lu]: {", space + 3, "", A_VALUE, (long unsigned) rational.dims[0], (long unsigned) rational.dims[1]);
-    if (rational.data != NULL)
+    printf("%*s-%s:\n", space, "", get_name_from_path(rational->path));
+    print_opt_attrs(&(rational->opt_attrs), space + 3);
+    printf("%*s-@%s [%lux%lu]: {", space + 3, "", A_VALUE, (long unsigned) rational->dims[0], (long unsigned) rational->dims[1]);
+    if (rational->data != NULL)
     {
-        total = (rational.dims[0]) * (rational.dims[1]);
+        total = (rational->dims[0]) * (rational->dims[1]);
         for (i = 0; i < total - 1; i++)
         {
-            printf("\"%s\", ", rational.data[i]);
+            printf("\"%s\", ", rational->data[i]);
         }
-        printf("\"%s\"", rational.data[total - 1]);
+        printf("\"%s\"", rational->data[total - 1]);
     }
     printf("}\n");
     // Print functions inside rational
-    for (j = 0; j < rational.nb_functions; j++)
+    for (j = 0; j < rational->nb_functions; j++)
     {
-        switch (rational.functions[j].type)
+        switch (rational->functions[j].type)
         {
         case FT_RATIONAL_FUNCTION:
-            print_ft_rationalfunction(rational.functions[j].data.rf, space + 6);
+            print_ft_rationalfunction(&(rational->functions[j].data.rf), space + 6);
             break;
         case FT_GENERAL_RATIONAL_FUNCTION:
-            print_ft_generalrationalfunction(rational.functions[j].data.grf, space + 6);
+            print_ft_generalrationalfunction(&(rational->functions[j].data.grf), space + 6);
             break;
         default:
             break;
@@ -873,122 +873,122 @@ void print_ft_rational (rational_t rational, int space)
 
 
 // Print dataset
-void print_ft_dataset (dataset_t dataset, int space)
+void print_ft_dataset (const dataset_t *dataset, int space)
 {
     hsize_t i, total = 1;
     int j;
 
-    printf("%*s-%s [", space, "", get_name_from_path(dataset.path));
-    for (j = 0; j < dataset.nb_dims - 1; j++)
+    printf("%*s-%s [", space, "", get_name_from_path(dataset->path));
+    for (j = 0; j < dataset->nb_dims - 1; j++)
     {
-        printf("%lux", (long unsigned) dataset.dims[j]);
-        total *= dataset.dims[j];
+        printf("%lux", (long unsigned) dataset->dims[j]);
+        total *= dataset->dims[j];
     }
-    printf("%lu]: {", (long unsigned) dataset.dims[dataset.nb_dims - 1]);
-    total *= dataset.dims[dataset.nb_dims - 1];
+    printf("%lu]: {", (long unsigned) dataset->dims[dataset->nb_dims - 1]);
+    total *= dataset->dims[dataset->nb_dims - 1];
 
-    switch (dataset.type_class)
+    switch (dataset->type_class)
     {
     case H5T_INTEGER:
         for (i = 0; i < total - 1; i++)
         {
-            printf("%i, ", dataset.values.i[i]);
+            printf("%i, ", dataset->values.i[i]);
         }
-        printf("%i}\n", dataset.values.i[total - 1]);
+        printf("%i}\n", dataset->values.i[total - 1]);
         break;
     case H5T_FLOAT:
         for (i = 0; i < total - 1; i++)
         {
-            printf("%g, ", dataset.values.f[i]);
+            printf("%g, ", dataset->values.f[i]);
         }
-        printf("%g}\n", dataset.values.f[total - 1]);
+        printf("%g}\n", dataset->values.f[total - 1]);
         break;
     case H5T_COMPOUND:
         for (i = 0; i < total - 1; i++)
         {
-            printf("%g%+gi, ", creal(dataset.values.c[i]), cimag(dataset.values.c[i]));
+            printf("%g%+gi, ", creal(dataset->values.c[i]), cimag(dataset->values.c[i]));
         }
-        printf("%g%+gi}\n", creal(dataset.values.c[total - 1]), cimag(dataset.values.c[total - 1]));
+        printf("%g%+gi}\n", creal(dataset->values.c[total - 1]), cimag(dataset->values.c[total - 1]));
         break;
     case H5T_STRING:
-        if (dataset.values.s != NULL)
+        if (dataset->values.s != NULL)
         {
             for (i = 0; i < total - 1; i++)
             {
-                printf("\"%s\", ", dataset.values.s[i]);
+                printf("\"%s\", ", dataset->values.s[i]);
             }
-            printf("\"%s\"}\n", dataset.values.s[total - 1]);
+            printf("\"%s\"}\n", dataset->values.s[total - 1]);
         }
         break;
     default:
         break;
     }
-    print_opt_attrs(dataset.opt_attrs, space + 3);
+    print_opt_attrs(&(dataset->opt_attrs), space + 3);
 }
 
 
 // Print arrayset
-void print_ft_arrayset (arrayset_t arrayset, int space)
+void print_ft_arrayset (const arrayset_t *arrayset, int space)
 {
     hsize_t i;
 
-    printf("%*s-%s:\n", space, "", get_name_from_path(arrayset.path));
-    print_opt_attrs(arrayset.opt_attrs, space + 4);
-    print_ft_dataset(arrayset.data, space + 2);
-    for (i = 0; i < arrayset.nb_dims; i++)
-        print_ft_vector(arrayset.dims[i], space + 2);
+    printf("%*s-%s:\n", space, "", get_name_from_path(arrayset->path));
+    print_opt_attrs(&(arrayset->opt_attrs), space + 4);
+    print_ft_dataset(&(arrayset->data), space + 2);
+    for (i = 0; i < arrayset->nb_dims; i++)
+        print_ft_vector(&(arrayset->dims[i]), space + 2);
 }
 
 
 // Print floatingType structure
-void print_floatingtype (floatingtype_t floatingtype, int space)
+void print_floatingtype (const floatingtype_t *floatingtype, int space)
 {
-    switch(floatingtype.type)
+    switch(floatingtype->type)
     {
     case FT_SINGLE_INTEGER:
-        print_ft_singleinteger(floatingtype.data.singleinteger, space);
+        print_ft_singleinteger(&(floatingtype->data.singleinteger), space);
         break;
     case FT_SINGLE_REAL:
-        print_ft_singlereal(floatingtype.data.singlereal, space);
+        print_ft_singlereal(&(floatingtype->data.singlereal), space);
         break;
     case FT_SINGLE_COMPLEX:
-        print_ft_singlecomplex(floatingtype.data.singlecomplex, space);
+        print_ft_singlecomplex(&(floatingtype->data.singlecomplex), space);
         break;
     case FT_SINGLE_STRING:
-        print_ft_singlestring(floatingtype.data.singlestring, space);
+        print_ft_singlestring(&(floatingtype->data.singlestring), space);
         break;
     case FT_VECTOR:
-        print_ft_vector(floatingtype.data.vector, space);
+        print_ft_vector(&(floatingtype->data.vector), space);
         break;
     case FT_LINEARLISTOFREAL1:
-        print_ft_linearlistofreal1(floatingtype.data.linearlistofreal1, space);
+        print_ft_linearlistofreal1(&(floatingtype->data.linearlistofreal1), space);
         break;
     case FT_LINEARLISTOFREAL2:
-        print_ft_linearlistofreal2(floatingtype.data.linearlistofreal2, space);
+        print_ft_linearlistofreal2(&(floatingtype->data.linearlistofreal2), space);
         break;
     case FT_LOGARITHMLISTOFREAL:
-        print_ft_logarithmlistofreal(floatingtype.data.logarithmlistofreal, space);
+        print_ft_logarithmlistofreal(&(floatingtype->data.logarithmlistofreal), space);
         break;
     case FT_PERDECADELISTOFREAL:
-        print_ft_perdecadelistofreal(floatingtype.data.perdecadelistofreal, space);
+        print_ft_perdecadelistofreal(&(floatingtype->data.perdecadelistofreal), space);
         break;
     case FT_LINEARLISTOFINTEGER2:
-        print_ft_linearlistofinteger2(floatingtype.data.linearlistofinteger2, space);
+        print_ft_linearlistofinteger2(&(floatingtype->data.linearlistofinteger2), space);
         break;
     case FT_RATIONAL_FUNCTION:
-        print_ft_rationalfunction(floatingtype.data.rationalfunction, space);
+        print_ft_rationalfunction(&(floatingtype->data.rationalfunction), space);
         break;
     case FT_GENERAL_RATIONAL_FUNCTION:
-        print_ft_generalrationalfunction(floatingtype.data.generalrationalfunction, space);
+        print_ft_generalrationalfunction(&(floatingtype->data.generalrationalfunction), space);
         break;
     case FT_RATIONAL:
-        print_ft_rational(floatingtype.data.rational, space);
+        print_ft_rational(&(floatingtype->data.rational), space);
         break;
     case FT_DATASET:
-        print_ft_dataset(floatingtype.data.dataset, space);
+        print_ft_dataset(&(floatingtype->data.dataset), space);
         break;
     case FT_ARRAYSET:
-        print_ft_arrayset(floatingtype.data.arrayset, space);
+        print_ft_arrayset(&(floatingtype->data.arrayset), space);
         break;
     default:
         break;

@@ -225,13 +225,13 @@ extern "C" {
     void read_msh_group (hid_t file_id, const char *path, msh_group_t *msh_group);
     void read_mesh (hid_t file_id, mesh_t *mesh);
 
-    void print_smesh (smesh_t smesh, int space);
-    void print_umesh_som_table (usom_table_t usom_table, int space);
-    void print_umesh (umesh_t umesh, int space);
-    void print_msh_instance (msh_instance_t msh_instance, int space);
-    void print_mlk_instance (mlk_instance_t mlk_instance, int space);
-    void print_msh_group (msh_group_t msh_group, int space);
-    void print_mesh (mesh_t mesh);
+    void print_smesh (const smesh_t *smesh, int space);
+    void print_umesh_som_table (const usom_table_t *usom_table, int space);
+    void print_umesh (const umesh_t *umesh, int space);
+    void print_msh_instance (const msh_instance_t *msh_instance, int space);
+    void print_mlk_instance (const mlk_instance_t *mlk_instance, int space);
+    void print_msh_group (const msh_group_t *msh_group, int space);
+    void print_mesh (const mesh_t *mesh);
 
     void free_groupgroup (groupgroup_t *groupgroup);
     void free_smesh (smesh_t *smesh);

@@ -49,9 +49,9 @@ extern "C" {
     void read_lsm_instance (hid_t file_id, const char *path, lsm_instance_t *lsm_instance);
     void read_localization_system (hid_t file_id, localization_system_t *localization_system);
 
-    void print_lsm_transformation (lsm_transformation_t lsm_transformation, int space);
-    void print_lsm_instance (lsm_instance_t lsm_instance, int space);
-    void print_localization_system (localization_system_t localization_system);
+    void print_lsm_transformation (const lsm_transformation_t *lsm_transformation, int space);
+    void print_lsm_instance (const lsm_instance_t *lsm_instance, int space);
+    void print_localization_system (const localization_system_t *localization_system);
 
     void free_lsm_transformation (lsm_transformation_t *lsm_transformation);
     void free_lsm_instance (lsm_instance_t *lsm_instance);

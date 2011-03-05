@@ -221,45 +221,45 @@ void read_physicalmodel (hid_t file_id, physicalmodel_t *physicalmodel)
 
 
 // Print instance in physicalModel/volume
-void print_physicalmodel_volume_instance (volume_instance_t volume_instance, int space)
+void print_physicalmodel_volume_instance (const volume_instance_t *volume_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", get_name_from_path(volume_instance.path));
-    print_opt_attrs(volume_instance.opt_attrs, space + 3);
-    print_floatingtype(volume_instance.relative_permittivity, space + 3);
-    print_floatingtype(volume_instance.relative_permeability, space + 3);
-    print_floatingtype(volume_instance.electric_conductivity, space + 3);
-    print_floatingtype(volume_instance.magnetic_conductivity, space + 3);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(volume_instance->path));
+    print_opt_attrs(&(volume_instance->opt_attrs), space + 3);
+    print_floatingtype(&(volume_instance->relative_permittivity), space + 3);
+    print_floatingtype(&(volume_instance->relative_permeability), space + 3);
+    print_floatingtype(&(volume_instance->electric_conductivity), space + 3);
+    print_floatingtype(&(volume_instance->magnetic_conductivity), space + 3);
     printf("\n");
 }
 
 
 // Print instance in physicalModel/surface
-void print_physicalmodel_surface_instance (surface_instance_t surface_instance, int space)
+void print_physicalmodel_surface_instance (const surface_instance_t *surface_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", get_name_from_path(surface_instance.path));
-    print_opt_attrs(surface_instance.opt_attrs, space + 3);
-    switch (surface_instance.type)
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(surface_instance->path));
+    print_opt_attrs(&(surface_instance->opt_attrs), space + 3);
+    switch (surface_instance->type)
     {
     case S_THIN_DIELECTRIC_LAYER:
-        print_str_attr(A_PHYSICAL_MODEL, surface_instance.physicalmodel, space + 3);
-        print_flt_attr(A_THICKNESS, surface_instance.thickness, space + 3);
+        print_str_attr(A_PHYSICAL_MODEL, surface_instance->physicalmodel, space + 3);
+        print_flt_attr(A_THICKNESS, surface_instance->thickness, space + 3);
         break;
     case S_SIBC:
-        print_str_attr(A_PHYSICAL_MODEL, surface_instance.physicalmodel, space + 3);
-        print_flt_attr(A_THICKNESS, surface_instance.thickness, space + 3);
+        print_str_attr(A_PHYSICAL_MODEL, surface_instance->physicalmodel, space + 3);
+        print_flt_attr(A_THICKNESS, surface_instance->thickness, space + 3);
         break;
     case S_ZS:
-        print_str_attr(A_ZS, surface_instance.zs, space + 3);
+        print_str_attr(A_ZS, surface_instance->zs, space + 3);
         break;
     case S_ZSZT:
-        print_str_attr(A_ZS, surface_instance.zs, space + 3);
-        print_str_attr(A_ZT, surface_instance.zt, space + 3);
+        print_str_attr(A_ZS, surface_instance->zs, space + 3);
+        print_str_attr(A_ZT, surface_instance->zt, space + 3);
         break;
     case S_ZSZT2:
-        print_str_attr(A_ZS1, surface_instance.zs1, space + 3);
-        print_str_attr(A_ZT1, surface_instance.zt1, space + 3);
-        print_str_attr(A_ZS2, surface_instance.zs2, space + 3);
-        print_str_attr(A_ZT2, surface_instance.zt2, space + 3);
+        print_str_attr(A_ZS1, surface_instance->zs1, space + 3);
+        print_str_attr(A_ZT1, surface_instance->zt1, space + 3);
+        print_str_attr(A_ZS2, surface_instance->zs2, space + 3);
+        print_str_attr(A_ZT2, surface_instance->zt2, space + 3);
         break;
     default:
         break;
@@ -269,43 +269,43 @@ void print_physicalmodel_surface_instance (surface_instance_t surface_instance, 
 
 
 // Print instance in physicalModel/interface
-void print_physicalmodel_interface_instance (interface_instance_t interface_instance, int space)
+void print_physicalmodel_interface_instance (const interface_instance_t *interface_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", get_name_from_path(interface_instance.path));
-    print_opt_attrs(interface_instance.opt_attrs, space + 3);
-    if (interface_instance.medium1 != NULL)
-        print_str_attr(A_MEDIUM1, interface_instance.medium1, space + 3);
-    if (interface_instance.medium2 != NULL)
-        print_str_attr(A_MEDIUM2, interface_instance.medium2, space + 3);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(interface_instance->path));
+    print_opt_attrs(&(interface_instance->opt_attrs), space + 3);
+    if (interface_instance->medium1 != NULL)
+        print_str_attr(A_MEDIUM1, interface_instance->medium1, space + 3);
+    if (interface_instance->medium2 != NULL)
+        print_str_attr(A_MEDIUM2, interface_instance->medium2, space + 3);
     printf("\n");
 }
 
 
 // Print physicalModel category
-void print_physicalmodel (physicalmodel_t physicalmodel)
+void print_physicalmodel (const physicalmodel_t *physicalmodel)
 {
     hsize_t i;
 
-    if (physicalmodel.nb_volume_instances > 0 || physicalmodel.nb_surface_instances > 0 || physicalmodel.nb_interface_instances > 0)
+    if (physicalmodel->nb_volume_instances > 0 || physicalmodel->nb_surface_instances > 0 || physicalmodel->nb_interface_instances > 0)
     {
         printf("##############################  Physical model  ##############################\n\n");
-        if (physicalmodel.nb_volume_instances > 0)
+        if (physicalmodel->nb_volume_instances > 0)
         {
             printf("Volume:\n");
-            for (i = 0; i < physicalmodel.nb_volume_instances; i++)
-                print_physicalmodel_volume_instance(physicalmodel.volume_instances[i], 3);
+            for (i = 0; i < physicalmodel->nb_volume_instances; i++)
+                print_physicalmodel_volume_instance(&(physicalmodel->volume_instances[i]), 3);
         }
-        if (physicalmodel.nb_surface_instances > 0)
+        if (physicalmodel->nb_surface_instances > 0)
         {
             printf("Surface:\n");
-            for (i = 0; i < physicalmodel.nb_surface_instances; i++)
-                print_physicalmodel_surface_instance(physicalmodel.surface_instances[i], 3);
+            for (i = 0; i < physicalmodel->nb_surface_instances; i++)
+                print_physicalmodel_surface_instance(&(physicalmodel->surface_instances[i]), 3);
         }
-        if (physicalmodel.nb_interface_instances > 0)
+        if (physicalmodel->nb_interface_instances > 0)
         {
             printf("Interface:\n");
-            for (i = 0; i < physicalmodel.nb_interface_instances; i++)
-                print_physicalmodel_interface_instance(physicalmodel.interface_instances[i], 3);
+            for (i = 0; i < physicalmodel->nb_interface_instances; i++)
+                print_physicalmodel_interface_instance(&(physicalmodel->interface_instances[i]), 3);
         }
         printf("\n");
     }

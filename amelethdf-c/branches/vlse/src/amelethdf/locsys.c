@@ -81,11 +81,11 @@ void read_localization_system (hid_t file_id, localization_system_t *localizatio
 
 
 // Print localizationSystem transformation
-void print_lsm_transformation (lsm_transformation_t lsm_transformation, int space)
+void print_lsm_transformation (const lsm_transformation_t *lsm_transformation, int space)
 {
-    printf("%*sTransformation: %s\n", space, "", get_name_from_path(lsm_transformation.path));
-    print_int_attr(A_RANK, lsm_transformation.rank, space + 3);
-    switch (lsm_transformation.type)
+    printf("%*sTransformation: %s\n", space, "", get_name_from_path(lsm_transformation->path));
+    print_int_attr(A_RANK, lsm_transformation->rank, space + 3);
+    switch (lsm_transformation->type)
     {
     case TRF_SCALE:
         print_str_attr(A_TYPE, V_SCALE, space + 3);
@@ -104,26 +104,26 @@ void print_lsm_transformation (lsm_transformation_t lsm_transformation, int spac
 
 
 // Print localizationSystem instance
-void print_lsm_instance (lsm_instance_t lsm_instance, int space)
+void print_lsm_instance (const lsm_instance_t *lsm_instance, int space)
 {
     hsize_t i;
 
-    printf("%*sInstance: %s\n", space, "", get_name_from_path(lsm_instance.path));
-    print_int_attr(A_DIMENSION, lsm_instance.dimension, space + 4);
-    print_opt_attrs(lsm_instance.opt_attrs, space + 4);
-    for (i = 0; i < lsm_instance.nb_transformations; i++)
-        print_lsm_transformation(lsm_instance.transformations[i], space + 2);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(lsm_instance->path));
+    print_int_attr(A_DIMENSION, lsm_instance->dimension, space + 4);
+    print_opt_attrs(&(lsm_instance->opt_attrs), space + 4);
+    for (i = 0; i < lsm_instance->nb_transformations; i++)
+        print_lsm_transformation(&(lsm_instance->transformations[i]), space + 2);
 }
 
 
 // Print localizationSystem category
-void print_localization_system (localization_system_t localization_system)
+void print_localization_system (const localization_system_t *localization_system)
 {
     hsize_t i;
 
     printf("############################  Localization system  ###########################\n\n");
-    for (i = 0; i < localization_system.nb_instances; i++)
-        print_lsm_instance(localization_system.instances[i], 0);
+    for (i = 0; i < localization_system->nb_instances; i++)
+        print_lsm_instance(&(localization_system->instances[i]), 0);
     printf("\n");
 }
 

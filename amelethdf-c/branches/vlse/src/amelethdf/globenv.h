@@ -35,8 +35,8 @@ extern "C" {
     void read_global_environment_instance (hid_t file_id, const char *path, gle_instance_t *gle_instance);
     void read_global_environment (hid_t file_id, global_environment_t *global_environment);
 
-    void print_global_environment_instance (gle_instance_t gle_instance, int space);
-    void print_global_environment (global_environment_t global_environment);
+    void print_global_environment_instance (const gle_instance_t *gle_instance, int space);
+    void print_global_environment (const global_environment_t *global_environment);
 
     void free_global_environment_instance (gle_instance_t *gle_instance);
     void free_global_environment (global_environment_t *global_environment);

@@ -13,8 +13,8 @@ extern "C" {
 
 #include "category.h"
 
-#define ABSOLUTE_PATH_NAME_LENGTH 101  // length in C (incl. '\0')
-#define ELEMENT_NAME_LENGTH 21 // length in C (incl. '\0')
+#define ABSOLUTE_PATH_NAME_LENGTH 111  // length in C (incl. '\0')
+#define ELEMENT_NAME_LENGTH 31 // length in C (incl. '\0')
 #define ATTR_LENGTH 31
 #define TABLE_FIELD_NAME_LENGTH 31
 
@@ -80,7 +80,7 @@ extern "C" {
     char read_string_dataset (hid_t file_id, const char *path, hsize_t mn, size_t length, char ***rdata);
 
     char read_opt_attrs (hid_t file_id, const char *path, opt_attrs_t *opt_attrs, char mandatory_attrs[][ATTR_LENGTH], size_t nb_mandatory_attrs);
-    void print_opt_attrs (opt_attrs_t opt_attrs, int space);
+    void print_opt_attrs (const opt_attrs_t *opt_attrs, int space);
     void free_opt_attrs(opt_attrs_t *opt_attrs);
 
     void print_err_dset (const char *category, const char *path);

@@ -49,8 +49,8 @@ extern "C" {
     void read_exs_group (hid_t file_id, const char *path, exs_group_t *exs_group);
     void read_exchange_surface (hid_t file_id, exchange_surface_t *exchange_surface);
 
-    void print_exs_group (exs_group_t exs_group, int space);
-    void print_exchange_surface (exchange_surface_t exchange_surface);
+    void print_exs_group (const exs_group_t *exs_group, int space);
+    void print_exchange_surface (const exchange_surface_t *exchange_surface);
 
     void free_exs_group (exs_group_t *exs_group);
     void free_exchange_surface (exchange_surface_t *exchange_surface);

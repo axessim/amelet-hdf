@@ -258,22 +258,22 @@ extern "C" {
     char read_ft_arrayset (hid_t file_id, const char *path, arrayset_t *arrayset);
     char read_floatingtype (hid_t file_id, const char *path, floatingtype_t *floatingtype);
 
-    void print_ft_singleinteger (singleinteger_t singleinteger, int space);
-    void print_ft_singlereal (singlereal_t singlereal, int space);
-    void print_ft_singlecomplex (singlecomplex_t singlecomplex, int space);
-    void print_ft_singlestring (singlestring_t singlestring, int space);
-    void print_ft_vector (vector_t vector, int space);
-    void print_ft_linearlistofreal1 (linearlistofreal1_t linearlistofreal1, int space);
-    void print_ft_linearlistofreal2 (linearlistofreal2_t linearlistofreal2, int space);
-    void print_ft_logarithmlistofreal (logarithmlistofreal_t logarithmlistofreal, int space);
-    void print_ft_perdecadelistofreal (perdecadelistofreal_t perdecadelistofreal, int space);
-    void print_ft_linearlistofinteger2 (linearlistofinteger2_t linearlistofinteger2, int space);
-    void print_ft_rationalfunction (rationalfunction_t rationalfunction, int space);
-    void print_ft_generalrationalfunction (generalrationalfunction_t generalrationalfunction, int space);
-    void print_ft_rational (rational_t rational, int space);
-    void print_ft_dataset (dataset_t dataset, int space);
-    void print_ft_arrayset (arrayset_t arrayset, int space);
-    void print_floatingtype (floatingtype_t floatingtype, int space);
+    void print_ft_singleinteger (const singleinteger_t *singleinteger, int space);
+    void print_ft_singlereal (const singlereal_t *singlereal, int space);
+    void print_ft_singlecomplex (const singlecomplex_t *singlecomplex, int space);
+    void print_ft_singlestring (const singlestring_t *singlestring, int space);
+    void print_ft_vector (const vector_t *vector, int space);
+    void print_ft_linearlistofreal1 (const linearlistofreal1_t *linearlistofreal1, int space);
+    void print_ft_linearlistofreal2 (const linearlistofreal2_t *linearlistofreal2, int space);
+    void print_ft_logarithmlistofreal (const logarithmlistofreal_t *logarithmlistofreal, int space);
+    void print_ft_perdecadelistofreal (const perdecadelistofreal_t *perdecadelistofreal, int space);
+    void print_ft_linearlistofinteger2 (const linearlistofinteger2_t *linearlistofinteger2, int space);
+    void print_ft_rationalfunction (const rationalfunction_t *rationalfunction, int space);
+    void print_ft_generalrationalfunction (const generalrationalfunction_t *generalrationalfunction, int space);
+    void print_ft_rational (const rational_t *rational, int space);
+    void print_ft_dataset (const dataset_t *dataset, int space);
+    void print_ft_arrayset (const arrayset_t *arrayset, int space);
+    void print_floatingtype (const floatingtype_t *floatingtype, int space);
 
     void free_ft_singleinteger (singleinteger_t *singleinteger);
     void free_ft_singlereal (singlereal_t *singlereal);

@@ -95,12 +95,12 @@ void read_exchange_surface (hid_t file_id, exchange_surface_t *exchange_surface)
 
 
 // Print exchangeSurface group
-void print_exs_group (exs_group_t exs_group, int space)
+void print_exs_group (const exs_group_t *exs_group, int space)
 {
     hsize_t i;
 
-    printf("%*sGroup: %s\n", space, "", get_name_from_path(exs_group.path));
-    switch (exs_group.type)
+    printf("%*sGroup: %s\n", space, "", get_name_from_path(exs_group->path));
+    switch (exs_group->type)
     {
     case EXS_TYPE_RECIPROCITY:
         print_str_attr(A_TYPE, V_RECIPROCITY, space + 4);
@@ -115,7 +115,7 @@ void print_exs_group (exs_group_t exs_group, int space)
         print_str_attr(A_TYPE, V_INVALID, space + 4);
         break;
     }
-    switch (exs_group.nature)
+    switch (exs_group->nature)
     {
     case EXS_NATURE_OUTSIDE:
         print_str_attr(A_NATURE, V_OUTSIDE, space + 4);
@@ -128,19 +128,19 @@ void print_exs_group (exs_group_t exs_group, int space)
         break;
     }
 
-    for (i = 0; i < exs_group.nb_instances; i++)
-        print_ft_arrayset(exs_group.instances[i], space + 2);
+    for (i = 0; i < exs_group->nb_instances; i++)
+        print_ft_arrayset(&(exs_group->instances[i]), space + 2);
 }
 
 
 // Print exchangeSurface category
-void print_exchange_surface (exchange_surface_t exchange_surface)
+void print_exchange_surface (const exchange_surface_t *exchange_surface)
 {
     hsize_t i;
 
     printf("#############################  Exchange surface  #############################\n\n");
-    for (i = 0; i < exchange_surface.nb_groups; i++)
-        print_exs_group(exchange_surface.groups[i], 0);
+    for (i = 0; i < exchange_surface->nb_groups; i++)
+        print_exs_group(&(exchange_surface->groups[i]), 0);
     printf("\n");
 }
 

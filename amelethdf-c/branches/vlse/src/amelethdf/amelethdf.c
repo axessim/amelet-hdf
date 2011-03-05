@@ -518,28 +518,28 @@ char read_opt_attrs (hid_t file_id, const char *path, opt_attrs_t *opt_attrs, ch
 
 
 // Print all optional attributes
-void print_opt_attrs(opt_attrs_t opt_attrs, int space)
+void print_opt_attrs(const opt_attrs_t *opt_attrs, int space)
 {
     hsize_t i;
 
-    for (i = 0; i < opt_attrs.nb_instances; i++)
+    for (i = 0; i < opt_attrs->nb_instances; i++)
     {
-        switch (opt_attrs.instances[i].type)
+        switch (opt_attrs->instances[i].type)
         {
         case H5T_INTEGER:
-            print_int_attr(opt_attrs.instances[i].name, opt_attrs.instances[i].value.i, space);
+            print_int_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.i, space);
             break;
         case H5T_FLOAT:
-            print_flt_attr(opt_attrs.instances[i].name, opt_attrs.instances[i].value.f, space);
+            print_flt_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.f, space);
             break;
         case H5T_COMPOUND:
-            print_cpx_attr(opt_attrs.instances[i].name, opt_attrs.instances[i].value.c, space);
+            print_cpx_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.c, space);
             break;
         case H5T_STRING:
-            print_str_attr(opt_attrs.instances[i].name, opt_attrs.instances[i].value.s, space);
+            print_str_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.s, space);
             break;
         default:
-            print_str_attr(opt_attrs.instances[i].name, "UNSUPPORTED DATA TYPE", space);
+            print_str_attr(opt_attrs->instances[i].name, "UNSUPPORTED DATA TYPE", space);
             break;
         }
     }

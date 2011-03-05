@@ -770,84 +770,85 @@ void read_mesh (hid_t file_id, mesh_t *mesh)
 
 
 // Print structured mesh
-void print_smesh (smesh_t smesh, int space)
+void print_smesh (const smesh_t *smesh, int space)
 {
     hsize_t i;
 
     print_str_attr(A_TYPE, V_STRUCTURED, space + 4);
-    printf("%*s-groups: %lu\n", space + 2, "", (long unsigned) smesh.nb_groups);
-    for (i = 0; i < smesh.nb_groups; i++)
+    printf("%*s-groups: %lu\n", space + 2, "", (long unsigned) smesh->nb_groups);
+    for (i = 0; i < smesh->nb_groups; i++)
     {
-        printf("%*sName: %s\n", space + 5, "", get_name_from_path(smesh.groups[i].path));
-        if (smesh.groups[i].type != NULL)
-            print_str_attr(A_TYPE, smesh.groups[i].type, space + 8);
-        if (smesh.groups[i].entitytype != NULL)
-            print_str_attr(A_ENTITY_TYPE, smesh.groups[i].entitytype, space + 8);
-        if (smesh.groups[i].normals != NULL)
+        printf("%*sName: %s\n", space + 5, "", get_name_from_path(smesh->groups[i].path));
+        if (smesh->groups[i].type != NULL)
+            print_str_attr(A_TYPE, smesh->groups[i].type, space + 8);
+        if (smesh->groups[i].entitytype != NULL)
+            print_str_attr(A_ENTITY_TYPE, smesh->groups[i].entitytype, space + 8);
+        if (smesh->groups[i].normals != NULL)
             printf("%*s-normals: yes\n", space + 8, "");
     }
-    printf("%*s-groupgroups: %lu\n", space + 2, "", (unsigned long) smesh.nb_groupgroups);
-    for (i = 0; i < smesh.nb_groupgroups; i++)
-        printf("%*sName: %s\n", space + 5, "", get_name_from_path(smesh.groupgroups[i].path));
+    printf("%*s-groupgroups: %lu\n", space + 2, "", (unsigned long) smesh->nb_groupgroups);
+    for (i = 0; i < smesh->nb_groupgroups; i++)
+        printf("%*sName: %s\n", space + 5, "", get_name_from_path(smesh->groupgroups[i].path));
 
-    if (smesh.nb_som_tables > 0)
+    if (smesh->nb_som_tables > 0)
     {
-        printf("%*s-selector on mesh: %lu\n", space + 2, "", (unsigned long) smesh.nb_som_tables);
-        for (i = 0; i < smesh.nb_som_tables; i++)
+        printf("%*s-selector on mesh: %lu\n", space + 2, "", (unsigned long) smesh->nb_som_tables);
+        for (i = 0; i < smesh->nb_som_tables; i++)
         {
-            printf("%*sName: %s\n", space + 5, "", get_name_from_path(smesh.som_tables[i].path));
+            printf("%*sName: %s\n", space + 5, "", get_name_from_path(smesh->som_tables[i].path));
             print_str_attr(A_TYPE, V_POINT_IN_ELEMENT, space + 9);
-            printf("%*s-number of points: %lu\n", space + 7, "", (long unsigned) smesh.som_tables[i].nb_points);
+            printf("%*s-number of points: %lu\n", space + 7, "", (long unsigned) smesh->som_tables[i].nb_points);
         }
     }
-
 }
 
-void print_umesh_som_table (usom_table_t usom_table, int space)
+
+// Print selectorOnMesh table in unstructured mesh
+void print_umesh_som_table (const usom_table_t *usom_table, int space)
 {
     hsize_t k;
     char dim;
 
-    switch (usom_table.type)
+    switch (usom_table->type)
     {
     case SOM_POINT_IN_ELEMENT:
-        printf("%*sInstance: %s\n", space + 5, "", get_name_from_path(usom_table.path));
+        printf("%*sInstance: %s\n", space + 5, "", get_name_from_path(usom_table->path));
         print_str_attr(A_TYPE, V_POINT_IN_ELEMENT, space + 9);
-        for (k = 0; k < usom_table.data.pie.nb_points; k++)
+        for (k = 0; k < usom_table->data.pie.nb_points; k++)
         {
-            dim = usom_table.data.pie.nb_dims;
+            dim = usom_table->data.pie.nb_dims;
             if (dim == 3)
-                if (usom_table.data.pie.vectors[k][2] == -1)
+                if (usom_table->data.pie.vectors[k][2] == -1)
                     dim = 2;
             if (dim == 2)
-                if (usom_table.data.pie.vectors[k][1] == -1)
+                if (usom_table->data.pie.vectors[k][1] == -1)
                     dim = 1;
 
             switch (dim)
             {
             case 1:
-                printf("%*sPoint %lu: index=%i, v1=%f\n", space + 7, "", (long unsigned) k, usom_table.data.pie.indices[k], usom_table.data.pie.vectors[k][0]);
+                printf("%*sPoint %lu: index=%i, v1=%f\n", space + 7, "", (long unsigned) k, usom_table->data.pie.indices[k], usom_table->data.pie.vectors[k][0]);
                 break;
             case 2:
-                printf("%*sPoint %lu: index=%i, v1=%f, v2=%f\n", space + 7, "", (long unsigned) k, usom_table.data.pie.indices[k], usom_table.data.pie.vectors[k][0], usom_table.data.pie.vectors[k][1]);
+                printf("%*sPoint %lu: index=%i, v1=%f, v2=%f\n", space + 7, "", (long unsigned) k, usom_table->data.pie.indices[k], usom_table->data.pie.vectors[k][0], usom_table->data.pie.vectors[k][1]);
                 break;
             case 3:
-                printf("%*sPoint %lu: index=%i, v1=%f, v2=%f, v3=%f\n", space + 7, "", (long unsigned) k, usom_table.data.pie.indices[k], usom_table.data.pie.vectors[k][0], usom_table.data.pie.vectors[k][1], usom_table.data.pie.vectors[k][2]);
+                printf("%*sPoint %lu: index=%i, v1=%f, v2=%f, v3=%f\n", space + 7, "", (long unsigned) k, usom_table->data.pie.indices[k], usom_table->data.pie.vectors[k][0], usom_table->data.pie.vectors[k][1], usom_table->data.pie.vectors[k][2]);
                 break;
             }
         }
         break;
     case SOM_EDGE:
-        printf("%*sInstance: %s\n", space + 5, "", get_name_from_path(usom_table.path));
+        printf("%*sInstance: %s\n", space + 5, "", get_name_from_path(usom_table->path));
         print_str_attr(A_TYPE, V_EDGE, space + 9);
-        for (k = 0; k < usom_table.data.ef.dims[0]; k++)
-            printf("%*sId %lu: element=%i, inner_id=%i\n", space + 7, "", (long unsigned) k, usom_table.data.ef.items[2*k], usom_table.data.ef.items[2*k+1]);
+        for (k = 0; k < usom_table->data.ef.dims[0]; k++)
+            printf("%*sId %lu: element=%i, inner_id=%i\n", space + 7, "", (long unsigned) k, usom_table->data.ef.items[2*k], usom_table->data.ef.items[2*k+1]);
         break;
     case SOM_FACE:
-        printf("%*sInstance: %s\n", space + 5, "", get_name_from_path(usom_table.path));
+        printf("%*sInstance: %s\n", space + 5, "", get_name_from_path(usom_table->path));
         print_str_attr(A_TYPE, V_FACE, space + 9);
-        for (k = 0; k < usom_table.data.ef.dims[0]; k++)
-            printf("%*sId %lu: element=%i, inner_id=%i\n", space + 7, "", (long unsigned) k, usom_table.data.ef.items[2*k], usom_table.data.ef.items[2*k+1]);
+        for (k = 0; k < usom_table->data.ef.dims[0]; k++)
+            printf("%*sId %lu: element=%i, inner_id=%i\n", space + 7, "", (long unsigned) k, usom_table->data.ef.items[2*k], usom_table->data.ef.items[2*k+1]);
         break;
     default:
         break;
@@ -856,90 +857,90 @@ void print_umesh_som_table (usom_table_t usom_table, int space)
 
 
 // Print unstructured mesh
-void print_umesh (umesh_t umesh, int space)
+void print_umesh (const umesh_t *umesh, int space)
 {
     hsize_t i, offset = 0;
     int j, element_type;
 
     print_str_attr(A_TYPE, V_UNSTRUCTURED, space + 4);
-    if (umesh.nb_nodes[0] > 0)
+    if (umesh->nb_nodes[0] > 0)
     {
-        printf("%*s-nodes: %lu\n", space + 2, "", (unsigned long) umesh.nb_nodes[0]);
-        for (i = 0; i < umesh.nb_nodes[0]; i++)
+        printf("%*s-nodes: %lu\n", space + 2, "", (unsigned long) umesh->nb_nodes[0]);
+        for (i = 0; i < umesh->nb_nodes[0]; i++)
         {
             printf("%*sNode n°%lu: ", space + 5, "", (unsigned long) i);
-            for (j = 0; j < (int) umesh.nb_nodes[1]; j++)
-                printf("%f ", umesh.nodes[i * umesh.nb_nodes[1] + j]);
+            for (j = 0; j < (int) umesh->nb_nodes[1]; j++)
+                printf("%f ", umesh->nodes[i * umesh->nb_nodes[1] + j]);
             printf("\n");
         }
     }
-    if (umesh.nb_elementtypes > 0 && umesh.nb_elementnodes > 0)
+    if (umesh->nb_elementtypes > 0 && umesh->nb_elementnodes > 0)
     {
-        printf("%*s-elements: %lu\n", space + 2, "", (unsigned long) umesh.nb_elementtypes);
-        for (i = 0; i < umesh.nb_elementtypes; i++)
+        printf("%*s-elements: %lu\n", space + 2, "", (unsigned long) umesh->nb_elementtypes);
+        for (i = 0; i < umesh->nb_elementtypes; i++)
         {
-            printf("%*sElement %lu: type=%i", space + 5, "", (unsigned long) i, umesh.elementtypes[i]);
-            element_type = umesh.elementtypes[i];
+            printf("%*sElement %lu: type=%i", space + 5, "", (unsigned long) i, umesh->elementtypes[i]);
+            element_type = umesh->elementtypes[i];
             if (element_type == 1)
                 for (j = 0; j < 2; j++)
-                    printf(", N%i=%i", j, umesh.elementnodes[offset++]);
+                    printf(", N%i=%i", j, umesh->elementnodes[offset++]);
             else if (element_type == 2)
                 for (j = 0; j < 3; j++)
-                    printf(", N%i=%i", j, umesh.elementnodes[offset++]);
+                    printf(", N%i=%i", j, umesh->elementnodes[offset++]);
             else if (element_type == 11)
                 for (j = 0; j < 3; j++)
-                    printf(", N%i=%i", j, umesh.elementnodes[offset++]);
+                    printf(", N%i=%i", j, umesh->elementnodes[offset++]);
             else if (element_type == 12)
                 for (j = 0; j < 6; j++)
-                    printf(", N%i=%i", j, umesh.elementnodes[offset++]);
+                    printf(", N%i=%i", j, umesh->elementnodes[offset++]);
             else if (element_type == 13)
                 for (j = 0; j < 4; j++)
-                    printf(", N%i=%i", j, umesh.elementnodes[offset++]);
+                    printf(", N%i=%i", j, umesh->elementnodes[offset++]);
             else if (element_type == 14)
                 for (j = 0; j < 8; j++)
-                    printf(", N%i=%i", j, umesh.elementnodes[offset++]);
+                    printf(", N%i=%i", j, umesh->elementnodes[offset++]);
             else if (element_type == 101)
                 for (j = 0; j < 4; j++)
-                    printf(", N%i=%i", j, umesh.elementnodes[offset++]);
+                    printf(", N%i=%i", j, umesh->elementnodes[offset++]);
             else if (element_type == 102)
                 for (j = 0; j < 5; j++)
-                    printf(", N%i=%i", j, umesh.elementnodes[offset++]);
+                    printf(", N%i=%i", j, umesh->elementnodes[offset++]);
             else if (element_type == 103)
                 for (j = 0; j < 6; j++)
-                    printf(", N%i=%i", j, umesh.elementnodes[offset++]);
+                    printf(", N%i=%i", j, umesh->elementnodes[offset++]);
             else if (element_type == 104)
                 for (j = 0; j < 8; j++)
-                    printf(", N%i=%i", j, umesh.elementnodes[offset++]);
+                    printf(", N%i=%i", j, umesh->elementnodes[offset++]);
             printf("\n");
         }
     }
-    printf("%*s-groups: %lu\n", space + 2, "", (unsigned long) umesh.nb_groups);
-    for (i = 0; i < umesh.nb_groups; i++)
-        printf("%*sName: %s\n", space + 5, "", get_name_from_path(umesh.groups[i].path));
-    printf("%*s-groupgroups: %lu\n", space + 2, "", (unsigned long) umesh.nb_groupgroups);
-    for (i = 0; i < umesh.nb_groupgroups; i++)
-        printf("%*sName : %s\n", space + 5, "", get_name_from_path(umesh.groupgroups[i].path));
+    printf("%*s-groups: %lu\n", space + 2, "", (unsigned long) umesh->nb_groups);
+    for (i = 0; i < umesh->nb_groups; i++)
+        printf("%*sName: %s\n", space + 5, "", get_name_from_path(umesh->groups[i].path));
+    printf("%*s-groupgroups: %lu\n", space + 2, "", (unsigned long) umesh->nb_groupgroups);
+    for (i = 0; i < umesh->nb_groupgroups; i++)
+        printf("%*sName : %s\n", space + 5, "", get_name_from_path(umesh->groupgroups[i].path));
 
-    if (umesh.nb_som_tables > 0)
+    if (umesh->nb_som_tables > 0)
     {
-        printf("%*s-selector on mesh: %lu\n", space + 2, "", (unsigned long) umesh.nb_som_tables);
-        for (i = 0; i < umesh.nb_som_tables; i++)
-            print_umesh_som_table(umesh.som_tables[i], space);
+        printf("%*s-selector on mesh: %lu\n", space + 2, "", (unsigned long) umesh->nb_som_tables);
+        for (i = 0; i < umesh->nb_som_tables; i++)
+            print_umesh_som_table(&(umesh->som_tables[i]), space);
     }
 }
 
 
 // Print mesh instance
-void print_msh_instance (msh_instance_t msh_instance, int space)
+void print_msh_instance (const msh_instance_t *msh_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", get_name_from_path(msh_instance.path));
-    switch (msh_instance.type)
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(msh_instance->path));
+    switch (msh_instance->type)
     {
     case MSH_STRUCTURED:
-        print_smesh(msh_instance.data.structured, space);
+        print_smesh(&(msh_instance->data.structured), space);
         break;
     case MSH_UNSTRUCTURED:
-        print_umesh(msh_instance.data.unstructured, space);
+        print_umesh(&(msh_instance->data.unstructured), space);
         break;
     default:
         break;
@@ -948,36 +949,36 @@ void print_msh_instance (msh_instance_t msh_instance, int space)
 
 
 // Print meshLink instance
-void print_mlk_instance (mlk_instance_t mlk_instance, int space)
+void print_mlk_instance (const mlk_instance_t *mlk_instance, int space)
 {
-    printf("%*sMeshLink instance: %s\n", space, "", get_name_from_path(mlk_instance.path));
-    print_str_attr(A_MESH1, mlk_instance.mesh1, space + 3);
-    print_str_attr(A_MESH2, mlk_instance.mesh2, space + 3);
+    printf("%*sMeshLink instance: %s\n", space, "", get_name_from_path(mlk_instance->path));
+    print_str_attr(A_MESH1, mlk_instance->mesh1, space + 3);
+    print_str_attr(A_MESH2, mlk_instance->mesh2, space + 3);
 }
 
 
 // Print mesh group
-void print_msh_group (msh_group_t msh_group, int space)
+void print_msh_group (const msh_group_t *msh_group, int space)
 {
     hsize_t i;
 
-    printf("%*sGroup: %s\n", space, "", get_name_from_path(msh_group.path));
-    for (i = 0; i < msh_group.nb_msh_instances; i++)
-        print_msh_instance(msh_group.msh_instances[i], space + 2);
-    for (i = 0; i < msh_group.nb_mlk_instances; i++)
-        print_mlk_instance(msh_group.mlk_instances[i], space + 2);
+    printf("%*sGroup: %s\n", space, "", get_name_from_path(msh_group->path));
+    for (i = 0; i < msh_group->nb_msh_instances; i++)
+        print_msh_instance(&(msh_group->msh_instances[i]), space + 2);
+    for (i = 0; i < msh_group->nb_mlk_instances; i++)
+        print_mlk_instance(&(msh_group->mlk_instances[i]), space + 2);
     printf("\n");
 }
 
 
 // Print mesh category
-void print_mesh (mesh_t mesh)
+void print_mesh (const mesh_t *mesh)
 {
     hsize_t i;
 
     printf("###################################  Mesh  ###################################\n\n");
-    for (i = 0; i < mesh.nb_groups; i++)
-        print_msh_group(mesh.groups[i], 0);
+    for (i = 0; i < mesh->nb_groups; i++)
+        print_msh_group(&(mesh->groups[i]), 0);
     printf("\n");
 }
 

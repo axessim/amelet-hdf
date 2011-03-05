@@ -71,36 +71,36 @@ void read_link (hid_t file_id, link_t *link)
 
 
 // Print link instance
-void print_lnk_instance (lnk_instance_t lnk_instance, int space)
+void print_lnk_instance (const lnk_instance_t *lnk_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", get_name_from_path(lnk_instance.path));
-    print_str_attr(A_SUBJECT, lnk_instance.subject, space + 3);
-    print_str_attr(A_OBJECT, lnk_instance.object, space + 3);
-    print_opt_attrs(lnk_instance.opt_attrs, space + 3);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(lnk_instance->path));
+    print_str_attr(A_SUBJECT, lnk_instance->subject, space + 3);
+    print_str_attr(A_OBJECT, lnk_instance->object, space + 3);
+    print_opt_attrs(&(lnk_instance->opt_attrs), space + 3);
 }
 
 
 // Print link group (group of instances)
-void print_lnk_group (lnk_group_t lnk_group, int space)
+void print_lnk_group (const lnk_group_t *lnk_group, int space)
 {
     hsize_t i;
 
-    printf("%*sGroup: %s\n", space, "", get_name_from_path(lnk_group.path));
-    print_opt_attrs(lnk_group.opt_attrs, space + 4);
-    for (i = 0; i < lnk_group.nb_instances; i++)
-        print_lnk_instance(lnk_group.instances[i], space + 2);
+    printf("%*sGroup: %s\n", space, "", get_name_from_path(lnk_group->path));
+    print_opt_attrs(&(lnk_group->opt_attrs), space + 4);
+    for (i = 0; i < lnk_group->nb_instances; i++)
+        print_lnk_instance(&(lnk_group->instances[i]), space + 2);
     printf("\n");
 }
 
 
 // Print link category (all groups/instances)
-void print_link (link_t link)
+void print_link (const link_t *link)
 {
     hsize_t i;
 
     printf("###################################  Link  ###################################\n\n");
-    for (i = 0; i < link.nb_groups; i++)
-        print_lnk_group(link.groups[i], 0);
+    for (i = 0; i < link->nb_groups; i++)
+        print_lnk_group(&(link->groups[i]), 0);
     printf("\n");
 }
 

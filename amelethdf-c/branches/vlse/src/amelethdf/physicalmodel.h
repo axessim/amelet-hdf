@@ -104,10 +104,10 @@ extern "C" {
     void read_physicalmodel_interface_instance (hid_t file_id, const char *path, interface_instance_t *interface_instance);
     void read_physicalmodel (hid_t file_id, physicalmodel_t *physicalmodel);
 
-    void print_physicalmodel_volume_instance (volume_instance_t volume_instance, int space);
-    void print_physicalmodel_surface_instance (surface_instance_t surface_instance, int space);
-    void print_physicalmodel_interface_instance (interface_instance_t interface_instance, int space);
-    void print_physicalmodel (physicalmodel_t physicalmodel);
+    void print_physicalmodel_volume_instance (const volume_instance_t *volume_instance, int space);
+    void print_physicalmodel_surface_instance (const surface_instance_t *surface_instance, int space);
+    void print_physicalmodel_interface_instance (const interface_instance_t *interface_instance, int space);
+    void print_physicalmodel (const physicalmodel_t *physicalmodel);
 
     void free_physicalmodel_volume_instance (volume_instance_t *volume_instance);
     void free_physicalmodel_surface_instance (surface_instance_t *surface_instance);

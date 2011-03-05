@@ -203,13 +203,13 @@ extern "C" {
     void read_els_sourceonmesh (hid_t file_id, const char *path, sourceonmesh_t *sourceonmesh);
     void read_electromagnetic_source (hid_t file_id, em_source_t *em_source);
 
-    void print_els_planewave (planewave_t planewave, int space);
-    void print_els_sphericalwave (sphericalwave_t sphericalwave, int space);
-    void print_els_generator (generator_t generator, int space);
-    void print_els_dipole (dipole_t dipole, int space);
-    void print_els_antenna (antenna_t antenna, int space);
-    void print_els_sourceonmesh (sourceonmesh_t sourceonmesh, int space);
-    void print_electromagnetic_source (em_source_t em_source);
+    void print_els_planewave (const planewave_t *planewave, int space);
+    void print_els_sphericalwave (const sphericalwave_t *sphericalwave, int space);
+    void print_els_generator (const generator_t *generator, int space);
+    void print_els_dipole (const dipole_t *dipole, int space);
+    void print_els_antenna (const antenna_t *antenna, int space);
+    void print_els_sourceonmesh (const sourceonmesh_t *sourceonmesh, int space);
+    void print_electromagnetic_source (const em_source_t *em_source);
 
     void free_els_planewave (planewave_t *planewave);
     void free_els_sphericalwave (sphericalwave_t *sphericalwave);

@@ -87,41 +87,41 @@ void read_simulation(hid_t file_id, simulation_t *simulation)
 
 
 // Print simulation instance
-void print_sim_instance(sim_instance_t sim_instance, int space)
+void print_sim_instance(const sim_instance_t *sim_instance, int space)
 {
     hsize_t i;
 
-    printf("%*sInstance: %s\n", space, "", get_name_from_path(sim_instance.path));
-    print_opt_attrs(sim_instance.opt_attrs, space + 4);
-    print_str_attr(A_MODULE, sim_instance.module, space + 4);
-    print_str_attr(A_VERSION, sim_instance.version, space + 4);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(sim_instance->path));
+    print_opt_attrs(&(sim_instance->opt_attrs), space + 4);
+    print_str_attr(A_MODULE, sim_instance->module, space + 4);
+    print_str_attr(A_VERSION, sim_instance->version, space + 4);
 
-    if (sim_instance.nb_inputs > 0)
+    if (sim_instance->nb_inputs > 0)
     {
         printf("%*sInputs:\n", space + 2, "");
-        for (i = 0; i < sim_instance.nb_inputs; i++)
-            printf("%*s%s\n", space + 5, " ", sim_instance.inputs[i]);
+        for (i = 0; i < sim_instance->nb_inputs; i++)
+            printf("%*s%s\n", space + 5, " ", sim_instance->inputs[i]);
     }
 
-    if (sim_instance.nb_outputs > 0)
+    if (sim_instance->nb_outputs > 0)
     {
         printf("%*sOutputs:\n", space + 2, "");
-        for (i = 0; i < sim_instance.nb_outputs; i++)
-            printf("%*s%s\n", space + 5, "", sim_instance.outputs[i]);
+        for (i = 0; i < sim_instance->nb_outputs; i++)
+            printf("%*s%s\n", space + 5, "", sim_instance->outputs[i]);
     }
     printf("\n");
 }
 
 
 // Print simulation category (all instances)
-void print_simulation(simulation_t simulation)
+void print_simulation(const simulation_t *simulation)
 {
     hsize_t i;
 
     printf("################################  Simulation  ################################\n\n");
-    for (i = 0; i < simulation.nb_instances; i++)
+    for (i = 0; i < simulation->nb_instances; i++)
     {
-        print_sim_instance(simulation.instances[i], 0);
+        print_sim_instance(&(simulation->instances[i]), 0);
     }
     printf("\n");
 }

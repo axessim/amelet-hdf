@@ -309,38 +309,38 @@ void read_electromagnetic_source (hid_t file_id, em_source_t *em_source)
 
 
 // Print instance in /electromagneticSource/planeWave
-void print_els_planewave (planewave_t planewave, int space)
+void print_els_planewave (const planewave_t *planewave, int space)
 {
-    printf("%*sName: %s\n", space, "", get_name_from_path(planewave.path));
-    print_opt_attrs(planewave.opt_attrs, space + 4);
-    print_flt_attr(A_XO, planewave.xo, space + 4);
-    print_flt_attr(A_YO, planewave.yo, space + 4);
-    print_flt_attr(A_ZO, planewave.zo, space + 4);
-    print_flt_attr(A_THETA, planewave.theta, space + 4);
-    print_flt_attr(A_PHI, planewave.phi, space + 4);
-    print_floatingtype(planewave.magnitude, space + 2);
+    printf("%*sName: %s\n", space, "", get_name_from_path(planewave->path));
+    print_opt_attrs(&(planewave->opt_attrs), space + 4);
+    print_flt_attr(A_XO, planewave->xo, space + 4);
+    print_flt_attr(A_YO, planewave->yo, space + 4);
+    print_flt_attr(A_ZO, planewave->zo, space + 4);
+    print_flt_attr(A_THETA, planewave->theta, space + 4);
+    print_flt_attr(A_PHI, planewave->phi, space + 4);
+    print_floatingtype(&(planewave->magnitude), space + 2);
     printf("\n");
 }
 
 
 // Print instance in /electromagneticSource/sphericalWave
-void print_els_sphericalwave (sphericalwave_t sphericalwave, int space)
+void print_els_sphericalwave (const sphericalwave_t *sphericalwave, int space)
 {
-    printf("%*sName: %s\n", space, "", get_name_from_path(sphericalwave.path));
-    print_flt_attr(A_XO, sphericalwave.xo, space + 4);
-    print_flt_attr(A_YO, sphericalwave.yo, space + 4);
-    print_flt_attr(A_ZO, sphericalwave.zo, space + 4);
-    print_floatingtype(sphericalwave.magnitude, space + 2);
+    printf("%*sName: %s\n", space, "", get_name_from_path(sphericalwave->path));
+    print_flt_attr(A_XO, sphericalwave->xo, space + 4);
+    print_flt_attr(A_YO, sphericalwave->yo, space + 4);
+    print_flt_attr(A_ZO, sphericalwave->zo, space + 4);
+    print_floatingtype(&(sphericalwave->magnitude), space + 2);
     printf("\n");
 }
 
 
 // Print instance in /electromagneticSource/generator
-void print_els_generator (generator_t generator, int space)
+void print_els_generator (const generator_t *generator, int space)
 {
-    printf("%*sName: %s\n", space, "", get_name_from_path(generator.path));
-    print_opt_attrs(generator.opt_attrs, space + 4);
-    switch (generator.type)
+    printf("%*sName: %s\n", space, "", get_name_from_path(generator->path));
+    print_opt_attrs(&(generator->opt_attrs), space + 4);
+    switch (generator->type)
     {
     case GEN_VOLTAGE:
         print_str_attr(A_TYPE, V_VOLTAGE, space + 4);
@@ -358,17 +358,17 @@ void print_els_generator (generator_t generator, int space)
         print_str_attr(A_TYPE, "INVALID", space + 4);
         break;
     }
-    print_floatingtype(generator.inner_impedance, space + 2);
-    print_floatingtype(generator.magnitude, space + 2);
+    print_floatingtype(&(generator->inner_impedance), space + 2);
+    print_floatingtype(&(generator->magnitude), space + 2);
     printf("\n");
 }
 
 
 // Print instance in /electromagneticSource/dipole
-void print_els_dipole (dipole_t dipole, int space)
+void print_els_dipole (const dipole_t *dipole, int space)
 {
-    printf("%*sName: %s\n", space, "", get_name_from_path(dipole.path));
-    switch (dipole.type)
+    printf("%*sName: %s\n", space, "", get_name_from_path(dipole->path));
+    switch (dipole->type)
     {
     case DIPOLE_ELECTRIC:
         print_str_attr(A_TYPE, V_ELECTRIC, space + 4);
@@ -380,77 +380,77 @@ void print_els_dipole (dipole_t dipole, int space)
         print_str_attr(A_TYPE, "INVALID", space + 4);
         break;
     }
-    print_opt_attrs(dipole.opt_attrs, space + 4);
-    print_flt_attr(A_X, dipole.x, space + 4);
-    print_flt_attr(A_Y, dipole.y, space + 4);
-    print_flt_attr(A_Z, dipole.z, space + 4);
-    print_flt_attr(A_THETA, dipole.theta, space + 4);
-    print_flt_attr(A_PHI, dipole.phi, space + 4);
-    print_flt_attr(A_WIRE_RADIUS, dipole.wire_radius, space + 4);
+    print_opt_attrs(&(dipole->opt_attrs), space + 4);
+    print_flt_attr(A_X, dipole->x, space + 4);
+    print_flt_attr(A_Y, dipole->y, space + 4);
+    print_flt_attr(A_Z, dipole->z, space + 4);
+    print_flt_attr(A_THETA, dipole->theta, space + 4);
+    print_flt_attr(A_PHI, dipole->phi, space + 4);
+    print_flt_attr(A_WIRE_RADIUS, dipole->wire_radius, space + 4);
     printf("\n");
 }
 
 
 // Print instance in /electromagneticSource/antenna
-void print_els_antenna (antenna_t antenna, int space)
+void print_els_antenna (const antenna_t *antenna, int space)
 {
-    printf("%*sName: %s\n", space, "", get_name_from_path(antenna.path));
-    print_opt_attrs(antenna.opt_attrs, space + 5);
-    print_floatingtype(antenna.input_impedance, space + 2);
-    print_floatingtype(antenna.load_impedance, space + 2);
-    print_floatingtype(antenna.feeder_impedance, space + 2);
-    print_floatingtype(antenna.magnitude, space + 2);
+    printf("%*sName: %s\n", space, "", get_name_from_path(antenna->path));
+    print_opt_attrs(&(antenna->opt_attrs), space + 5);
+    print_floatingtype(&(antenna->input_impedance), space + 2);
+    print_floatingtype(&(antenna->load_impedance), space + 2);
+    print_floatingtype(&(antenna->feeder_impedance), space + 2);
+    print_floatingtype(&(antenna->magnitude), space + 2);
     printf("%*s-model:\n", space + 2, "");
-    switch (antenna.model.type)
+    switch (antenna->model.type)
     {
     case ANT_GAIN:
         print_str_attr(A_TYPE, V_GAIN, space + 6);
-        print_opt_attrs(antenna.model.opt_attrs, space + 6);
-        print_floatingtype(antenna.model.data.gain, space + 4);
+        print_opt_attrs(&(antenna->model.opt_attrs), space + 6);
+        print_floatingtype(&(antenna->model.data.gain), space + 4);
         break;
     case ANT_EFFECTIVE_AREA:
         print_str_attr(A_TYPE, V_EFFECTIVE_AREA, space + 6);
-        print_opt_attrs(antenna.model.opt_attrs, space + 6);
-        print_floatingtype(antenna.model.data.effarea, space + 4);
+        print_opt_attrs(&(antenna->model.opt_attrs), space + 6);
+        print_floatingtype(&(antenna->model.data.effarea), space + 4);
         break;
     case ANT_FAR_FIELD:
         print_str_attr(A_TYPE, V_FAR_FIELD, space + 6);
-        print_opt_attrs(antenna.model.opt_attrs, space + 6);
-        print_floatingtype(antenna.model.data.farfield, space + 4);
+        print_opt_attrs(&(antenna->model.opt_attrs), space + 6);
+        print_floatingtype(&(antenna->model.data.farfield), space + 4);
         break;
     case ANT_RECTANGULAR_HORN:
         print_str_attr(A_TYPE, V_RECTANGULAR_HORN, space + 6);
-        print_opt_attrs(antenna.model.opt_attrs, space + 6);
-        if (antenna.model.data.parreflct.nb_instances > 0)
+        print_opt_attrs(&(antenna->model.opt_attrs), space + 6);
+        if (antenna->model.data.parreflct.nb_instances > 0)
         {
             printf("%*s-parabolicReflector:\n", space + 4, "");
-            print_opt_attrs(antenna.model.data.parreflct, space + 7);
+            print_opt_attrs(&(antenna->model.data.parreflct), space + 7);
         }
         break;
     case ANT_CIRCULAR_HORN:
         print_str_attr(A_TYPE, V_CIRCULAR_HORN, space + 6);
-        print_opt_attrs(antenna.model.opt_attrs, space + 6);
-        if (antenna.model.data.parreflct.nb_instances > 0)
+        print_opt_attrs(&(antenna->model.opt_attrs), space + 6);
+        if (antenna->model.data.parreflct.nb_instances > 0)
         {
             printf("%*s-parabolicReflector:\n", space + 4, "");
-            print_opt_attrs(antenna.model.data.parreflct, space + 7);
+            print_opt_attrs(&(antenna->model.data.parreflct), space + 7);
         }
         break;
     case ANT_LOG_PERIODIC:
         print_str_attr(A_TYPE, V_LOG_PERIODIC, space + 5);
-        print_opt_attrs(antenna.model.opt_attrs, space + 5);
+        print_opt_attrs(&(antenna->model.opt_attrs), space + 5);
         break;
     case ANT_WHIP:
         print_str_attr(A_TYPE, V_WHIP, space + 5);
-        print_opt_attrs(antenna.model.opt_attrs, space + 5);
+        print_opt_attrs(&(antenna->model.opt_attrs), space + 5);
         break;
     case ANT_GENERIC:
         print_str_attr(A_TYPE, V_GENERIC, space + 5);
-        print_opt_attrs(antenna.model.opt_attrs, space + 5);
+        print_opt_attrs(&(antenna->model.opt_attrs), space + 5);
         break;
     case ANT_EXCHANGE_SURFACE:
         print_str_attr(A_TYPE, V_EXCHANGE_SURFACE, space + 5);
-        print_opt_attrs(antenna.model.opt_attrs, space + 5);
+        print_opt_attrs(&(antenna->model.opt_attrs), space + 5);
     break;
     default:
         print_str_attr(A_TYPE, "INVALID", space + 5);
@@ -461,22 +461,22 @@ void print_els_antenna (antenna_t antenna, int space)
 
 
 // Print instance in /electromagneticSource/sourceOnMesh
-void print_els_sourceonmesh (sourceonmesh_t sourceonmesh, int space)
+void print_els_sourceonmesh (const sourceonmesh_t *sourceonmesh, int space)
 {
     hsize_t i;
 
-    printf("%*sName: %s\n", space, "", get_name_from_path(sourceonmesh.path));
-    switch (sourceonmesh.type)
+    printf("%*sName: %s\n", space, "", get_name_from_path(sourceonmesh->path));
+    switch (sourceonmesh->type)
     {
     case SCOM_ARRAYSET:
         print_str_attr(A_TYPE, V_ARRAYSET, space + 4);
-        print_ft_dataset(sourceonmesh.data.arrayset.data, space + 2);
-        for (i = 0; i < sourceonmesh.data.arrayset.nb_dims; i++)
-            print_ft_vector(sourceonmesh.data.arrayset.dims[i], space + 2);
+        print_ft_dataset(&(sourceonmesh->data.arrayset.data), space + 2);
+        for (i = 0; i < sourceonmesh->data.arrayset.nb_dims; i++)
+            print_ft_vector(&(sourceonmesh->data.arrayset.dims[i]), space + 2);
         break;
     case SCOM_EXCHANGE_SURFACE:
         print_str_attr(A_TYPE, V_EXCHANGE_SURFACE, space + 3);
-        print_str_attr(A_EXCHANGE_SURFACE, sourceonmesh.data.exchange_surface, space + 3);
+        print_str_attr(A_EXCHANGE_SURFACE, sourceonmesh->data.exchange_surface, space + 3);
         break;
     case SCOM_INVALID:
         print_str_attr(A_TYPE, "INVALID", space + 3);
@@ -486,40 +486,40 @@ void print_els_sourceonmesh (sourceonmesh_t sourceonmesh, int space)
 }
 
 // Print electromagneticSource category
-void print_electromagnetic_source (em_source_t em_source)
+void print_electromagnetic_source (const em_source_t *em_source)
 {
     hsize_t i;
 
     printf("##########################  Electromagnetic source  ##########################\n\n");
-    if (em_source.nb_pw_sources)
+    if (em_source->nb_pw_sources)
         printf("Plane wave:\n");
-    for (i = 0; i < em_source.nb_pw_sources; i++)
-        print_els_planewave(em_source.pw_sources[i], 3);
+    for (i = 0; i < em_source->nb_pw_sources; i++)
+        print_els_planewave(&(em_source->pw_sources[i]), 3);
 
-    if (em_source.nb_sw_sources)
+    if (em_source->nb_sw_sources)
         printf("Spherical wave:\n");
-    for (i = 0; i < em_source.nb_sw_sources; i++)
-        print_els_sphericalwave(em_source.sw_sources[i], 3);
+    for (i = 0; i < em_source->nb_sw_sources; i++)
+        print_els_sphericalwave(&(em_source->sw_sources[i]), 3);
 
-    if (em_source.nb_ge_sources)
+    if (em_source->nb_ge_sources)
         printf("Generator:\n");
-    for (i = 0; i < em_source.nb_ge_sources; i++)
-        print_els_generator(em_source.ge_sources[i], 3);
+    for (i = 0; i < em_source->nb_ge_sources; i++)
+        print_els_generator(&(em_source->ge_sources[i]), 3);
 
-    if (em_source.nb_di_sources)
+    if (em_source->nb_di_sources)
         printf("Dipole:\n");
-    for (i = 0; i < em_source.nb_di_sources; i++)
-        print_els_dipole(em_source.di_sources[i], 3);
+    for (i = 0; i < em_source->nb_di_sources; i++)
+        print_els_dipole(&(em_source->di_sources[i]), 3);
 
-    if (em_source.nb_an_sources)
+    if (em_source->nb_an_sources)
         printf("Antenna:\n");
-    for (i = 0; i < em_source.nb_an_sources; i++)
-        print_els_antenna(em_source.an_sources[i], 3);
+    for (i = 0; i < em_source->nb_an_sources; i++)
+        print_els_antenna(&(em_source->an_sources[i]), 3);
 
-    if (em_source.nb_sm_sources)
+    if (em_source->nb_sm_sources)
         printf("Source on mesh:\n");
-    for (i = 0; i < em_source.nb_sm_sources; i++)
-        print_els_sourceonmesh(em_source.sm_sources[i], 3);
+    for (i = 0; i < em_source->nb_sm_sources; i++)
+        print_els_sourceonmesh(&(em_source->sm_sources[i]), 3);
     printf("\n");
 }
 

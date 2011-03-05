@@ -57,25 +57,25 @@ void read_label(hid_t file_id, label_t *label)
 
 
 // Print label dataset
-void print_lbl_dataset (lbl_dataset_t lbl_dataset, int space)
+void print_lbl_dataset (const lbl_dataset_t *lbl_dataset, int space)
 {
     hsize_t i;
 
-    printf("%*sName: %s\n", space, "", get_name_from_path(lbl_dataset.path));
-    for (i = 0; i < lbl_dataset.nb_items; i++)
-        printf("%*s%s\n", space + 3, "", lbl_dataset.items[i]);
+    printf("%*sName: %s\n", space, "", get_name_from_path(lbl_dataset->path));
+    for (i = 0; i < lbl_dataset->nb_items; i++)
+        printf("%*s%s\n", space + 3, "", lbl_dataset->items[i]);
     printf("\n");
 }
 
 
 // Print label category (all datasets)
-void print_label(label_t label)
+void print_label(const label_t *label)
 {
     hsize_t i;
 
     printf("##################################  Label  ###################################\n\n");
-    for (i = 0; i < label.nb_datasets; i++)
-        print_lbl_dataset(label.datasets[i], 0);
+    for (i = 0; i < label->nb_datasets; i++)
+        print_lbl_dataset(&(label->datasets[i]), 0);
     printf("\n");
 }
 

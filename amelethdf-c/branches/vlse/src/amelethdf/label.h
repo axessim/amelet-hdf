@@ -23,8 +23,8 @@ extern "C" {
     void read_lbl_dataset (hid_t file_id, const char *path, lbl_dataset_t *lbl_dataset);
     void read_label (hid_t file_id, label_t *label);
 
-    void print_lbl_dataset (lbl_dataset_t lbl_dataset, int space);
-    void print_label (label_t label);
+    void print_lbl_dataset (const lbl_dataset_t *lbl_dataset, int space);
+    void print_label (const label_t *label);
 
     void free_lbl_dataset (lbl_dataset_t *lbl_dataset);
     void free_label (label_t *label);

@@ -72,37 +72,37 @@ void read_outputrequest(hid_t file_id, outputrequest_t *outputrequest)
 
 
 // Print outputRequest instance
-void print_ort_instance (ort_instance_t ort_instance, int space)
+void print_ort_instance (const ort_instance_t *ort_instance, int space)
 {
-    printf("%*sInstance: %s\n", space, "", get_name_from_path(ort_instance.path));
-    print_opt_attrs(ort_instance.opt_attrs, space + 3);
-    print_str_attr(A_SUBJECT, ort_instance.subject, space + 3);
-    print_str_attr(A_OBJECT, ort_instance.object, space + 3);
-    print_str_attr(A_OUTPUT, ort_instance.output, space + 3);
+    printf("%*sInstance: %s\n", space, "", get_name_from_path(ort_instance->path));
+    print_opt_attrs(&(ort_instance->opt_attrs), space + 3);
+    print_str_attr(A_SUBJECT, ort_instance->subject, space + 3);
+    print_str_attr(A_OBJECT, ort_instance->object, space + 3);
+    print_str_attr(A_OUTPUT, ort_instance->output, space + 3);
 }
 
 
 // Print outputRequest group (group of instances)
-void print_ort_group (ort_group_t ort_group, int space)
+void print_ort_group (const ort_group_t *ort_group, int space)
 {
     hsize_t i;
 
-    printf("%*sGroup: %s\n", space, "", get_name_from_path(ort_group.path));
-    print_opt_attrs(ort_group.opt_attrs, space + 4);
-    for (i = 0; i < ort_group.nb_instances; i++)
-        print_ort_instance(ort_group.instances[i], space + 2);
+    printf("%*sGroup: %s\n", space, "", get_name_from_path(ort_group->path));
+    print_opt_attrs(&(ort_group->opt_attrs), space + 4);
+    for (i = 0; i < ort_group->nb_instances; i++)
+        print_ort_instance(&(ort_group->instances[i]), space + 2);
     printf("\n");
 }
 
 
 // Print outputRequest category (all groups/instances)
-void print_outputrequest (outputrequest_t outputrequest)
+void print_outputrequest (const outputrequest_t *outputrequest)
 {
     hsize_t i;
 
     printf("##############################  Output request  ##############################\n\n");
-    for (i = 0; i < outputrequest.nb_groups; i++)
-        print_ort_group(outputrequest.groups[i], 0);
+    for (i = 0; i < outputrequest->nb_groups; i++)
+        print_ort_group(&(outputrequest->groups[i]), 0);
     printf("\n");
 }
 

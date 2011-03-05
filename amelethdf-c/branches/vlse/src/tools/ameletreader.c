@@ -140,77 +140,77 @@ char *argv[];
     // Simulation
     if(H5Lexists(file_id, C_SIMULATION, H5P_DEFAULT) != FALSE)
     {
-        print_simulation(simulation);
+        print_simulation(&simulation);
         free_simulation(&simulation);
     }
 
     // Global environment
     if(H5Lexists(file_id, C_GLOBAL_ENVIRONMENT, H5P_DEFAULT) != FALSE)
     {
-        print_global_environment(global_environment);
+        print_global_environment(&global_environment);
         free_global_environment(&global_environment);
     }
 
     // Localization system
     if(H5Lexists(file_id, C_LOCALIZATION_SYSTEM, H5P_DEFAULT) != FALSE)
     {
-        print_localization_system(localization_system);
+        print_localization_system(&localization_system);
         free_localization_system(&localization_system);
     }
 
     // Mesh
     if(H5Lexists(file_id, C_MESH, H5P_DEFAULT) != FALSE)
     {
-        print_mesh(mesh);
+        print_mesh(&mesh);
         free_mesh(&mesh);
     }
 
     // Physical model
     if (H5Lexists(file_id, C_PHYSICAL_MODEL, H5P_DEFAULT) != FALSE)
     {
-        print_physicalmodel(physicalmodel);
+        print_physicalmodel(&physicalmodel);
         free_physicalmodel(&physicalmodel);
     }
 
     // Electromagnetic source
     if (H5Lexists(file_id, C_ELECTROMAGNETIC_SOURCE, H5P_DEFAULT) != FALSE)
     {
-        print_electromagnetic_source(em_source);
+        print_electromagnetic_source(&em_source);
         free_electromagnetic_source(&em_source);
     }
 
     // External element
     if (H5Lexists(file_id, C_EXTERNAL_ELEMENT, H5P_DEFAULT) != FALSE)
     {
-        print_external_element(external_element);
+        print_external_element(&external_element);
         free_external_element(&external_element);
     }
 
     // Label
     if (H5Lexists(file_id, C_LABEL, H5P_DEFAULT) != FALSE)
     {
-        print_label(label);
+        print_label(&label);
         free_label(&label);
     }
 
     // Link
     if (H5Lexists(file_id, C_LINK, H5P_DEFAULT) != FALSE)
     {
-        print_link(link);
+        print_link(&link);
         free_link(&link);
     }
 
     // Output request
     if (H5Lexists(file_id, C_OUTPUT_REQUEST, H5P_DEFAULT) != FALSE)
     {
-        print_outputrequest(outputrequest);
+        print_outputrequest(&outputrequest);
         free_outputrequest(&outputrequest);
     }
 
     // Exchange surface
     if (H5Lexists(file_id, C_EXCHANGE_SURFACE, H5P_DEFAULT) != FALSE)
     {
-        print_exchange_surface(exchange_surface);
+        print_exchange_surface(&exchange_surface);
         free_exchange_surface(&exchange_surface);
     }
 

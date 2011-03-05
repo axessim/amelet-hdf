@@ -36,9 +36,9 @@ extern "C" {
     void read_lnk_group (hid_t file_id, const char *path, lnk_group_t *lnk_group);
     void read_link (hid_t file_id, link_t *link);
 
-    void print_lnk_instance (lnk_instance_t lnk_instance, int space);
-    void print_lnk_group (lnk_group_t lnk_group, int space);
-    void print_link (link_t link);
+    void print_lnk_instance (const lnk_instance_t *lnk_instance, int space);
+    void print_lnk_group (const lnk_group_t *lnk_group, int space);
+    void print_link (const link_t *link);
 
     void free_lnk_instance (lnk_instance_t *lnk_instance);
     void free_lnk_group (lnk_group_t *lnk_group);
