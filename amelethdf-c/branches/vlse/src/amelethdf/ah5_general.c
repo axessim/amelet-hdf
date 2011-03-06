@@ -1,27 +1,27 @@
-#include "amelethdf.h"
+#include "ah5_general.h"
 
 
 /*
-    FALSE = version_minimum("0.5", "0.1");
-    FALSE = version_minimum("3.5", "2");
-    FALSE = version_minimum("3.1", "2.186");
+    FALSE = AH5_version_minimum("0.5", "0.1");
+    FALSE = AH5_version_minimum("3.5", "2");
+    FALSE = AH5_version_minimum("3.1", "2.186");
 
-    TRUE = version_minimum("1.2.3.4", "1.2.3.4");
-    TRUE = version_minimum("0.5", "0.6");
-    TRUE = version_minimum("0.5", "1.8.6");
-    TRUE = version_minimum("0.5.5", "1");
-    TRUE = version_minimum("2", "2.5");
-    TRUE = version_minimum("2.0.5.0", "2.1");
+    TRUE = AH5_version_minimum("1.2.3.4", "1.2.3.4");
+    TRUE = AH5_version_minimum("0.5", "0.6");
+    TRUE = AH5_version_minimum("0.5", "1.8.6");
+    TRUE = AH5_version_minimum("0.5.5", "1");
+    TRUE = AH5_version_minimum("2", "2.5");
+    TRUE = AH5_version_minimum("2.0.5.0", "2.1");
 */
-char version_minimum (const char *required_version, const char *sim_version)
+char AH5_version_minimum (const char *required_version, const char *sim_version)
 {
     char rdata = FALSE;
     char *a, *b, *atemp, *btemp, *temp;
     int ai = 0, bi = 0;  // storage for version numbers
 
     // cannot use 2x strtok
-    a = trim_zeros(required_version);  // original pointers
-    b = trim_zeros(sim_version);  //  to be used in free()
+    a = AH5_trim_zeros(required_version);  // original pointers
+    b = AH5_trim_zeros(sim_version);  //  to be used in free()
     atemp = a;  // creatin working pointers
     btemp = b;  //  (that will be destroyed)
 
@@ -66,7 +66,7 @@ char version_minimum (const char *required_version, const char *sim_version)
     return rdata;
 }
 
-char *trim_zeros (const char *version)
+char *AH5_trim_zeros (const char *version)
 {
     int i, number = 0;
     char *rdata;
@@ -89,11 +89,11 @@ char *trim_zeros (const char *version)
 
 
 // Add aelement to aset
-set_t add_to_set(set_t aset, char *aelement)
+AH5_set_t AH5_add_to_set(AH5_set_t aset, char *aelement)
 {
     hsize_t id = 0;
 
-    if (!index_in_set(aset, aelement, &id))
+    if (!AH5_index_in_set(aset, aelement, &id))
     {
         aset.values[aset.nb_values] = strdup(aelement);  // malloc!!!
         aset.nb_values++;
@@ -103,7 +103,7 @@ set_t add_to_set(set_t aset, char *aelement)
 
 
 // Return the index of first occurrence of an element
-int index_in_set(set_t aset, char *aelement, hsize_t *index)
+int AH5_index_in_set(AH5_set_t aset, char *aelement, hsize_t *index)
 {
     int present = FALSE;
     hsize_t i;
@@ -122,14 +122,14 @@ int index_in_set(set_t aset, char *aelement, hsize_t *index)
 
 
 // Read children names of an object
-children_t read_children_name (hid_t file_id, const char* path)
+AH5_children_t AH5_read_children_name (hid_t file_id, const char* path)
 {
     H5G_info_t ginfo;
-    children_t children;
+    AH5_children_t children;
     hsize_t i, j = 0;
     ssize_t size;
     hid_t group_id;
-    char temp[ELEMENT_NAME_LENGTH], *temp2;
+    char temp[AH5_ELEMENT_NAME_LENGTH], *temp2;
 
     children.childnames = NULL;
     /*
@@ -137,7 +137,7 @@ children_t read_children_name (hid_t file_id, const char* path)
         - number of children must be greater than zero
         - element name
             - must be readable
-            - must be shorter than ELEMENT_NAME_LENGTH
+            - must be shorter than AH5_ELEMENT_NAME_LENGTH
             - must NOT be same as "_param"
     */
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0 || strcmp(path, "/") == 0)
@@ -152,11 +152,11 @@ children_t read_children_name (hid_t file_id, const char* path)
                 size = H5Lget_name_by_idx(group_id, ".", H5_INDEX_NAME, H5_ITER_INC, i, NULL, 0, H5P_DEFAULT);
                 if (size < 0)
                     printf("***** ERROR: Cannot read all children of \"%s\". *****\n\n", path);
-                else if (size >= ELEMENT_NAME_LENGTH)
+                else if (size >= AH5_ELEMENT_NAME_LENGTH)
                 {
                     temp2 = (char *) malloc ((size + 1) * sizeof(char));
                     H5Lget_name_by_idx(group_id, ".", H5_INDEX_NAME, H5_ITER_INC, i, temp2, size + 1, H5P_DEFAULT);
-                    printf("***** ERROR: Maximum name length (%i) exceeded in \"%s/%s\". *****\n\n", ELEMENT_NAME_LENGTH - 1, path, temp2);
+                    printf("***** ERROR: Maximum name length (%i) exceeded in \"%s/%s\". *****\n\n", AH5_ELEMENT_NAME_LENGTH - 1, path, temp2);
                     free(temp2);
                 }
                 else
@@ -181,7 +181,7 @@ children_t read_children_name (hid_t file_id, const char* path)
 
 
 // Get last part of a path; does not allocate new memory
-char *get_name_from_path (const char *path)
+char *AH5_get_name_from_path (const char *path)
 {
     int i;
 
@@ -192,7 +192,7 @@ char *get_name_from_path (const char *path)
 }
 
 // Get base part of a path; allocates new memory!
-char *get_base_from_path (const char *path)
+char *AH5_get_base_from_path (const char *path)
 {
     int i;
     char *rdata, *temp;
@@ -209,7 +209,7 @@ char *get_base_from_path (const char *path)
 
 
 // Read integer attribute <attr_name> given by address <path>
-char read_int_attr (hid_t file_id, const char* path, char* attr, int *rdata)
+char AH5_read_int_attr (hid_t file_id, const char* path, char* attr, int *rdata)
 {
     char success = FALSE;
 
@@ -224,7 +224,7 @@ char read_int_attr (hid_t file_id, const char* path, char* attr, int *rdata)
 
 
 // Read float attribute <attr_name> given by address <path>
-char read_flt_attr (hid_t file_id, const char* path, char* attr_name, float *rdata)
+char AH5_read_flt_attr (hid_t file_id, const char* path, char* attr_name, float *rdata)
 {
     char success = FALSE;
 
@@ -239,7 +239,7 @@ char read_flt_attr (hid_t file_id, const char* path, char* attr_name, float *rda
 
 
 // Read complex attribute <attr_name> given by address <path>
-char read_cpx_attr (hid_t file_id, const char* path, char* attr_name, complex float *rdata)
+char AH5_read_cpx_attr (hid_t file_id, const char* path, char* attr_name, complex float *rdata)
 {
     hid_t attr_id, type_id;
     float buf[2];
@@ -267,7 +267,7 @@ char read_cpx_attr (hid_t file_id, const char* path, char* attr_name, complex fl
 
 
 // Read string attribute <attr_name> given by address <path>
-char read_str_attr (hid_t file_id, const char *path, char *attr_name, char **rdata)
+char AH5_read_str_attr (hid_t file_id, const char *path, char *attr_name, char **rdata)
 {
     hid_t attr_id, filetype, memtype;
     size_t sdim;
@@ -299,28 +299,28 @@ char read_str_attr (hid_t file_id, const char *path, char *attr_name, char **rda
 
 
 // Print integer attribute
-void print_int_attr (char *name, int value, int space)
+void AH5_print_int_attr (char *name, int value, int space)
 {
     printf("%*s-@%s: %i\n", space, "", name, value);
 }
 
 
 // Print float attribute
-void print_flt_attr (char *name, float value, int space)
+void AH5_print_flt_attr (char *name, float value, int space)
 {
     printf("%*s-@%s: %g\n", space, "", name, value);
 }
 
 
 // Print complex attribute
-void print_cpx_attr (char *name, complex float value, int space)
+void AH5_print_cpx_attr (char *name, complex float value, int space)
 {
     printf("%*s-@%s: %g%+gi\n", space, "", name, creal(value), cimag(value));
 }
 
 
 // Print string attribute
-void print_str_attr (char *name, char *value, int space)
+void AH5_print_str_attr (char *name, char *value, int space)
 {
     printf("%*s-@%s: %s\n", space, "", name, value);
 }
@@ -328,7 +328,7 @@ void print_str_attr (char *name, char *value, int space)
 
 
 // Read int dataset
-char read_int_dataset (hid_t file_id, const char *path, const hsize_t mn, int **rdata)
+char AH5_read_int_dataset (hid_t file_id, const char *path, const hsize_t mn, int **rdata)
 {
     char success = FALSE;
     hid_t dset_id;
@@ -348,7 +348,7 @@ char read_int_dataset (hid_t file_id, const char *path, const hsize_t mn, int **
 
 
 // Read float dataset
-char read_float_dataset (hid_t file_id, const char *path, const hsize_t mn, float **rdata)
+char AH5_read_float_dataset (hid_t file_id, const char *path, const hsize_t mn, float **rdata)
 {
     char success = FALSE;
     hid_t dset_id;
@@ -368,7 +368,7 @@ char read_float_dataset (hid_t file_id, const char *path, const hsize_t mn, floa
 
 
 // Read complex float dataset
-char read_complex_dataset (hid_t file_id, const char *path, const hsize_t mn, complex float **rdata)
+char AH5_read_complex_dataset (hid_t file_id, const char *path, const hsize_t mn, complex float **rdata)
 {
     char success = FALSE;
     hid_t dset_id, type_id;
@@ -400,7 +400,7 @@ char read_complex_dataset (hid_t file_id, const char *path, const hsize_t mn, co
 
 
 // Read string dataset
-char read_string_dataset(hid_t file_id, const char *path, const hsize_t mn, size_t length, char ***rdata)
+char AH5_read_string_dataset(hid_t file_id, const char *path, const hsize_t mn, size_t length, char ***rdata)
 {
     char success = FALSE;
     hid_t dset_id, memtype;
@@ -431,7 +431,7 @@ char read_string_dataset(hid_t file_id, const char *path, const hsize_t mn, size
 
 
 // Read all optional attributes
-char read_opt_attrs (hid_t file_id, const char *path, opt_attrs_t *opt_attrs, char mandatory_attrs[][ATTR_LENGTH], size_t nb_mandatory_attrs)
+char AH5_read_opt_attrs (hid_t file_id, const char *path, AH5_opt_attrs_t *opt_attrs, char mandatory_attrs[][AH5_ATTR_LENGTH], size_t nb_mandatory_attrs)
 {
     char success = FALSE, is_mandatory;
     H5O_info_t object_info;
@@ -439,7 +439,7 @@ char read_opt_attrs (hid_t file_id, const char *path, opt_attrs_t *opt_attrs, ch
     hid_t attr_id, type_id, memtype;
     float buf[2];
     hsize_t nb_present_mandatory_attrs = 0;
-    char temp_name[ATTR_LENGTH];
+    char temp_name[AH5_ATTR_LENGTH];
 
     if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
     {
@@ -450,12 +450,12 @@ char read_opt_attrs (hid_t file_id, const char *path, opt_attrs_t *opt_attrs, ch
         H5Oget_info_by_name(file_id, path, &object_info, H5P_DEFAULT);
         opt_attrs->nb_instances = object_info.num_attrs - nb_present_mandatory_attrs;
         if (opt_attrs->nb_instances > 0)
-            opt_attrs->instances = (attr_instance_t *) malloc (opt_attrs->nb_instances * sizeof(attr_instance_t));
+            opt_attrs->instances = (AH5_attr_instance_t *) malloc (opt_attrs->nb_instances * sizeof(AH5_attr_instance_t));
         for (i = 0; i < object_info.num_attrs; i++)
         {
             is_mandatory = FALSE;
             attr_id = H5Aopen_by_idx(file_id, path, H5_INDEX_CRT_ORDER, H5_ITER_NATIVE, i, H5P_DEFAULT, H5P_DEFAULT);
-            H5Aget_name(attr_id, ATTR_LENGTH, temp_name);
+            H5Aget_name(attr_id, AH5_ATTR_LENGTH, temp_name);
             for (j = 0; j < nb_mandatory_attrs; j++)
                 if (strcmp(temp_name, mandatory_attrs[j]) == 0)
                     is_mandatory = TRUE;
@@ -492,8 +492,8 @@ char read_opt_attrs (hid_t file_id, const char *path, opt_attrs_t *opt_attrs, ch
                 case H5T_STRING:
                     opt_attrs->instances[k].value.s = NULL;
                     memtype = H5Tcopy(H5T_C_S1);
-                    H5Tset_size(memtype, ATTR_LENGTH);
-                    opt_attrs->instances[k].value.s = (char *) malloc(ATTR_LENGTH * sizeof(char));
+                    H5Tset_size(memtype, AH5_ATTR_LENGTH);
+                    opt_attrs->instances[k].value.s = (char *) malloc(AH5_ATTR_LENGTH * sizeof(char));
                     if (H5Aread(attr_id, memtype, opt_attrs->instances[k].value.s) >= 0)
                         success = TRUE;
                     H5Tclose(memtype);
@@ -518,7 +518,7 @@ char read_opt_attrs (hid_t file_id, const char *path, opt_attrs_t *opt_attrs, ch
 
 
 // Print all optional attributes
-void print_opt_attrs(const opt_attrs_t *opt_attrs, int space)
+void AH5_print_opt_attrs(const AH5_opt_attrs_t *opt_attrs, int space)
 {
     hsize_t i;
 
@@ -527,19 +527,19 @@ void print_opt_attrs(const opt_attrs_t *opt_attrs, int space)
         switch (opt_attrs->instances[i].type)
         {
         case H5T_INTEGER:
-            print_int_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.i, space);
+            AH5_print_int_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.i, space);
             break;
         case H5T_FLOAT:
-            print_flt_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.f, space);
+            AH5_print_flt_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.f, space);
             break;
         case H5T_COMPOUND:
-            print_cpx_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.c, space);
+            AH5_print_cpx_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.c, space);
             break;
         case H5T_STRING:
-            print_str_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.s, space);
+            AH5_print_str_attr(opt_attrs->instances[i].name, opt_attrs->instances[i].value.s, space);
             break;
         default:
-            print_str_attr(opt_attrs->instances[i].name, "UNSUPPORTED DATA TYPE", space);
+            AH5_print_str_attr(opt_attrs->instances[i].name, "UNSUPPORTED DATA TYPE", space);
             break;
         }
     }
@@ -547,7 +547,7 @@ void print_opt_attrs(const opt_attrs_t *opt_attrs, int space)
 
 
 // Free memory used by optional attributes
-void free_opt_attrs(opt_attrs_t *opt_attrs)
+void AH5_free_opt_attrs(AH5_opt_attrs_t *opt_attrs)
 {
     hsize_t i;
 
@@ -575,17 +575,17 @@ void free_opt_attrs(opt_attrs_t *opt_attrs)
 }
 
 
-void print_err_dset (const char *category, const char *path)
+void AH5_print_err_dset (const char *category, const char *path)
 {
     printf("***** ERROR(%s): Cannot read dataset \"%s\". *****\n\n", category, path);
 }
 
-void print_err_attr (const char *category, const char *path, const char *attr_name)
+void AH5_print_err_attr (const char *category, const char *path, const char *attr_name)
 {
     printf("***** ERROR(%s): Cannot read mandatory attribute \"%s[@%s]\". *****\n\n", category, path, attr_name);
 }
 
-void print_wrn_attr (const char *category, const char *path, const char *attr_name)
+void AH5_print_wrn_attr (const char *category, const char *path, const char *attr_name)
 {
     printf("***** WARNING(%s): Invalid attribute value in \"%s[@%s]\". *****\n\n", category, path, attr_name);
 }
