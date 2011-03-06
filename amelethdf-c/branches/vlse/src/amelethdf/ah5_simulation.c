@@ -12,7 +12,7 @@ void AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t 
     int nb_dims;
 
     sim_instance->path = strdup(path);
-    AH5_read_opt_attrs(file_id, path2, &(sim_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
+    AH5_read_opt_attrs(file_id, path, &(sim_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
     if (!AH5_read_str_attr(file_id, path, AH5_A_MODULE, &(sim_instance->module)))
         AH5_print_err_attr(AH5_C_SIMULATION, path, AH5_A_MODULE);
     if (!AH5_read_str_attr(file_id, path, AH5_A_VERSION, &(sim_instance->version)))

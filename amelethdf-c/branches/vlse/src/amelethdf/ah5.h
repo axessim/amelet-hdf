@@ -5,9 +5,6 @@
 extern "C" {
 #endif
 
-#define FALSE 0
-#define TRUE 1
-
 #include "ah5_general.h"
 #include "ah5_fltype.h"
 #include "ah5_category.h"
