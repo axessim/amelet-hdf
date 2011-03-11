@@ -37,9 +37,9 @@ extern "C" {
         AH5_lsm_instance_t *instances;
     } AH5_localization_system_t;
 
-    void AH5_read_lsm_transformation (hid_t file_id, const char *path, AH5_lsm_transf_t *lsm_transformation);
-    void AH5_read_lsm_instance (hid_t file_id, const char *path, AH5_lsm_instance_t *lsm_instance);
-    void AH5_read_localization_system (hid_t file_id, AH5_localization_system_t *localization_system);
+    char AH5_read_lsm_transformation (hid_t file_id, const char *path, AH5_lsm_transf_t *lsm_transformation);
+    char AH5_read_lsm_instance (hid_t file_id, const char *path, AH5_lsm_instance_t *lsm_instance);
+    char AH5_read_localization_system (hid_t file_id, AH5_localization_system_t *localization_system);
 
     void AH5_print_lsm_transformation (const AH5_lsm_transf_t *lsm_transformation, int space);
     void AH5_print_lsm_instance (const AH5_lsm_instance_t *lsm_instance, int space);

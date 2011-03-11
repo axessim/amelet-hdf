@@ -2,93 +2,119 @@
 
 
 // Read exchangeSurface group
-void AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_group)
+char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_group)
 {
-    char path2[AH5_ABSOLUTE_PATH_LENGTH], *temp;
+    char path2[AH5_ABSOLUTE_PATH_LENGTH], *temp, rdata = TRUE;
     AH5_children_t children;
     hsize_t i;
 
     exs_group->path = strdup(path);
-    if (AH5_read_str_attr(file_id, path, AH5_A_TYPE, &temp))
+    exs_group->instances = NULL;
+    exs_group->type = EXS_TYPE_INVALID;
+    exs_group->nature = EXS_NATURE_INVALID;
+
+    if (AH5_path_valid(file_id, path))
     {
-        if (strcmp(temp, AH5_V_RECIPROCITY) == 0)
-            exs_group->type = EXS_TYPE_RECIPROCITY;
-        else if (strcmp(temp, AH5_V_HUYGENS) == 0)
-            exs_group->type = EXS_TYPE_HUYGENS;
-        else if (strcmp(temp, AH5_V_GAUSS) == 0)
-            exs_group->type = EXS_TYPE_GAUSS;
+        if (AH5_read_str_attr(file_id, path, AH5_A_TYPE, &temp))
+        {
+            if (strcmp(temp, AH5_V_RECIPROCITY) == 0)
+                exs_group->type = EXS_TYPE_RECIPROCITY;
+            else if (strcmp(temp, AH5_V_HUYGENS) == 0)
+                exs_group->type = EXS_TYPE_HUYGENS;
+            else if (strcmp(temp, AH5_V_GAUSS) == 0)
+                exs_group->type = EXS_TYPE_GAUSS;
+            else
+            {
+                AH5_print_wrn_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_TYPE);
+                rdata = FALSE;
+            }
+            free(temp);
+        }
         else
         {
             exs_group->type = EXS_TYPE_INVALID;
-            AH5_print_wrn_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_TYPE);
+            AH5_print_err_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_TYPE);
+            rdata = FALSE;
         }
-        free(temp);
-    }
-    else
-    {
-        exs_group->type = EXS_TYPE_INVALID;
-        AH5_print_err_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_TYPE);
-    }
 
-    if (AH5_read_str_attr(file_id, path, AH5_A_NATURE, &temp))
-    {
-        if (strcmp(temp, AH5_V_OUTSIDE) == 0)
-            exs_group->nature = EXS_NATURE_OUTSIDE;
-        else if (strcmp(temp, AH5_V_INSIDE) == 0)
-            exs_group->nature = EXS_NATURE_INSIDE;
+        if (AH5_read_str_attr(file_id, path, AH5_A_NATURE, &temp))
+        {
+            if (strcmp(temp, AH5_V_OUTSIDE) == 0)
+                exs_group->nature = EXS_NATURE_OUTSIDE;
+            else if (strcmp(temp, AH5_V_INSIDE) == 0)
+                exs_group->nature = EXS_NATURE_INSIDE;
+            else
+            {
+                AH5_print_wrn_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_NATURE);
+                rdata = FALSE;
+            }
+            free(temp);
+        }
         else
         {
             exs_group->nature = EXS_NATURE_INVALID;
-            AH5_print_wrn_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_NATURE);
+            AH5_print_err_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_NATURE);
+            rdata = FALSE;
         }
-        free(temp);
+
+        children = AH5_read_children_name(file_id, path);
+        exs_group->nb_instances = children.nb_children;
+        if (children.nb_children > 0)
+        {
+            exs_group->instances = (AH5_arrayset_t *) malloc(children.nb_children * sizeof(AH5_arrayset_t));
+            for (i = 0; i < children.nb_children; i++)
+            {
+                strcpy(path2, path);
+                strcat(path2, children.childnames[i]);
+                if (!AH5_read_ft_arrayset(file_id, path2, exs_group->instances + i))
+                    rdata = FALSE;
+                free(children.childnames[i]);
+            }
+            free(children.childnames);
+        }
     }
     else
     {
-        exs_group->nature = EXS_NATURE_INVALID;
-        AH5_print_err_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_NATURE);
+        AH5_print_err_path(AH5_C_GLOBAL_ENVIRONMENT, path);
+        rdata = FALSE;
     }
-
-    children = AH5_read_children_name(file_id, path);
-    exs_group->nb_instances = children.nb_children;
-    exs_group->instances = NULL;
-    if (children.nb_children > 0)
-    {
-        exs_group->instances = (AH5_arrayset_t *) malloc(children.nb_children * sizeof(AH5_arrayset_t));
-        for (i = 0; i < children.nb_children; i++)
-        {
-            strcpy(path2, path);
-            strcat(path2, children.childnames[i]);
-            AH5_read_ft_arrayset(file_id, path2, exs_group->instances + i);
-            free(children.childnames[i]);
-        }
-        free(children.childnames);
-    }
+    return rdata;
 }
 
 
 // Read exchangeSurface category
-void AH5_read_exchange_surface (hid_t file_id, AH5_exchange_surface_t *exchange_surface)
+char AH5_read_exchange_surface (hid_t file_id, AH5_exchange_surface_t *exchange_surface)
 {
-    char path[AH5_ABSOLUTE_PATH_LENGTH];
+    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
     AH5_children_t children;
     hsize_t i;
 
-    children = AH5_read_children_name(file_id, AH5_C_EXCHANGE_SURFACE);
-    exchange_surface->nb_groups = children.nb_children;
     exchange_surface->groups = NULL;
-    if (children.nb_children > 0)
+
+    if (H5Lexists(file_id, AH5_C_EXCHANGE_SURFACE, H5P_DEFAULT) == TRUE)
     {
-        exchange_surface->groups = (AH5_exs_group_t *) malloc(children.nb_children * sizeof(AH5_exs_group_t));
-        for (i = 0; i < children.nb_children; i++)
+        children = AH5_read_children_name(file_id, AH5_C_EXCHANGE_SURFACE);
+        exchange_surface->nb_groups = children.nb_children;
+        if (children.nb_children > 0)
         {
-            strcpy(path, AH5_C_EXCHANGE_SURFACE);
-            strcat(path, children.childnames[i]);
-            AH5_read_exs_group(file_id, path, exchange_surface->groups + i);
-            free(children.childnames[i]);
+            exchange_surface->groups = (AH5_exs_group_t *) malloc(children.nb_children * sizeof(AH5_exs_group_t));
+            for (i = 0; i < children.nb_children; i++)
+            {
+                strcpy(path, AH5_C_EXCHANGE_SURFACE);
+                strcat(path, children.childnames[i]);
+                if (!AH5_read_exs_group(file_id, path, exchange_surface->groups + i))
+                    rdata = FALSE;
+                free(children.childnames[i]);
+            }
+            free(children.childnames);
         }
-        free(children.childnames);
     }
+    else
+    {
+        AH5_print_err_path(AH5_C_EXCHANGE_SURFACE, AH5_C_EXCHANGE_SURFACE);
+        rdata = FALSE;
+    }
+    return rdata;
 }
 
 
@@ -127,7 +153,6 @@ void AH5_print_exs_group (const AH5_exs_group_t *exs_group, int space)
         AH5_print_str_attr(AH5_A_NATURE, AH5_V_INVALID, space + 4);
         break;
     }
-
     for (i = 0; i < exs_group->nb_instances; i++)
         AH5_print_ft_arrayset(&(exs_group->instances[i]), space + 2);
 }
@@ -157,7 +182,7 @@ void AH5_free_exs_group (AH5_exs_group_t *exs_group)
         free(exs_group->path);
         exs_group->path = NULL;
     }
-    if (exs_group->nb_instances > 0)
+    if (exs_group->instances != NULL)
     {
         for (i = 0; i < exs_group->nb_instances; i++)
             AH5_free_ft_arrayset(exs_group->instances + i);
@@ -165,6 +190,8 @@ void AH5_free_exs_group (AH5_exs_group_t *exs_group)
         exs_group->instances = NULL;
         exs_group->nb_instances = 0;
     }
+    exs_group->type = EXS_TYPE_INVALID;
+    exs_group->nature = EXS_NATURE_INVALID;
 }
 
 
@@ -173,7 +200,7 @@ void AH5_free_exchange_surface (AH5_exchange_surface_t *exchange_surface)
 {
     hsize_t i;
 
-    if (exchange_surface->nb_groups > 0)
+    if (exchange_surface->groups != NULL)
     {
         for (i = 0; i < exchange_surface->nb_groups; i++)
             AH5_free_exs_group(exchange_surface->groups + i);

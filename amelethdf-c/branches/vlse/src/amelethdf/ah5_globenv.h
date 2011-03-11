@@ -28,8 +28,8 @@ extern "C" {
         AH5_gle_instance_t *instances;
     } AH5_global_environment_t;
 
-    void AH5_read_global_environment_instance (hid_t file_id, const char *path, AH5_gle_instance_t *gle_instance);
-    void AH5_read_global_environment (hid_t file_id, AH5_global_environment_t *global_environment);
+    char AH5_read_global_environment_instance (hid_t file_id, const char *path, AH5_gle_instance_t *gle_instance);
+    char AH5_read_global_environment (hid_t file_id, AH5_global_environment_t *global_environment);
 
     void AH5_print_global_environment_instance (const AH5_gle_instance_t *gle_instance, int space);
     void AH5_print_global_environment (const AH5_global_environment_t *global_environment);

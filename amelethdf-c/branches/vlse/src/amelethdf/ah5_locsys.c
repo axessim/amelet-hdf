@@ -2,79 +2,114 @@
 
 
 // Read localizationSystem transformation
-void AH5_read_lsm_transformation (hid_t file_id, const char *path, AH5_lsm_transf_t *lsm_transformation)
+char AH5_read_lsm_transformation (hid_t file_id, const char *path, AH5_lsm_transf_t *lsm_transformation)
 {
-    char *type;
+    char *type, rdata = TRUE;
 
     lsm_transformation->path = strdup(path);
     lsm_transformation->type = TRF_INVALID;
-    if (AH5_read_str_attr(file_id, path, AH5_A_TYPE, &type))
+
+    if (AH5_path_valid(file_id, path))
     {
-        if (strcmp(type, AH5_V_SCALE) == 0)
-            lsm_transformation->type = TRF_SCALE;
-        else if (strcmp(type, AH5_V_ROTATION) == 0)
-            lsm_transformation->type = TRF_ROTATION;
-        else if (strcmp(type, AH5_V_TRANSLATION) == 0)
-            lsm_transformation->type = TRF_TRANSLATION;
-        free(type);
+        if (AH5_read_str_attr(file_id, path, AH5_A_TYPE, &type))
+        {
+            if (strcmp(type, AH5_V_SCALE) == 0)
+                lsm_transformation->type = TRF_SCALE;
+            else if (strcmp(type, AH5_V_ROTATION) == 0)
+                lsm_transformation->type = TRF_ROTATION;
+            else if (strcmp(type, AH5_V_TRANSLATION) == 0)
+                lsm_transformation->type = TRF_TRANSLATION;
+            free(type);
+        }
+        else
+            rdata = FALSE;
+        if(!AH5_read_int_attr(file_id, path, AH5_A_RANK, &(lsm_transformation->rank)))
+            rdata = FALSE;
     }
-    AH5_read_int_attr(file_id, path, AH5_A_RANK, &(lsm_transformation->rank));
+    else
+    {
+        AH5_print_err_path(AH5_C_LOCALIZATION_SYSTEM, path);
+        rdata = FALSE;
+    }
+    return rdata;
 }
 
 
 // Read localizationSystem instance
-void AH5_read_lsm_instance (hid_t file_id, const char *path, AH5_lsm_instance_t *lsm_instance)
+char AH5_read_lsm_instance (hid_t file_id, const char *path, AH5_lsm_instance_t *lsm_instance)
 {
-    char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_DIMENSION};
+    char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_DIMENSION}, rdata = TRUE;
     char path2[AH5_ABSOLUTE_PATH_LENGTH];
     AH5_children_t children;
     hsize_t i;
 
     lsm_instance->path = strdup(path);
-    AH5_read_opt_attrs(file_id, path, &(lsm_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
-    AH5_read_int_attr(file_id, path, AH5_A_DIMENSION, &(lsm_instance->dimension));
-
-    children = AH5_read_children_name(file_id, path);
-    lsm_instance->nb_transformations = children.nb_children;
     lsm_instance->transformations = NULL;
-    if (children.nb_children > 0)
-    {
-        lsm_instance->transformations = (AH5_lsm_transf_t *) malloc(children.nb_children * sizeof(AH5_lsm_transf_t));
-        for (i = 0; i < children.nb_children; i++)
-        {
-            strcpy(path2, path);
-            strcat(path2, children.childnames[i]);
-            AH5_read_lsm_transformation(file_id, path2, lsm_instance->transformations + i);
-            free(children.childnames[i]);
-        }
-        free(children.childnames);
-    }
+    lsm_instance->opt_attrs.instances = NULL;
 
+    if (AH5_path_valid(file_id, path))
+    {
+        AH5_read_opt_attrs(file_id, path, &(lsm_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
+        AH5_read_int_attr(file_id, path, AH5_A_DIMENSION, &(lsm_instance->dimension));
+
+        children = AH5_read_children_name(file_id, path);
+        lsm_instance->nb_transformations = children.nb_children;
+        if (children.nb_children > 0)
+        {
+            lsm_instance->transformations = (AH5_lsm_transf_t *) malloc(children.nb_children * sizeof(AH5_lsm_transf_t));
+            for (i = 0; i < children.nb_children; i++)
+            {
+                strcpy(path2, path);
+                strcat(path2, children.childnames[i]);
+                if (!AH5_read_lsm_transformation(file_id, path2, lsm_instance->transformations + i))
+                    rdata = FALSE;
+                free(children.childnames[i]);
+            }
+            free(children.childnames);
+        }
+    }
+    else
+    {
+        AH5_print_err_path(AH5_C_LOCALIZATION_SYSTEM, path);
+        rdata = FALSE;
+    }
+    return rdata;
 }
 
 
 // Read localizationSystem category
-void AH5_read_localization_system (hid_t file_id, AH5_localization_system_t *localization_system)
+char AH5_read_localization_system (hid_t file_id, AH5_localization_system_t *localization_system)
 {
-    char path[AH5_ABSOLUTE_PATH_LENGTH];
+    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
     AH5_children_t children;
     hsize_t i;
 
-    children = AH5_read_children_name(file_id, AH5_C_LOCALIZATION_SYSTEM);
-    localization_system->nb_instances = children.nb_children;
     localization_system->instances = NULL;
-    if (children.nb_children > 0)
+
+    if (H5Lexists(file_id, AH5_C_LOCALIZATION_SYSTEM, H5P_DEFAULT) == TRUE)
     {
-        localization_system->instances = (AH5_lsm_instance_t *) malloc(children.nb_children * sizeof(AH5_lsm_instance_t));
-        for (i = 0; i < children.nb_children; i++)
+        children = AH5_read_children_name(file_id, AH5_C_LOCALIZATION_SYSTEM);
+        localization_system->nb_instances = children.nb_children;
+        if (children.nb_children > 0)
         {
-            strcpy(path, AH5_C_LOCALIZATION_SYSTEM);
-            strcat(path, children.childnames[i]);
-            AH5_read_lsm_instance(file_id, path, localization_system->instances + i);
-            free(children.childnames[i]);
+            localization_system->instances = (AH5_lsm_instance_t *) malloc(children.nb_children * sizeof(AH5_lsm_instance_t));
+            for (i = 0; i < children.nb_children; i++)
+            {
+                strcpy(path, AH5_C_LOCALIZATION_SYSTEM);
+                strcat(path, children.childnames[i]);
+                if(!AH5_read_lsm_instance(file_id, path, localization_system->instances + i))
+                    rdata = FALSE;
+                free(children.childnames[i]);
+            }
+            free(children.childnames);
         }
-        free(children.childnames);
     }
+    else
+    {
+        AH5_print_err_path(AH5_C_LOCALIZATION_SYSTEM, AH5_C_LOCALIZATION_SYSTEM);
+        rdata = FALSE;
+    }
+    return rdata;
 }
 
 
@@ -138,6 +173,7 @@ void AH5_free_lsm_transformation (AH5_lsm_transf_t *lsm_transformation)
         free(lsm_transformation->path);
         lsm_transformation->path = NULL;
     }
+    lsm_transformation->type = TRF_INVALID;
 }
 
 
@@ -152,7 +188,7 @@ void AH5_free_lsm_instance (AH5_lsm_instance_t *lsm_instance)
         lsm_instance->path = NULL;
     }
     AH5_free_opt_attrs(&(lsm_instance->opt_attrs));
-    if (lsm_instance->nb_transformations > 0)
+    if (lsm_instance->transformations != NULL)
     {
         for (i = 0; i < lsm_instance->nb_transformations; i++)
             AH5_free_lsm_transformation(lsm_instance->transformations + i);
@@ -168,7 +204,7 @@ void AH5_free_localization_system (AH5_localization_system_t *localization_syste
 {
     hsize_t i;
 
-    if (localization_system->nb_instances > 0)
+    if (localization_system->instances != NULL)
     {
         for (i = 0; i < localization_system->nb_instances; i++)
             AH5_free_lsm_instance(localization_system->instances + i);

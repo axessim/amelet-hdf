@@ -37,8 +37,8 @@ extern "C" {
         AH5_exs_group_t *groups;
     } AH5_exchange_surface_t;
 
-    void AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_group);
-    void AH5_read_exchange_surface (hid_t file_id, AH5_exchange_surface_t *exchange_surface);
+    char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_group);
+    char AH5_read_exchange_surface (hid_t file_id, AH5_exchange_surface_t *exchange_surface);
 
     void AH5_print_exs_group (const AH5_exs_group_t *exs_group, int space);
     void AH5_print_exchange_surface (const AH5_exchange_surface_t *exchange_surface);

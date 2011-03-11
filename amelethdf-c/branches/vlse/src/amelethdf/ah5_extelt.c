@@ -2,15 +2,17 @@
 
 
 // Read dataset in externalElement and open external files
-void AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *eet_dataset)
+char AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *eet_dataset)
 {
     H5T_class_t type_class;
-    char success = FALSE;
+    char rdata = FALSE;
     hsize_t dims[2], i;
     size_t length;
     int nb_dims;
 
-    if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
+    eet_dataset->path = strdup(path);
+
+    if (AH5_path_valid(file_id, path))
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims == 2)
                 if (H5LTget_dataset_info(file_id, path, dims, &type_class, &length) >= 0)
@@ -18,47 +20,58 @@ void AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *e
                         if(AH5_read_string_dataset(file_id, path, dims[0] * dims[1], length, &(eet_dataset->eed_items)))
                         {
                             eet_dataset->nb_eed_items = dims[0];
-                            success = TRUE;
+                            rdata = TRUE;
                             eet_dataset->file_id = (hid_t *) malloc(eet_dataset->nb_eed_items * sizeof(hid_t));
                             for (i = 0; i < eet_dataset->nb_eed_items; i++)
                                 eet_dataset->file_id[i] = -1;
-                            AH5_open_external_files(eet_dataset);
                         }
-    if (success)
-        eet_dataset->path = strdup(path);
-    else
+    if (!rdata)
     {
         AH5_print_err_dset(AH5_C_EXTERNAL_ELEMENT, path);
-        eet_dataset->path = NULL;
-        eet_dataset->file_id = NULL;
         eet_dataset->nb_eed_items = 0;
+        eet_dataset->file_id = NULL;
         eet_dataset->eed_items = NULL;
     }
+    else
+        if (!AH5_open_external_files(eet_dataset))
+            rdata = FALSE;
+    return rdata;
 }
 
 
 // Read externalElement category (all datasets)
-void AH5_read_external_element (hid_t file_id, AH5_external_element_t *external_element)
+char AH5_read_external_element (hid_t file_id, AH5_external_element_t *external_element)
 {
-    char path[AH5_ABSOLUTE_PATH_LENGTH];
+    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
     AH5_children_t children;
     hsize_t i;
 
-    children = AH5_read_children_name(file_id, AH5_C_EXTERNAL_ELEMENT);
-    external_element->nb_datasets = children.nb_children;
     external_element->datasets = NULL;
-    if (children.nb_children > 0)
+
+    if (H5Lexists(file_id, AH5_C_EXTERNAL_ELEMENT, H5P_DEFAULT) == TRUE)
     {
-        external_element->datasets = (AH5_eet_dataset_t *) malloc(children.nb_children * sizeof(AH5_eet_dataset_t));
-        for (i = 0; i < children.nb_children; i++)
+        children = AH5_read_children_name(file_id, AH5_C_EXTERNAL_ELEMENT);
+        external_element->nb_datasets = children.nb_children;
+        if (children.nb_children > 0)
         {
-            strcpy(path, AH5_C_EXTERNAL_ELEMENT);
-            strcat(path, children.childnames[i]);
-            AH5_read_eet_dataset(file_id, path, external_element->datasets + i);
-            free(children.childnames[i]);
+            external_element->datasets = (AH5_eet_dataset_t *) malloc(children.nb_children * sizeof(AH5_eet_dataset_t));
+            for (i = 0; i < children.nb_children; i++)
+            {
+                strcpy(path, AH5_C_EXTERNAL_ELEMENT);
+                strcat(path, children.childnames[i]);
+                if (!AH5_read_eet_dataset(file_id, path, external_element->datasets + i))
+                    rdata = FALSE;
+                free(children.childnames[i]);
+            }
+            free(children.childnames);
         }
-        free(children.childnames);
     }
+    else
+    {
+        AH5_print_err_path(AH5_C_EXTERNAL_ELEMENT, AH5_C_EXTERNAL_ELEMENT);
+        rdata = FALSE;
+    }
+    return rdata;
 }
 
 
@@ -102,11 +115,12 @@ void AH5_free_eet_dataset (AH5_eet_dataset_t *eet_dataset)
         free(eet_dataset->path);
         eet_dataset->path = NULL;
     }
-    if (eet_dataset->nb_eed_items > 0)
+    if (eet_dataset->eed_items != NULL)
     {
         AH5_close_external_files(eet_dataset);
         free(eet_dataset->eed_items[0]);
         free(eet_dataset->eed_items);
+        eet_dataset->eed_items = NULL;
         eet_dataset->nb_eed_items = 0;
     }
     if (eet_dataset->file_id != NULL)
@@ -122,7 +136,7 @@ void AH5_free_external_element (AH5_external_element_t *external_element)
 {
     hsize_t i;
 
-    if (external_element->nb_datasets > 0)
+    if (external_element->datasets != NULL)
     {
         for (i = 0; i < external_element->nb_datasets; i++)
             AH5_free_eet_dataset(external_element->datasets + i);

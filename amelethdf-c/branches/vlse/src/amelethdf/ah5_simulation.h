@@ -25,8 +25,8 @@ extern "C" {
         AH5_sim_instance_t *instances;
     } AH5_simulation_t;
 
-    void AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t *sim_instance);
-    void AH5_read_simulation (hid_t file_id, AH5_simulation_t *simulation);
+    char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t *sim_instance);
+    char AH5_read_simulation (hid_t file_id, AH5_simulation_t *simulation);
 
     void AH5_print_sim_instance (const AH5_sim_instance_t *sim_instance, int space);
     void AH5_print_simulation (const AH5_simulation_t *simulation);

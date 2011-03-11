@@ -29,9 +29,9 @@ extern "C" {
         AH5_lnk_group_t *groups;
     } AH5_link_t;
 
-    void AH5_read_lnk_instance (hid_t file_id, const char *path, AH5_lnk_instance_t *lnk_instance);
-    void AH5_read_lnk_group (hid_t file_id, const char *path, AH5_lnk_group_t *lnk_group);
-    void AH5_read_link (hid_t file_id, AH5_link_t *link);
+    char AH5_read_lnk_instance (hid_t file_id, const char *path, AH5_lnk_instance_t *lnk_instance);
+    char AH5_read_lnk_group (hid_t file_id, const char *path, AH5_lnk_group_t *lnk_group);
+    char AH5_read_link (hid_t file_id, AH5_link_t *link);
 
     void AH5_print_lnk_instance (const AH5_lnk_instance_t *lnk_instance, int space);
     void AH5_print_lnk_group (const AH5_lnk_group_t *lnk_group, int space);

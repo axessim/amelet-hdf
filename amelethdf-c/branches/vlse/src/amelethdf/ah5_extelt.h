@@ -22,8 +22,8 @@ extern "C" {
         AH5_eet_dataset_t *datasets;
     } AH5_external_element_t;
 
-    void AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *eet_dataset);
-    void AH5_read_external_element (hid_t file_id, AH5_external_element_t *external_element);
+    char AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *eet_dataset);
+    char AH5_read_external_element (hid_t file_id, AH5_external_element_t *external_element);
 
     void AH5_print_eet_dataset (const AH5_eet_dataset_t *eet_dataset, int space);
     void AH5_print_external_element (const AH5_external_element_t *external_element);

@@ -2,71 +2,117 @@
 
 
 // Read outputRequest instance
-void AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t *ort_instance)
+char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t *ort_instance)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_SUBJECT, AH5_A_OBJECT, AH5_A_OUTPUT};
+    char rdata = TRUE;
 
     ort_instance->path = strdup(path);
-    AH5_read_opt_attrs(file_id, path, &(ort_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
-    if (!AH5_read_str_attr(file_id, path, AH5_A_SUBJECT, &(ort_instance->subject)))
-        AH5_print_err_attr(AH5_C_OUTPUT_REQUEST, path, AH5_A_SUBJECT);
-    if (!AH5_read_str_attr(file_id, path, AH5_A_OBJECT, &(ort_instance->object)))
-        AH5_print_err_attr(AH5_C_OUTPUT_REQUEST, path, AH5_A_OBJECT);
-    if (!AH5_read_str_attr(file_id, path, AH5_A_OUTPUT, &(ort_instance->output)))
-        AH5_print_err_attr(AH5_C_OUTPUT_REQUEST, path, AH5_A_OUTPUT);
+    ort_instance->subject = NULL;
+    ort_instance->object = NULL;
+    ort_instance->output = NULL;
+    ort_instance->opt_attrs.instances = NULL;
+
+    if (AH5_path_valid(file_id, path))
+    {
+        AH5_read_opt_attrs(file_id, path, &(ort_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
+        if (!AH5_read_str_attr(file_id, path, AH5_A_SUBJECT, &(ort_instance->subject)))
+        {
+            AH5_print_err_attr(AH5_C_OUTPUT_REQUEST, path, AH5_A_SUBJECT);
+            rdata = FALSE;
+        }
+        if (!AH5_read_str_attr(file_id, path, AH5_A_OBJECT, &(ort_instance->object)))
+        {
+            AH5_print_err_attr(AH5_C_OUTPUT_REQUEST, path, AH5_A_OBJECT);
+            rdata = FALSE;
+        }
+        if (!AH5_read_str_attr(file_id, path, AH5_A_OUTPUT, &(ort_instance->output)))
+        {
+            AH5_print_err_attr(AH5_C_OUTPUT_REQUEST, path, AH5_A_OUTPUT);
+            rdata = FALSE;
+        }
+    }
+    else
+    {
+        AH5_print_err_path(AH5_C_OUTPUT_REQUEST, path);
+        rdata = FALSE;
+    }
+    return rdata;
 }
 
 
 // Read outputRequest group (group of instances)
-void AH5_read_ort_group (hid_t file_id, const char *path, AH5_ort_group_t *ort_group)
+char AH5_read_ort_group (hid_t file_id, const char *path, AH5_ort_group_t *ort_group)
 {
+    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char mandatory[][AH5_ATTR_LENGTH] = {};
     AH5_children_t children;
     hsize_t i;
-    char path2[AH5_ABSOLUTE_PATH_LENGTH];
-    char mandatory[][AH5_ATTR_LENGTH] = {};
 
     ort_group->path = strdup(path);
-    AH5_read_opt_attrs(file_id, path, &(ort_group->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
-    children = AH5_read_children_name(file_id, path);
-    ort_group->nb_instances = children.nb_children;
     ort_group->instances = NULL;
-    if (children.nb_children > 0)
+    ort_group->opt_attrs.instances = NULL;
+
+    if (AH5_path_valid(file_id, path))
     {
-        ort_group->instances = (AH5_ort_instance_t *) malloc(children.nb_children * sizeof(AH5_ort_instance_t));
-        for (i = 0; i < children.nb_children; i++)
+        AH5_read_opt_attrs(file_id, path, &(ort_group->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
+        children = AH5_read_children_name(file_id, path);
+        ort_group->nb_instances = children.nb_children;
+        if (children.nb_children > 0)
         {
-            strcpy(path2, path);
-            strcat(path2, children.childnames[i]);
-            AH5_read_ort_instance(file_id, path2, ort_group->instances + i);
-            free(children.childnames[i]);
+            ort_group->instances = (AH5_ort_instance_t *) malloc(children.nb_children * sizeof(AH5_ort_instance_t));
+            for (i = 0; i < children.nb_children; i++)
+            {
+                strcpy(path2, path);
+                strcat(path2, children.childnames[i]);
+                AH5_read_ort_instance(file_id, path2, ort_group->instances + i);
+                free(children.childnames[i]);
+            }
+            free(children.childnames);
         }
-        free(children.childnames);
     }
+    else
+    {
+        AH5_print_err_path(AH5_C_OUTPUT_REQUEST, path);
+        rdata = FALSE;
+    }
+    return rdata;
 }
 
 
 // Read outputRequest category (all groups/instances)
-void AH5_read_outputrequest(hid_t file_id, AH5_outputrequest_t *outputrequest)
+char AH5_read_outputrequest(hid_t file_id, AH5_outputrequest_t *outputrequest)
 {
+    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
     AH5_children_t children;
     hsize_t i;
-    char path[AH5_ABSOLUTE_PATH_LENGTH];
 
-    children = AH5_read_children_name(file_id, AH5_C_OUTPUT_REQUEST);
-    outputrequest->nb_groups = children.nb_children;
     outputrequest->groups = NULL;
-    if (children.nb_children > 0)
+
+    if (H5Lexists(file_id, AH5_C_OUTPUT_REQUEST, H5P_DEFAULT) == TRUE)
     {
-        outputrequest->groups = (AH5_ort_group_t *) malloc(children.nb_children * sizeof(AH5_ort_group_t));
-        for (i = 0; i < children.nb_children; i++)
+        children = AH5_read_children_name(file_id, AH5_C_OUTPUT_REQUEST);
+        outputrequest->nb_groups = children.nb_children;
+        if (children.nb_children > 0)
         {
-            strcpy(path, AH5_C_OUTPUT_REQUEST);
-            strcat(path, children.childnames[i]);
-            AH5_read_ort_group(file_id, path, outputrequest->groups + i);
-            free(children.childnames[i]);
+            outputrequest->groups = (AH5_ort_group_t *) malloc(children.nb_children * sizeof(AH5_ort_group_t));
+            for (i = 0; i < children.nb_children; i++)
+            {
+                strcpy(path, AH5_C_OUTPUT_REQUEST);
+                strcat(path, children.childnames[i]);
+                if (!AH5_read_ort_group(file_id, path, outputrequest->groups + i))
+                    rdata = FALSE;
+                free(children.childnames[i]);
+            }
+            free(children.childnames);
         }
-        free(children.childnames);
     }
+    else
+    {
+        AH5_print_err_path(AH5_C_OUTPUT_REQUEST, AH5_C_OUTPUT_REQUEST);
+        rdata = FALSE;
+    }
+    return rdata;
 }
 
 
@@ -147,7 +193,7 @@ void AH5_free_ort_group (AH5_ort_group_t *ort_group)
         ort_group->path = NULL;
     }
     AH5_free_opt_attrs(&(ort_group->opt_attrs));
-    if (ort_group->nb_instances > 0)
+    if (ort_group->instances != NULL)
     {
         for (i = 0; i < ort_group->nb_instances; i++)
             AH5_free_ort_instance(ort_group->instances + i);
@@ -163,7 +209,7 @@ void AH5_free_outputrequest (AH5_outputrequest_t *outputrequest)
 {
     hsize_t i;
 
-    if (outputrequest->nb_groups > 0)
+    if (outputrequest->groups != NULL)
     {
         for (i = 0; i < outputrequest->nb_groups; i++)
         {

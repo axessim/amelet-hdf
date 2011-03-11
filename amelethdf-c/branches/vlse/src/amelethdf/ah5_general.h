@@ -15,39 +15,40 @@ extern "C" {
 
     typedef struct AH5_children_t
     {
-        char        **childnames;
-        hsize_t     nb_children;
+        char            **childnames;
+        hsize_t         nb_children;
     } AH5_children_t;
 
     typedef struct AH5_set_t
     {
-        char        **values;
-        hsize_t     nb_values;
+        char            **values;
+        hsize_t         nb_values;
     } AH5_set_t;
 
     typedef union AH5_value_t
     {
-        int         i;
-        float       f;
-        complex float c;
-        char        *s;
+        int             i;
+        float           f;
+        complex float   c;
+        char            *s;
     } AH5_value_t;
 
     typedef struct AH5_attr_instance_t
     {
-        char        *name;
-        H5T_class_t type;
+        char            *name;
+        H5T_class_t     type;
         AH5_value_t     value;
     } AH5_attr_instance_t;
 
     typedef struct AH5_opt_attrs_t
     {
-        hsize_t     nb_instances;
+        hsize_t         nb_instances;
         AH5_attr_instance_t *instances;
     } AH5_opt_attrs_t;
 
     char AH5_version_minimum (const char *required_version, const char *sim_version);
     char *AH5_trim_zeros (const char *version);
+    char AH5_path_valid (hid_t file_id, const char *path);
     AH5_set_t AH5_add_to_set (AH5_set_t aset, char *aelement);
     int AH5_index_in_set (AH5_set_t aset, char *aelement, hsize_t *index);
     AH5_children_t AH5_read_children_name (hid_t file_id, const char *path);
@@ -74,7 +75,9 @@ extern "C" {
     void AH5_free_opt_attrs(AH5_opt_attrs_t *opt_attrs);
 
     void AH5_print_err_dset (const char *category, const char *path);
+    void AH5_print_err_tble (const char *category, const char *path);
     void AH5_print_err_attr (const char *category, const char *path, const char *attr_name);
+    void AH5_print_err_path (const char *category, const char *path);
     void AH5_print_wrn_attr (const char *category, const char *path, const char *attr_name);
 
 #ifdef __cplusplus

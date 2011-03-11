@@ -55,17 +55,17 @@ extern "C" {
 
     typedef struct AH5_dipole_t
     {
-        char        *path;
+        char            *path;
         AH5_opt_attrs_t opt_attrs;
         AH5_dip_class_t type;
-        float       x;
-        float       y;
-        float       z;
-        float       theta;
-        float       phi;
-        float       wire_radius;
-        AH5_ft_t inner_impedance;
-        AH5_ft_t magnitude;
+        float           x;
+        float           y;
+        float           z;
+        float           theta;
+        float           phi;
+        float           wire_radius;
+        AH5_ft_t        inner_impedance;
+        AH5_ft_t        magnitude;
     } AH5_dipole_t;
 
     typedef enum AH5_ant_class_t
@@ -84,9 +84,9 @@ extern "C" {
 
     typedef union AH5_antennax_t
     {
-        AH5_ft_t gain;
-        AH5_ft_t effarea;
-        AH5_ft_t farfield;
+        AH5_ft_t        gain;
+        AH5_ft_t        effarea;
+        AH5_ft_t        farfield;
         AH5_opt_attrs_t parreflct;
     } AH5_antennax_t;
 
@@ -94,17 +94,17 @@ extern "C" {
     {
         AH5_ant_class_t type;
         AH5_opt_attrs_t opt_attrs;
-        AH5_antennax_t data;
+        AH5_antennax_t  data;
     } AH5_ant_model_t;
 
     typedef struct AH5_antenna_t
     {
-        char *path;
+        char            *path;
         AH5_opt_attrs_t opt_attrs;
-        AH5_ft_t input_impedance;
-        AH5_ft_t load_impedance;
-        AH5_ft_t feeder_impedance;
-        AH5_ft_t magnitude;
+        AH5_ft_t        input_impedance;
+        AH5_ft_t        load_impedance;
+        AH5_ft_t        feeder_impedance;
+        AH5_ft_t        magnitude;
         AH5_ant_model_t model;
     } AH5_antenna_t;
 
@@ -149,13 +149,13 @@ extern "C" {
         AH5_sourceonmesh_t *sm_sources;
     } AH5_em_source_t;
 
-    void AH5_read_els_planewave (hid_t file_id, const char *path, AH5_planewave_t *planewave);
-    void AH5_read_els_sphericalwave (hid_t file_id, const char *path, AH5_sphericalwave_t *sphericalwave);
-    void AH5_read_els_generator (hid_t file_id, const char *path, AH5_generator_t *generator);
-    void AH5_read_els_dipole (hid_t file_id, const char *path, AH5_dipole_t *dipole);
-    void AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *antenna);
-    void AH5_read_els_sourceonmesh (hid_t file_id, const char *path, AH5_sourceonmesh_t *sourceonmesh);
-    void AH5_read_electromagnetic_source (hid_t file_id, AH5_em_source_t *em_source);
+    char AH5_read_els_planewave (hid_t file_id, const char *path, AH5_planewave_t *planewave);
+    char AH5_read_els_sphericalwave (hid_t file_id, const char *path, AH5_sphericalwave_t *sphericalwave);
+    char AH5_read_els_generator (hid_t file_id, const char *path, AH5_generator_t *generator);
+    char AH5_read_els_dipole (hid_t file_id, const char *path, AH5_dipole_t *dipole);
+    char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *antenna);
+    char AH5_read_els_sourceonmesh (hid_t file_id, const char *path, AH5_sourceonmesh_t *sourceonmesh);
+    char AH5_read_electromagnetic_source (hid_t file_id, AH5_em_source_t *em_source);
 
     void AH5_print_els_planewave (const AH5_planewave_t *planewave, int space);
     void AH5_print_els_sphericalwave (const AH5_sphericalwave_t *sphericalwave, int space);

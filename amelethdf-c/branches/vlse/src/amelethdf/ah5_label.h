@@ -20,8 +20,8 @@ extern "C" {
         AH5_lbl_dataset_t *datasets;
     } AH5_label_t;
 
-    void AH5_read_lbl_dataset (hid_t file_id, const char *path, AH5_lbl_dataset_t *lbl_dataset);
-    void AH5_read_label (hid_t file_id, AH5_label_t *label);
+    char AH5_read_lbl_dataset (hid_t file_id, const char *path, AH5_lbl_dataset_t *lbl_dataset);
+    char AH5_read_label (hid_t file_id, AH5_label_t *label);
 
     void AH5_print_lbl_dataset (const AH5_lbl_dataset_t *lbl_dataset, int space);
     void AH5_print_label (const AH5_label_t *label);

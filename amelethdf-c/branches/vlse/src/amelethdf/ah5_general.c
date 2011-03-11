@@ -87,6 +87,41 @@ char *AH5_trim_zeros (const char *version)
     return rdata;
 }
 
+char AH5_path_valid (hid_t file_id, const char *path)
+{
+    char *temp;
+    int i, slashes = 0;
+
+    temp = strdup(path);
+    for (i = strlen(path); i > 0; i--)
+        if (temp[i] == '/')
+        {
+            temp[i] = '\0';
+            slashes++;  /* count number of slashes excluding the first one */
+        }
+
+    if(H5Lexists(file_id, temp, H5P_DEFAULT) != TRUE)
+    {
+        free(temp);
+        return FALSE;
+    }
+
+    i = 1;
+    while (slashes > 0)
+    {
+        while (temp[i] != '\0')
+            i++;
+        temp[i] = '/';
+        slashes--;
+        if(H5Lexists(file_id, temp, H5P_DEFAULT) != TRUE)
+        {
+            free(temp);
+            return FALSE;
+        }
+    }
+    free(temp);
+    return TRUE;
+}
 
 // Add aelement to aset
 AH5_set_t AH5_add_to_set(AH5_set_t aset, char *aelement)
@@ -140,7 +175,7 @@ AH5_children_t AH5_read_children_name (hid_t file_id, const char* path)
             - must be shorter than AH5_ELEMENT_NAME_LENGTH
             - must NOT be same as "_param"
     */
-    if (H5Lexists(file_id, path, H5P_DEFAULT) > 0 || strcmp(path, "/") == 0)
+    if (H5Lexists(file_id, path, H5P_DEFAULT) == TRUE || strcmp(path, "/") == 0)
     {
         group_id = H5Gopen1(file_id, path);
         H5Gget_info(group_id, &ginfo);
@@ -213,7 +248,7 @@ char AH5_read_int_attr (hid_t file_id, const char* path, char* attr, int *rdata)
 {
     char success = FALSE;
 
-    if (H5Lexists(file_id, path, H5P_DEFAULT))
+    if (H5Lexists(file_id, path, H5P_DEFAULT) == TRUE)
         if (H5Aexists_by_name(file_id, path, attr, H5P_DEFAULT) > 0)
             if (H5LTget_attribute_int(file_id, path, attr, rdata) >= 0)
                 success = TRUE;
@@ -228,7 +263,7 @@ char AH5_read_flt_attr (hid_t file_id, const char* path, char* attr_name, float 
 {
     char success = FALSE;
 
-    if (H5Lexists(file_id, path, H5P_DEFAULT))
+    if (H5Lexists(file_id, path, H5P_DEFAULT) == TRUE)
         if (H5Aexists_by_name(file_id, path, attr_name, H5P_DEFAULT) > 0)
             if (H5LTget_attribute_float(file_id, path, attr_name, rdata) >= 0)
                 success = TRUE;
@@ -245,7 +280,7 @@ char AH5_read_cpx_attr (hid_t file_id, const char* path, char* attr_name, comple
     float buf[2];
     char success = FALSE;
 
-    if (H5Lexists(file_id, path, H5P_DEFAULT))
+    if (H5Lexists(file_id, path, H5P_DEFAULT) == TRUE)
         if (H5Aexists_by_name(file_id, path, attr_name, H5P_DEFAULT) > 0)
         {
             attr_id = H5Aopen_by_name(file_id, path, attr_name, H5P_DEFAULT, H5P_DEFAULT);
@@ -273,7 +308,7 @@ char AH5_read_str_attr (hid_t file_id, const char *path, char *attr_name, char *
     size_t sdim;
     char success = FALSE;
 
-    if (H5Lexists(file_id, path, H5P_DEFAULT))
+    if (H5Lexists(file_id, path, H5P_DEFAULT) == TRUE)
         if (H5Aexists_by_name(file_id, path, attr_name, H5P_DEFAULT) > 0)
         {
             attr_id = H5Aopen_by_name(file_id, path, attr_name, H5P_DEFAULT, H5P_DEFAULT);
@@ -441,7 +476,7 @@ char AH5_read_opt_attrs (hid_t file_id, const char *path, AH5_opt_attrs_t *opt_a
     hsize_t nb_present_mandatory_attrs = 0;
     char temp_name[AH5_ATTR_LENGTH];
 
-    if (H5Lexists(file_id, path, H5P_DEFAULT) > 0)
+    if (H5Lexists(file_id, path, H5P_DEFAULT) == TRUE)
     {
         // Check presence of all mandatory attributes
         for (i = 0; i < (hsize_t) nb_mandatory_attrs; i++)
@@ -551,7 +586,7 @@ void AH5_free_opt_attrs(AH5_opt_attrs_t *opt_attrs)
 {
     hsize_t i;
 
-    if (opt_attrs->nb_instances > 0)
+    if (opt_attrs->instances != NULL)
     {
 
         for (i = 0; i < opt_attrs->nb_instances; i++)
@@ -580,9 +615,19 @@ void AH5_print_err_dset (const char *category, const char *path)
     printf("***** ERROR(%s): Cannot read dataset \"%s\". *****\n\n", category, path);
 }
 
+void AH5_print_err_tble (const char *category, const char *path)
+{
+    printf("***** ERROR(%s): Cannot read table \"%s\". *****\n\n", category, path);
+}
+
 void AH5_print_err_attr (const char *category, const char *path, const char *attr_name)
 {
     printf("***** ERROR(%s): Cannot read mandatory attribute \"%s[@%s]\". *****\n\n", category, path, attr_name);
+}
+
+void AH5_print_err_path (const char *category, const char *path)
+{
+    printf("***** ERROR(%s): Cannot read path \"%s\". *****\n\n", category, path);
 }
 
 void AH5_print_wrn_attr (const char *category, const char *path, const char *attr_name)

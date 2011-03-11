@@ -7,17 +7,11 @@ extern "C" {
 
 #include "ah5_general.h"
 
-    typedef enum AH5_mesh_class_t {
-        MSH_INVALID             = -1,
-        MSH_STRUCTURED          = 1,
-        MSH_UNSTRUCTURED        = 2
-    } AH5_mesh_class_t;
-
     typedef struct AH5_groupgroup_t
     {
-        char*           path;
+        char            *path;
         hsize_t         nb_groupgroupnames;
-        char**          groupgroupnames;
+        char            **groupgroupnames;
     } AH5_groupgroup_t;
 
     typedef struct AH5_ssom_pie_table_t
@@ -116,6 +110,12 @@ extern "C" {
         AH5_usom_table_t *som_tables;
     } AH5_umesh_t;
 
+    typedef enum AH5_mesh_class_t {
+        MSH_INVALID             = -1,
+        MSH_STRUCTURED          = 1,
+        MSH_UNSTRUCTURED        = 2
+    } AH5_mesh_class_t;
+
     typedef union AH5_meshx_t
     {
         AH5_smesh_t     structured;
@@ -162,20 +162,20 @@ extern "C" {
         AH5_msh_group_t *groups;
     } AH5_mesh_t;
 
-    void AH5_read_groupgroup (hid_t file_id, const char* path, AH5_groupgroup_t *groupgroup);
-    void AH5_read_smesh_axis (hid_t file_id, const char* path, AH5_axis_t *axis);
-    void AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup);
-    void AH5_read_ssom_pie_table (hid_t file_id, const char *path, AH5_ssom_pie_table_t *ssom_pie_table);
-    void AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh);
-    void AH5_read_umsh_group (hid_t file_id, const char* path, AH5_ugroup_t *ugroup);
-    void AH5_read_usom_pie_table (hid_t file_id, const char *path, AH5_usom_pie_table_t *usom_pie_table);
-    void AH5_read_usom_ef_table (hid_t file_id, const char *path, AH5_usom_ef_table_t *usom_ef_table);
-    void AH5_read_umesh_som_table (hid_t file_id, const char *path, AH5_usom_table_t *usom_table);
+    char AH5_read_groupgroup (hid_t file_id, const char* path, AH5_groupgroup_t *groupgroup);
+    char AH5_read_smesh_axis (hid_t file_id, const char* path, AH5_axis_t *axis);
+    char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup);
+    char AH5_read_ssom_pie_table (hid_t file_id, const char *path, AH5_ssom_pie_table_t *ssom_pie_table);
+    char AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh);
+    char AH5_read_umsh_group (hid_t file_id, const char* path, AH5_ugroup_t *ugroup);
+    char AH5_read_usom_pie_table (hid_t file_id, const char *path, AH5_usom_pie_table_t *usom_pie_table);
+    char AH5_read_usom_ef_table (hid_t file_id, const char *path, AH5_usom_ef_table_t *usom_ef_table);
+    char AH5_read_umesh_som_table (hid_t file_id, const char *path, AH5_usom_table_t *usom_table);
     char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh);
-    void AH5_read_msh_instance (hid_t file_id, const char *path, AH5_msh_instance_t *msh_instance);
-    void AH5_read_mlk_instance (hid_t file_id, const char *path, AH5_mlk_instance_t *mlk_instance);
-    void AH5_read_msh_group (hid_t file_id, const char *path, AH5_msh_group_t *msh_group);
-    void AH5_read_mesh (hid_t file_id, AH5_mesh_t *mesh);
+    char AH5_read_msh_instance (hid_t file_id, const char *path, AH5_msh_instance_t *msh_instance);
+    char AH5_read_mlk_instance (hid_t file_id, const char *path, AH5_mlk_instance_t *mlk_instance);
+    char AH5_read_msh_group (hid_t file_id, const char *path, AH5_msh_group_t *msh_group);
+    char AH5_read_mesh (hid_t file_id, AH5_mesh_t *mesh);
 
     void AH5_print_smesh (const AH5_smesh_t *smesh, int space);
     void AH5_print_umesh_som_table (const AH5_usom_table_t *usom_table, int space);

@@ -60,15 +60,15 @@ extern "C" {
         AH5_interface_instance_t *interface_instances;
     } AH5_physicalmodel_t;
 
-    void AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_instance_t *volume_instance);
-    void AH5_read_phm_surface_instance_tdl (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    void AH5_read_phm_surface_instance_sibc (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    void AH5_read_phm_surface_instance_zs (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    void AH5_read_phm_surface_instance_zszt (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    void AH5_read_phm_surface_instance_zszt2 (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    void AH5_read_phm_surface_instance (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    void AH5_read_phm_interface_instance (hid_t file_id, const char *path, AH5_interface_instance_t *interface_instance);
-    void AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel);
+    char AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_instance_t *volume_instance);
+    char AH5_read_phm_surface_instance_tdl (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    char AH5_read_phm_surface_instance_sibc (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    char AH5_read_phm_surface_instance_zs (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    char AH5_read_phm_surface_instance_zszt (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    char AH5_read_phm_surface_instance_zszt2 (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    char AH5_read_phm_surface_instance (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    char AH5_read_phm_interface_instance (hid_t file_id, const char *path, AH5_interface_instance_t *interface_instance);
+    char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel);
 
     void AH5_print_phm_volume_instance (const AH5_volume_instance_t *volume_instance, int space);
     void AH5_print_phm_surface_instance (const AH5_surface_instance_t *surface_instance, int space);
