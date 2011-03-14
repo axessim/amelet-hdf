@@ -395,7 +395,10 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                         {
                           if(componentdim>-1)
                           {
-                            floatscalar->SetNumberOfComponents(3);
+                            if(ars.dims[componentdim].nbvalues<3)
+                              floatscalar->SetNumberOfComponents(ars.dims[componentdim].nbvalues);
+                            else
+                              floatscalar->SetNumberOfComponents(3);
                             
                             
                           for(int j2=0;j2<ars.dims[componentdim].nbvalues;j2++)
@@ -500,6 +503,9 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                       for(int ioffsetdim=0;ioffsetdim<meshentitydim;ioffsetdim++)
                         offsetmesh=offsetmesh+ars.dims[ioffsetdim].nbvalues;
                       cout<<"offsetmesh="<<offsetmesh<<endl;
+                      if(ars.dims[componentdim].nbvalues<3)
+                        floatscalar->SetNumberOfComponents(ars.dims[componentdim].nbvalues);
+                      else
                         floatscalar->SetNumberOfComponents(3);
                       int offsetm=offset;
                       for(int j=0;j<ars.dims[componentdim].nbvalues;j++)
