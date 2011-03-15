@@ -9,6 +9,7 @@ char AH5_read_els_planewave (hid_t file_id, const char *path, AH5_planewave_t *p
 
     planewave->path = strdup(path);
     planewave->opt_attrs.instances = NULL;
+    planewave->magnitude.type = FT_INVALID;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -62,6 +63,7 @@ char AH5_read_els_sphericalwave (hid_t file_id, const char *path, AH5_sphericalw
     char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
 
     sphericalwave->path = strdup(path);
+    sphericalwave->magnitude.type = FT_INVALID;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -103,6 +105,8 @@ char AH5_read_els_generator (hid_t file_id, const char *path, AH5_generator_t *g
     generator->path = strdup(path);
     generator->type = GEN_INVALID;
     generator->opt_attrs.instances = NULL;
+    generator->inner_impedance.type = FT_INVALID;
+    generator->magnitude.type = FT_INVALID;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -153,6 +157,8 @@ char AH5_read_els_dipole (hid_t file_id, const char *path, AH5_dipole_t *dipole)
     dipole->path = strdup(path);
     dipole->type = DIPOLE_INVALID;
     dipole->opt_attrs.instances = NULL;
+    dipole->inner_impedance.type = FT_INVALID;
+    dipole->magnitude.type = FT_INVALID;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -229,6 +235,12 @@ char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *anten
     antenna->path = strdup(path);
     antenna->model.type = ANT_INVALID;
     antenna->opt_attrs.instances = NULL;
+    antenna->model.opt_attrs.instances = NULL;
+    antenna->input_impedance.type = FT_INVALID;
+    antenna->load_impedance.type = FT_INVALID;
+    antenna->feeder_impedance.type = FT_INVALID;
+    antenna->magnitude.type = FT_INVALID;
+    antenna->model.type = ANT_INVALID;
     antenna->model.opt_attrs.instances = NULL;
 
     if (AH5_path_valid(file_id, path))

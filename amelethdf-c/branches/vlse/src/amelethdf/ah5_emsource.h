@@ -76,7 +76,7 @@ extern "C" {
         ANT_FAR_FIELD           = 3,
         ANT_RECTANGULAR_HORN    = 4,
         ANT_CIRCULAR_HORN       = 5,
-        ANT_LOAH5_G_PERIODIC        = 6,
+        ANT_LOAH5_G_PERIODIC    = 6,
         ANT_WHIP                = 7,
         ANT_GENERIC             = 8,
         ANT_EXCHANGE_SURFACE    = 9

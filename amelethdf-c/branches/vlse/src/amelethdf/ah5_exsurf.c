@@ -66,8 +66,11 @@ char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_g
             {
                 strcpy(path2, path);
                 strcat(path2, children.childnames[i]);
-                if (!AH5_read_ft_arrayset(file_id, path2, exs_group->instances + i))
+                if (H5Lexists(file_id, path2, H5P_DEFAULT) != TRUE)
                     rdata = FALSE;
+                else
+                    if (!AH5_read_ft_arrayset(file_id, path2, exs_group->instances + i))
+                        rdata = FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);

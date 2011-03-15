@@ -10,6 +10,7 @@ char AH5_read_global_environment_instance (hid_t file_id, const char *path, AH5_
     gle_instance->path = strdup(path);
     gle_instance->type = GE_INVALID;
     gle_instance->limit_conditions.instances = NULL;
+    gle_instance->data.type = FT_INVALID;
 
     if (AH5_path_valid(file_id, path))
     {

@@ -9,6 +9,10 @@ char AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_i
 
     volume_instance->path = strdup(path);
     volume_instance->opt_attrs.instances = NULL;
+    volume_instance->relative_permittivity.type = FT_INVALID;
+    volume_instance->relative_permeability.type = FT_INVALID;
+    volume_instance->electric_conductivity.type = FT_INVALID;
+    volume_instance->magnetic_conductivity.type = FT_INVALID;
 
     if (AH5_path_valid(file_id, path))
     {
