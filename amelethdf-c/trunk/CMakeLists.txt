@@ -19,17 +19,17 @@ FIND_PACKAGE(ZLIB REQUIRED)
 get_filename_component (C_COMPILER_NAME ${CMAKE_C_COMPILER} NAME)
 MESSAGE(C COMPILER = "${C_COMPILER_NAME}")
 IF (${CMAKE_HOST_WIN32})
-    IF (C_COMPILER_NAME STREQUAL "gcc")
+    IF (C_COMPILER_NAME STREQUAL "gcc.exe")
         MESSAGE(GCC)
         SET(amelethdf_lib_dep ${LIBHDF5_DIR}/lib/libhdf5_hl.a
                               ${LIBHDF5_DIR}/lib/libhdf5.a
                               ${ZLIB_LIBRARY})
-    ELSE (C_COMPILER_NAME STREQUAL "gcc")
+    ELSE (C_COMPILER_NAME STREQUAL "gcc.exe")
         MESSAGE(NOT GCC)
-        SET(amelethdf_lib_dep ${LIBHDF5_DIR}/lib/hf5_hl.lib
+        SET(amelethdf_lib_dep ${LIBHDF5_DIR}/lib/hdf5_hl.lib
                               ${LIBHDF5_DIR}/lib/hdf5.lib
                               ${ZLIB_LIBRARY})
-    ENDIF (C_COMPILER_NAME STREQUAL "gcc")
+    ENDIF (C_COMPILER_NAME STREQUAL "gcc.exe")
    
 ELSE (${CMAKE_HOST_UNIX})
     SET(amelethdf_lib_dep ${LIBHDF5_DIR}/lib/libhdf5_hl.a
