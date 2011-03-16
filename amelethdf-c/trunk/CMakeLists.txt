@@ -17,11 +17,17 @@ find_library(M_LIB m)
 
 FIND_PACKAGE(ZLIB REQUIRED)
 
-SET(amelethdf_lib_dep     ${LIBHDF5_DIR}/lib/libhdf5_hl.a
-	                      ${LIBHDF5_DIR}/lib/libhdf5.a
-	                      ${ZLIB_LIBRARY}
-	                      ${M_LIB})
-	                      
+IF (${CMAKE_HOST_WIN32})
+    SET(amelethdf_lib_dep ${LIBHDF5_DIR}/lib/hdf5_hldll.lib
+                          ${LIBHDF5_DIR}/lib/hdf5dll.lib
+                          ${ZLIB_LIBRARY})
+ELSE (${CMAKE_HOST_UNIX})
+    SET(amelethdf_lib_dep ${LIBHDF5_DIR}/lib/libhdf5_hl.a
+                          ${LIBHDF5_DIR}/lib/libhdf5.a
+                          ${ZLIB_LIBRARY}
+                          ${M_LIB})
+
+ENDIF (${CMAKE_HOST_WIN32})
 
 SET(tools_lib_dep amelethdf ${amelethdf_lib_dep})
 
