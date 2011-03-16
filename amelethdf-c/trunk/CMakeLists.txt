@@ -16,11 +16,18 @@ INCLUDE_DIRECTORIES(${LIBHDF5_DIR}/include
 find_library(M_LIB m)
 
 FIND_PACKAGE(ZLIB REQUIRED)
-
+et_filename_component (C_COMPILER_NAME ${CMAKE_C_COMPILER} NAME)
 IF (${CMAKE_HOST_WIN32})
-    SET(amelethdf_lib_dep ${LIBHDF5_DIR}/lib/libhdf5_hl.a
-                          ${LIBHDF5_DIR}/lib/libhdf5.a
-                          ${ZLIB_LIBRARY})
+    IF (C_COMPILER_NAME STREQUAL "gcc")
+        SET(amelethdf_lib_dep ${LIBHDF5_DIR}/lib/libhdf5_hl.a
+                              ${LIBHDF5_DIR}/lib/libhdf5.a
+                              ${ZLIB_LIBRARY})
+    ELSE (C_COMPILER_NAME STREQUAL "gcc")
+        SET(amelethdf_lib_dep ${LIBHDF5_DIR}/lib/hf5_hl.lib
+                              ${LIBHDF5_DIR}/lib/hdf5.lib
+                              ${ZLIB_LIBRARY})
+    ENDIF (C_COMPILER_NAME STREQUAL "gcc")
+   
 ELSE (${CMAKE_HOST_UNIX})
     SET(amelethdf_lib_dep ${LIBHDF5_DIR}/lib/libhdf5_hl.a
                           ${LIBHDF5_DIR}/lib/libhdf5.a
