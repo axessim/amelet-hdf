@@ -372,7 +372,8 @@ char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rati
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE};
     char path2[AH5_ABSOLUTE_PATH_LENGTH];
     char *buf, rdata = FALSE;
-    hsize_t i, invalid = -1;
+    hsize_t i, invalid_nb;
+    char invalid = FALSE;
     H5T_class_t type_class;
     AH5_children_t children;
     size_t length;
@@ -388,7 +389,7 @@ char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rati
         rational->functions = (AH5_ftr_t *) malloc(children.nb_children * sizeof(AH5_ftr_t));
         for (i = 0; i < children.nb_children; i++)
         {
-            if (invalid == -1)
+            if (!invalid)
             {
                 strcpy(path2, path);
                 strcat(path2, AH5_G_FUNCTION);
@@ -399,18 +400,24 @@ char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rati
                     {
                         rational->functions[i].type = FT_RATIONAL_FUNCTION;
                         if(!AH5_read_ft_rationalfunction(file_id, path2, &(rational->functions[i].data.rf)))
-                            invalid = i;
+                        {
+                            invalid_nb = i;
+                            invalid = TRUE;
+                        }
                     }
                     else if (strcmp(buf, AH5_V_GENERAL_RATIONAL_FUNCTION) == 0)
                     {
                         rational->functions[i].type = FT_GENERAL_RATIONAL_FUNCTION;
                         if(!AH5_read_ft_generalrationalfunction(file_id, path2, &(rational->functions[i].data.grf)))
-                            invalid = i;
-                    }
+                        {
+                            invalid_nb = i;
+                            invalid = TRUE;
+                        }                    }
                     else
                     {
                         printf("***** WARNING: Invalid attribute \"floatingType\" in \"%s\". *****\n\n", path2);
-                        invalid = i;
+                        invalid_nb = i;
+                        invalid = TRUE;
                     }
                     free(buf);
                     buf = NULL;
@@ -421,9 +428,9 @@ char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rati
         free(children.childnames);
 
         // Free allocated memory in case of error
-        if (invalid != -1)
+        if (invalid)
         {
-            for (i = 0; i < invalid; i++)
+            for (i = 0; i < invalid_nb; i++)
             {
                 switch (rational->functions[i].type)
                 {
@@ -522,7 +529,8 @@ char AH5_read_ft_arrayset (hid_t file_id, const char *path, AH5_arrayset_t *arra
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE};
     char path2[AH5_ABSOLUTE_PATH_LENGTH];
-    hsize_t i, invalid = -1;
+    hsize_t i, invalid_nb;
+    char invalid = FALSE;
     char rdata = FALSE;
     AH5_children_t children;
 
@@ -537,21 +545,24 @@ char AH5_read_ft_arrayset (hid_t file_id, const char *path, AH5_arrayset_t *arra
         arrayset->dims = (AH5_vector_t *) malloc(children.nb_children * sizeof(AH5_vector_t));
         for (i = 0; i < children.nb_children; i++)
         {
-            if (invalid == -1)
+            if (!invalid)
             {
                 strcpy(path2, path);
                 strcat(path2, AH5_G_DS);
                 strcat(path2, children.childnames[i]);
                 if(!AH5_read_ft_vector(file_id, path2, arrayset->dims + i))
-                    invalid = i;
+                {
+                    invalid_nb = i;
+                    invalid = TRUE;
+                }
             }
             free(children.childnames[i]);
         }
         free(children.childnames);
 
-        if (invalid != -1)
+        if (invalid)
         {
-            for (i = 0; i < invalid; i++)
+            for (i = 0; i < invalid_nb; i++)
                 AH5_free_ft_vector(arrayset->dims + i);
             free(arrayset->dims);
         }
