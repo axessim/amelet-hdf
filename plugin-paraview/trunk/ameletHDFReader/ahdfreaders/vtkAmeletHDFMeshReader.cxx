@@ -134,7 +134,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     hid_t groupGroup_id, group_id;
     if (H5Lexists(loc_id,"groupGroup",H5P_DEFAULT)!=FALSE)
     {
-        std::cout<<"read groupGroup"<<std::endl;
+        //std::cout<<"read groupGroup"<<std::endl;
     	groupGroup_id = H5Gopen1(loc_id,"groupGroup");
     	child = read_children_name(loc_id,"groupGroup");
     	group_id = H5Gopen1(loc_id,"group");
@@ -155,6 +155,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
                             for(int k=0;k<grp.nbeltgroup;k++)
                                 grpgroupId->SetTuple1(grp.eltgroup[k],i);
                             H5Dclose(grp_id);
+                            delete(grp.eltgroup);
                         }
                     }
     		}
@@ -166,11 +167,13 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     	//ugrid->GetCellData()->SetScalars(grpgroupId);
         ugrid->GetCellData()->AddArray(grpgroupId);
         grpgroupId->Delete();
+        delete(child.childnames);
     }
     // set data for each group
+    
     group_id = H5Gopen1(loc_id,"group");
     child = read_children_name(loc_id,"group");
-    std::cout<<"read groups"<<std::endl;
+    //std::cout<<"read groups"<<std::endl;
     for (int i=0;i<child.nbchild;i++)
     {
         hid_t grp_id = H5Dopen1(group_id,child.childnames[i]);
@@ -180,6 +183,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
             grp = readUGroup(grp_id,child.childnames[i]);
             for (int k=0;k<grp.nbeltgroup;k++)
                 groupId->SetTuple1(grp.eltgroup[k],i);
+            delete(grp.eltgroup);
         }
         else
         {
@@ -194,6 +198,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
                 grpgroupId->InsertTuple1(nbcells,-1);
                 groupId->InsertTuple1(nbcells,i);
             }
+            delete(grp.eltgroup);
         }
     
         H5Dclose(grp_id);
@@ -203,7 +208,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     //this->UpdateProgress(this->GetProgress()+0.5);
     ugrid->GetCellData()->AddArray(groupId);
     groupId->Delete();
-    
+    delete(child.childnames);
     return 1;
     }
     else
@@ -263,7 +268,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
         child=read_children_name(loc_id,"normal");
     }
     grpchild = read_children_name(loc_id,"group");
-    std::cout<<"child = "<<grpchild.nbchild<<std::endl;
+    //std::cout<<"child = "<<grpchild.nbchild<<std::endl;
     snorm_t normals;
     // read groupGroup
     children_t groupGroup;
@@ -295,7 +300,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
     	H5Gclose(groupGroup_id);
     }
     //this->UpdateProgress(this->GetProgress()+0.25);
-    std::cout<<"nb child="<<child.nbchild<<std::endl;
+    //std::cout<<"nb child="<<child.nbchild<<std::endl;
     for(int i=0;i<grpchild.nbchild;i++)
     {
         hid_t grp_id = H5Dopen1(group_id,grpchild.childnames[i]);
@@ -304,12 +309,12 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
             if (H5Lexists(norm_id,grpchild.childnames[i],H5P_DEFAULT)!=FALSE)
             {
                 hid_t normChildId = H5Dopen1(norm_id,grpchild.childnames[i]);
-                std::cout<<"read normals"<<std::endl;
+                //std::cout<<"read normals"<<std::endl;
                 normals = readNormals(normChildId);
                 H5Dclose(normChildId);
             }
         }
-        cout<<"read sgroup :"<< grpchild.childnames[i]<<endl;
+        //cout<<"read sgroup :"<< grpchild.childnames[i]<<endl;
         sgroup = readSGroup(grp_id,grpchild.childnames[i]);
         H5Dclose(grp_id);
         for(unsigned int j=0;j<sgroup.nbelt;j++)
@@ -397,6 +402,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         ptexist[id]=true;
                     }
                 }
+                
             }
             else if(strcmp(sgroup.entityType,"volume")==0)
             {
@@ -440,6 +446,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                              (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
                     ptexist[id]=true;
                 }
+                
             }
             else if((strcmp(sgroup.entityType,"edge")==0) ||
                     (strcmp(sgroup.entityType,"slot")==0))
@@ -460,6 +467,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                              (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
                     ptexist[id]=true;
                 }
+                
             }
             else if(strcmp(sgroup.type,"node")==0)
             {
@@ -470,8 +478,15 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 unsigned int id = (ijk[2]*(x.nbnodes)*(y.nbnodes))+
                          (ijk[1]*(x.nbnodes))+ijk[0];
                 ptexist[id]=true;
+                
             }
         }
+        delete(sgroup.imin);
+        delete(sgroup.jmin);
+        delete(sgroup.kmin);
+        delete(sgroup.imax);
+        delete(sgroup.jmax);
+        delete(sgroup.kmax);
     }
     unsigned int nbptexistreal=0;
     unsigned int nbexist=0;
@@ -506,7 +521,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
             if (H5Lexists(norm_id,grpchild.childnames[i],H5P_DEFAULT)!=FALSE)
             {
                 hid_t normChildId = H5Dopen1(norm_id,grpchild.childnames[i]);
-                std::cout<<"read normals"<<std::endl;
+                //std::cout<<"read normals"<<std::endl;
                 normals = readNormals(normChildId);
                 H5Dclose(normChildId);
             }
@@ -623,6 +638,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                     cellId++;
                 }
                 groupId->InsertTuple1(cellId-1,groupValue);
+                
             }
             else if(strcmp(sgroup.entityType,"volume")==0)
             {
@@ -675,6 +691,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 groupId->InsertTuple1(cellId,groupValue);
                 
                 cellId++;
+                
             }
             else if((strcmp(sgroup.entityType,"edge")==0) ||
                     (strcmp(sgroup.entityType,"slot")==0))
@@ -704,6 +721,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 groupId->InsertTuple1(cellId,groupValue);
                 
                 cellId++;
+                
             }
             else if(strcmp(sgroup.type,"node")==0)
             {
@@ -723,8 +741,15 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 grpgroupId->InsertTuple1(cellId,grpgroupId_value[grpchild.childnames[i]]);
                 groupId->InsertTuple1(cellId,groupValue);
                 cellId++;
+                
             }
         }
+        delete(sgroup.imin);
+        delete(sgroup.jmin);
+        delete(sgroup.kmin);
+        delete(sgroup.imax);
+        delete(sgroup.jmax);
+        delete(sgroup.kmax);
     }
     ptugridreal.clear();
     if(norm_id!=-1) H5Gclose(norm_id);
@@ -735,6 +760,8 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
     sgrid->GetCellData()->AddArray(groupId);
     grpgroupId->Delete();
     groupId->Delete();
+    delete(grpchild.childnames);
+
 
 
     return 1;
