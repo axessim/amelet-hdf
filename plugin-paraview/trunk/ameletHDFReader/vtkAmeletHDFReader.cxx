@@ -349,7 +349,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
             else
                 sgrp = readSGroup(grp_id,grpname);
             
-            //strcpy(attr,"type");
+            strcpy(attr,"type");
             char *type;
             int offset=0;
             int nbeltgrp;
