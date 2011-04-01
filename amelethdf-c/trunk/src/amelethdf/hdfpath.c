@@ -293,6 +293,7 @@ char * path_element(char *path, int index, int back)
     }
     free(strbuf.chartab[0]);
     free(strbuf.chartab);
+    free(buf);
     return res;
 }
 
