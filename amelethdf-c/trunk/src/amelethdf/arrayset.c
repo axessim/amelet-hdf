@@ -41,7 +41,9 @@ arrayset_t read_arrayset(hid_t file_id, const char* path)
     ars.nbdims = nbdims;
     for (i = 0; i < nbdims; i++)
     {
-        char *buf = strdup("");
+        char *buf;
+        buf = (char *) malloc(2* sizeof(char));
+        //= strdup("");
         sprintf(buf, "%i", i + 1);
         strcpy(dim, "");
         strcat(dim, path);
@@ -49,6 +51,7 @@ arrayset_t read_arrayset(hid_t file_id, const char* path)
         strcat(dim, P_DIM);
         strcat(dim, buf);
         ars.dims[i] = read_vector(file_id, dim);
+	free(buf);
     }
     return ars;
 }
@@ -60,7 +63,8 @@ arrayset_t clear_content_ars(arrayset_t ars)
     ars.data = clear_content_dataset(ars.data);
     if (ars.nbdims != 0)
     {
-        free(ars.dims);
+	for (i=0;i<=ars.nbdims;i++)
+          vector_clear_content(ars.dims[i]);
         ars.nbdims = 0;
     }
 }

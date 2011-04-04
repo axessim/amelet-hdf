@@ -41,6 +41,7 @@ int meshtype(hid_t loc_id, const char * path)
         H5Aclose(attr_id);
     }
     H5Gclose(mesh_id);
+    free(rdata);
     return ret_val;
 
 }

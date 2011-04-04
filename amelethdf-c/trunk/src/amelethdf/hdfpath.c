@@ -14,7 +14,6 @@ char* path_basename(char *path)
 
 char* path_dirname(char *path)
 {
-    char *dirname = "";
     char **buf;
     buf = (char **) malloc(2 * sizeof(char*));
     buf[0] = (char *) malloc(strlen(path) * sizeof(char));
@@ -125,6 +124,7 @@ char * remove_sep(char *path)
     {
         buf[i - begin] = path[i];
     }
+    free(pch);
     return buf;
 }
 
@@ -184,6 +184,8 @@ char** rsplit(char *path)
             splitpath[0] = strcat(splitpath[0], pointer2);
         }
     }
+    free(buffer2);
+    free(buffer);
     return splitpath;
 }
 
@@ -232,6 +234,8 @@ char** lsplit(char *path)
             splitpath[0] = strcat(splitpath[0], pointer2);
         }
     }
+    free(buffer2);
+    free(buffer);
     return splitpath;
 }
 
@@ -333,6 +337,8 @@ stringtab_t path_split(char *path)
         }
     }
     rdata.nb = nb;
+    free(buffer2);
+    free(buffer);
     return rdata;
 }
 

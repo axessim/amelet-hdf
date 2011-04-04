@@ -50,10 +50,10 @@ single_t read_single(hid_t loc_id, const char* path)
 single_t clear_content_single(single_t single)
 {
 
-    strcpy(single.label, "");
-    strcpy(single.comment, "");
-    strcpy(single.physical_nature, "");
-    strcpy(single.unit, "");
+    free(single.label);
+    free(single.comment);
+    free(single.physical_nature);
+    free(single.unit);
 
     return single;
 }

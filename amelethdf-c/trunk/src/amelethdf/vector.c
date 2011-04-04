@@ -17,6 +17,7 @@ vector_t read_vector(hid_t loc_id, const char* path)
     vec.ivalue = NULL;
     vec.rvalue = NULL;
     vec.cvalue = NULL;
+    vec.svalue = NULL;
     vec.single.comment = (char *) malloc(ELEMENT_NAME_LENGTH * sizeof(char));
     vec.single.label = (char *) malloc(ELEMENT_NAME_LENGTH * sizeof(char));
     vec.single.physical_nature = (char *) malloc(ELEMENT_NAME_LENGTH

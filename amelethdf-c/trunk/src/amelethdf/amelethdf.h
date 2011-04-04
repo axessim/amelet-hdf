@@ -10,7 +10,7 @@ extern "C" {
 
 
 #define ABSOLUTE_PATH_NAME_LENGTH 101
-#define ELEMENT_NAME_LENGTH 21
+#define ELEMENT_NAME_LENGTH 51
 
 #define TRUE 1
 #define FALSE 0

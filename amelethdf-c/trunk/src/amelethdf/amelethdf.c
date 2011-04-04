@@ -36,6 +36,7 @@ char * read_string_attribute(hid_t loc_id, const char* path, char* attr)
     hsize_t dims[1] = { 1 };
     size_t sdim;
     char **rdata; /* Read buffer */
+    char *attribute;
     int ndims, i;
     hid_t filetype, memtype, space, dset, attr_id;
 
@@ -46,6 +47,7 @@ char * read_string_attribute(hid_t loc_id, const char* path, char* attr)
         rdata = (char **) malloc(1 * sizeof(char*));
         rdata[0] = (char *) malloc(ELEMENT_NAME_LENGTH * sdim * sizeof(char));
         strcpy(rdata[0], "");
+	attribute = (char *) malloc(ELEMENT_NAME_LENGTH * sdim * sizeof(char));
     }
     else
     {
@@ -58,6 +60,7 @@ char * read_string_attribute(hid_t loc_id, const char* path, char* attr)
         ndims = H5Sget_simple_extent_dims(space, dims, NULL);
         rdata = (char **) malloc(dims[0] * sizeof(char *));
         rdata[0] = (char *) malloc(dims[0] * sdim * sizeof(char));
+	attribute = (char *) malloc(dims[0] * sdim * sizeof(char));
         for (i = 1; i < dims[0]; i++)
             rdata[i] = rdata[0] + i * sdim;
         memtype = H5Tcopy(H5T_C_S1);
@@ -68,7 +71,9 @@ char * read_string_attribute(hid_t loc_id, const char* path, char* attr)
         status = H5Tclose(filetype);
         status = H5Tclose(memtype);
     }
-    return rdata[0];
+    strcpy(attribute,rdata[0]);
+    free(rdata);
+    return attribute;
 }
 
 float read_float_attribute(hid_t loc_id, const char* path, char* attr)
