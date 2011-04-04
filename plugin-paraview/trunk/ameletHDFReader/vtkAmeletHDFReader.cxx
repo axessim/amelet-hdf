@@ -155,9 +155,10 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
     children_t meshChild, child;
     vtkAmeletHDFMeshReader ahdfmesh;
     int meshType;
-    char  attr_value[ELEMENT_NAME_LENGTH];
-    char  path[ABSOLUTE_PATH_NAME_LENGTH];
-    char  attr[ELEMENT_NAME_LENGTH];
+    char * attr_value;
+    char * path;
+    attr_value = (char *) malloc(ELEMENT_NAME_LENGTH * sizeof(char));
+    path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     arrayset_t ars;
 
     //read mesh under "/mesh"
@@ -187,29 +188,32 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 
     H5Gclose(mesh_id);
     H5Gclose(loc_id);
-    delete(meshChild.childnames);
+    for (int idel=0;idel<meshChild.nbchild; idel++)
+        free(*(meshChild.childnames + idel));
+//    free(meshChild.childnames);
     child = read_children_name(file_id,"/floatingType");
     if(child.nbchild>1)
     {
         vtkErrorMacro("This is more than one arrayset in the ameletHDF file.");
         return 0;
     }
-    strcpy(attr,"floatingType");
+//    strcpy(attr,"floatingType");
     strcpy(path,"/floatingType");
     strcat(path,"/");
     strcat(path,child.childnames[0]);
-    strcpy(attr_value,read_string_attribute(file_id,path,attr));
+    strcpy(attr_value,read_string_attribute(file_id,path,"floatingType"));
     if(strcmp(attr_value,"arraySet")!=0)
     {
     	vtkErrorMacro("This is not an arrayset in the ameletHDF file.");
     	return 0;
     }
-
+    free(attr_value);
     int meshentitydim=-1;
     int componentdim=-1;
     int timedim=-1;
 
     ars = read_arrayset(file_id,path); 
+    free(path);
     //char **dataname;
     int nbdataarray=1;
     int max=ars.nbdims-1;
@@ -226,7 +230,6 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
       if(strcmp(ars.dims[i].single.physical_nature,"Frequency")==0)
            timedim=i;
     }
-    
 
 
     if(ars.nbdims>1)
@@ -319,55 +322,69 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 //          std::cout<<"dataname["<<i<<"] = "<<dataname[i]<<std::endl;
 //      }
 
-        char meshEntity[ABSOLUTE_PATH_NAME_LENGTH];
+        char *meshEntity;
+	meshEntity = (char *) malloc (ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
         int meshdim = meshentitydim+1;
       
         //strcpy(attr,"meshEntity");
         strcpy(meshEntity,ars.dims[meshentitydim].svalue[0]);
         //cout<<meshEntity<<endl;
-        char * grp2 = path_element(meshEntity,1,1);
+        char * grp2;
+	grp2 = (char *)malloc (ELEMENT_NAME_LENGTH * sizeof(char));
+	strcpy(grp2,path_element(meshEntity,1,1));
 
         if(strcmp(grp2,"group")==0)
         {
             hid_t grp_id = H5Dopen1(file_id,meshEntity);
             ugroup_t grp;
             sgroup_t sgrp;
-            char pathmesh[ABSOLUTE_PATH_NAME_LENGTH];
-            
-            char *grpname = path_element(meshEntity,0,1);
-            char *meshname = path_element(meshEntity,2,1);
-            char *meshgrp = path_element(meshEntity,3,1);
+            //char pathmesh[ABSOLUTE_PATH_NAME_LENGTH];
+            char *pathmesh;
+            pathmesh = (char *) malloc (ABSOLUTE_PATH_NAME_LENGTH * sizeof (char));
+            char *grpname;
+	    char *meshname;
+	    char *meshgrp;
+	    grpname =  (char *) malloc (ELEMENT_NAME_LENGTH * sizeof (char));
+	    meshname = (char *) malloc (ELEMENT_NAME_LENGTH * sizeof (char));
+	    meshgrp = (char *) malloc (ELEMENT_NAME_LENGTH * sizeof (char));
+            strcpy(grpname,path_element(meshEntity,0,1));
+            strcpy(meshname,path_element(meshEntity,2,1));
+            strcpy(meshgrp,path_element(meshEntity,3,1));
             
             
             strcpy(pathmesh,"/mesh/");
             strcat(pathmesh,meshgrp);
             strcat(pathmesh,"/");
             strcat(pathmesh,meshname);
+
             int meshType =  meshtype(file_id,pathmesh);
+            free(pathmesh);
+	    free(meshname);
+	    free(meshgrp);
             if(meshType == 1)
                 grp = readUGroup(grp_id,grpname);
             else
                 sgrp = readSGroup(grp_id,grpname);
-            
-            strcpy(attr,"type");
-            char *type;
+            free(grpname); 
+//            strcpy(attr,"type");
+//            char *type;
             int offset=0;
             int nbeltgrp;
+
             if(meshType==1)
             {
               nbeltgrp=grp.nbeltgroup;
-              //delete(grp.eltgroup);
             }
             else {
               nbeltgrp=sgrp.nbelt;
-              delete(sgrp.imin);
-              delete(sgrp.jmin);
-              delete(sgrp.kmin);
-              delete(sgrp.imax);
-              delete(sgrp.jmax);
-              delete(sgrp.kmax);
+	      free(sgrp.name);
+              free(sgrp.imin);
+              free(sgrp.jmin);
+              free(sgrp.kmin);
+              free(sgrp.imax);
+              free(sgrp.jmax);
+              free(sgrp.kmax);
             }
-            
             
             int nbtotaldata=1;
             if(ars.nbdims>1)
@@ -501,7 +518,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                            
                            if(actualtimestep==j)
                            {
-                             if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0))
+                             if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,"type"),"node")==0))
                              {
                                
                                  grid->GetPointData()->AddArray(floatscalar);
@@ -565,7 +582,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                         }
                         offset=offset+ars.dims[componentdim].nbvalues*nbeltgrp;
                         //cout<<"offset="<<offset<<endl;
-                        if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0))
+                        if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,"type"),"node")==0))
                         {
                           grid->GetPointData()->AddArray(floatscalar);
                         }
@@ -595,7 +612,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                      }
                      offset=offset+nbeltgrp;
                      //std::cout<<"name = "<<floatscalar->GetName()<<std::endl;
-                     if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0))
+                     if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,"type"),"node")==0))
                      {
                        grid->GetPointData()->AddArray(floatscalar);
                      }
@@ -626,7 +643,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                  }
                  offset=offset+nbeltgrp;
                  //std::cout<<"name = "<<floatscalar->GetName()<<std::endl;
-                 if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,attr),"node")==0))
+                 if(meshType == 1 && (strcmp(read_string_attribute(file_id,meshEntity,"type"),"node")==0))
                  {
                      grid->GetPointData()->AddArray(floatscalar);
                  }
@@ -637,18 +654,54 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                  floatscalar->Delete();
             }
         }
+
+    free(meshEntity);
+    free(grp.eltgroup);
+    free(grp.name);
     H5Dclose(grp_id);
     }
-    delete(child.childnames);
+    for (int idel=0;idel<child.nbchild; idel++)
+        free(*(child.childnames + idel)); 
+//    free(child.childnames);
     for(int i=0;i<nbdataarray;i++)
     {
         dataname[i].erase();
     }
-    delete(ars.dims);
-    delete(ars.data.dims);
-    delete(ars.data.ivalue);
-    delete(ars.data.rvalue);
-    delete(ars.data.cvalue);
+    free(grp2);
+
+    free(ars.data.single.label);
+    free(ars.data.single.comment);
+    free(ars.data.single.physical_nature);
+    free(ars.data.single.unit);
+    free(ars.data.dims);
+    if(ars.data.ivalue!=NULL)
+        free(ars.data.ivalue);
+    if(ars.data.rvalue!=NULL)
+        free(ars.data.rvalue);
+    if(ars.data.cvalue!=NULL)
+        free(ars.data.cvalue);
+    free(ars.single.label);
+    free(ars.single.comment);
+    free(ars.single.physical_nature);
+    free(ars.single.unit);
+    for (int idel=0;idel<ars.nbdims;idel++)
+    {
+        if(ars.dims[idel].ivalue!=NULL)
+            free(ars.dims[idel].ivalue);
+	else if(ars.dims[idel].rvalue!=NULL)
+	    free(ars.dims[idel].rvalue);
+	else if(ars.dims[idel].cvalue!=NULL)
+	    free(ars.dims[idel].cvalue);
+	else if(ars.dims[idel].svalue!=NULL)
+		for(int idel2=0;idel2<ars.dims[idel].nbvalues;idel2++)
+		  {
+                     free(*(ars.dims[idel].svalue + idel2));
+		  }
+	free(ars.dims[idel].single.label);
+	free(ars.dims[idel].single.comment);
+	free(ars.dims[idel].single.physical_nature);
+	free(ars.dims[idel].single.unit);
+    }
     return 1;
 }
 
@@ -725,7 +778,7 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
   hid_t file_id, loc_id;
   herr_t status;
 
-  cout<<"Request DATA"<<endl;
+  //cout<<"Request DATA"<<endl;
   // get the info objects
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::GetData(outInfo);
@@ -748,7 +801,7 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
 
   if(dataType==1)
   {
-	  cout<<"data on mesh conversion"<<endl;
+	  //cout<<"data on mesh conversion"<<endl;
 	  //read mesh under "/mesh"
 	  loc_id = H5Gopen(file_id, "/mesh",H5P_DEFAULT);
 	  child = read_children_name(file_id,"/mesh");
@@ -757,7 +810,9 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
 	   	   vtkErrorMacro("This is more than one mesh in the ameletHDF file.");
 	   	   return 0;
 	  }
-
+	  for (int idel=0;idel<child.nbchild; idel++)
+             free(*(child.childnames + idel));
+          //free(child.childnames);
 	  //vtkUnstructuredGrid *grid = AllocateGetBlock(output, 0,IS_DATAONMESH());
 	  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()) && this->TimeStepMode )
 	  {
@@ -784,7 +839,7 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
   }
   else if(dataType==2)
   {
-      cout<<"data conversion"<<endl;
+      //cout<<"data conversion"<<endl;
       vtkTable *table = vtkTable::New();
       output->SetBlock(0,table);
       vtkAmeletHDFDataReader ahdfdata;
@@ -793,7 +848,7 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
   }
   else if(dataType==3) //mesh
   {
-	  cout<<"mesh conversion"<<endl;
+	  //cout<<"mesh conversion"<<endl;
 	  vtkAmeletHDFMeshReader ahdfmesh;
 	  //read mesh under "/mesh"
       loc_id = H5Gopen(file_id, "/mesh",H5P_DEFAULT);
@@ -827,6 +882,10 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
       }
       H5Gclose(mesh_id);
       H5Gclose(loc_id);
+      for (int idel=0;idel<child.nbchild; idel++)
+        free(*(child.childnames + idel));
+//      free(child.childnames);
+      free(meshChild.childnames);
   }
   else if(dataType>3 || dataType<1)
   {
@@ -877,9 +936,11 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
     {
     	//time series ?
     	hid_t file_id=H5Fopen(this->FileName,H5F_ACC_RDONLY, H5P_DEFAULT);
-    	char path[ABSOLUTE_PATH_NAME_LENGTH];
-        char path2[ABSOLUTE_PATH_NAME_LENGTH];
-    	strcpy(path,"/floatingType");
+    	char *path;
+        char *path2;
+	path = (char *) malloc (ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+	path2 = (char *) malloc (ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+	strcpy(path,"/floatingType");
     	children_t child;
     	child=read_children_name(file_id,path);
     	strcat(path,"/");
@@ -922,11 +983,32 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
     		outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
 
     	     }
+	    if(vec.ivalue!=NULL)
+                free(vec.ivalue);
+	    else if(vec.cvalue!=NULL)
+                free(vec.cvalue);
+	    else if(vec.rvalue!=NULL)
+                free(vec.rvalue);
+	    else if(vec.svalue!=NULL)
+                {
+                    for(int idel=0;idel<vec.nbvalues;idel++)
+			    free(*(vec.svalue + idel));
+		}
+	    free(vec.single.label);
+	    free(vec.single.comment);
+	    free(vec.single.physical_nature);
+	    free(vec.single.unit);
+
     	   }
     	   
     	   strcpy(path,path2);
            
         }
+	free(path);
+	free(path2);
+	for (int idel=0;idel<child.nbchild; idel++)
+           free(*(child.childnames + idel));
+//	free(child.childnames);
     	H5Fclose(file_id);
 
     }

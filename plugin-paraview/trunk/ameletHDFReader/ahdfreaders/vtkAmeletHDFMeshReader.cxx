@@ -31,11 +31,12 @@ using namespace vtkstd;
 
 int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredGrid *ugrid)
 {
-    std::cout<<"Read umesh"<<std::endl;
-    std::cout<<"=========="<<std::endl;
+    //std::cout<<"Read umesh"<<std::endl;
+    //std::cout<<"=========="<<std::endl;
     //Unstructuredmesh umesh;
     hid_t nodes_id, eltype_id, eltnode_id, loc_id;
     nodes_t umeshnodes;
+    int idel;
     loc_id = H5Gopen1(meshId,name);
     // read nodes
     if (H5Lexists(loc_id,"nodes",H5P_DEFAULT)!=FALSE)
@@ -48,7 +49,9 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
        		                                        umeshnodes.nodes[i][2]);
     ugrid->SetPoints(points);
     points->Delete();
-    //this->UpdateProgress(this->GetProgress()+0.125);
+    for (int idel=0;idel<umeshnodes.nbnodes; idel++)
+               free(*(umeshnodes.nodes + idel));
+
     elttypes_t umeshelttypes;
     eltnodes_t umesheltnodes;
     umeshelttypes.nbelttypes=0;
@@ -106,7 +109,9 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
        		idnode=idnode+4;
        	}
     }
-    //this->UpdateProgress(this->GetProgress()+0.25);
+
+    free(umeshelttypes.elttypes);
+
     // Read GroupGroup
     if(umesheltnodes.nbeltnodes==0)
     {
@@ -119,6 +124,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
                 vertexcell->Delete();
     	}
     }
+    free(umesheltnodes.eltnodes);
     vtkIntArray *grpgroupId = vtkIntArray::New();
     vtkIntArray *groupId = vtkIntArray::New();
     grpgroupId->SetName("groupGroup Id");
@@ -155,10 +161,16 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
                             for(int k=0;k<grp.nbeltgroup;k++)
                                 grpgroupId->SetTuple1(grp.eltgroup[k],i);
                             H5Dclose(grp_id);
-                            delete(grp.eltgroup);
+			    free(grp.name);
+                            free(grp.eltgroup);
                         }
                     }
     		}
+		free(grpGrp.name);
+		for (int idel=0;idel<grpGrp.nbeltgroupGroup; idel++)
+                    free(*(grpGrp.groupGroupnames + idel));
+		//free(grpGrp.groupGroupnames);
+
     		H5Dclose(grpGrp_id);
     	}
         H5Gclose(group_id);
@@ -167,7 +179,9 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     	//ugrid->GetCellData()->SetScalars(grpgroupId);
         ugrid->GetCellData()->AddArray(grpgroupId);
         grpgroupId->Delete();
-        delete(child.childnames);
+	for (int idel=0;idel<child.nbchild; idel++)
+               free(*(child.childnames + idel));
+
     }
     // set data for each group
     
@@ -183,7 +197,8 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
             grp = readUGroup(grp_id,child.childnames[i]);
             for (int k=0;k<grp.nbeltgroup;k++)
                 groupId->SetTuple1(grp.eltgroup[k],i);
-            delete(grp.eltgroup);
+	    free(grp.name);
+            free(grp.eltgroup);
         }
         else
         {
@@ -198,7 +213,8 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
                 grpgroupId->InsertTuple1(nbcells,-1);
                 groupId->InsertTuple1(nbcells,i);
             }
-            delete(grp.eltgroup);
+	    free(grp.name);
+            free(grp.eltgroup);
         }
     
         H5Dclose(grp_id);
@@ -208,7 +224,9 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     //this->UpdateProgress(this->GetProgress()+0.5);
     ugrid->GetCellData()->AddArray(groupId);
     groupId->Delete();
-    delete(child.childnames);
+    for (int idel=0;idel<child.nbchild; idel++)
+        free(*(child.childnames + idel));
+
     return 1;
     }
     else
@@ -219,8 +237,8 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
 
 int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredGrid *sgrid)
 {
-    std::cout<<"Read smesh"<<std::endl;
-    std::cout<<"=========="<<std::endl;
+    //std::cout<<"Read smesh"<<std::endl;
+    //std::cout<<"=========="<<std::endl;
     hid_t cgrid, loc_id;
 
     loc_id = H5Gopen1(meshId, name);
@@ -234,9 +252,9 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
 
     vector<bool> ptexist;
     int idptexist;
-    cout<<"nbx="<<x.nbnodes<<endl;
-    cout<<"nby="<<y.nbnodes<<endl;
-    cout<<"nbz="<<z.nbnodes<<endl;
+    //cout<<"nbx="<<x.nbnodes<<endl;
+    //cout<<"nby="<<y.nbnodes<<endl;
+    //cout<<"nbz="<<z.nbnodes<<endl;
 
     for(int k=0;k<z.nbnodes;k++)
     { 
@@ -293,11 +311,18 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                     if(strcmp(grpGrp.groupGroupnames[j],grpchild.childnames[k])==0)
                         grpValue = i;
                 }
+
+                for (int idel=0;idel<grpGrp.nbeltgroupGroup; idel++)
+                     free(*(grpGrp.groupGroupnames + idel));
+
                 H5Dclose(grpGrp_id);
             }
             grpgroupId_value[grpchild.childnames[k]]=grpValue;
     	}
     	H5Gclose(groupGroup_id);
+        for (int idel=0;idel<groupGroup.nbchild; idel++)
+              free(*(groupGroup.childnames + idel));
+
     }
     //this->UpdateProgress(this->GetProgress()+0.25);
     //std::cout<<"nb child="<<child.nbchild<<std::endl;
@@ -481,12 +506,12 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 
             }
         }
-        delete(sgroup.imin);
-        delete(sgroup.jmin);
-        delete(sgroup.kmin);
-        delete(sgroup.imax);
-        delete(sgroup.jmax);
-        delete(sgroup.kmax);
+        free(sgroup.imin);
+        free(sgroup.jmin);
+        free(sgroup.kmin);
+        free(sgroup.imax);
+        free(sgroup.jmax);
+        free(sgroup.kmax);
     }
     unsigned int nbptexistreal=0;
     unsigned int nbexist=0;
@@ -744,13 +769,16 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                 
             }
         }
-        delete(sgroup.imin);
-        delete(sgroup.jmin);
-        delete(sgroup.kmin);
-        delete(sgroup.imax);
-        delete(sgroup.jmax);
-        delete(sgroup.kmax);
+        free(sgroup.imin);
+        free(sgroup.jmin);
+        free(sgroup.kmin);
+        free(sgroup.imax);
+        free(sgroup.jmax);
+        free(sgroup.kmax);
     }
+    free(x.nodes);
+    free(y.nodes);
+    free(z.nodes);
     ptugridreal.clear();
     if(norm_id!=-1) H5Gclose(norm_id);
     H5Gclose(group_id);
@@ -760,7 +788,9 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
     sgrid->GetCellData()->AddArray(groupId);
     grpgroupId->Delete();
     groupId->Delete();
-    delete(grpchild.childnames);
+    for (int idel=0;idel<grpchild.nbchild; idel++)
+        free(*(grpchild.childnames + idel));
+
 
 
 
