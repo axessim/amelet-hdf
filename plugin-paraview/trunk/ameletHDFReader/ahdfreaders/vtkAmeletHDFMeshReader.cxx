@@ -49,8 +49,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
        		                                        umeshnodes.nodes[i][2]);
     ugrid->SetPoints(points);
     points->Delete();
-    for (int idel=0;idel<umeshnodes.nbnodes; idel++)
-               free(*(umeshnodes.nodes + idel));
+    free(umeshnodes.nodes);
 
     elttypes_t umeshelttypes;
     eltnodes_t umesheltnodes;

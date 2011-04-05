@@ -65,11 +65,11 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
                 for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
                 {
                     std::ostringstream buf;
-                   // buf<<"_"<<crealf(ars.dims[ars.nbdims-i-1].cvalue[l])<<"_j"<<cimagf(ars.dims[ars.nbdims-i-1].cvalue[l]);
-                   // for(int k=0;k<temp;k++)
-                   //     dataname[j+k]=dataname[j+k]
-                   //                   +"_"+ars.dims[ars.nbdims-i-1].single.label
-                   //                   +buf.str();
+                    buf<<"_"<<crealf(ars.dims[ars.nbdims-i-1].cvalue[l])<<"_j"<<cimagf(ars.dims[ars.nbdims-i-1].cvalue[l]);
+                    for(int k=0;k<temp;k++)
+                        dataname[j+k]=dataname[j+k]
+                                      +"_"+ars.dims[ars.nbdims-i-1].single.label
+                                      +buf.str();
                  }
                     j=j+temp;
             }
@@ -78,11 +78,11 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
                 for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
                 {
                     std::ostringstream buf;
-                    //buf<<"_"<<ars.dims[ars.nbdims-i-1].rvalue[l];
-                    //for(int k=0;k<temp;k++)
-                    //    dataname[j+k]=dataname[j+k]
-                    //                  +"_"+ars.dims[ars.nbdims-i-1].single.label
-                    //                  +buf.str();
+                    buf<<"_"<<ars.dims[ars.nbdims-i-1].rvalue[l];
+                    for(int k=0;k<temp;k++)
+                        dataname[j+k]=dataname[j+k]
+                                      +"_"+ars.dims[ars.nbdims-i-1].single.label
+                                      +buf.str();
                 }
                 
                 j=j+temp;
@@ -93,11 +93,11 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
                 for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
                 {
                     std::ostringstream buf;
-                    //buf<<"_"<<ars.dims[ars.nbdims-i-1].ivalue[l];
-                    //for(int k=0;k<temp;k++)
-                      //  dataname[j+k]=dataname[j+k]
-                        //              +"_"+ars.dims[ars.nbdims-i-1].single.label
-                          //            +buf.str();
+                    buf<<"_"<<ars.dims[ars.nbdims-i-1].ivalue[l];
+                    for(int k=0;k<temp;k++)
+                      dataname[j+k]=dataname[j+k]
+                                      +"_"+ars.dims[ars.nbdims-i-1].single.label
+                                      +buf.str();
                 }
                 j=j+temp;
                 
@@ -154,6 +154,7 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
             }
         }
         table->AddColumn(array);
+        array->Delete();
     }
     offset=0;
     array = vtkFloatArray::New();
@@ -179,6 +180,7 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
         //table->AddColumn(array);
     }
     table->AddColumn(array);
+    array->Delete();
     //add ia dummy column 
     array = vtkFloatArray::New();
     array->SetName("dummy");
@@ -187,6 +189,7 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
         array->InsertTuple1(j,0.0);
     }
     table->AddColumn(array);
+    array->Delete();
 
     return 1;
 }

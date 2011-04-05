@@ -693,10 +693,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 	else if(ars.dims[idel].cvalue!=NULL)
 	    free(ars.dims[idel].cvalue);
 	else if(ars.dims[idel].svalue!=NULL)
-		for(int idel2=0;idel2<ars.dims[idel].nbvalues;idel2++)
-		  {
-                     free(*(ars.dims[idel].svalue + idel2));
-		  }
+            free(ars.dims[idel].svalue);
 	free(ars.dims[idel].single.label);
 	free(ars.dims[idel].single.comment);
 	free(ars.dims[idel].single.physical_nature);
@@ -991,8 +988,11 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
                 free(vec.rvalue);
 	    else if(vec.svalue!=NULL)
                 {
-                    for(int idel=0;idel<vec.nbvalues;idel++)
-			    free(*(vec.svalue + idel));
+                    if(vec.nbvalues==1) free(vec.svalue);
+                    else  {
+                       for(int idel=0;idel<vec.nbvalues;idel++)
+			    std::cout<<(vec.svalue[idel])<<std::endl;
+                       free(vec.svalue);}
 		}
 	    free(vec.single.label);
 	    free(vec.single.comment);
