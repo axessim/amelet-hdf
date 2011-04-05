@@ -166,9 +166,10 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
                     }
     		}
 		free(grpGrp.name);
-		for (int idel=0;idel<grpGrp.nbeltgroupGroup; idel++)
-                    free(*(grpGrp.groupGroupnames + idel));
-		//free(grpGrp.groupGroupnames);
+		//for (int idel=0;idel<grpGrp.nbeltgroupGroup; idel++)
+                //    free(*(grpGrp.groupGroupnames + idel));
+                if(grpGrp.nbeltgroupGroup>1) free(grpGrp.groupGroupnames[0]);
+		free(grpGrp.groupGroupnames);
 
     		H5Dclose(grpGrp_id);
     	}
@@ -180,6 +181,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
         grpgroupId->Delete();
 	//for (int idel=0;idel<child.nbchild; idel++)
         //       free(*(child.childnames + idel));
+        if(child.nbchild>1) free(child.childnames[0]);
         free(child.childnames);
 
     }
@@ -226,6 +228,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     groupId->Delete();
     //for (int idel=0;idel<child.nbchild; idel++)
     //    free(*(child.childnames + idel));
+    if(child.nbchild>1) free(child.childnames[0]);
     free(child.childnames);
     return 1;
     }
@@ -312,8 +315,10 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
                         grpValue = i;
                 }
 
-                for (int idel=0;idel<grpGrp.nbeltgroupGroup; idel++)
-                     free(*(grpGrp.groupGroupnames + idel));
+                //for (int idel=0;idel<grpGrp.nbeltgroupGroup; idel++)
+                //     free(*(grpGrp.groupGroupnames + idel));
+                if(grpGrp.nbeltgroupGroup>1)free(grpGrp.groupGroupnames[0]);
+                free(grpGrp.groupGroupnames);
 
                 H5Dclose(grpGrp_id);
             }
@@ -322,6 +327,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
     	H5Gclose(groupGroup_id);
         //for (int idel=0;idel<groupGroup.nbchild; idel++)
         //      free(*(groupGroup.childnames + idel));
+        if(groupGroup.nbchild>1)free(groupGroup.childnames[0]);
         free(groupGroup.childnames); 
 
     }
@@ -791,6 +797,7 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
     groupId->Delete();
     //for (int idel=0;idel<grpchild.nbchild; idel++)
     //    free(*(grpchild.childnames + idel));
+    if(grpchild.nbchild>1) free(grpchild.childnames[0]);
     free(grpchild.childnames);
 
 

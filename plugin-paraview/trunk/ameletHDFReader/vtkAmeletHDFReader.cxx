@@ -9,7 +9,6 @@ extern "C" {
     #include "hdfpath.h"
     #include "unstructuredmesh.h"
     #include "structuredmesh.h"
-    #include "stringdataset.h"
 }
 
 
@@ -190,6 +189,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
     H5Gclose(loc_id);
     //for (int idel=0;idel<meshChild.nbchild; idel++)
     //    free(*(meshChild.childnames + idel));
+    if(meshChild.nbchild>1)free(meshChild.childnames[0]);
     free(meshChild.childnames);
     child = read_children_name(file_id,"/floatingType");
     if(child.nbchild>1)
@@ -331,7 +331,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
         //cout<<meshEntity<<endl;
         char * grp2;
 	grp2 = (char *)malloc (ELEMENT_NAME_LENGTH * sizeof(char));
-	strcpy(grp2,path_element(meshEntity,1,1));
+        strcpy(grp2,path_element(meshEntity,1,1));
 
         if(strcmp(grp2,"group")==0)
         {
@@ -663,6 +663,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
     }
     //for (int idel=0;idel<child.nbchild; idel++)
     //    free(*(child.childnames + idel)); 
+    if(child.nbchild>1) free(child.childnames[0]);
     free(child.childnames);
     for(int i=0;i<nbdataarray;i++)
     {
@@ -810,6 +811,7 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
 	  }
 	  //for (int idel=0;idel<child.nbchild; idel++)
           //   free(*(child.childnames + idel));
+          if(child.nbchild>1) free(child.childnames[0]);
           free(child.childnames);
 	  //vtkUnstructuredGrid *grid = AllocateGetBlock(output, 0,IS_DATAONMESH());
 	  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()) && this->TimeStepMode )
@@ -882,7 +884,9 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
       H5Gclose(loc_id);
       //for (int idel=0;idel<child.nbchild; idel++)
       //  free(*(child.childnames + idel));
+      if(child.nbchild>1) free(child.childnames[0]);
       free(child.childnames);
+      if(meshChild.nbchild>1) free(meshChild.childnames[0]); 
       free(meshChild.childnames);
   }
   else if(dataType>3 || dataType<1)
@@ -1002,6 +1006,7 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
 	free(path);
 	free(path2);
 	//for (int idel=0;idel<child.nbchild; idel++)
+        if(child.nbchild>1) free(child.childnames[0]);
         free(child.childnames);
 //	free(child.childnames);
     	H5Fclose(file_id);
