@@ -188,9 +188,9 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 
     H5Gclose(mesh_id);
     H5Gclose(loc_id);
-    for (int idel=0;idel<meshChild.nbchild; idel++)
-        free(*(meshChild.childnames + idel));
-//    free(meshChild.childnames);
+    //for (int idel=0;idel<meshChild.nbchild; idel++)
+    //    free(*(meshChild.childnames + idel));
+    free(meshChild.childnames);
     child = read_children_name(file_id,"/floatingType");
     if(child.nbchild>1)
     {
@@ -656,13 +656,14 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
         }
 
     free(meshEntity);
+    if(meshType==1){
     free(grp.eltgroup);
-    free(grp.name);
+    free(grp.name);}
     H5Dclose(grp_id);
     }
-    for (int idel=0;idel<child.nbchild; idel++)
-        free(*(child.childnames + idel)); 
-//    free(child.childnames);
+    //for (int idel=0;idel<child.nbchild; idel++)
+    //    free(*(child.childnames + idel)); 
+    free(child.childnames);
     for(int i=0;i<nbdataarray;i++)
     {
         dataname[i].erase();
@@ -807,9 +808,9 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
 	   	   vtkErrorMacro("This is more than one mesh in the ameletHDF file.");
 	   	   return 0;
 	  }
-	  for (int idel=0;idel<child.nbchild; idel++)
-             free(*(child.childnames + idel));
-          //free(child.childnames);
+	  //for (int idel=0;idel<child.nbchild; idel++)
+          //   free(*(child.childnames + idel));
+          free(child.childnames);
 	  //vtkUnstructuredGrid *grid = AllocateGetBlock(output, 0,IS_DATAONMESH());
 	  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()) && this->TimeStepMode )
 	  {
@@ -879,9 +880,9 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
       }
       H5Gclose(mesh_id);
       H5Gclose(loc_id);
-      for (int idel=0;idel<child.nbchild; idel++)
-        free(*(child.childnames + idel));
-//      free(child.childnames);
+      //for (int idel=0;idel<child.nbchild; idel++)
+      //  free(*(child.childnames + idel));
+      free(child.childnames);
       free(meshChild.childnames);
   }
   else if(dataType>3 || dataType<1)
@@ -987,13 +988,7 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
 	    else if(vec.rvalue!=NULL)
                 free(vec.rvalue);
 	    else if(vec.svalue!=NULL)
-                {
-                    if(vec.nbvalues==1) free(vec.svalue);
-                    else  {
-                       for(int idel=0;idel<vec.nbvalues;idel++)
-			    std::cout<<(vec.svalue[idel])<<std::endl;
-                       free(vec.svalue);}
-		}
+                free(vec.svalue);
 	    free(vec.single.label);
 	    free(vec.single.comment);
 	    free(vec.single.physical_nature);
@@ -1006,8 +1001,8 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
         }
 	free(path);
 	free(path2);
-	for (int idel=0;idel<child.nbchild; idel++)
-           free(*(child.childnames + idel));
+	//for (int idel=0;idel<child.nbchild; idel++)
+        free(child.childnames);
 //	free(child.childnames);
     	H5Fclose(file_id);
 
