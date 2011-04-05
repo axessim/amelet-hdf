@@ -310,7 +310,8 @@ stringtab_t path_split(char *path)
     { "/" };
     char *buffer, *buffer2;
     stringtab_t rdata;
-
+    buffer = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    buffer2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     buffer = strdup(path);
     buffer2 = strdup(path);
     buffer = remove_sep(buffer);
