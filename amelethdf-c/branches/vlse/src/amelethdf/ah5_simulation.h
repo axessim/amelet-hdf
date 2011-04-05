@@ -7,7 +7,7 @@ extern "C" {
 
 #include "ah5_general.h"
 
-    typedef struct AH5_sim_instance_t
+    typedef struct _AH5_sim_instance_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -19,7 +19,7 @@ extern "C" {
         char            **outputs;
     } AH5_sim_instance_t;
 
-    typedef struct AH5_simulation_t
+    typedef struct _AH5_simulation_t
     {
         hsize_t         nb_instances;
         AH5_sim_instance_t *instances;

@@ -7,14 +7,14 @@ extern "C" {
 
 #include "ah5_fltype.h"
 
-    typedef enum AH5_gle_class_t
+    typedef enum _AH5_gle_class_t
     {
         GE_INVALID              = -1,
         GE_FREQUENCY            = 1,
         GE_TIME                 = 2
     } AH5_gle_class_t;
 
-    typedef struct AH5_gle_instance_t
+    typedef struct _AH5_gle_instance_t
     {
         char            *path;
         AH5_gle_class_t type;
@@ -22,7 +22,7 @@ extern "C" {
         AH5_opt_attrs_t limit_conditions;
     } AH5_gle_instance_t;
 
-    typedef struct AH5_global_environment_t
+    typedef struct _AH5_global_environment_t
     {
         hsize_t         nb_instances;
         AH5_gle_instance_t *instances;

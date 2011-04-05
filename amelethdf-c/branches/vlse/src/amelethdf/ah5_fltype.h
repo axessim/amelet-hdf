@@ -7,7 +7,7 @@ extern "C" {
 
 #include "ah5_general.h"
 
-    typedef enum AH5_ft_class_t
+    typedef enum _AH5_ft_class_t
     {
         FT_INVALID              = -1,
         FT_SINGLE_INTEGER       = 1,
@@ -27,35 +27,35 @@ extern "C" {
         FT_ARRAYSET             = 15
     } AH5_ft_class_t;
 
-    typedef struct AH5_singleinteger_t
+    typedef struct _AH5_singleinteger_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
         int             value;
     } AH5_singleinteger_t;
 
-    typedef struct AH5_singlereal_t
+    typedef struct _AH5_singlereal_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
         float           value;
     } AH5_singlereal_t;
 
-    typedef struct AH5_singlecomplex_t
+    typedef struct _AH5_singlecomplex_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
         complex float   value;
     } AH5_singlecomplex_t;
 
-    typedef struct AH5_singlestring_t
+    typedef struct _AH5_singlestring_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
         char            *value;
     } AH5_singlestring_t;
 
-    typedef union AH5_datasetx_t
+    typedef union _AH5_datasetx_t
     {
         int             *i;
         float           *f;
@@ -63,7 +63,7 @@ extern "C" {
         char            **s;
     } AH5_datasetx_t;
 
-    typedef struct AH5_vector_t
+    typedef struct _AH5_vector_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -72,7 +72,7 @@ extern "C" {
         AH5_datasetx_t  values;
     } AH5_vector_t;
 
-    typedef struct AH5_linearlistofreal1_t
+    typedef struct _AH5_linearlistofreal1_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -81,7 +81,7 @@ extern "C" {
         int             number_of_values;
     } AH5_linearlistofreal1_t;
 
-    typedef struct AH5_linearlistofreal2_t
+    typedef struct _AH5_linearlistofreal2_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -90,7 +90,7 @@ extern "C" {
         int             number_of_values;
     } AH5_linearlistofreal2_t;
 
-    typedef struct AH5_logarithmlistofreal_t
+    typedef struct _AH5_logarithmlistofreal_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -99,7 +99,7 @@ extern "C" {
         int             number_of_values;
     } AH5_logarithmlistofreal_t;
 
-    typedef struct AH5_perdecadelistofreal_t
+    typedef struct _AH5_perdecadelistofreal_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -108,7 +108,7 @@ extern "C" {
         int             number_of_values_per_decade;
     } AH5_perdecadelistofreal_t;
 
-    typedef struct AH5_linearlistofinteger2_t
+    typedef struct _AH5_linearlistofinteger2_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -117,7 +117,7 @@ extern "C" {
         int             number_of_values;
     } AH5_linearlistofinteger2_t;
 
-    typedef struct AH5_rationalfunction_t
+    typedef struct _AH5_rationalfunction_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -128,7 +128,7 @@ extern "C" {
         float           *f;
     } AH5_rationalfunction_t;
 
-    typedef struct AH5_generalrationalfunction_t
+    typedef struct _AH5_generalrationalfunction_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -137,19 +137,19 @@ extern "C" {
         complex float   *denominator;
     } AH5_generalrationalfunction_t;
 
-    typedef union AH5_ftr_data_t
+    typedef union _AH5_ftr_data_t
     {
         AH5_rationalfunction_t rf;
         AH5_generalrationalfunction_t grf;
     } AH5_ftr_data_t;
 
-    typedef struct AH5_ftr_t
+    typedef struct _AH5_ftr_t
     {
         AH5_ft_class_t  type;
         AH5_ftr_data_t  data;
     } AH5_ftr_t;
 
-    typedef struct AH5_rational_t
+    typedef struct _AH5_rational_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -159,7 +159,7 @@ extern "C" {
         char            **data;
     } AH5_rational_t;
 
-    typedef struct AH5_dataset_t
+    typedef struct _AH5_dataset_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -169,7 +169,7 @@ extern "C" {
         AH5_datasetx_t  values;
     } AH5_dataset_t;
 
-    typedef struct AH5_arrayset_t
+    typedef struct _AH5_arrayset_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -178,7 +178,7 @@ extern "C" {
         AH5_vector_t    *dims;
     } AH5_arrayset_t;
 
-    typedef union AH5_ft_data_t
+    typedef union _AH5_ft_data_t
     {
         AH5_singleinteger_t singleinteger;
         AH5_singlereal_t singlereal;
@@ -197,7 +197,7 @@ extern "C" {
         AH5_arrayset_t  arrayset;
     } AH5_ft_data_t;
 
-    typedef struct AH5_ft_t
+    typedef struct _AH5_ft_t
     {
         AH5_ft_class_t  type;
         AH5_ft_data_t   data;

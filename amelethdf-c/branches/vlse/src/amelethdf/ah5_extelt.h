@@ -8,7 +8,7 @@ extern "C" {
 #include "ah5_general.h"
 #include <unistd.h>
 
-    typedef struct AH5_eet_dataset_t
+    typedef struct _AH5_eet_dataset_t
     {
         char            *path;
         hid_t           *file_id;
@@ -16,7 +16,7 @@ extern "C" {
         char            **eed_items;
     } AH5_eet_dataset_t;
 
-    typedef struct AH5_external_element_t
+    typedef struct _AH5_external_element_t
     {
         hsize_t         nb_datasets;
         AH5_eet_dataset_t *datasets;

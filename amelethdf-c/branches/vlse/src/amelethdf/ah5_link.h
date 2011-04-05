@@ -7,7 +7,7 @@ extern "C" {
 
 #include "ah5_general.h"
 
-    typedef struct AH5_lnk_instance_t
+    typedef struct _AH5_lnk_instance_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -15,7 +15,7 @@ extern "C" {
         char            *object;
     } AH5_lnk_instance_t;
 
-    typedef struct AH5_lnk_group_t
+    typedef struct _AH5_lnk_group_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -23,7 +23,7 @@ extern "C" {
         AH5_lnk_instance_t *instances;
     } AH5_lnk_group_t;
 
-    typedef struct AH5_link_t
+    typedef struct _AH5_link_t
     {
         hsize_t         nb_groups;
         AH5_lnk_group_t *groups;

@@ -7,14 +7,14 @@ extern "C" {
 
 #include "ah5_general.h"
 
-    typedef struct AH5_groupgroup_t
+    typedef struct _AH5_groupgroup_t
     {
         char            *path;
         hsize_t         nb_groupgroupnames;
         char            **groupgroupnames;
     } AH5_groupgroup_t;
 
-    typedef struct AH5_ssom_pie_table_t
+    typedef struct _AH5_ssom_pie_table_t
     {
         char            *path;
         char            nb_dims;
@@ -23,13 +23,13 @@ extern "C" {
         float           **vectors;
     } AH5_ssom_pie_table_t;
 
-    typedef struct AH5_axis_t
+    typedef struct _AH5_axis_t
     {
         hsize_t         nb_nodes;
         float           *nodes;
     } AH5_axis_t;
 
-    typedef struct AH5_sgroup_t
+    typedef struct _AH5_sgroup_t
     {
         char            *path;
         char            *type;
@@ -39,7 +39,7 @@ extern "C" {
         char            **normals;
     } AH5_sgroup_t;
 
-    typedef struct AH5_smesh_t
+    typedef struct _AH5_smesh_t
     {
         AH5_axis_t      x;
         AH5_axis_t      y;
@@ -52,14 +52,14 @@ extern "C" {
         AH5_ssom_pie_table_t *som_tables;
     } AH5_smesh_t;
 
-    typedef struct AH5_ugroup_t
+    typedef struct _AH5_ugroup_t
     {
         char            *path;
         hsize_t         nb_groupelts;
         int             *groupelts;
     } AH5_ugroup_t;
 
-    typedef enum AH5_usom_class_t
+    typedef enum _AH5_usom_class_t
     {
         SOM_INVALID             = -1,
         SOM_POINT_IN_ELEMENT    = 1,
@@ -67,7 +67,7 @@ extern "C" {
         SOM_FACE                = 3
     } AH5_usom_class_t;
 
-    typedef struct AH5_usom_pie_table_t
+    typedef struct _AH5_usom_pie_table_t
     {
         char            nb_dims;
         hsize_t         nb_points;
@@ -75,26 +75,26 @@ extern "C" {
         float           **vectors;
     } AH5_usom_pie_table_t;
 
-    typedef struct AH5_usom_ef_table_t
+    typedef struct _AH5_usom_ef_table_t
     {
         hsize_t         dims[2];
         int             *items;
     } AH5_usom_ef_table_t;
 
-    typedef union AH5_usomx_t
+    typedef union _AH5_usomx_t
     {
         AH5_usom_pie_table_t pie;
         AH5_usom_ef_table_t ef;
     } AH5_usomx_t;
 
-    typedef struct AH5_usom_table_t
+    typedef struct _AH5_usom_table_t
     {
         char            *path;
         AH5_usom_class_t type;
         AH5_usomx_t     data;
     } AH5_usom_table_t;
 
-    typedef struct AH5_umesh_t
+    typedef struct _AH5_umesh_t
     {
         hsize_t         nb_elementnodes;
         int             *elementnodes;
@@ -110,26 +110,26 @@ extern "C" {
         AH5_usom_table_t *som_tables;
     } AH5_umesh_t;
 
-    typedef enum AH5_mesh_class_t {
+    typedef enum _AH5_mesh_class_t {
         MSH_INVALID             = -1,
         MSH_STRUCTURED          = 1,
         MSH_UNSTRUCTURED        = 2
     } AH5_mesh_class_t;
 
-    typedef union AH5_meshx_t
+    typedef union _AH5_meshx_t
     {
         AH5_smesh_t     structured;
         AH5_umesh_t     unstructured;
     } AH5_meshx_t;
 
-    typedef struct AH5_msh_instance_t
+    typedef struct _AH5_msh_instance_t
     {
         char            *path;
         AH5_mesh_class_t type;
         AH5_meshx_t     data;
     } AH5_msh_instance_t;
 
-    typedef enum AH5_meshlink_class_t {
+    typedef enum _AH5_meshlink_class_t {
         MSHLNK_INVALID          = -1,
         MSHLNK_NODE             = 1,
         MSHLNK_EDGE             = 2,
@@ -137,7 +137,7 @@ extern "C" {
         MSHLNK_VOLUME           = 4
     } AH5_meshlink_class_t;
 
-    typedef struct AH5_mlk_instance_t
+    typedef struct _AH5_mlk_instance_t
     {
         char            *path;
         AH5_meshlink_class_t type;
@@ -147,7 +147,7 @@ extern "C" {
         int             *data;
     } AH5_mlk_instance_t;
 
-    typedef struct AH5_msh_group_t
+    typedef struct _AH5_msh_group_t
     {
         char            *path;
         hsize_t         nb_msh_instances;
@@ -156,7 +156,7 @@ extern "C" {
         AH5_mlk_instance_t *mlk_instances;
     } AH5_msh_group_t;
 
-    typedef struct AH5_mesh_t
+    typedef struct _AH5_mesh_t
     {
         hsize_t         nb_groups;
         AH5_msh_group_t *groups;

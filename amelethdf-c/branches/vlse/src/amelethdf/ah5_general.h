@@ -13,19 +13,19 @@ extern "C" {
 
 #include "ah5_category.h"
 
-    typedef struct AH5_children_t
+    typedef struct _AH5_children_t
     {
         char            **childnames;
         hsize_t         nb_children;
     } AH5_children_t;
 
-    typedef struct AH5_set_t
+    typedef struct _AH5_set_t
     {
         char            **values;
         hsize_t         nb_values;
     } AH5_set_t;
 
-    typedef union AH5_value_t
+    typedef union _AH5_value_t
     {
         int             i;
         float           f;
@@ -33,14 +33,14 @@ extern "C" {
         char            *s;
     } AH5_value_t;
 
-    typedef struct AH5_attr_instance_t
+    typedef struct _AH5_attr_instance_t
     {
         char            *name;
         H5T_class_t     type;
         AH5_value_t     value;
     } AH5_attr_instance_t;
 
-    typedef struct AH5_opt_attrs_t
+    typedef struct _AH5_opt_attrs_t
     {
         hsize_t         nb_instances;
         AH5_attr_instance_t *instances;

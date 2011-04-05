@@ -7,7 +7,7 @@ extern "C" {
 
 #include "ah5_fltype.h"
 
-    typedef enum AH5_surface_class_t
+    typedef enum _AH5_surface_class_t
     {
         S_INVALID               = -1,
         S_THIN_DIELECTRIAH5_C_LAYER = 1,
@@ -17,7 +17,7 @@ extern "C" {
         S_ZSZT2                 = 5
     } AH5_surface_class_t;
 
-    typedef struct AH5_volume_instance_t
+    typedef struct _AH5_volume_instance_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -27,7 +27,7 @@ extern "C" {
         AH5_ft_t        magnetic_conductivity;
     } AH5_volume_instance_t;
 
-    typedef struct AH5_surface_instance_t
+    typedef struct _AH5_surface_instance_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -42,7 +42,7 @@ extern "C" {
         char            *zt2;
     } AH5_surface_instance_t;
 
-    typedef struct AH5_interface_instance_t
+    typedef struct _AH5_interface_instance_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -50,7 +50,7 @@ extern "C" {
         char            *medium2;
     } AH5_interface_instance_t;
 
-    typedef struct AH5_physicalmodel_t
+    typedef struct _AH5_physicalmodel_t
     {
         hsize_t         nb_volume_instances;
         AH5_volume_instance_t *volume_instances;

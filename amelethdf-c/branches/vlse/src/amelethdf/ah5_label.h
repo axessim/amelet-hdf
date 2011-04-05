@@ -7,14 +7,14 @@ extern "C" {
 
 #include "ah5_general.h"
 
-    typedef struct AH5_lbl_dataset_t
+    typedef struct _AH5_lbl_dataset_t
     {
         char            *path;
         hsize_t         nb_items;
         char            **items;
     } AH5_lbl_dataset_t;
 
-    typedef struct AH5_label_t
+    typedef struct _AH5_label_t
     {
         hsize_t         nb_datasets;
         AH5_lbl_dataset_t *datasets;

@@ -7,7 +7,7 @@ extern "C" {
 
     #include "ah5_fltype.h"
 
-    typedef struct AH5_planewave_t
+    typedef struct _AH5_planewave_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -19,7 +19,7 @@ extern "C" {
         AH5_ft_t magnitude;
     } AH5_planewave_t;
 
-    typedef struct AH5_sphericalwave_t
+    typedef struct _AH5_sphericalwave_t
     {
         char            *path;
         float           xo;
@@ -28,7 +28,7 @@ extern "C" {
         AH5_ft_t magnitude;
     } AH5_sphericalwave_t;
 
-    typedef enum AH5_gen_class_t
+    typedef enum _AH5_gen_class_t
     {
         GEN_INVALID             = -1,
         GEN_VOLTAGE             = 1,
@@ -37,7 +37,7 @@ extern "C" {
         GEN_POWER_DENSITY       = 4
     } AH5_gen_class_t;
 
-    typedef struct AH5_generator_t
+    typedef struct _AH5_generator_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -46,14 +46,14 @@ extern "C" {
         AH5_ft_t magnitude;
     } AH5_generator_t;
 
-    typedef enum AH5_dip_class_t
+    typedef enum _AH5_dip_class_t
     {
         DIPOLE_INVALID          = -1,
         DIPOLE_ELECTRIC         = 1,
         DIPOLE_MAGNETIC         = 2
     } AH5_dip_class_t;
 
-    typedef struct AH5_dipole_t
+    typedef struct _AH5_dipole_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -68,7 +68,7 @@ extern "C" {
         AH5_ft_t        magnitude;
     } AH5_dipole_t;
 
-    typedef enum AH5_ant_class_t
+    typedef enum _AH5_ant_class_t
     {
         ANT_INVALID             = -1,
         ANT_GAIN                = 1,
@@ -82,7 +82,7 @@ extern "C" {
         ANT_EXCHANGE_SURFACE    = 9
     } AH5_ant_class_t;
 
-    typedef union AH5_antennax_t
+    typedef union _AH5_antennax_t
     {
         AH5_ft_t        gain;
         AH5_ft_t        effarea;
@@ -90,14 +90,14 @@ extern "C" {
         AH5_opt_attrs_t parreflct;
     } AH5_antennax_t;
 
-    typedef struct AH5_ant_model_t
+    typedef struct _AH5_ant_model_t
     {
         AH5_ant_class_t type;
         AH5_opt_attrs_t opt_attrs;
         AH5_antennax_t  data;
     } AH5_ant_model_t;
 
-    typedef struct AH5_antenna_t
+    typedef struct _AH5_antenna_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -108,27 +108,27 @@ extern "C" {
         AH5_ant_model_t model;
     } AH5_antenna_t;
 
-    typedef enum AH5_scm_class_t
+    typedef enum _AH5_scm_class_t
     {
         SCOM_INVALID            = -1,
         SCOM_ARRAYSET           = 1,
         SCOM_EXCHANGE_SURFACE   = 2
     } AH5_scm_class_t;
 
-    typedef union AH5_scmx_t
+    typedef union _AH5_scmx_t
     {
         AH5_arrayset_t  arrayset;
         char            *exchange_surface;
     } AH5_scmx_t;
 
-    typedef struct AH5_sourceonmesh_t
+    typedef struct _AH5_sourceonmesh_t
     {
         char            *path;
         AH5_scm_class_t type;
         AH5_scmx_t      data;
     } AH5_sourceonmesh_t;
 
-    typedef struct AH5_em_source_t
+    typedef struct _AH5_em_source_t
     {
         hsize_t         nb_pw_sources;
         AH5_planewave_t *pw_sources;

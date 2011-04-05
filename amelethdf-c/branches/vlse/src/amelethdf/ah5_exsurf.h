@@ -7,7 +7,7 @@ extern "C" {
 
 #include "ah5_fltype.h"
 
-    typedef enum AH5_exs_type_class_t
+    typedef enum _AH5_exs_type_class_t
     {
         EXS_TYPE_INVALID            = -1,
         EXS_TYPE_RECIPROCITY        = 1,
@@ -15,14 +15,14 @@ extern "C" {
         EXS_TYPE_GAUSS              = 3
     } AH5_exs_type_class_t;
 
-    typedef enum AH5_exs_nature_class_t
+    typedef enum _AH5_exs_nature_class_t
     {
         EXS_NATURE_INVALID          = -1,
         EXS_NATURE_OUTSIDE          = 1,
         EXS_NATURE_INSIDE           = 2
     } AH5_exs_nature_class_t;
 
-    typedef struct AH5_exs_group_t
+    typedef struct _AH5_exs_group_t
     {
         char            *path;
         AH5_exs_type_class_t type;
@@ -31,7 +31,7 @@ extern "C" {
         AH5_arrayset_t  *instances;
     } AH5_exs_group_t;
 
-    typedef struct AH5_exchange_surface_t
+    typedef struct _AH5_exchange_surface_t
     {
         hsize_t         nb_groups;
         AH5_exs_group_t *groups;

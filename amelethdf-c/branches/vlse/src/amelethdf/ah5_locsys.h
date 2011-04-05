@@ -7,7 +7,7 @@ extern "C" {
 
 #include "ah5_general.h"
 
-    typedef enum AH5_lsm_transf_class_t
+    typedef enum _AH5_lsm_transf_class_t
     {
         TRF_INVALID             = -1,
         TRF_SCALE               = 1,
@@ -15,14 +15,14 @@ extern "C" {
         TRF_TRANSLATION         = 3
     } AH5_lsm_transf_class_t;
 
-    typedef struct AH5_lsm_transf_t
+    typedef struct _AH5_lsm_transf_t
     {
         char            *path;
         AH5_lsm_transf_class_t type;
         int             rank;
     } AH5_lsm_transf_t;
 
-    typedef struct AH5_lsm_instance_t
+    typedef struct _AH5_lsm_instance_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
@@ -31,7 +31,7 @@ extern "C" {
         AH5_lsm_transf_t *transformations;
     } AH5_lsm_instance_t;
 
-    typedef struct AH5_localization_system_t
+    typedef struct _AH5_localization_system_t
     {
         hsize_t         nb_instances;
         AH5_lsm_instance_t *instances;
