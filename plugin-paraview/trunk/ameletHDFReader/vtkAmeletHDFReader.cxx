@@ -403,8 +403,8 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                   if(timedim>-1)
                     {
                       int actualtimestep = this->ActualTimeStep;
-                      if(ars.dims[timedim].nbvalues==1)
-                                actualtimestep=actualtimestep-1;
+                      /*if(ars.dims[timedim].nbvalues==1)
+                                actualtimestep=actualtimestep-1;*/
                       int offsetcomp=1;
                       for(int ioffsetdim=0;ioffsetdim<componentdim;ioffsetdim++){
                              if(ioffsetdim==meshentitydim)
@@ -813,6 +813,8 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
           //   free(*(child.childnames + idel));
           if(child.nbchild>1) free(child.childnames[0]);
           free(child.childnames);
+          int tsLength = outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+          double* steps = outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 	  //vtkUnstructuredGrid *grid = AllocateGetBlock(output, 0,IS_DATAONMESH());
 	  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()) && this->TimeStepMode )
 	  {
@@ -821,13 +823,17 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
 		        outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 		  double* steps =
 		        outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-
-		  this->ActualTimeStep =
+                  int cnt = 0;
+                  while(cnt < tsLength-1 && steps[cnt] < requestedTimeValue)
+                  {
+                    cnt++;
+                  }
+                  this->ActualTimeStep = cnt;
+		  /*this->ActualTimeStep =
 		        vtkstd::find_if(this->TimeStepValues.begin(), this->TimeStepValues.end(),
 		                        vtkstd::bind2nd( WithinTolerance(1e-9), requestedTimeValue ))
-		        - this->TimeStepValues.begin();
-
-
+		        - this->TimeStepValues.begin();*/
+                  
 		 output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
 		                                    &TimeStepValues[this->ActualTimeStep], 1);
 	  }
