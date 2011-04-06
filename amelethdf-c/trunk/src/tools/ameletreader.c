@@ -257,7 +257,7 @@ int main(argc, argv)
                 lnk = read_link(file_id, path2);
                 printf("Subject : %s\n", lnk.subject);
                 printf("Object : %s\n", lnk.object);
-                printf("Is dataonmesh : %i\n", isdataonmesh(lnk));
+                //printf("Is dataonmesh : %i\n", isdataonmesh(lnk));
                 free(path2);
             }
             for (idel=0;idel<children2.nbchild; idel++)

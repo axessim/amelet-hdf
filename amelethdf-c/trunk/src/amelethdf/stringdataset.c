@@ -58,6 +58,8 @@ char *** read_string_dataset1(hid_t file_id, const char * path, int l, int m,
         }
         offset = offset + m;
     }
+    for(i =0;i<m*n;i++)
+	    free(buf[i]);
     free(buf);
     return data;
 }

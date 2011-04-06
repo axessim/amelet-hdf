@@ -8,8 +8,12 @@ arrayset_t read_arrayset(hid_t file_id, const char* path)
 {
     arrayset_t ars;
     int nbdims, i;
-    char params[ABSOLUTE_PATH_NAME_LENGTH], dims[ABSOLUTE_PATH_NAME_LENGTH];
-    char dim[ABSOLUTE_PATH_NAME_LENGTH];
+    char *params;
+    char *dims;
+    char *dim;
+    params = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    dims  = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    dim = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
 
     strcpy(params, "");
     strcat(params, path);
@@ -53,6 +57,9 @@ arrayset_t read_arrayset(hid_t file_id, const char* path)
         ars.dims[i] = read_vector(file_id, dim);
 	free(buf);
     }
+    free(dim);
+    free(dims);
+    free(params);
     return ars;
 }
 

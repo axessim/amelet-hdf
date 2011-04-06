@@ -149,7 +149,7 @@ ugroup_t readUGroup(hid_t group_id, const char* name)
     ugroup_t rdata;
     herr_t status;
 
-    rdata.name = (char *) malloc(30 * sizeof(char));
+    rdata.name = (char *) malloc(ELEMENT_NAME_LENGTH * sizeof(char));
     strcpy(rdata.name, name);
     space = H5Dget_space(group_id);
     ndims = H5Sget_simple_extent_dims(space, dims, NULL);
