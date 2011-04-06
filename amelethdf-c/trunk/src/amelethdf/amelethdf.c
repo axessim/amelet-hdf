@@ -72,6 +72,7 @@ char * read_string_attribute(hid_t loc_id, const char* path, char* attr)
         status = H5Tclose(memtype);
     }
     strcpy(attribute,rdata[0]);
+    free(rdata[0]);
     free(rdata);
     return attribute;
 }
