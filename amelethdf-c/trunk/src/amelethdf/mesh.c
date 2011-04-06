@@ -39,8 +39,7 @@ int meshtype(hid_t loc_id, const char * path)
         else if (strcmp(rdata[0], "structured") == 0)
             ret_val = STRUCTURED;
         H5Aclose(attr_id);
-        for(i=1;i<dims[0];i++)
-          free(rdata[i]);
+        free(rdata[0]);
         free(rdata);
     }
     H5Gclose(mesh_id);
