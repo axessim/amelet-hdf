@@ -7,7 +7,7 @@ char* path_basename(char *path)
 {
     char **buf;
     buf = (char **) malloc(2 * sizeof(char*));
-    buf[0] = (char *) malloc(strlen(path) * sizeof(char));
+    buf[0] = (char *) malloc((strlen(path)+1) * sizeof(char));
     buf = rsplit(path);
     return buf[1];
 }
@@ -16,7 +16,7 @@ char* path_dirname(char *path)
 {
     char **buf;
     buf = (char **) malloc(2 * sizeof(char*));
-    buf[0] = (char *) malloc(strlen(path) * sizeof(char));
+    buf[0] = (char *) malloc((strlen(path)+1) * sizeof(char));
     buf = rsplit(path);
     return buf[0];
 }
@@ -111,7 +111,7 @@ char * remove_sep(char *path)
     char *pch;
     if (path_isabs(path))
         begin = 1;
-    int pathsize = strlen(path);
+    int pathsize = strlen(path) + 1 ;
     buf = (char *) malloc(pathsize * sizeof(char));
     pch = strchr(path, '/');
     while (pch != NULL)
@@ -159,7 +159,7 @@ char** rsplit(char *path)
     buffer = remove_sep(buffer);
     buffer2 = remove_sep(buffer2);
     splitpath = (char **) malloc(2 * sizeof(char*));
-    splitpath[0] = (char *) malloc(strlen(path) * sizeof(char));
+    splitpath[0] = (char *) malloc((strlen(path)+1) * sizeof(char));
 
     pointer = strtok(buffer, sep);
     while (pointer != NULL)
@@ -172,7 +172,7 @@ char** rsplit(char *path)
         }
     }
     pointer2 = strtok(buffer2, sep);
-    splitpath[0] = (char *) malloc(strlen(pointer2) * sizeof(char));
+    splitpath[0] = (char *) malloc((strlen(pointer2)+1) * sizeof(char));
     splitpath[0] = strcat(splitpath[0], "/");
     splitpath[0] = strcat(splitpath[0], pointer2);
     if (nb > 1)
@@ -208,7 +208,7 @@ char** lsplit(char *path)
     buffer2 = remove_sep(buffer2);
 
     splitpath = (char **) malloc(2 * sizeof(char*));
-    splitpath[0] = (char *) malloc(strlen(path) * sizeof(char));
+    splitpath[0] = (char *) malloc((strlen(path)+1) * sizeof(char));
 
     pointer = strtok(buffer, sep);
     while (pointer != NULL)
@@ -274,8 +274,8 @@ char * path_element(char *path, int index, int back)
     stringtab_t strbuf;
     int i;
 
-    buf = (char *) malloc(strlen(path) * sizeof(char));
-    res = (char *) malloc(strlen(path) * sizeof(char));
+    buf = (char *) malloc((strlen(path)+1) * sizeof(char));
+    res = (char *) malloc((strlen(path)+1) * sizeof(char));
     if (strcmp(path, "") == 0)
         strcpy(res, path);
     else
@@ -306,8 +306,7 @@ stringtab_t path_split(char *path)
     int i;
     int nb = 1;
     char *pointer, *pointer2;
-    char *sep =
-    { "/" };
+    char *sep =  "/" ;
     char *buffer, *buffer2;
     stringtab_t rdata;
     //buffer = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
