@@ -6,8 +6,6 @@
 char* path_basename(char *path)
 {
     char **buf;
-    buf = (char **) malloc(2 * sizeof(char*));
-    buf[0] = (char *) malloc((strlen(path)+1) * sizeof(char));
     buf = rsplit(path);
     return buf[1];
 }
@@ -15,8 +13,6 @@ char* path_basename(char *path)
 char* path_dirname(char *path)
 {
     char **buf;
-    buf = (char **) malloc(2 * sizeof(char*));
-    buf[0] = (char *) malloc((strlen(path)+1) * sizeof(char));
     buf = rsplit(path);
     return buf[0];
 }
