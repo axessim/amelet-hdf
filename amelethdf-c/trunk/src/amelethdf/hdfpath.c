@@ -134,7 +134,7 @@ char* path_join(char **paths, int nbpath)
 {
     int i;
     char *buf = "";
-    int sizebuf = 0;
+    int sizebuf = 1;
     for (i = 0; i < nbpath; i++)
         sizebuf = sizebuf + strlen(paths[i]);
     buf = (char *) malloc(sizebuf * sizeof(char));
