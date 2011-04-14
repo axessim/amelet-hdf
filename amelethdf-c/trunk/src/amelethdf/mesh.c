@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "mesh.h"
+#include "stringdataset.h"
 
 int meshtype(hid_t loc_id, const char * path)
 {
@@ -81,6 +82,8 @@ groupgroup_t readGroupGroup(hid_t grpgrp_id, const char* name)
     // read the data
     status = H5Dread(grpgrp_id, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT,
             rdata.groupGroupnames[0]);
+    for (i=0; i< dims[0]; i++)
+        strcpy(rdata.groupGroupnames[i],remove_space(rdata.groupGroupnames[i]));
 
     return rdata;
 }

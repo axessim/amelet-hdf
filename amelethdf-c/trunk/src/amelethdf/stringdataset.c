@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stringdataset.h"
+#include <ctype.h>
+
 
 // Read a long string dataset
 char ** read_string_dataset2(hid_t file_id, const char * path, size_t length, hsize_t mn)
@@ -171,4 +173,45 @@ void write_string_dataset(hid_t file_id, char* path, int values_len, int rank,
     H5Tclose(memtype);
     H5Dclose(dset_id);
     H5Sclose(ds_id);
+}
+
+char *remove_space(char *name)
+{
+      char *buf = name, *output = name;
+      int i = 0, count = 0;
+
+      if (name)
+      {
+
+            for (buf = name; *buf && isspace(*buf); ++buf)
+                  ;
+            if (name != buf)
+                  memmove(name, buf, buf - name);
+
+            while (*buf)
+            {
+                  if (isspace(*buf) && count)
+                        buf++;
+                  else
+                  {
+                        if (!isspace(*buf))
+                              count = 0;
+                        else
+                        {
+                              *buf = ' ';
+                              count = 1;
+                        }
+                        output[i++] = *buf++;
+                  }
+            }
+            output[i] = '\0';
+
+            while (--i >= 0)
+            {
+                  if (!isspace(output[i]))
+                        break;
+            }
+            output[++i] = '\0';
+      }
+      return name;
 }
