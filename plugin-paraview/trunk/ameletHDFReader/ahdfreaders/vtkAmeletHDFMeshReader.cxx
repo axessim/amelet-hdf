@@ -805,3 +805,383 @@ int vtkAmeletHDFMeshReader::readSmesh(hid_t meshId, char *name, vtkUnstructuredG
 
     return 1;
 }
+
+int vtkAmeletHDFMeshReader::readUgrp(hid_t meshId, char *name, vtkUnstructuredGrid *ugrid, char* groupname)
+{
+
+    hid_t nodes_id, eltype_id, eltnode_id, loc_id;
+    nodes_t umeshnodes;
+    elttypes_t umeshelttypes;
+    eltnodes_t umesheltnodes;
+    umeshelttypes.nbelttypes=0;
+    umesheltnodes.nbeltnodes=0;
+    children_t child;
+    char * path;
+    int idel;
+
+    loc_id = H5Gopen1(meshId,name);
+
+    path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    strcpy(path,"group/");
+    hid_t group_id = H5Gopen1(loc_id,"group");
+    strcat(path,groupname);
+    if (H5Lexists(loc_id,path,H5P_DEFAULT)==TRUE)
+    {
+        hid_t grp_id = H5Dopen1(loc_id,path);
+        ugroup_t grp;
+        char * type = read_string_attribute(group_id, groupname, "type");
+        grp = readUGroup(grp_id,groupname);
+   
+        H5Dclose(grp_id);
+        free(path);
+
+
+        // read nodes
+        if (H5Lexists(loc_id,"nodes",H5P_DEFAULT)!=FALSE)
+        {
+            nodes_id = H5Dopen1(loc_id,"nodes");
+            umeshnodes = readNodes(nodes_id);
+            vtkPoints *points = vtkPoints::New();
+            for (int i=0 ;i<umeshnodes.nbnodes;i++)
+                 points->InsertNextPoint(umeshnodes.nodes[i][0],umeshnodes.nodes[i][1],
+                                                        umeshnodes.nodes[i][2]);
+            ugrid->SetPoints(points);
+            points->Delete();
+        }
+
+        if (H5Lexists(loc_id,"elementNodes",H5P_DEFAULT)!=FALSE)
+        {
+            eltnode_id = H5Dopen1(loc_id,"elementNodes");
+            eltype_id = H5Dopen1(loc_id,"elementTypes");
+            umeshelttypes = readElementTypes(eltype_id);
+            umesheltnodes = readElementNodes(eltnode_id);
+        }
+
+        int idnode=0;
+        if(strcmp(type,"node")!=0){
+            for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
+            {
+                int i=grp.eltgroup[igrp];
+                if(umeshelttypes.elttypes[i]==1)
+                {
+                        vtkLine * linecell = vtkLine::New();
+                        linecell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                        linecell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                        ugrid->InsertNextCell(linecell->GetCellType(),linecell->GetPointIds());
+                        linecell->Delete();
+                        idnode=idnode+2;
+                }
+                else if(umeshelttypes.elttypes[i]==11)
+                {
+                        vtkTriangle * tricell = vtkTriangle::New();
+                        tricell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                        tricell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                        tricell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                        ugrid->InsertNextCell(tricell->GetCellType(),tricell->GetPointIds());
+                        tricell->Delete();
+                        idnode=idnode+3;
+                }
+                else if(umeshelttypes.elttypes[i]==13)
+                {
+                        vtkQuad * quadcell = vtkQuad::New();
+                        quadcell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                        quadcell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                        quadcell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                        quadcell->GetPointIds()->SetId(3,umesheltnodes.eltnodes[idnode+3]);
+                        ugrid->InsertNextCell(quadcell->GetCellType(),quadcell->GetPointIds());
+                        quadcell->Delete();
+                        idnode=idnode+4;
+                }
+                else if(umeshelttypes.elttypes[i]==101)
+                {
+                        vtkTetra * tetracell = vtkTetra::New();
+                        tetracell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                        tetracell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                        tetracell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                        tetracell->GetPointIds()->SetId(3,umesheltnodes.eltnodes[idnode+3]);
+                        ugrid->InsertNextCell(tetracell->GetCellType(),tetracell->GetPointIds());
+                        tetracell->Delete();
+                        idnode=idnode+4;
+                }
+            }
+            
+        }
+        else
+        if(umesheltnodes.nbeltnodes==0)
+        {
+            //so there is only nodes in mesh
+            for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
+            { 
+                    int i = grp.eltgroup[i];
+                    vtkVertex * vertexcell = vtkVertex::New();
+                    vertexcell->GetPointIds()->SetId(0,i);
+                    ugrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+                    vertexcell->Delete();
+            }
+        }
+        else if(umeshnodes.nbnodes == grp.nbeltgroup){
+            for(int i=0; i<umeshelttypes.nbelttypes;i++)
+            {
+                //int i=grp.eltgroup[igrp];
+                if(umeshelttypes.elttypes[i]==1)
+                {
+                    vtkLine * linecell = vtkLine::New();
+                    linecell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                    linecell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                    ugrid->InsertNextCell(linecell->GetCellType(),linecell->GetPointIds());
+                    linecell->Delete();
+                    idnode=idnode+2;
+                }
+                else if(umeshelttypes.elttypes[i]==11)
+                {
+                    vtkTriangle * tricell = vtkTriangle::New();
+                    tricell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                    tricell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                    tricell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                    ugrid->InsertNextCell(tricell->GetCellType(),tricell->GetPointIds());
+                    tricell->Delete();
+                    idnode=idnode+3;
+                }
+                else if(umeshelttypes.elttypes[i]==13)
+                {
+                    vtkQuad * quadcell = vtkQuad::New();
+                    quadcell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                    quadcell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                    quadcell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                    quadcell->GetPointIds()->SetId(3,umesheltnodes.eltnodes[idnode+3]);
+                    ugrid->InsertNextCell(quadcell->GetCellType(),quadcell->GetPointIds());
+                    quadcell->Delete();
+                    idnode=idnode+4;
+                }
+                else if(umeshelttypes.elttypes[i]==101)
+                {
+                    vtkTetra * tetracell = vtkTetra::New();
+                    tetracell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                    tetracell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                    tetracell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                    tetracell->GetPointIds()->SetId(3,umesheltnodes.eltnodes[idnode+3]);
+                    ugrid->InsertNextCell(tetracell->GetCellType(),tetracell->GetPointIds());
+                    tetracell->Delete();
+                    idnode=idnode+4;
+                }
+                else
+                    std::cout<<"eltype = "<<umeshelttypes.elttypes[i]<<std::endl;
+            }
+        }
+        if(umeshnodes.nbnodes > 0) {
+            umeshnodes.nbnodes = 0;
+            free(umeshnodes.nodes);
+        }
+        if(umeshelttypes.nbelttypes > 0) {
+            umeshelttypes.nbelttypes = 0;
+            free(umeshelttypes.elttypes);
+        }
+        if(umesheltnodes.nbeltnodes > 0) {
+            umesheltnodes.nbeltnodes = 0;
+            free(umesheltnodes.eltnodes);
+        }
+
+        return grp.nbeltgroup;
+    }
+    else
+    {
+        std::cout<<"group "<<path<< "doesn't exist !!"<<std::endl;
+        return 0;
+    }
+}
+
+int vtkAmeletHDFMeshReader::readUgrpgrp(hid_t meshId, char *name, vtkUnstructuredGrid *ugrid, char* groupname)
+{
+    
+    //Unstructuredmesh umesh;
+    hid_t nodes_id, eltype_id, eltnode_id, loc_id;
+    nodes_t umeshnodes;
+    elttypes_t umeshelttypes;
+    eltnodes_t umesheltnodes;
+    umeshelttypes.nbelttypes=0;
+    umesheltnodes.nbeltnodes=0;
+    children_t child;
+    char * path;
+    int nbelt=0;
+    int idel;
+
+    loc_id = H5Gopen1(meshId,name);
+
+    path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    
+    strcpy(path,"groupGroup/");
+    hid_t groupGroup_id = H5Gopen1(loc_id,"groupGroup");
+    hid_t group_id = H5Gopen1(loc_id,"group");
+    strcat(path,groupname);
+    
+    if (H5Lexists(loc_id,path,H5P_DEFAULT)==TRUE)
+    {
+
+
+        // read nodes
+        if (H5Lexists(loc_id,"nodes",H5P_DEFAULT)!=FALSE)
+        {
+            nodes_id = H5Dopen1(loc_id,"nodes");
+            umeshnodes = readNodes(nodes_id);
+            vtkPoints *points = vtkPoints::New();
+            for (int i=0 ;i<umeshnodes.nbnodes;i++)
+                 points->InsertNextPoint(umeshnodes.nodes[i][0],umeshnodes.nodes[i][1],
+                                                        umeshnodes.nodes[i][2]);
+            ugrid->SetPoints(points);
+            points->Delete();
+            
+        }
+
+        if (H5Lexists(loc_id,"elementNodes",H5P_DEFAULT)!=FALSE)
+        {
+            eltnode_id = H5Dopen1(loc_id,"elementNodes");
+            eltype_id = H5Dopen1(loc_id,"elementTypes");
+            umeshelttypes = readElementTypes(eltype_id);
+            umesheltnodes = readElementNodes(eltnode_id);
+        }
+        hid_t grpGrp_id = H5Dopen1(groupGroup_id , groupname);
+        groupgroup_t grpGrp = readGroupGroup(grpGrp_id,groupname);
+        int idnode=0;
+        for (int j=0; j<grpGrp.nbeltgroupGroup;j++)
+        {
+            char * path2;
+            path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+            strcpy(path2,"group/");
+            strcat(path2,grpGrp.groupGroupnames[j]);
+            
+            hid_t grp_id = H5Dopen1(loc_id,path2);
+            ugroup_t grp;
+            char * type = read_string_attribute(group_id, grpGrp.groupGroupnames[j], "type");
+            grp = readUGroup(grp_id,grpGrp.groupGroupnames[j]);
+       
+            H5Dclose(grp_id);
+            free(path2);
+
+            
+            if(strcmp(type,"node")!=0){
+                nbelt=nbelt+grp.nbeltgroup;
+                for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
+                {
+                    int i=grp.eltgroup[igrp];
+                    if(umeshelttypes.elttypes[i]==1)
+                    {
+                            vtkLine * linecell = vtkLine::New();
+                            linecell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                            linecell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                            ugrid->InsertNextCell(linecell->GetCellType(),linecell->GetPointIds());
+                            linecell->Delete();
+                            idnode=idnode+2;
+                    }
+                    else if(umeshelttypes.elttypes[i]==11)
+                    {
+                            vtkTriangle * tricell = vtkTriangle::New();
+                            tricell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                            tricell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                            tricell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                            ugrid->InsertNextCell(tricell->GetCellType(),tricell->GetPointIds());
+                            tricell->Delete();
+                            idnode=idnode+3;
+                    }
+                    else if(umeshelttypes.elttypes[i]==13)
+                    {
+                            vtkQuad * quadcell = vtkQuad::New();
+                            quadcell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                            quadcell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                            quadcell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                            quadcell->GetPointIds()->SetId(3,umesheltnodes.eltnodes[idnode+3]);
+                            ugrid->InsertNextCell(quadcell->GetCellType(),quadcell->GetPointIds());
+                            quadcell->Delete();
+                            idnode=idnode+4;
+                    }
+                    else if(umeshelttypes.elttypes[i]==101)
+                    {
+                            vtkTetra * tetracell = vtkTetra::New();
+                            tetracell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                            tetracell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                            tetracell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                            tetracell->GetPointIds()->SetId(3,umesheltnodes.eltnodes[idnode+3]);
+                            ugrid->InsertNextCell(tetracell->GetCellType(),tetracell->GetPointIds());
+                            tetracell->Delete();
+                            idnode=idnode+4;
+                    }
+                    else
+                      std::cout<<"eltype = "<<umeshelttypes.elttypes[i]<<std::endl;
+                }
+            }
+            else if(umesheltnodes.nbeltnodes==0)
+            {
+                //so there is only nodes in mesh
+                nbelt=nbelt+grp.nbeltgroup;
+                for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
+                { 
+                        int i = grp.eltgroup[i];
+                        vtkVertex * vertexcell = vtkVertex::New();
+                        vertexcell->GetPointIds()->SetId(0,i);
+                        ugrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+                        vertexcell->Delete();
+                }
+            }
+            else if(umeshnodes.nbnodes == grp.nbeltgroup){
+                nbelt=nbelt+grp.nbeltgroup;
+                for(int i=0; i<umeshelttypes.nbelttypes;i++)
+                {
+                    
+                    if(umeshelttypes.elttypes[i]==1)
+                    {
+                            vtkLine * linecell = vtkLine::New();
+                            linecell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                            linecell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                            ugrid->InsertNextCell(linecell->GetCellType(),linecell->GetPointIds());
+                            linecell->Delete();
+                            idnode=idnode+2;
+                    }
+                    else if(umeshelttypes.elttypes[i]==11)
+                    {
+                            vtkTriangle * tricell = vtkTriangle::New();
+                            tricell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                            tricell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                            tricell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                            ugrid->InsertNextCell(tricell->GetCellType(),tricell->GetPointIds());
+                            tricell->Delete();
+                            idnode=idnode+3;
+                    }
+                    else if(umeshelttypes.elttypes[i]==13)
+                    {
+                            vtkQuad * quadcell = vtkQuad::New();
+                            quadcell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                            quadcell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                            quadcell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                            quadcell->GetPointIds()->SetId(3,umesheltnodes.eltnodes[idnode+3]);
+                            ugrid->InsertNextCell(quadcell->GetCellType(),quadcell->GetPointIds());
+                            quadcell->Delete();
+                            idnode=idnode+4;
+                    }
+                    else if(umeshelttypes.elttypes[i]==101)
+                    {
+                            vtkTetra * tetracell = vtkTetra::New();
+                            tetracell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
+                            tetracell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
+                            tetracell->GetPointIds()->SetId(2,umesheltnodes.eltnodes[idnode+2]);
+                            tetracell->GetPointIds()->SetId(3,umesheltnodes.eltnodes[idnode+3]);
+                            ugrid->InsertNextCell(tetracell->GetCellType(),tetracell->GetPointIds());
+                            tetracell->Delete();
+                            idnode=idnode+4;
+                    }
+                    else
+                      std::cout<<"eltype = "<<umeshelttypes.elttypes[i]<<std::endl;
+                }
+            }
+            free(grp.eltgroup);
+        }
+        free(umeshnodes.nodes);
+        free(umeshelttypes.elttypes);
+        free(umesheltnodes.eltnodes);
+        free(path);
+        return nbelt;
+    }
+    else
+    {
+        std::cout<<"group "<<path<< "doesn't exist !!"<<std::endl;
+        return 0;
+    }
+}

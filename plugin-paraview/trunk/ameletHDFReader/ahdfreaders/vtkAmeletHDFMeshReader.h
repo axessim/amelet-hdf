@@ -17,6 +17,7 @@ class vtkAmeletHDFMeshReader
 public:
     virtual int readUmesh(hid_t loc_id, char *name, vtkUnstructuredGrid *ugrid);
     virtual int readSmesh(hid_t loc_id, char *name, vtkUnstructuredGrid *sgrid);
-
+    virtual int readUgrp(hid_t loc_id, char *name, vtkUnstructuredGrid *ugrid, char* groupname);
+    virtual int readUgrpgrp(hid_t loc_id, char *name, vtkUnstructuredGrid *ugrid, char* groupname);
 };
 #endif /* __VTKvtkAmeletHDFMeshReader_H_  */
