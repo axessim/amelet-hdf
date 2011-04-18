@@ -24,8 +24,8 @@ typedef struct
         float phi;
         float linear_polarization;
         int polarization;
-        complex float elliptical_polarization_etheta;
-        complex float elliptical_polarization_ephi;
+        float_complex elliptical_polarization_etheta;
+        float_complex elliptical_polarization_ephi;
         floatingtype_t magnitude;
 } planewave_t;
 

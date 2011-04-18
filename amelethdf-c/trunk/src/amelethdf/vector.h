@@ -11,7 +11,7 @@ typedef struct
         single_t single;
         int* ivalue;
         float* rvalue;
-        complex float* cvalue;
+        float_complex* cvalue;
         char ** svalue;
         int nbvalues;
 } vector_t;

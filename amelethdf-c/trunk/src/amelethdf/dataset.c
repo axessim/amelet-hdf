@@ -53,7 +53,7 @@ dataset_t read_dataset(hid_t loc_id, const char* path)
     }
     else if (type_class[0] == H5T_COMPOUND)
     {
-        ds.cvalue = (complex float *)malloc(length*sizeof(complex float));
+        ds.cvalue = (float_complex *)malloc(length*sizeof(float_complex));
         ds.cvalue = read_complex_dataset(loc_id, path);
     }
     ds.single = read_single(loc_id, path);
@@ -153,9 +153,9 @@ float get_float_dataset(dataset_t ds, hsize_t *indices)
 }
 
 // Given a complex float dataset return the value at indices
-complex float get_complexfloat_dataset(dataset_t ds, hsize_t *indices)
+float_complex get_complexfloat_dataset(dataset_t ds, hsize_t *indices)
 {
-    complex float rdata;
+    float_complex rdata;
     herr_t status;
     status = get_check_dataset(ds, indices, P_COMPLEX);
     rdata = ds.cvalue[get_index_dataset(indices, ds.dims)];

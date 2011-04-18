@@ -68,7 +68,8 @@ singlereal_t clear_content_singlereal(singlereal_t singlereal)
 singlecomplex_t clear_content_singlecomplex(singlecomplex_t singlecomplex)
 {
     singlecomplex.single = clear_content_single(singlecomplex.single);
-    singlecomplex.value = 0.;
+    singlecomplex.value.re = 0.;
+    singlecomplex.value.im = 0.;
     return singlecomplex;
 }
 

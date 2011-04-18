@@ -1,6 +1,34 @@
 #include <stdlib.h>
 
 #include "complextype.h"
+#include <math.h>
+
+#if __STDC_VERSION__ >= 199901L
+//creal, cimag already defined in complex.h
+
+inline float_complex make_complex_float(float real, float imag)
+{
+   return real + imag * I;
+}
+
+inline float abs_complex(float_complex a)
+{
+  return cabs(a);
+}
+#else
+
+inline float_complex make_complex_float(float real, float imag)
+{
+    float_complex z = {real, imag};
+    return z;
+}
+
+inline float abs_complex(float_complex a)
+{
+   float b = sqrt(a.re*a.re + a.im*a.im);
+   return b;
+}
+#endif
 
 // Create datatype
 hid_t create_type_id(hid_t real_or_double)
@@ -59,7 +87,7 @@ herr_t write_complex_type(hid_t loc_id)
 
 // create a complex float attribute
 herr_t create_complex_attribute(hid_t loc_id, const char* path,
-        const char* name, complex float value)
+        const char* name, float_complex value)
 {
     hid_t space_id, attr_id;
     hid_t real_type_id;
@@ -77,10 +105,10 @@ herr_t create_complex_attribute(hid_t loc_id, const char* path,
 }
 
 // read a complex float attribute
-complex float read_complex_attribute(hid_t loc_id, const char* path,
+float_complex read_complex_attribute(hid_t loc_id, const char* path,
         const char* name)
 {
-    complex float value;
+    float_complex value;
     float *buf;
     hid_t attr_id, real_type_id;
     ;
@@ -99,15 +127,15 @@ complex float read_complex_attribute(hid_t loc_id, const char* path,
     {
         printf("Can't read attribute : %s\n", name);
     }
-    value = buf[0] + buf[1] * _Complex_I;
+    value.re = buf[0]; value.im=buf[1];
     return value;
 }
 
 // read a complex float dataset
 
-complex float *read_complex_dataset(hid_t loc_id, const char* path)
+float_complex *read_complex_dataset(hid_t loc_id, const char* path)
 {
-    complex float* values;
+    float_complex *values;
     int rank;
     int i;
     hsize_t *dims;
@@ -138,11 +166,12 @@ complex float *read_complex_dataset(hid_t loc_id, const char* path)
     {
         printf("Can't read dataset\n");
     } 
-    values = (complex float *) malloc(length*sizeof(complex float));
+    values = (float_complex *) malloc(length*sizeof(float_complex));
     int j = 0;
     for (i = 0; i < length; i++)
     {
-        values[i] = buf[j] + buf[j + 1] * _Complex_I;
+        values[i].re = buf[j];
+        values[i].im = buf[j + 1];
         j = j + 2;
     }
     free(buf);
@@ -153,7 +182,7 @@ complex float *read_complex_dataset(hid_t loc_id, const char* path)
 // Write a 1D complex dataset
 
 herr_t write_complexe_1D_dataset(hid_t loc_id, const char* path,
-        complex float* values, int nbvalues)
+        float_complex* values, int nbvalues)
 {
     int i,rank = 1;
     hsize_t dims[1];

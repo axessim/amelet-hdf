@@ -45,7 +45,7 @@ vector_t read_vector(hid_t loc_id, const char* path)
     }
     else if (type_class == H5T_COMPOUND)
     {
-        vec.cvalue = (complex float*)malloc(dims[0]*sizeof(complex float));
+        vec.cvalue = (float_complex *)malloc(dims[0]*sizeof(float_complex));
         vec.cvalue = read_complex_dataset(loc_id, path);
     }
     else if (type_class == H5T_STRING)

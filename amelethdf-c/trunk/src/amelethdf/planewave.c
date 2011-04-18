@@ -45,8 +45,10 @@ planewave_t clear_content_planewave(planewave_t pw)
     pw.theta = 0;
     pw.phi = 0;
     pw.linear_polarization = 0;
-    pw.elliptical_polarization_etheta = 0;
-    pw.elliptical_polarization_ephi = 0;
+    pw.elliptical_polarization_etheta.re = 0;
+    pw.elliptical_polarization_etheta.im = 0;
+    pw.elliptical_polarization_ephi.re = 0;
+    pw.elliptical_polarization_ephi.im = 0;
     pw.magnitude = clear_content_ft(pw.magnitude);
     return pw;
 

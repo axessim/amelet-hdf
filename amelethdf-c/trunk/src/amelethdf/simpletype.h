@@ -1,5 +1,3 @@
-
-
 #ifndef SIMPLETYPE_H
 #define SIMPLETYPE_H
 
@@ -31,7 +29,7 @@ typedef struct
 typedef struct
 {
         single_t single;
-        complex float value;
+        float_complex value;
 } singlecomplex_t;
 
 typedef struct
@@ -41,7 +39,7 @@ typedef struct
         int nbdims;
         int *ivalue;
         float *rvalue;
-        complex float *cvalue;
+        float_complex *cvalue;
 } dataset_t;
 
 typedef struct
