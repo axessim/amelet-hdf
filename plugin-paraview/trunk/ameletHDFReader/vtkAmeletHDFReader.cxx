@@ -443,7 +443,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                                         int offsetmesht;
                                         if (offsetmesh==0) offsetmesh=1;
                                         //else offsetmesht=offsetm;
-                                        module=cabs(ars.data.cvalue[j2*offsetcomp+k*offsetmesh+(offsettime)*j]);
+                                        module=abs_complex(ars.data.cvalue[j2*offsetcomp+k*offsetmesh+(offsettime)*j]);
                                         //if(meshType==1) floatscalar->InsertComponent(grp.eltgroup[k],j2,module);
                                         //else 
                                         floatscalar->InsertComponent(k,j2,module);
@@ -481,7 +481,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                                     if(actualtimestep==j)
                                     {
                                         float module;
-                                        module=cabs(ars.data.cvalue[k+offset]);
+                                        module=abs_complex(ars.data.cvalue[k+offset]);
                                         floatscalar->InsertTuple1(k,module);
                                     }
                                 }
@@ -540,7 +540,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                                     else if(ars.data.cvalue!=NULL)
                                     {
                                         float module;
-                                        module=cabs(ars.data.cvalue[offsetm]);
+                                        module=abs_complex(ars.data.cvalue[offsetm]);
                                        /* if(meshType==1) floatscalar->InsertComponent(grp.eltgroup[k],j,module);
                                         else*/
                                        floatscalar->InsertComponent(k,j,module);
@@ -577,7 +577,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                          else if(ars.data.cvalue!=NULL)
                          {
                              float module;
-                             module=cabs(ars.data.cvalue[k+offset]);
+                             module=abs_complex(ars.data.cvalue[k+offset]);
                              if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
                              else floatscalar->InsertTuple1(k,module);
                          }
@@ -608,7 +608,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                      else if(ars.data.cvalue!=NULL)
                      {
                          float module;
-                         module=cabs(ars.data.cvalue[k+offset]);
+                         module=abs_complex(ars.data.cvalue[k+offset]);
                          if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
                          else floatscalar->InsertTuple1(k,module);
                      }

@@ -171,7 +171,7 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
         	else if(ars.data.cvalue!=NULL)
         	{
         		float module;
-        		module=cabs(ars.data.cvalue[j+offset]);
+        		module=abs_complex(ars.data.cvalue[j+offset]);
         		array->InsertTuple1(j+offset,module);
         	}
 
