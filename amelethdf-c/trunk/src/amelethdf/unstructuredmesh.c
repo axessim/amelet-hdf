@@ -264,9 +264,9 @@ unstructured_mesh_t read_unstructured_mesh(hid_t file_id, const char* path)
     strcat(bufpath, SELECTOR_ON_MESH);
     umesh.som_ptsinelements.nb = 0;
     umesh.som_nodes.nbsomnodes = 0;
-    dimptsinelts_t dimsptelt;
     if (H5Lexists(file_id, bufpath, H5P_DEFAULT) != FALSE)
     {
+        dimptsinelts_t dimsptelt;
         dimsptelt = readNbSemPtInElt(file_id, bufpath);
         int j;
         umesh.som_ptsinelements.ptsinelt = (usemptsinelt_t *) malloc(dimsptelt.nb * sizeof(usemptsinelt_t));
