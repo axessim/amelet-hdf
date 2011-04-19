@@ -21,16 +21,16 @@ typedef struct
 #if __STDC_VERSION__ >= 199901L
 //creal, cimag already defined in complex.h
 
-inline float_complex make_complex_float(float real, float imag);
-inline float abs_complex(float_complex a);
+__inline float_complex make_complex_float(float real, float imag);
+__inline float abs_complex(float_complex a);
 #else
 #define crealf(z) ((z).re)
 #define cimagf(z) ((z).im)
 
 extern const float_complex complex_i; //put in a translation unit somewhere
 #define I complex_i
-inline float_complex make_complex_float(float real, float imag);
-inline float abs_complex(float_complex a);
+__inline float_complex make_complex_float(float real, float imag);
+__inline float abs_complex(float_complex a);
 #endif
 
 

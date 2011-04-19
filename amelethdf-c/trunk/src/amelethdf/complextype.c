@@ -6,24 +6,24 @@
 #if __STDC_VERSION__ >= 199901L
 //creal, cimag already defined in complex.h
 
-inline float_complex make_complex_float(float real, float imag)
+__inline float_complex make_complex_float(float real, float imag)
 {
    return real + imag * I;
 }
 
-inline float abs_complex(float_complex a)
+__inline float abs_complex(float_complex a)
 {
   return cabs(a);
 }
 #else
 
-inline float_complex make_complex_float(float real, float imag)
+__inline float_complex make_complex_float(float real, float imag)
 {
     float_complex z = {real, imag};
     return z;
 }
 
-inline float abs_complex(float_complex a)
+__inline float abs_complex(float_complex a)
 {
    float b = sqrt(a.re*a.re + a.im*a.im);
    return b;
