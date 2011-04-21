@@ -304,9 +304,9 @@ structured_mesh_t read_structured_mesh(hid_t file_id, const char* path)
     strcat(bufpath, SELECTOR_ON_MESH);
     smesh.som_ptsinelements.nb = 0;
     
-    dimptsinelts_t dimsptelt;
     if (H5Lexists(file_id, bufpath, H5P_DEFAULT) != FALSE)
     {
+        dimptsinelts_t dimsptelt;
         dimsptelt = readNbSemPtInElt(file_id, bufpath);
         int j;
         smesh.som_ptsinelements.ptsinelt = (ssemptsinelt_t *) malloc(dimsptelt.nb * sizeof(ssemptsinelt_t));
