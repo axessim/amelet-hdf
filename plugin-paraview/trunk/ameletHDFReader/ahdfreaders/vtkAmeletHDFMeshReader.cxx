@@ -2119,3 +2119,177 @@ int vtkAmeletHDFMeshReader::readSgrpgrp(hid_t meshId, char *name, vtkUnstructure
     }
 }
 
+
+int vtkAmeletHDFMeshReader::readSSom(hid_t meshId, char *name, vtkUnstructuredGrid *sgrid, char* somname)
+{
+
+    hid_t cgrid, loc_id;
+    char * path;
+
+    loc_id = H5Gopen1(meshId, name);
+
+    path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    strcpy(path,"selectorOnMesh/");
+    hid_t group_id = H5Gopen1(loc_id,"selectorOnMesh");
+    strcat(path,somname);
+    if (H5Lexists(loc_id,path,H5P_DEFAULT)==TRUE)
+    {
+        //read cartesian grid
+        cgrid = H5Gopen1(loc_id,"cartesianGrid");
+        axis_t x,y,z;
+        x = readAxis(cgrid,"x");
+        y = readAxis(cgrid,"y");
+        z = readAxis(cgrid,"z");
+        H5Gclose(cgrid);
+
+        vector<bool> ptexist;
+        int idptexist;
+
+        for(int k=0;k<z.nbnodes;k++)
+        { 
+            for(int j=0;j<y.nbnodes;j++)
+            {
+                for(int i=0;i<x.nbnodes;i++)
+                {
+                    idptexist = (k*(x.nbnodes)*(y.nbnodes))+(j*x.nbnodes)+i;
+                    ptexist.push_back(false);
+                }
+            }
+        }
+   
+
+    //read selectorOnMesh
+        ssemptsinelt_t sem;
+        hid_t sem_id;
+        group_id = H5Gopen1(loc_id,"selectorOnMesh");
+        sem = readSSemPtInElt(group_id,somname);
+        
+        for(unsigned int j=0;j<sem.nb;j++)
+        {
+                int ijk[3];
+                ijk[0]=sem.ssemptinelt[j].imin;
+                ijk[1]=sem.ssemptinelt[j].jmin;
+                ijk[2]=sem.ssemptinelt[j].kmin;
+                unsigned int id = (ijk[2]*(x.nbnodes)*(y.nbnodes))+
+                         (ijk[1]*(x.nbnodes))+ijk[0];
+                ptexist[id]=true;
+        }
+        //free(ssemptinelt);
+
+        unsigned int nbptexistreal=0;
+        unsigned int nbexist=0;
+        vtkPoints *xyzpointsreal = vtkPoints::New();
+        map <unsigned int,int> ptugridreal;
+        for (int k=0; k<z.nbnodes;k++)
+        {
+            for(int j=0;j<y.nbnodes;j++)
+            {
+                for(int i=0;i<x.nbnodes;i++)
+                {
+                    idptexist = (k*(x.nbnodes)*(y.nbnodes))+(j*(x.nbnodes))+i;
+                    if(ptexist[idptexist])
+                    {
+                            xyzpointsreal->InsertNextPoint(x.nodes[i],y.nodes[j],z.nodes[k]);
+                            ptugridreal[idptexist]=nbptexistreal;
+                            nbptexistreal=nbptexistreal+1;
+                    }
+                    nbexist=nbexist+1;
+                }
+            }
+        }
+        sgrid->SetPoints(xyzpointsreal);
+        xyzpointsreal->Delete();
+        ptexist.clear();
+    
+        int nbelt = sem.nb;
+
+        for(unsigned int j=0;j<sem.nb;j++)
+        {
+               int ijk[3];
+               ijk[0]=sem.ssemptinelt[j].imin;
+               ijk[1]=sem.ssemptinelt[j].jmin;
+               ijk[2]=sem.ssemptinelt[j].kmin;
+               vtkVertex *vertexcell = vtkVertex::New();
+               double point[3];
+               unsigned int idtemp = ijk[2]*(x.nbnodes)*(y.nbnodes)+
+                        ijk[1]*(x.nbnodes)+ijk[0];
+               unsigned int id = ptugridreal[idtemp];
+               sgrid->GetPoint(id,point);
+               vertexcell->GetPointIds()->SetId(0,id);
+               sgrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+               vertexcell->Delete();
+       }
+       free(x.nodes);
+       free(y.nodes);
+       free(z.nodes);
+       ptugridreal.clear();
+       H5Gclose(group_id);
+       H5Gclose(loc_id);
+       return nbelt;
+    }
+
+    else
+    {
+        std::cout<<"group"<<path<< "doesn't exist !!"<<std::endl;
+        return 0;
+    }
+}
+
+int vtkAmeletHDFMeshReader::readUSom(hid_t meshId, char *name, vtkUnstructuredGrid *ugrid, char* somname)
+{
+
+    hid_t nodes_id, eltype_id, eltnode_id, loc_id;
+    nodes_t umeshnodes;
+    elttypes_t umeshelttypes;
+    eltnodes_t umesheltnodes;
+    umeshelttypes.nbelttypes=0;
+    umesheltnodes.nbeltnodes=0;
+    children_t child;
+    char * path;
+    int idel;
+
+    loc_id = H5Gopen1(meshId,name);
+
+    path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    strcpy(path,"selectorOnMesh/");
+    hid_t group_id = H5Gopen1(loc_id,"selectorOnMesh");
+    strcat(path,somname);
+    if (H5Lexists(loc_id,path,H5P_DEFAULT)==TRUE)
+    {
+        usemptsinelt_t sem;
+        sem = readUSemPtInElt(group_id,somname);
+   
+        free(path);
+
+
+        // read nodes
+        if (H5Lexists(loc_id,"nodes",H5P_DEFAULT)!=FALSE)
+        {
+            nodes_id = H5Dopen1(loc_id,"nodes");
+            umeshnodes = readNodes(nodes_id);
+            vtkPoints *points = vtkPoints::New();
+            for (int i=0 ;i<umeshnodes.nbnodes;i++)
+                 points->InsertNextPoint(umeshnodes.nodes[i][0],umeshnodes.nodes[i][1],
+                                                        umeshnodes.nodes[i][2]);
+            ugrid->SetPoints(points);
+            points->Delete();
+        }
+
+        int idnode=0;
+            //so there is only nodes in mesh
+        for(int igrp=0; igrp<sem.nb;igrp++)
+        { 
+            int i = sem.usemptinelt[igrp].index;
+            vtkVertex * vertexcell = vtkVertex::New();
+            vertexcell->GetPointIds()->SetId(0,i);
+            ugrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+            vertexcell->Delete();
+        }
+        return sem.nb;
+    }
+    else
+    {
+        std::cout<<"group "<<path<< "doesn't exist !!"<<std::endl;
+        return 0;
+    }
+}

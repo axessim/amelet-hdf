@@ -319,16 +319,22 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
              //ahdfmesh.readUmesh(mesh_id,meshChild.childnames[0],grid);
              if(strcmp(grp2,"group")==0)
                nbelt = ahdfmesh.readUgrp(mesh_id,meshname,grid,grpname);
-             else
+             else if(strcmp(grp2,"selectorOnMesh")==0)
+               nbelt = ahdfmesh.readUSom(mesh_id,meshname,grid,grpname);
+             else if(strcmp(grp2,"groupGroup")==0)
                nbelt = ahdfmesh.readUgrpgrp(mesh_id,meshname,grid,grpname);
+             else
+               nbelt = 0;
         }
         else if(meshType==STRUCTURED)
         {
              //ahdfmesh.readSmesh(mesh_id,meshname,grid);
              if(strcmp(grp2,"group")==0)
                nbelt = ahdfmesh.readSgrp(mesh_id,meshname,grid,grpname);
+             else if(strcmp(grp2,"selectorOnMesh")==0)
+               nbelt = ahdfmesh.readSSom(mesh_id,meshname,grid,grpname);
              else
-               nbelt = ahdfmesh.readSgrpgrp(mesh_id,meshname,grid,grpname);
+               nbelt = 0;
 
         }
         free(grpname);
@@ -337,7 +343,8 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
         H5Gclose(mesh_id);
         H5Gclose(loc_id);
         
-        if(strcmp(grp2,"group")==0 || strcmp(grp2,"groupGroup")==0)
+        if(strcmp(grp2,"group")==0 || strcmp(grp2,"groupGroup")==0
+           || strcmp(grp2,"selectorOnMesh")==0)
         {
             hid_t grp_id = H5Dopen1(file_id,meshEntity);
             ugroup_t grp;
