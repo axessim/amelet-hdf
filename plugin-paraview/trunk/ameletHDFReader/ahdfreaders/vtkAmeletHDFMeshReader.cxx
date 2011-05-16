@@ -909,15 +909,39 @@ int vtkAmeletHDFMeshReader::readUgrp(hid_t meshId, char *name, vtkUnstructuredGr
         else
         if(umesheltnodes.nbeltnodes==0)
         {
-            //so there is only nodes in mesh
-            for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
-            { 
+            // read nodes
+            
+            ugrid->Delete();
+            vtkUnstructuredGrid *ugrid = vtkUnstructuredGrid::New();
+            if (H5Lexists(loc_id,"nodes",H5P_DEFAULT)!=FALSE)
+            {
+                /*nodes_id = H5Dopen1(loc_id,"nodes");
+                umeshnodes = readNodes(nodes_id);*/
+                vtkPoints *points = vtkPoints::New();
+                for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
+                { 
                     int i = grp.eltgroup[i];
                     vtkVertex * vertexcell = vtkVertex::New();
-                    vertexcell->GetPointIds()->SetId(0,i);
+                    std::cout<<umeshnodes.nodes[0]<<std::endl;
+                    points->InsertNextPoint(umeshnodes.nodes[i][0],umeshnodes.nodes[i][1],
+                                                        umeshnodes.nodes[i][2]);
+                }          
+                ugrid->SetPoints(points);                              
+                points->Delete();
+                for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
+                { 
+                    int i = grp.eltgroup[i];
+                    vtkVertex * vertexcell = vtkVertex::New();
+                    vertexcell->GetPointIds()->SetId(0,igrp);                   
                     ugrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
                     vertexcell->Delete();
+                 }
+                
+                
+                
+                
             }
+            //so there is only nodes in mesh
         }
         else if(umeshnodes.nbnodes == grp.nbeltgroup){
             for(int i=0; i<umeshelttypes.nbelttypes;i++)
