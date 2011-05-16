@@ -292,10 +292,10 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 //      }
 
         char *meshEntity;
-	meshEntity = (char *) malloc (ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+	//meshEntity = (char *) malloc (ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
         int meshdim = meshentitydim+1;
       
-        strcpy(meshEntity,ars.dims[meshentitydim].svalue[0]);
+        meshEntity = strdup(ars.dims[meshentitydim].svalue[0]);
         char * grp2;
         char * grpname;
         char *meshname;
@@ -324,7 +324,12 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
         }
         else if(meshType==STRUCTURED)
         {
-             ahdfmesh.readSmesh(mesh_id,meshname,grid);
+             //ahdfmesh.readSmesh(mesh_id,meshname,grid);
+             if(strcmp(grp2,"group")==0)
+               nbelt = ahdfmesh.readSgrp(mesh_id,meshname,grid,grpname);
+             else
+               nbelt = ahdfmesh.readSgrpgrp(mesh_id,meshname,grid,grpname);
+
         }
         free(grpname);
         free(meshname);
@@ -349,8 +354,9 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
             free(grpname); 
             int offset=0;
             int nbeltgrp;
+            nbeltgrp = nbelt;
 
-            if(meshType==1)
+            /*if(meshType==1)
             {
               nbeltgrp=nbelt;
             }
@@ -363,7 +369,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
               free(sgrp.imax);
               free(sgrp.jmax);
               free(sgrp.kmax);
-            }
+            }*/
             
             int nbtotaldata=1;
             if(ars.nbdims>1)

@@ -20,12 +20,15 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
     char  path[ABSOLUTE_PATH_NAME_LENGTH];
     char  attr_value[ELEMENT_NAME_LENGTH];
     char  attr[ELEMENT_NAME_LENGTH];
-
+    int xdim = -1; int ydim = -1; int zdim = -1;
+    int nbdataarray=1;
+    int max=1;
+    
     child = read_children_name(file_id,"/floatingType");
     if(child.nbchild>1)
     {
     	cout<<"This is more than one arrayset in the ameletHDF file."<<endl;
-        return 0;
+        return 0;           
     }
     strcpy(attr,"floatingType");
     strcpy(path,"/floatingType");
@@ -40,83 +43,36 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
 
     ars = read_arrayset(file_id,path);
 
-    int nbdataarray=1;
-    int max=1;
     if(ars.nbdims>1)
     {
+        for(int i=0;i<ars.nbdims;i++)
+        {
+          if(ars.dims[i].single.physical_nature == "lenght")
+          {
+            if(ars.dims[i].single.label == "x") xdim = i;
+            if(ars.dims[i].single.label == "y") ydim = i;
+            if(ars.dims[i].single.label == "z") zdim = i;
+          }
+        }
         max=ars.nbdims-1;
-        for(int i=1;i<ars.nbdims;i++)
+        if(xdim>-1){
+          for(int i= 0;i<ars.nbdims;i++)
+            if(i!=xdim) nbdataarray = nbdataarray*ars.dims[ars.nbdims-i].nbvalues;
+        }
+        else
+          for(int i=1;i<ars.nbdims;i++)
             nbdataarray = nbdataarray*ars.dims[ars.nbdims-i].nbvalues;
     }
     //set data name
-    vtkstd::string dataname[nbdataarray];
-    for(int i=0;i<nbdataarray;i++)
+    vtkstd::string dataname[ars.dims[0].nbvalues];
+      
+    for(int i=0;i<ars.dims[0].nbvalues;i++)
     	dataname[i]= child.childnames[0];
     int temp=nbdataarray;
-    for(int i=0;i<max;i++)
-    {
-        temp = (int)temp/ars.dims[ars.nbdims-i-1].nbvalues;
-        if(temp<1) temp=1;
-        int j=0;
-        while(j<nbdataarray)
-        {
-            if(ars.dims[ars.nbdims-i-1].cvalue!=NULL)
-            {
-                for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
-                {
-                    std::ostringstream buf;
-                    buf<<"_"<<crealf(ars.dims[ars.nbdims-i-1].cvalue[l])<<"_j"<<cimagf(ars.dims[ars.nbdims-i-1].cvalue[l]);
-                    for(int k=0;k<temp;k++)
-                        dataname[j+k]=dataname[j+k]
-                                      +"_"+ars.dims[ars.nbdims-i-1].single.label
-                                      +buf.str();
-                 }
-                    j=j+temp;
-            }
-            else if(ars.dims[ars.nbdims-i-1].rvalue!=NULL)
-            {
-                for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
-                {
-                    std::ostringstream buf;
-                    buf<<"_"<<ars.dims[ars.nbdims-i-1].rvalue[l];
-                    for(int k=0;k<temp;k++)
-                        dataname[j+k]=dataname[j+k]
-                                      +"_"+ars.dims[ars.nbdims-i-1].single.label
-                                      +buf.str();
-                }
-                
-                j=j+temp;
-                
-            }
-            else if(ars.dims[ars.nbdims-i-1].ivalue!=NULL)
-            {
-                for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
-                {
-                    std::ostringstream buf;
-                    buf<<"_"<<ars.dims[ars.nbdims-i-1].ivalue[l];
-                    for(int k=0;k<temp;k++)
-                      dataname[j+k]=dataname[j+k]
-                                      +"_"+ars.dims[ars.nbdims-i-1].single.label
-                                      +buf.str();
-                }
-                j=j+temp;
-                
-            }
-            else if(ars.dims[ars.nbdims-i-1].svalue!=NULL)
-            {
-                for(int l=0;l<ars.dims[ars.nbdims-i-1].nbvalues;l++)
-                {
-                    for(int k=0;k<temp;k++)
-                        dataname[j+k]=dataname[j+k]
-                                      +"_"+ars.dims[ars.nbdims-i-1].single.label
-                                      +"_"+ars.dims[ars.nbdims-i-1].svalue[l];
-                }
-                j=j+temp;
-                
-            }
-        }
-
-    }
+    
+    std::cout<<"nbdataarray = "<<nbdataarray<<std::endl;
+    for(int i=0;i<nbdataarray;i++)
+      std::cout<<"dataname = "<<dataname[i]<<std::endl;
     int offset = 0;
     for(int i=0;i<ars.nbdims;i++)
     {

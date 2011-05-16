@@ -19,5 +19,7 @@ public:
     virtual int readSmesh(hid_t loc_id, char *name, vtkUnstructuredGrid *sgrid);
     virtual int readUgrp(hid_t loc_id, char *name, vtkUnstructuredGrid *ugrid, char* groupname);
     virtual int readUgrpgrp(hid_t loc_id, char *name, vtkUnstructuredGrid *ugrid, char* groupname);
+    virtual int readSgrp(hid_t loc_id, char *name, vtkUnstructuredGrid *sgrid, char* groupname);
+    virtual int readSgrpgrp(hid_t loc_id, char *name, vtkUnstructuredGrid *sgrid, char* groupname);
 };
 #endif /* __VTKvtkAmeletHDFMeshReader_H_  */

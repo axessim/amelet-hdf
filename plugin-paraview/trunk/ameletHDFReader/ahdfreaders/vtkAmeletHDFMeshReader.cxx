@@ -1181,7 +1181,941 @@ int vtkAmeletHDFMeshReader::readUgrpgrp(hid_t meshId, char *name, vtkUnstructure
     }
     else
     {
-        std::cout<<"group "<<path<< "doesn't exist !!"<<std::endl;
+        std::cout<<"groupGroup "<<path<< "doesn't exist !!"<<std::endl;
         return 0;
     }
 }
+
+int vtkAmeletHDFMeshReader::readSgrp(hid_t meshId, char *name, vtkUnstructuredGrid *sgrid, char* groupname)
+{
+    hid_t cgrid, loc_id;
+    char * path;
+
+    loc_id = H5Gopen1(meshId, name);
+
+    path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    strcpy(path,"group/");
+    hid_t group_id = H5Gopen1(loc_id,"group");
+    strcat(path,groupname);
+    if (H5Lexists(loc_id,path,H5P_DEFAULT)==TRUE)
+    {
+        //read cartesian grid
+        cgrid = H5Gopen1(loc_id,"cartesianGrid");
+        axis_t x,y,z;
+        x = readAxis(cgrid,"x");
+        y = readAxis(cgrid,"y");
+        z = readAxis(cgrid,"z");
+        H5Gclose(cgrid);
+
+        vector<bool> ptexist;
+        int idptexist;
+
+        for(int k=0;k<z.nbnodes;k++)
+        { 
+            for(int j=0;j<y.nbnodes;j++)
+            {
+                for(int i=0;i<x.nbnodes;i++)
+                {
+                    idptexist = (k*(x.nbnodes)*(y.nbnodes))+(j*x.nbnodes)+i;
+                    ptexist.push_back(false);
+                }
+            }
+        }
+   
+
+    //read group
+        sgroup_t sgroup;
+        hid_t group_id;
+        hid_t norm_id = -1;
+        group_id = H5Gopen1(loc_id,"group");
+        children_t child, grpchild;
+        hid_t grp_id = H5Dopen1(group_id,groupname);
+        sgroup = readSGroup(grp_id,groupname);
+        H5Dclose(grp_id);
+        for(unsigned int j=0;j<sgroup.nbelt;j++)
+        {
+            if(strcmp(sgroup.entityType,"face")==0)
+            {
+              
+                int ijk[4][3];
+                if(sgroup.imin[j]==sgroup.imax[j])
+                {
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imin[j];
+                    ijk[1][1]=sgroup.jmax[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmin[j];
+                    ijk[2][2]=sgroup.kmax[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imin[j];
+                    ijk[3][1]=sgroup.jmax[j];
+                    ijk[3][2]=sgroup.kmax[j];
+                    double point[4][3];
+                    for (int ii=0; ii<4; ii++)
+                    {
+                        unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                         
+                        ptexist[id]=true;
+                    }
+                }
+                if(sgroup.jmin[j]==sgroup.jmax[j])
+                {
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmin[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmin[j];
+                    ijk[2][2]=sgroup.kmax[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imax[j];
+                    ijk[3][1]=sgroup.jmin[j];
+                    ijk[3][2]=sgroup.kmax[j];
+                    double point[4][3];
+                    for (int ii=0; ii<4; ii++)
+                    {
+                        unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                        ptexist[id]=true;
+                    }
+                }
+                if(sgroup.kmin[j]==sgroup.kmax[j])
+                {
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmin[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmax[j];
+                    ijk[2][2]=sgroup.kmin[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imax[j];
+                    ijk[3][1]=sgroup.jmax[j];
+                    ijk[3][2]=sgroup.kmin[j];
+                    double point[4][3];
+                    for (int ii=0; ii<4; ii++)
+                    {
+                        unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                        ptexist[id]=true;
+                    }
+                }
+                
+            }
+            else if(strcmp(sgroup.entityType,"volume")==0)
+            {
+                int ijk[8][3];
+                // point 1
+                ijk[0][0]=sgroup.imin[j];
+                ijk[0][1]=sgroup.jmin[j];
+                ijk[0][2]=sgroup.kmin[j];
+                // point 2
+                ijk[1][0]=sgroup.imax[j];
+                ijk[1][1]=sgroup.jmin[j];
+                ijk[1][2]=sgroup.kmin[j];
+                // point 3
+                ijk[2][0]=sgroup.imin[j];
+                ijk[2][1]=sgroup.jmax[j];
+                ijk[2][2]=sgroup.kmin[j];
+                // point 4
+                ijk[3][0]=sgroup.imax[j];
+                ijk[3][1]=sgroup.jmax[j];
+                ijk[3][2]=sgroup.kmin[j];
+                // point 5
+                ijk[4][0]=sgroup.imin[j];
+                ijk[4][1]=sgroup.jmin[j];
+                ijk[4][2]=sgroup.kmax[j];
+                // point 6
+                ijk[5][0]=sgroup.imax[j];
+                ijk[5][1]=sgroup.jmin[j];
+                ijk[5][2]=sgroup.kmax[j];
+                // point 7
+                ijk[6][0]=sgroup.imin[j];
+                ijk[6][1]=sgroup.jmax[j];
+                ijk[6][2]=sgroup.kmax[j];
+                // point 8
+                ijk[7][0]=sgroup.imax[j];
+                ijk[7][1]=sgroup.jmax[j];
+                ijk[7][2]=sgroup.kmax[j];
+                double point[8][3];
+                for (int ii=0; ii<8; ii++)
+                {
+                    unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                             (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                    ptexist[id]=true;
+                }
+                
+            }
+            else if((strcmp(sgroup.entityType,"edge")==0) ||
+                    (strcmp(sgroup.entityType,"slot")==0))
+            {
+                int ijk[2][3];
+                // point 1
+                ijk[0][0]=sgroup.imin[j];
+                ijk[0][1]=sgroup.jmin[j];
+                ijk[0][2]=sgroup.kmin[j];
+                // point 2
+                ijk[1][0]=sgroup.imax[j];
+                ijk[1][1]=sgroup.jmax[j];
+                ijk[1][2]=sgroup.kmax[j];
+                double point[2][3];
+                for (int ii=0; ii<2; ii++)
+                {
+                    unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                             (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                    ptexist[id]=true;
+                }
+                
+            }
+            else if(strcmp(sgroup.type,"node")==0)
+            {
+                int ijk[3];
+                ijk[0]=sgroup.imin[j];
+                ijk[1]=sgroup.jmin[j];
+                ijk[2]=sgroup.kmin[j];
+                unsigned int id = (ijk[2]*(x.nbnodes)*(y.nbnodes))+
+                         (ijk[1]*(x.nbnodes))+ijk[0];
+                ptexist[id]=true;
+                
+            }
+        }
+        free(sgroup.imin);
+        free(sgroup.jmin);
+        free(sgroup.kmin);
+        free(sgroup.imax);
+        free(sgroup.jmax);
+        free(sgroup.kmax);
+
+        unsigned int nbptexistreal=0;
+        unsigned int nbexist=0;
+        vtkPoints *xyzpointsreal = vtkPoints::New();
+        map <unsigned int,int> ptugridreal;
+        for (int k=0; k<z.nbnodes;k++)
+        {
+            for(int j=0;j<y.nbnodes;j++)
+            {
+                for(int i=0;i<x.nbnodes;i++)
+                {
+                    idptexist = (k*(x.nbnodes)*(y.nbnodes))+(j*(x.nbnodes))+i;
+                    if(ptexist[idptexist])
+                    {
+                            xyzpointsreal->InsertNextPoint(x.nodes[i],y.nodes[j],z.nodes[k]);
+                            ptugridreal[idptexist]=nbptexistreal;
+                            nbptexistreal=nbptexistreal+1;
+                    }
+                    nbexist=nbexist+1;
+                }
+            }
+        }
+        sgrid->SetPoints(xyzpointsreal);
+        xyzpointsreal->Delete();
+        ptexist.clear();
+    
+        grp_id = H5Dopen1(group_id,groupname);
+        sgroup = readSGroup(grp_id,groupname);
+        int nbelt = sgroup.nbelt;
+        H5Dclose(grp_id);
+        for(unsigned int j=0;j<sgroup.nbelt;j++)
+        {
+            if(strcmp(sgroup.entityType,"face")==0)
+            {
+                int ijk[4][3];
+                if(sgroup.imin[j]==sgroup.imax[j])
+                {
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imin[j];
+                    ijk[1][1]=sgroup.jmax[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmin[j];
+                    ijk[2][2]=sgroup.kmax[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imin[j];
+                    ijk[3][1]=sgroup.jmax[j];
+                    ijk[3][2]=sgroup.kmax[j];
+                    double point[4][3];
+                    vtkPixel *pixelcell = vtkPixel::New();
+                    for (int ii=0; ii<4; ii++)
+                    {
+                        unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                             (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                        unsigned int id = ptugridreal[idtemp];
+                        sgrid->GetPoint(id,point[ii]);
+                        pixelcell->GetPointIds()->SetId(ii,id);
+                    }
+                    sgrid->InsertNextCell(pixelcell->GetCellType(),
+                                      pixelcell->GetPointIds());
+                    pixelcell->Delete();
+                }
+                if(sgroup.jmin[j]==sgroup.jmax[j])
+                {
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmin[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmin[j];
+                    ijk[2][2]=sgroup.kmax[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imax[j];
+                    ijk[3][1]=sgroup.jmin[j];
+                    ijk[3][2]=sgroup.kmax[j];
+                    double point[4][3];
+                    vtkPixel *pixelcell = vtkPixel::New();
+                    for (int ii=0; ii<4; ii++)
+                    {
+                        unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                        unsigned int id = ptugridreal[idtemp];
+                        sgrid->GetPoint(id,point[ii]);
+                        pixelcell->GetPointIds()->SetId(ii,id);
+                    }
+                    sgrid->InsertNextCell(pixelcell->GetCellType(),
+                                      pixelcell->GetPointIds());
+                    pixelcell->Delete();
+                }
+                if(sgroup.kmin[j]==sgroup.kmax[j])
+                {
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmin[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmax[j];
+                    ijk[2][2]=sgroup.kmin[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imax[j];
+                    ijk[3][1]=sgroup.jmax[j];
+                    ijk[3][2]=sgroup.kmin[j];
+                    double point[4][3];
+                    vtkPixel *pixelcell = vtkPixel::New();
+                    for (int ii=0; ii<4; ii++)
+                    {
+                        unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                             (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                        unsigned int id = ptugridreal[idtemp];
+                        sgrid->GetPoint(id,point[ii]);
+                        pixelcell->GetPointIds()->SetId(ii,id);
+                    }
+                    sgrid->InsertNextCell(pixelcell->GetCellType(),
+                                      pixelcell->GetPointIds());
+                    pixelcell->Delete();
+               }
+           }
+           else if(strcmp(sgroup.entityType,"volume")==0)
+           {
+               int ijk[8][3];
+               // point 1
+               ijk[0][0]=sgroup.imin[j];
+               ijk[0][1]=sgroup.jmin[j];
+               ijk[0][2]=sgroup.kmin[j];
+               // point 2
+               ijk[1][0]=sgroup.imax[j];
+               ijk[1][1]=sgroup.jmin[j];
+               ijk[1][2]=sgroup.kmin[j];
+               // point 3
+               ijk[2][0]=sgroup.imin[j];
+               ijk[2][1]=sgroup.jmax[j];
+               ijk[2][2]=sgroup.kmin[j];
+               // point 4
+               ijk[3][0]=sgroup.imax[j];
+               ijk[3][1]=sgroup.jmax[j];
+               ijk[3][2]=sgroup.kmin[j];
+               // point 5
+               ijk[4][0]=sgroup.imin[j];
+               ijk[4][1]=sgroup.jmin[j];
+               ijk[4][2]=sgroup.kmax[j];
+               // point 6
+               ijk[5][0]=sgroup.imax[j];
+               ijk[5][1]=sgroup.jmin[j];
+               ijk[5][2]=sgroup.kmax[j];
+               // point 7
+               ijk[6][0]=sgroup.imin[j];
+               ijk[6][1]=sgroup.jmax[j];
+               ijk[6][2]=sgroup.kmax[j];
+               // point 8
+               ijk[7][0]=sgroup.imax[j];
+               ijk[7][1]=sgroup.jmax[j];
+               ijk[7][2]=sgroup.kmax[j];
+               double point[8][3];
+               vtkVoxel *voxelcell = vtkVoxel::New();
+               for (int ii=0; ii<8; ii++)
+               {
+                   unsigned int idtemp = ijk[ii][2]*(x.nbnodes)*(y.nbnodes)+
+                             ijk[ii][1]*(x.nbnodes)+ijk[ii][0];
+                   unsigned int id = ptugridreal[idtemp];
+                   sgrid->GetPoint(id,point[ii]);
+                   voxelcell->GetPointIds()->SetId(ii,id);
+               }
+               sgrid->InsertNextCell(voxelcell->GetCellType(),voxelcell->GetPointIds());
+               voxelcell->Delete();
+           }
+           else if((strcmp(sgroup.entityType,"edge")==0) ||
+                   (strcmp(sgroup.entityType,"slot")==0))
+           {
+               int ijk[2][3];
+               // point 1
+               ijk[0][0]=sgroup.imin[j];
+               ijk[0][1]=sgroup.jmin[j];
+               ijk[0][2]=sgroup.kmin[j];
+               // point 2
+               ijk[1][0]=sgroup.imax[j];
+               ijk[1][1]=sgroup.jmax[j];
+               ijk[1][2]=sgroup.kmax[j];
+               vtkLine *linecell = vtkLine::New();
+               double point[2][3];
+               for (int ii=0; ii<2; ii++)
+               {
+                    unsigned int idtemp = ijk[ii][2]*(x.nbnodes)*(y.nbnodes)+
+                         ijk[ii][1]*(x.nbnodes)+ijk[ii][0];
+                    unsigned int id = ptugridreal[idtemp];
+                    sgrid->GetPoint(id,point[ii]);
+                    linecell->GetPointIds()->SetId(ii,id);
+               }
+               sgrid->InsertNextCell(linecell->GetCellType(),linecell->GetPointIds());
+               linecell->Delete();
+           }
+           else if(strcmp(sgroup.type,"node")==0)
+           {
+               int ijk[3];
+               ijk[0]=sgroup.imin[j];
+               ijk[1]=sgroup.jmin[j];
+               ijk[2]=sgroup.kmin[j];
+               vtkVertex *vertexcell = vtkVertex::New();
+               double point[3];
+               unsigned int idtemp = ijk[2]*(x.nbnodes)*(y.nbnodes)+
+                        ijk[1]*(x.nbnodes)+ijk[0];
+               unsigned int id = ptugridreal[idtemp];
+               sgrid->GetPoint(id,point);
+               vertexcell->GetPointIds()->SetId(0,id);
+               sgrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+               vertexcell->Delete();
+           }
+       }
+       free(sgroup.imin);
+       free(sgroup.jmin);
+       free(sgroup.kmin);
+       free(sgroup.imax);
+       free(sgroup.jmax);
+       free(sgroup.kmax);
+       free(x.nodes);
+       free(y.nodes);
+       free(z.nodes);
+       ptugridreal.clear();
+       if(norm_id!=-1) H5Gclose(norm_id);
+       H5Gclose(group_id);
+       H5Gclose(loc_id);
+       return nbelt;
+    }
+
+    else
+    {
+        std::cout<<"group"<<path<< "doesn't exist !!"<<std::endl;
+        return 0;
+    }
+}
+
+int vtkAmeletHDFMeshReader::readSgrpgrp(hid_t meshId, char *name, vtkUnstructuredGrid *sgrid, char* groupname)
+{
+    //std::cout<<"Read smesh"<<std::endl;
+    //std::cout<<"=========="<<std::endl;
+    hid_t cgrid, loc_id;
+    char * path;
+    int nbelt = 0;
+
+    loc_id = H5Gopen1(meshId, name);
+    path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    
+    strcpy(path,"groupGroup/");
+    hid_t groupGroup_id = H5Gopen1(loc_id,"groupGroup");
+    hid_t group_id = H5Gopen1(loc_id,"group");
+    strcat(path,groupname);
+    
+    if (H5Lexists(loc_id,path,H5P_DEFAULT)==TRUE)
+    {
+        //read cartesian grid
+        cgrid = H5Gopen1(loc_id,"cartesianGrid");
+        axis_t x,y,z;
+        x = readAxis(cgrid,"x");
+        y = readAxis(cgrid,"y");
+        z = readAxis(cgrid,"z");
+        H5Gclose(cgrid);
+
+        vector<bool> ptexist;
+        int idptexist;
+
+        for(int k=0;k<z.nbnodes;k++)
+        { 
+            for(int j=0;j<y.nbnodes;j++)
+            {
+                for(int i=0;i<x.nbnodes;i++)
+                {
+                    idptexist = (k*(x.nbnodes)*(y.nbnodes))+(j*x.nbnodes)+i;
+                    ptexist.push_back(false);
+                }
+            }
+        }
+        sgroup_t sgroup;
+        hid_t grpGrp_id = H5Dopen1(groupGroup_id , groupname);
+        groupgroup_t grpGrp = readGroupGroup(grpGrp_id,groupname);
+        group_id = H5Gopen1(loc_id,"group");
+
+        for(int i=0;i<grpGrp.nbeltgroupGroup;i++)
+        {
+            char *path2;
+            path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+            strcpy(path2,"group/");
+            strcat(path2,grpGrp.groupGroupnames[i]);
+            hid_t grp_id = H5Dopen1(loc_id,path2);
+            sgroup = readSGroup(grp_id,grpGrp.groupGroupnames[i]);
+            H5Dclose(grp_id);
+            for(unsigned int j=0;j<sgroup.nbelt;j++)
+            {
+                if(strcmp(sgroup.entityType,"face")==0)
+                {
+                    int ijk[4][3];
+                    if(sgroup.imin[j]==sgroup.imax[j])
+                    {
+                        // point 1
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
+                        // point 2
+                        ijk[1][0]=sgroup.imin[j];
+                        ijk[1][1]=sgroup.jmax[j];
+                        ijk[1][2]=sgroup.kmin[j];
+                        // point 3
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmin[j];
+                        ijk[2][2]=sgroup.kmax[j];
+                        // point 4
+                        ijk[3][0]=sgroup.imin[j];
+                        ijk[3][1]=sgroup.jmax[j];
+                        ijk[3][2]=sgroup.kmax[j];
+                        double point[4][3];
+                        for (int ii=0; ii<4; ii++)
+                        {
+                            unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                    (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                            ptexist[id]=true;
+                        }
+                    }
+                    if(sgroup.jmin[j]==sgroup.jmax[j])
+                    {
+                        // point 1
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
+                        // point 2
+                        ijk[1][0]=sgroup.imax[j];
+                        ijk[1][1]=sgroup.jmin[j];
+                        ijk[1][2]=sgroup.kmin[j];
+                        // point 3
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmin[j];
+                        ijk[2][2]=sgroup.kmax[j];
+                        // point 4
+                        ijk[3][0]=sgroup.imax[j];
+                        ijk[3][1]=sgroup.jmin[j];
+                        ijk[3][2]=sgroup.kmax[j];
+                        double point[4][3];
+                        for (int ii=0; ii<4; ii++)
+                        {
+                            unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                     (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                            ptexist[id]=true;
+                        }
+                    }
+                    if(sgroup.kmin[j]==sgroup.kmax[j])
+                    {
+                        // point 1
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
+                        // point 2
+                        ijk[1][0]=sgroup.imax[j];
+                        ijk[1][1]=sgroup.jmin[j];
+                        ijk[1][2]=sgroup.kmin[j];
+                        // point 3
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmax[j];
+                        ijk[2][2]=sgroup.kmin[j];
+                        // point 4
+                        ijk[3][0]=sgroup.imax[j];
+                        ijk[3][1]=sgroup.jmax[j];
+                        ijk[3][2]=sgroup.kmin[j];
+                        double point[4][3];
+                        for (int ii=0; ii<4; ii++)
+                        {
+                            unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                            ptexist[id]=true;
+                        }
+                    }
+                }
+                else if(strcmp(sgroup.entityType,"volume")==0)
+                {
+                    int ijk[8][3];
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmin[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmax[j];
+                    ijk[2][2]=sgroup.kmin[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imax[j];
+                    ijk[3][1]=sgroup.jmax[j];
+                    ijk[3][2]=sgroup.kmin[j];
+                    // point 5
+                    ijk[4][0]=sgroup.imin[j];
+                    ijk[4][1]=sgroup.jmin[j];
+                    ijk[4][2]=sgroup.kmax[j];
+                    // point 6
+                    ijk[5][0]=sgroup.imax[j];
+                    ijk[5][1]=sgroup.jmin[j];
+                    ijk[5][2]=sgroup.kmax[j];
+                    // point 7
+                    ijk[6][0]=sgroup.imin[j];
+                    ijk[6][1]=sgroup.jmax[j];
+                    ijk[6][2]=sgroup.kmax[j];
+                    // point 8
+                    ijk[7][0]=sgroup.imax[j];
+                    ijk[7][1]=sgroup.jmax[j];
+                    ijk[7][2]=sgroup.kmax[j];
+                    double point[8][3];
+                    for (int ii=0; ii<8; ii++)
+                    {
+                        unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                             (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                        ptexist[id]=true;
+                    }
+                }
+                else if((strcmp(sgroup.entityType,"edge")==0) ||
+                        (strcmp(sgroup.entityType,"slot")==0))
+                {
+                    int ijk[2][3];
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmax[j];
+                    ijk[1][2]=sgroup.kmax[j];
+                    double point[2][3];
+                    for (int ii=0; ii<2; ii++)
+                    {
+                        unsigned int id = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                        ptexist[id]=true;
+                    }
+                }
+                else if(strcmp(sgroup.type,"node")==0)
+                {
+                    int ijk[3];
+                    ijk[0]=sgroup.imin[j];
+                    ijk[1]=sgroup.jmin[j];
+                    ijk[2]=sgroup.kmin[j];
+                    unsigned int id = (ijk[2]*(x.nbnodes)*(y.nbnodes))+
+                             (ijk[1]*(x.nbnodes))+ijk[0];
+                    ptexist[id]=true;
+                }
+            }
+            free(sgroup.imin);
+            free(sgroup.jmin);
+            free(sgroup.kmin);
+            free(sgroup.imax);
+            free(sgroup.jmax);
+            free(sgroup.kmax);
+        }
+        unsigned int nbptexistreal=0;
+        unsigned int nbexist=0;
+        vtkPoints *xyzpointsreal = vtkPoints::New();
+        map <unsigned int,int> ptugridreal;
+        for (int k=0; k<z.nbnodes;k++)
+        {
+            for(int j=0;j<y.nbnodes;j++)
+            {
+                for(int i=0;i<x.nbnodes;i++)
+                {
+                        idptexist = (k*(x.nbnodes)*(y.nbnodes))+(j*(x.nbnodes))+i;
+                        if(ptexist[idptexist])
+                        {
+                                xyzpointsreal->InsertNextPoint(x.nodes[i],y.nodes[j],z.nodes[k]);
+                                ptugridreal[idptexist]=nbptexistreal;
+                                nbptexistreal=nbptexistreal+1;
+                        }
+                        nbexist=nbexist+1;
+                }
+            }
+        }
+        sgrid->SetPoints(xyzpointsreal);
+        xyzpointsreal->Delete();
+        ptexist.clear();
+        nbelt = 0;
+        for  (int i=0;i<grpGrp.nbeltgroupGroup;i++)
+        {
+            char *path2;
+            path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+            strcpy(path2,"group/");
+            strcat(path2,grpGrp.groupGroupnames[i]);
+            hid_t grp_id = H5Dopen1(loc_id,path2);
+            sgroup = readSGroup(grp_id,grpGrp.groupGroupnames[i]);
+            H5Dclose(grp_id);
+            nbelt = nbelt + sgroup.nbelt;
+            for(unsigned int j=0;j<sgroup.nbelt;j++)
+            {
+                if(strcmp(sgroup.entityType,"face")==0)
+                {
+                    int ijk[4][3];
+                    if(sgroup.imin[j]==sgroup.imax[j])
+                    {
+                        // point 1
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
+                        // point 2
+                        ijk[1][0]=sgroup.imin[j];
+                        ijk[1][1]=sgroup.jmax[j];
+                        ijk[1][2]=sgroup.kmin[j];
+                        // point 3
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmin[j];
+                        ijk[2][2]=sgroup.kmax[j];
+                        // point 4
+                        ijk[3][0]=sgroup.imin[j];
+                        ijk[3][1]=sgroup.jmax[j];
+                        ijk[3][2]=sgroup.kmax[j];
+                        double point[4][3];
+                        vtkPixel *pixelcell = vtkPixel::New();
+                        for (int ii=0; ii<4; ii++)
+                        {
+                            unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                            unsigned int id = ptugridreal[idtemp];
+                            sgrid->GetPoint(id,point[ii]);
+                            pixelcell->GetPointIds()->SetId(ii,id);
+                        }
+                        sgrid->InsertNextCell(pixelcell->GetCellType(),
+                                          pixelcell->GetPointIds());
+                        pixelcell->Delete();
+                    }
+                    if(sgroup.jmin[j]==sgroup.jmax[j])
+                    {
+                        // point 1
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
+                        // point 2
+                        ijk[1][0]=sgroup.imax[j];
+                        ijk[1][1]=sgroup.jmin[j];
+                        ijk[1][2]=sgroup.kmin[j];
+                        // point 3
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmin[j];
+                        ijk[2][2]=sgroup.kmax[j];
+                        // point 4
+                        ijk[3][0]=sgroup.imax[j];
+                        ijk[3][1]=sgroup.jmin[j];
+                        ijk[3][2]=sgroup.kmax[j];
+                        double point[4][3];
+                        vtkPixel *pixelcell = vtkPixel::New();
+                        for (int ii=0; ii<4; ii++)
+                        {
+                            unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                            unsigned int id = ptugridreal[idtemp];
+                            sgrid->GetPoint(id,point[ii]);
+                            pixelcell->GetPointIds()->SetId(ii,id);
+                        }
+                        sgrid->InsertNextCell(pixelcell->GetCellType(),
+                                          pixelcell->GetPointIds());
+                        pixelcell->Delete();
+                    }
+                    if(sgroup.kmin[j]==sgroup.kmax[j])
+                    {
+                        // point 1
+                        ijk[0][0]=sgroup.imin[j];
+                        ijk[0][1]=sgroup.jmin[j];
+                        ijk[0][2]=sgroup.kmin[j];
+                        // point 2
+                        ijk[1][0]=sgroup.imax[j];
+                        ijk[1][1]=sgroup.jmin[j];
+                        ijk[1][2]=sgroup.kmin[j];
+                        // point 3
+                        ijk[2][0]=sgroup.imin[j];
+                        ijk[2][1]=sgroup.jmax[j];
+                        ijk[2][2]=sgroup.kmin[j];
+                        // point 4
+                        ijk[3][0]=sgroup.imax[j];
+                        ijk[3][1]=sgroup.jmax[j];
+                        ijk[3][2]=sgroup.kmin[j];
+                        double point[4][3];
+                        vtkPixel *pixelcell = vtkPixel::New();
+                        for (int ii=0; ii<4; ii++)
+                        {
+                            unsigned int idtemp = (ijk[ii][2]*(x.nbnodes)*(y.nbnodes))+
+                                 (ijk[ii][1]*(x.nbnodes))+ijk[ii][0];
+                            unsigned int id = ptugridreal[idtemp];
+                            sgrid->GetPoint(id,point[ii]);
+                            pixelcell->GetPointIds()->SetId(ii,id);
+                        }
+                        sgrid->InsertNextCell(pixelcell->GetCellType(),
+                                          pixelcell->GetPointIds());
+                        pixelcell->Delete();
+                    }
+                }
+                else if(strcmp(sgroup.entityType,"volume")==0)
+                {
+                    int ijk[8][3];
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmin[j];
+                    ijk[1][2]=sgroup.kmin[j];
+                    // point 3
+                    ijk[2][0]=sgroup.imin[j];
+                    ijk[2][1]=sgroup.jmax[j];
+                    ijk[2][2]=sgroup.kmin[j];
+                    // point 4
+                    ijk[3][0]=sgroup.imax[j];
+                    ijk[3][1]=sgroup.jmax[j];
+                    ijk[3][2]=sgroup.kmin[j];
+                    // point 5
+                    ijk[4][0]=sgroup.imin[j];
+                    ijk[4][1]=sgroup.jmin[j];
+                    ijk[4][2]=sgroup.kmax[j];
+                    // point 6
+                    ijk[5][0]=sgroup.imax[j];
+                    ijk[5][1]=sgroup.jmin[j];
+                    ijk[5][2]=sgroup.kmax[j];
+                    // point 7
+                    ijk[6][0]=sgroup.imin[j];
+                    ijk[6][1]=sgroup.jmax[j];
+                    ijk[6][2]=sgroup.kmax[j];
+                    // point 8
+                    ijk[7][0]=sgroup.imax[j];
+                    ijk[7][1]=sgroup.jmax[j];
+                    ijk[7][2]=sgroup.kmax[j];
+                    double point[8][3];
+                    vtkVoxel *voxelcell = vtkVoxel::New();
+                    for (int ii=0; ii<8; ii++)
+                    {
+                        unsigned int idtemp = ijk[ii][2]*(x.nbnodes)*(y.nbnodes)+
+                             ijk[ii][1]*(x.nbnodes)+ijk[ii][0];
+                        unsigned int id = ptugridreal[idtemp];
+                        sgrid->GetPoint(id,point[ii]);
+                        voxelcell->GetPointIds()->SetId(ii,id);
+                    }
+                    sgrid->InsertNextCell(voxelcell->GetCellType(),voxelcell->GetPointIds());
+                    voxelcell->Delete();
+                }
+                else if((strcmp(sgroup.entityType,"edge")==0) ||
+                        (strcmp(sgroup.entityType,"slot")==0))
+                {
+                    int ijk[2][3];
+                    // point 1
+                    ijk[0][0]=sgroup.imin[j];
+                    ijk[0][1]=sgroup.jmin[j];
+                    ijk[0][2]=sgroup.kmin[j];
+                    // point 2
+                    ijk[1][0]=sgroup.imax[j];
+                    ijk[1][1]=sgroup.jmax[j];
+                    ijk[1][2]=sgroup.kmax[j];
+                    vtkLine *linecell = vtkLine::New();
+                    double point[2][3];
+                    for (int ii=0; ii<2; ii++)
+                    {
+                        unsigned int idtemp = ijk[ii][2]*(x.nbnodes)*(y.nbnodes)+
+                             ijk[ii][1]*(x.nbnodes)+ijk[ii][0];
+                        unsigned int id = ptugridreal[idtemp];
+                        sgrid->GetPoint(id,point[ii]);
+                        linecell->GetPointIds()->SetId(ii,id);
+                    }
+                    sgrid->InsertNextCell(linecell->GetCellType(),linecell->GetPointIds());
+                    linecell->Delete();
+                }
+                else if(strcmp(sgroup.type,"node")==0)
+                {
+                    int ijk[3];
+                    ijk[0]=sgroup.imin[j];
+                    ijk[1]=sgroup.jmin[j];
+                    ijk[2]=sgroup.kmin[j];
+                    vtkVertex *vertexcell = vtkVertex::New();
+                    double point[3];
+                    unsigned int idtemp = ijk[2]*(x.nbnodes)*(y.nbnodes)+
+                         ijk[1]*(x.nbnodes)+ijk[0];
+                    unsigned int id = ptugridreal[idtemp];
+                    sgrid->GetPoint(id,point);
+                    vertexcell->GetPointIds()->SetId(0,id);
+                    sgrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+                    vertexcell->Delete();
+                }
+            }
+            free(sgroup.imin);
+            free(sgroup.jmin);
+            free(sgroup.kmin);
+            free(sgroup.imax);
+            free(sgroup.jmax);
+            free(sgroup.kmax);
+        }
+    
+    free(x.nodes);
+    free(y.nodes);
+    free(z.nodes);
+    ptugridreal.clear();
+    H5Gclose(group_id);
+    H5Gclose(loc_id);
+
+    
+    return nbelt;
+    }
+
+    else
+    {
+        std::cout<<"group"<<path<< "doesn't exist !!"<<std::endl;
+        return 0;
+    }
+}
+
