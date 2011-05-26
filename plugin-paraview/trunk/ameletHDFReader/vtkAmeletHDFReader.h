@@ -1,7 +1,7 @@
 #ifndef __VTKvtkAmeletHDFReader_H_
 #define __VTKvtkAmeletHDFReader_H_
 
-
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <stdlib.h>

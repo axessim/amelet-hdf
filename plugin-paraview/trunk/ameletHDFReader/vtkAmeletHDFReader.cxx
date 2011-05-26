@@ -65,6 +65,15 @@ static vtkUnstructuredGrid *AllocateGetBlock(vtkMultiBlockDataSet *blocks,
 }
 
 // -----------------------------------------------------------------------------
+// test if the file is readable
+
+bool is_readable( const std:: string & file)
+{
+  std::ifstream ameletfile( file.c_str());
+  return !ameletfile.fail();
+}
+
+// -----------------------------------------------------------------------------
 //
 int getAmeletHDFAttribut(hid_t loc_id, const char *attr_name, const char *attr_value)
 {
@@ -347,18 +356,18 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
            || strcmp(grp2,"selectorOnMesh")==0)
         {
             hid_t grp_id = H5Dopen1(file_id,meshEntity);
-            ugroup_t grp;
-            sgroup_t sgrp;
+//            ugroup_t grp;
+//            sgroup_t sgrp;
             //char pathmesh[ABSOLUTE_PATH_NAME_LENGTH];
-            char *pathmesh;
-            pathmesh = (char *) malloc (ABSOLUTE_PATH_NAME_LENGTH * sizeof (char));
-            char *grpname;
-	    grpname =  (char *) malloc (ELEMENT_NAME_LENGTH * sizeof (char));
-            strcpy(grpname,path_element(meshEntity,0,1));
+//            char *pathmesh;
+//            pathmesh = (char *) malloc (ABSOLUTE_PATH_NAME_LENGTH * sizeof (char));
+//            char *grpname;
+//	    grpname =  (char *) malloc (ELEMENT_NAME_LENGTH * sizeof (char));
+//            strcpy(grpname,path_element(meshEntity,0,1));
             
-            if(meshType != 1)
-                sgrp = readSGroup(grp_id,grpname);
-            free(grpname); 
+//            if(meshType != 1)
+//                sgrp = readSGroup(grp_id,grpname);
+//            free(grpname); 
             int offset=0;
             int nbeltgrp;
             nbeltgrp = nbelt;
@@ -584,15 +593,17 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                      {
                          if(ars.data.rvalue!=NULL)
                          {
-                             if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],ars.data.rvalue[k+offset]);
-                             else floatscalar->InsertTuple1(k,ars.data.rvalue[k+offset]);
+                             //if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],ars.data.rvalue[k+offset]);
+                             //else
+                               floatscalar->InsertTuple1(k,ars.data.rvalue[k+offset]);
                          }
                          else if(ars.data.cvalue!=NULL)
                          {
                              float module;
                              module=abs_complex(ars.data.cvalue[k+offset]);
-                             if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
-                             else floatscalar->InsertTuple1(k,module);
+                             //if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
+                             //else 
+                             floatscalar->InsertTuple1(k,module);
                          }
                      }
                      offset=offset+nbeltgrp;
@@ -615,15 +626,17 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
                  {
                      if(ars.data.rvalue!=NULL)
                      {
-                         if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],ars.data.rvalue[k+offset]);
-                         else floatscalar->InsertTuple1(k,ars.data.rvalue[k+offset]);
+                         //if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],ars.data.rvalue[k+offset]);
+                         //else 
+                         floatscalar->InsertTuple1(k,ars.data.rvalue[k+offset]);
                      }
                      else if(ars.data.cvalue!=NULL)
                      {
                          float module;
                          module=abs_complex(ars.data.cvalue[k+offset]);
-                         if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
-                         else floatscalar->InsertTuple1(k,module);
+                         //if(meshType==1) floatscalar->InsertTuple1(grp.eltgroup[k],module);
+                         //else
+                         floatscalar->InsertTuple1(k,module);
                      }
                  }
                  offset=offset+nbeltgrp;
@@ -738,16 +751,23 @@ int vtkAmeletHDFReader::CanReadFile(const char *filename)
 
 
   ret_val = 0;
-  file_id = H5Fopen (filename, H5F_ACC_RDONLY, H5P_DEFAULT);
-  // Check FORMAT and AMELETHDF_FORMAT_VERSION attributes values
-  group_id = H5Gopen(file_id,"/",H5P_DEFAULT);
-  ret_val = getAmeletHDFAttribut(group_id, "FORMAT", "AMELETHDF");
-  //ret_val = getAmeletHDFAttribut(group_id, "AMELETHDF_FORMAT_VERSION", "1.0.0");
-
-  H5Gclose(group_id);
-
-  H5Fclose(file_id);
-  return ret_val;
+  if ( is_readable(filename))
+  {
+     
+      file_id = H5Fopen (filename, H5F_ACC_RDONLY, H5P_DEFAULT);
+      // Check FORMAT and AMELETHDF_FORMAT_VERSION attributes values
+      group_id = H5Gopen(file_id,"/",H5P_DEFAULT);
+      ret_val = getAmeletHDFAttribut(group_id, "FORMAT", "AMELETHDF");
+      //ret_val = getAmeletHDFAttribut(group_id, "AMELETHDF_FORMAT_VERSION", "1.0.0");
+      H5Gclose(group_id);
+      H5Fclose(file_id);
+      return ret_val;
+  }
+  else 
+  {
+    std::cout<<"file doesn't exist !!!"<<std::endl;
+    return 0;
+  }
 
 
 }
@@ -773,6 +793,11 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
      vtkErrorMacro("No filename specified.");
      return 0;
      }
+  if( !is_readable(this->FileName))
+  {
+      vtkErrorMacro("The file does not exist.");
+      return 0;
+  }
   // Test data type (unstructured mesh, structured mesh, data on mesh, or data ?)
   dataType = getAmeletHDFDataType(this->FileName);
   if (dataType==0)
@@ -924,6 +949,11 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
 	    return 0;
 	    }
 	// Test data type (unstructured mesh, structured mesh, data on mesh, or data ?)
+        if( !is_readable(this->FileName))
+        {
+          vtkErrorMacro("The file does not exist.");
+          return 0;
+        }
     dataType = getAmeletHDFDataType(this->FileName);
     if(dataType==1)
     {

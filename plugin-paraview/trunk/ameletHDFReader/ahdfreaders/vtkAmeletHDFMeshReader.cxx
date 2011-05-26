@@ -107,9 +107,10 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
                 tetracell->Delete();
        		idnode=idnode+4;
        	}
+       	
     }
-
-    free(umeshelttypes.elttypes);
+    if(umeshelttypes.nbelttypes>0) free(umeshelttypes.elttypes);
+    
 
     // Read GroupGroup
     if(umesheltnodes.nbeltnodes==0)
@@ -123,7 +124,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
                 vertexcell->Delete();
     	}
     }
-    free(umesheltnodes.eltnodes);
+    if(umesheltnodes.nbeltnodes>0) free(umesheltnodes.eltnodes);
     vtkIntArray *grpgroupId = vtkIntArray::New();
     vtkIntArray *groupId = vtkIntArray::New();
     grpgroupId->SetName("groupGroup Id");
@@ -230,6 +231,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     //    free(*(child.childnames + idel));
     if(child.nbchild>1) free(child.childnames[0]);
     free(child.childnames);
+    
     return 1;
     }
     else
