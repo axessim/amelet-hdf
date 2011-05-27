@@ -838,18 +838,7 @@ int vtkAmeletHDFMeshReader::readUgrp(hid_t meshId, char *name, vtkUnstructuredGr
         free(path);
 
 
-        // read nodes
-        if (H5Lexists(loc_id,"nodes",H5P_DEFAULT)!=FALSE)
-        {
-            nodes_id = H5Dopen1(loc_id,"nodes");
-            umeshnodes = readNodes(nodes_id);
-            vtkPoints *points = vtkPoints::New();
-            for (int i=0 ;i<umeshnodes.nbnodes;i++)
-                 points->InsertNextPoint(umeshnodes.nodes[i][0],umeshnodes.nodes[i][1],
-                                                        umeshnodes.nodes[i][2]);
-            ugrid->SetPoints(points);
-            points->Delete();
-        }
+        
 
         if (H5Lexists(loc_id,"elementNodes",H5P_DEFAULT)!=FALSE)
         {
@@ -861,6 +850,18 @@ int vtkAmeletHDFMeshReader::readUgrp(hid_t meshId, char *name, vtkUnstructuredGr
 
         int idnode=0;
         if(strcmp(type,"node")!=0){
+          // read nodes
+        if (H5Lexists(loc_id,"nodes",H5P_DEFAULT)!=FALSE)
+        {
+            nodes_id = H5Dopen1(loc_id,"nodes");
+            umeshnodes = readNodes(nodes_id);
+            vtkPoints *points = vtkPoints::New();
+            for (int i=0 ;i<umeshnodes.nbnodes;i++)
+                 points->InsertNextPoint(umeshnodes.nodes[i][0],umeshnodes.nodes[i][1],
+                                                        umeshnodes.nodes[i][2]);
+            ugrid->SetPoints(points);
+            points->Delete();
+        }
             for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
             {
                 int i=grp.eltgroup[igrp];
@@ -912,19 +913,15 @@ int vtkAmeletHDFMeshReader::readUgrp(hid_t meshId, char *name, vtkUnstructuredGr
         if(umesheltnodes.nbeltnodes==0)
         {
             // read nodes
-            
-            ugrid->Delete();
-            vtkUnstructuredGrid *ugrid = vtkUnstructuredGrid::New();
             if (H5Lexists(loc_id,"nodes",H5P_DEFAULT)!=FALSE)
             {
-                /*nodes_id = H5Dopen1(loc_id,"nodes");
-                umeshnodes = readNodes(nodes_id);*/
+                nodes_id = H5Dopen1(loc_id,"nodes");
+                umeshnodes = readNodes(nodes_id);
                 vtkPoints *points = vtkPoints::New();
                 for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
                 { 
-                    int i = grp.eltgroup[i];
+                    int i = grp.eltgroup[igrp];
                     vtkVertex * vertexcell = vtkVertex::New();
-                    std::cout<<umeshnodes.nodes[0]<<std::endl;
                     points->InsertNextPoint(umeshnodes.nodes[i][0],umeshnodes.nodes[i][1],
                                                         umeshnodes.nodes[i][2]);
                 }          
@@ -932,12 +929,12 @@ int vtkAmeletHDFMeshReader::readUgrp(hid_t meshId, char *name, vtkUnstructuredGr
                 points->Delete();
                 for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
                 { 
-                    int i = grp.eltgroup[i];
+                    //int i = grp.eltgroup[igrp];
                     vtkVertex * vertexcell = vtkVertex::New();
                     vertexcell->GetPointIds()->SetId(0,igrp);                   
                     ugrid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
                     vertexcell->Delete();
-                 }
+                }
                 
                 
                 
@@ -945,7 +942,20 @@ int vtkAmeletHDFMeshReader::readUgrp(hid_t meshId, char *name, vtkUnstructuredGr
             }
             //so there is only nodes in mesh
         }
-        else if(umeshnodes.nbnodes == grp.nbeltgroup){
+        else if((umeshnodes.nbnodes == grp.nbeltgroup) && 
+                (H5Lexists(loc_id,"elementNodes",H5P_DEFAULT)!=FALSE)){
+          // read nodes
+        if (H5Lexists(loc_id,"nodes",H5P_DEFAULT)!=FALSE)
+        {
+            nodes_id = H5Dopen1(loc_id,"nodes");
+            umeshnodes = readNodes(nodes_id);
+            vtkPoints *points = vtkPoints::New();
+            for (int i=0 ;i<umeshnodes.nbnodes;i++)
+                 points->InsertNextPoint(umeshnodes.nodes[i][0],umeshnodes.nodes[i][1],
+                                                        umeshnodes.nodes[i][2]);
+            ugrid->SetPoints(points);
+            points->Delete();
+        }
             for(int i=0; i<umeshelttypes.nbelttypes;i++)
             {
                 //int i=grp.eltgroup[igrp];
