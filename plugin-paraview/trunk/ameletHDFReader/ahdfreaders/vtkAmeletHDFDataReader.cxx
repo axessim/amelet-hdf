@@ -146,6 +146,7 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
     }
     table->AddColumn(array);
     array->Delete();
-
+    if(child.nbchild>1) free(child.childnames[0]);
+        free(child.childnames);
     return 1;
 }
