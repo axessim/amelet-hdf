@@ -66,7 +66,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
     int idnode=0;
     for(int i=0; i<umeshelttypes.nbelttypes;i++)
     {
-      	if(umeshelttypes.elttypes[i]==1)
+      	if((umeshelttypes.elttypes[i]==1) ||(umeshelttypes.elttypes[i]==2))
        	{
        		vtkLine * linecell = vtkLine::New();
        		linecell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
@@ -74,8 +74,9 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
        		ugrid->InsertNextCell(linecell->GetCellType(),linecell->GetPointIds());
                 linecell->Delete();
        		idnode=idnode+2;
+                if(umeshelttypes.elttypes[i]==2) idnode=idnode+1;
        	}
-       	else if(umeshelttypes.elttypes[i]==11)
+       	else if((umeshelttypes.elttypes[i]==11) || (umeshelttypes.elttypes[i]==12))
        	{
        		vtkTriangle * tricell = vtkTriangle::New();
        		tricell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
@@ -84,8 +85,9 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
        		ugrid->InsertNextCell(tricell->GetCellType(),tricell->GetPointIds());
                 tricell->Delete();
        		idnode=idnode+3;
+                if(umeshelttypes.elttypes[i]==12) idnode=idnode+3;
        	}
-       	else if(umeshelttypes.elttypes[i]==13)
+       	else if((umeshelttypes.elttypes[i]==13) || (umeshelttypes.elttypes[i]==14))
        	{
        		vtkQuad * quadcell = vtkQuad::New();
        		quadcell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
@@ -95,6 +97,7 @@ int vtkAmeletHDFMeshReader::readUmesh(hid_t meshId, char *name, vtkUnstructuredG
        		ugrid->InsertNextCell(quadcell->GetCellType(),quadcell->GetPointIds());
                 quadcell->Delete();
        		idnode=idnode+4;
+                if(umeshelttypes.elttypes[i]==14) idnode=idnode+4;
        	}
        	else if(umeshelttypes.elttypes[i]==101)
        	{
