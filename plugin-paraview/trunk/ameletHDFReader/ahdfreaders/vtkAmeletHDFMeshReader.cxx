@@ -945,9 +945,7 @@ int vtkAmeletHDFMeshReader::readUgrp(hid_t meshId, char *name, vtkUnstructuredGr
             }
             //so there is only nodes in mesh
         }
-        else if((umeshnodes.nbnodes == grp.nbeltgroup) && 
-                (H5Lexists(loc_id,"elementNodes",H5P_DEFAULT)!=FALSE)){
-          // read nodes
+        else if(H5Lexists(loc_id,"elementNodes",H5P_DEFAULT)!=FALSE){
         if (H5Lexists(loc_id,"nodes",H5P_DEFAULT)!=FALSE)
         {
             nodes_id = H5Dopen1(loc_id,"nodes");
@@ -981,7 +979,7 @@ int vtkAmeletHDFMeshReader::readUgrp(hid_t meshId, char *name, vtkUnstructuredGr
                     tricell->Delete();
                     idnode=idnode+3;
                 }
-                else if(umeshelttypes.elttypes[i]==13)
+                else if((umeshelttypes.elttypes[i]==13) || (umeshelttypes.elttypes[i]==14))
                 {
                     vtkQuad * quadcell = vtkQuad::New();
                     quadcell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
@@ -991,6 +989,7 @@ int vtkAmeletHDFMeshReader::readUgrp(hid_t meshId, char *name, vtkUnstructuredGr
                     ugrid->InsertNextCell(quadcell->GetCellType(),quadcell->GetPointIds());
                     quadcell->Delete();
                     idnode=idnode+4;
+                if(umeshelttypes.elttypes[i]==14) idnode=idnode+4;
                 }
                 else if(umeshelttypes.elttypes[i]==101)
                 {
@@ -1231,7 +1230,6 @@ int vtkAmeletHDFMeshReader::readSgrp(hid_t meshId, char *name, vtkUnstructuredGr
     char * path;
 
     loc_id = H5Gopen1(meshId, name);
-
     path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     strcpy(path,"group/");
     hid_t group_id = H5Gopen1(loc_id,"group");
@@ -1681,7 +1679,7 @@ int vtkAmeletHDFMeshReader::readSgrp(hid_t meshId, char *name, vtkUnstructuredGr
 
     else
     {
-        std::cout<<"group"<<path<< "doesn't exist !!"<<std::endl;
+        std::cout<<"structured group "<<path<< " doesn't exist !!"<<std::endl;
         return 0;
     }
 }
@@ -2153,7 +2151,7 @@ int vtkAmeletHDFMeshReader::readSgrpgrp(hid_t meshId, char *name, vtkUnstructure
 
     else
     {
-        std::cout<<"group"<<path<< "doesn't exist !!"<<std::endl;
+        std::cout<<"groupGroup "<<path<< " doesn't exist !!"<<std::endl;
         return 0;
     }
 }
