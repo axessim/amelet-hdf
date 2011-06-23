@@ -12,6 +12,7 @@
 #include <vtkTable.h>
 #include <vtkAbstractArray.h>
 #include <vtkFloatArray.h>
+#include <vtkStringArray.h>
 #include <vtkstd/string>
 #include <iostream>
 #include <sstream>
