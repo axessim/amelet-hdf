@@ -98,7 +98,6 @@ char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *ma
                 printf("***** ERROR(%s): Missing attribute \"floatingType\" or \"type\" in \"%s\". *****\n\n", AH5_C_PHYSICAL_MODEL, path);
                 rdata = FALSE;
             }
-            free(buf);
         }
         else
         {

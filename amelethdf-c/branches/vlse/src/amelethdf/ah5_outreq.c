@@ -46,7 +46,7 @@ char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t 
                     ort_instance->opt_attrs.instances[i].type == H5T_INTEGER &&
                     AH5_read_lbl_dataset(file_id, ort_instance->subject, &AH5_label_dataset))
                 {
-                    ort_instance->subject_name = strdup(AH5_label_dataset.items[atoi(ort_instance->opt_attrs.instances[i].value.s)]);
+                    ort_instance->subject_name = strdup(AH5_label_dataset.items[ort_instance->opt_attrs.instances[i].value.i]);
                 }
                 AH5_free_lbl_dataset(&AH5_label_dataset);
             }
