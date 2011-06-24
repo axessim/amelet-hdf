@@ -609,29 +609,33 @@ void AH5_free_opt_attrs(AH5_opt_attrs_t *opt_attrs)
     }
 }
 
-
 void AH5_print_err_dset (const char *category, const char *path)
 {
-    printf("***** ERROR(%s): Cannot read dataset \"%s\". *****\n\n", category, path);
+    printf("\n***** ERROR(%s): Cannot read dataset \"%s\". *****\n\n", category, path);
 }
 
 void AH5_print_err_tble (const char *category, const char *path)
 {
-    printf("***** ERROR(%s): Cannot read table \"%s\". *****\n\n", category, path);
+    printf("\n***** ERROR(%s): Cannot read table \"%s\". *****\n\n", category, path);
 }
 
 void AH5_print_err_attr (const char *category, const char *path, const char *attr_name)
 {
-    printf("***** ERROR(%s): Cannot read mandatory attribute \"%s[@%s]\". *****\n\n", category, path, attr_name);
+    printf("\n***** ERROR(%s): Cannot read mandatory attribute \"%s[@%s]\". *****\n\n", category, path, attr_name);
 }
 
 void AH5_print_err_path (const char *category, const char *path)
 {
-    printf("***** ERROR(%s): Cannot read path \"%s\". *****\n\n", category, path);
+    printf("\n***** ERROR(%s): Cannot read path \"%s\". *****\n\n", category, path);
+}
+
+void AH5_print_err_inv_attr (const char *category, const char *path, const char *attr_name)
+{
+    printf("\n***** ERROR(%s): Invalid attribute value in \"%s[@%s]\". *****\n\n", category, path, attr_name);
 }
 
 void AH5_print_wrn_attr (const char *category, const char *path, const char *attr_name)
 {
-    printf("***** WARNING(%s): Invalid attribute value in \"%s[@%s]\". *****\n\n", category, path, attr_name);
+    printf("\n***** WARNING(%s): Invalid attribute value in \"%s[@%s]\". *****\n\n", category, path, attr_name);
 }
 

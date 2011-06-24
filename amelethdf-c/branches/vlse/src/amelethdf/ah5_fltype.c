@@ -372,7 +372,7 @@ char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rati
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE};
     char path2[AH5_ABSOLUTE_PATH_LENGTH];
     char *buf, rdata = FALSE;
-    hsize_t i, invalid_nb;
+    hsize_t i, invalid_nb = -1;
     char invalid = FALSE;
     H5T_class_t type_class;
     AH5_children_t children;
@@ -529,7 +529,7 @@ char AH5_read_ft_arrayset (hid_t file_id, const char *path, AH5_arrayset_t *arra
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE};
     char path2[AH5_ABSOLUTE_PATH_LENGTH];
-    hsize_t i, invalid_nb;
+    hsize_t i, invalid_nb = -1;
     char invalid = FALSE;
     char rdata = FALSE;
     AH5_children_t children;

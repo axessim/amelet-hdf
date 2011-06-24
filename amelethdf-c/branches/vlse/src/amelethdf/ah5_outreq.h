@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "ah5_general.h"
+#include "ah5_label.h"
 
     typedef struct _AH5_ort_instance_t
     {
@@ -13,6 +14,7 @@ extern "C" {
         AH5_opt_attrs_t opt_attrs;
         char            *subject;
         char            *object;
+        char            *subject_name;
         char            *output;
     } AH5_ort_instance_t;
 

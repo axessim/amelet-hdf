@@ -1,5 +1,145 @@
 #include "ah5_phmodel.h"
 
+char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *material_prop)
+{
+    char rdata = TRUE, *buf = NULL, path2[AH5_ABSOLUTE_PATH_LENGTH], datasetok = FALSE;
+    int nb_dims;
+    hsize_t dims[2] = {1, 1};
+    H5T_class_t type_class;
+    size_t length;
+
+    if (AH5_path_valid(file_id, path))
+    {
+        if (strcmp(AH5_get_name_from_path(path),"relativePermittivity") == 0 || strcmp(AH5_get_name_from_path(path),"relativePermeability") == 0)
+        {
+            /* relative permittivity, relative permeability */
+            if (AH5_read_str_attr(file_id, path, AH5_A_FLOATING_TYPE, &buf))
+            {
+                /* @floatingType = singleComplex/arraySet/generalRationalFunction */
+                if (strcmp(buf, AH5_V_SINGLE_COMPLEX) == 0)
+                {
+                    material_prop->type = MP_SINGLE_COMPLEX;
+                    if (!AH5_read_ft_singlecomplex(file_id, path, &(material_prop->data.singlecomplex)))
+                        rdata = FALSE;
+                }
+                else if (strcmp(buf, AH5_V_ARRAYSET) == 0)
+                {
+                    material_prop->type = MP_ARRAYSET;
+                    if (!AH5_read_ft_arrayset(file_id, path, &(material_prop->data.arrayset)))
+                        rdata = FALSE;
+                }
+                else if (strcmp(buf, AH5_V_GENERAL_RATIONAL_FUNCTION) == 0)
+                {
+                    material_prop->type = MP_GENERAL_RATIONAL_FUNCTION;
+                    if (!AH5_read_ft_generalrationalfunction(file_id, path, &(material_prop->data.generalrationalfunction)))
+                        rdata = FALSE;
+                }
+                else
+                {
+                    AH5_print_err_inv_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_FLOATING_TYPE);
+                    rdata = FALSE;
+                }
+            }
+            else if (AH5_read_str_attr(file_id, path, AH5_A_TYPE, &buf))
+            {
+                /* @type = debye/lorentz */
+                if (strcmp(buf, AH5_V_DEBYE) == 0)
+                {
+                    material_prop->type = MP_DEBYE;
+                    if (!AH5_read_flt_attr(file_id, path, AH5_A_ER_LIMIT, &(material_prop->data.debye.limit)))
+                        rdata = FALSE;
+                    if (!AH5_read_flt_attr(file_id, path, AH5_A_ER_STATIC, &(material_prop->data.debye.stat)))
+                        rdata = FALSE;
+                    strcpy(path2, path);
+                    strcat(path2, AH5_G_LIST_OF_FUNCTIONS);
+                    if (AH5_path_valid(file_id, path2) && rdata)
+                        if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
+                            if (nb_dims == 2)
+                                if (H5LTget_dataset_info(file_id, path2, dims, &type_class, &length) >= 0)
+                                    if (type_class == H5T_FLOAT && length == 4)
+                                        if (AH5_read_float_dataset(file_id, path2, dims[0]*dims[1], &(material_prop->data.debye.gtau)))
+                                        {
+                                            material_prop->data.debye.nb_gtau = dims[0];
+                                            datasetok = TRUE;
+                                        }
+                    if (!datasetok)
+                        rdata = FALSE;
+                }
+                else if (strcmp(buf, AH5_V_LORENTZ) == 0)
+                {
+                    material_prop->type = MP_LORENTZ;
+                    if (!AH5_read_flt_attr(file_id, path, AH5_A_ER_LIMIT, &(material_prop->data.lorentz.limit)))
+                        rdata = FALSE;
+                    if (!AH5_read_flt_attr(file_id, path, AH5_A_ER_STATIC, &(material_prop->data.lorentz.stat)))
+                        rdata = FALSE;
+                    strcpy(path2, path);
+                    strcat(path2, AH5_G_LIST_OF_FUNCTIONS);
+                    if (AH5_path_valid(file_id, path2))
+                        if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
+                            if (nb_dims == 2)
+                                if (H5LTget_dataset_info(file_id, path2, dims, &type_class, &length) >= 0)
+                                    if (type_class == H5T_FLOAT && length == 4)
+                                        if (AH5_read_float_dataset(file_id, path2, dims[0]*dims[1], &(material_prop->data.lorentz.god)))
+                                        {
+                                            material_prop->data.lorentz.nb_god = dims[0];
+                                            datasetok = TRUE;
+                                        }
+                    if (!datasetok)
+                        rdata = FALSE;
+                }
+                else
+                {
+                    AH5_print_err_inv_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_TYPE);
+                    rdata = FALSE;
+                }
+            }
+            else
+            {
+                printf("***** ERROR(%s): Missing attribute \"floatingType\" or \"type\" in \"%s\". *****\n\n", AH5_C_PHYSICAL_MODEL, path);
+                rdata = FALSE;
+            }
+            free(buf);
+        }
+        else
+        {
+            /* electric conductivity, magnetic conductivity */
+            if (AH5_read_str_attr(file_id, path, AH5_A_FLOATING_TYPE, &buf))
+            {
+                if (strcmp(buf, AH5_V_SINGLE_REAL) == 0)
+                {
+                    if (AH5_read_ft_singlereal(file_id, path, &(material_prop->data.singlereal)))
+                        material_prop->type = MP_SINGLE_REAL;
+                    else
+                        rdata = FALSE;
+                }
+                else if (strcmp(buf, AH5_V_ARRAYSET) == 0)
+                {
+                    if (AH5_read_ft_arrayset(file_id, path, &(material_prop->data.arrayset)))
+                        material_prop->type = MP_ARRAYSET;
+                    else
+                        rdata = FALSE;
+                }
+                else
+                {
+                    AH5_print_err_inv_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_FLOATING_TYPE);
+                    rdata = FALSE;
+                }
+            }
+            else
+            {
+                AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_FLOATING_TYPE);
+                rdata = FALSE;
+            }
+        }
+        free(buf);
+    }
+    else
+    {
+        AH5_print_err_path(AH5_C_PHYSICAL_MODEL, path);
+        rdata = FALSE;
+    }
+    return rdata;
+}
 
 // Read instance in physicalModel/volume
 char AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_instance_t *volume_instance)
@@ -9,29 +149,29 @@ char AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_i
 
     volume_instance->path = strdup(path);
     volume_instance->opt_attrs.instances = NULL;
-    volume_instance->relative_permittivity.type = FT_INVALID;
-    volume_instance->relative_permeability.type = FT_INVALID;
-    volume_instance->electric_conductivity.type = FT_INVALID;
-    volume_instance->magnetic_conductivity.type = FT_INVALID;
+    volume_instance->relative_permittivity.type = MP_INVALID;
+    volume_instance->relative_permeability.type = MP_INVALID;
+    volume_instance->electric_conductivity.type = MP_INVALID;
+    volume_instance->magnetic_conductivity.type = MP_INVALID;
 
     if (AH5_path_valid(file_id, path))
     {
         AH5_read_opt_attrs(file_id, path, &(volume_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
         strcpy(path2, path);
         strcat(path2, AH5_G_RELATIVE_PERMITTIVITY);
-        if (!AH5_read_floatingtype(file_id, path2, &(volume_instance->relative_permittivity)))
+        if (!AH5_read_phm_vimp(file_id, path2, &(volume_instance->relative_permittivity)))
             rdata = FALSE;
         strcpy(path2, path);
         strcat(path2, AH5_G_RELATIVE_PERMEABILITY);
-        if (!AH5_read_floatingtype(file_id, path2, &(volume_instance->relative_permeability)))
+        if (!AH5_read_phm_vimp(file_id, path2, &(volume_instance->relative_permeability)))
             rdata = FALSE;
         strcpy(path2, path);
         strcat(path2, AH5_G_ELECTRIC_CONDUCTIVITY);
-        if (!AH5_read_floatingtype(file_id, path2, &(volume_instance->electric_conductivity)))
+        if (!AH5_read_phm_vimp(file_id, path2, &(volume_instance->electric_conductivity)))
             rdata = FALSE;
         strcpy(path2, path);
         strcat(path2, AH5_G_MAGNETIC_CONDUCTIVITY);
-        if (!AH5_read_floatingtype(file_id, path2, &(volume_instance->magnetic_conductivity)))
+        if (!AH5_read_phm_vimp(file_id, path2, &(volume_instance->magnetic_conductivity)))
             rdata = FALSE;
     }
     else
@@ -383,12 +523,74 @@ char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel)
 // Print instance in physicalModel/volume
 void AH5_print_phm_volume_instance (const AH5_volume_instance_t *volume_instance, int space)
 {
+    hsize_t i;
+
     printf("%*sInstance: %s\n", space, "", AH5_get_name_from_path(volume_instance->path));
     AH5_print_opt_attrs(&(volume_instance->opt_attrs), space + 3);
-    AH5_print_floatingtype(&(volume_instance->relative_permittivity), space + 3);
-    AH5_print_floatingtype(&(volume_instance->relative_permeability), space + 3);
-    AH5_print_floatingtype(&(volume_instance->electric_conductivity), space + 3);
-    AH5_print_floatingtype(&(volume_instance->magnetic_conductivity), space + 3);
+
+    /* relative permittivity */
+    if (volume_instance->relative_permittivity.type == MP_SINGLE_COMPLEX)
+        AH5_print_ft_singlecomplex(&(volume_instance->relative_permittivity.data.singlecomplex), space + 3);
+    else if (volume_instance->relative_permittivity.type == MP_GENERAL_RATIONAL_FUNCTION)
+        AH5_print_ft_generalrationalfunction(&(volume_instance->relative_permittivity.data.generalrationalfunction), space + 3);
+    else if (volume_instance->relative_permittivity.type == MP_ARRAYSET)
+        AH5_print_ft_arrayset(&(volume_instance->relative_permittivity.data.arrayset), space + 3);
+    else if (volume_instance->relative_permittivity.type == MP_DEBYE)
+    {
+        printf("%*s-relativePermittivity (type=debye):\n", space + 3, "");
+        printf("%*s-@%s: %g\n", space + 7, "", AH5_A_ER_STATIC, volume_instance->relative_permittivity.data.debye.stat);
+        printf("%*s-@%s: %g\n", space + 7, "", AH5_A_ER_LIMIT, volume_instance->relative_permittivity.data.debye.limit);
+        for (i = 0; i < volume_instance->relative_permittivity.data.debye.nb_gtau; i++)
+        {
+            printf("%*sId %lu: G=%g tau=%g\n", space + 5, "", (long unsigned) i, volume_instance->relative_permittivity.data.debye.gtau[2*i], volume_instance->relative_permittivity.data.debye.gtau[2*i+1]);
+        }
+    }
+    else if (volume_instance->relative_permittivity.type == MP_LORENTZ)
+    {
+        printf("%*s-relativePermittivity (type=lorentz):\n", space + 3, "");
+        printf("%*s-@%s: %g\n", space + 7, "", AH5_A_ER_STATIC, volume_instance->relative_permittivity.data.lorentz.stat);
+        printf("%*s-@%s: %g\n", space + 7, "", AH5_A_ER_LIMIT, volume_instance->relative_permittivity.data.lorentz.limit);
+        for (i = 0; i < volume_instance->relative_permittivity.data.lorentz.nb_god; i++)
+            printf("%*sId %lu: G=%g omega=%g delta=%g\n", space + 5, "", (long unsigned) i, volume_instance->relative_permittivity.data.lorentz.god[3*i], volume_instance->relative_permittivity.data.lorentz.god[3*i+1], volume_instance->relative_permittivity.data.lorentz.god[3*i+2]);
+    }
+
+    /* relative permeability */
+    if (volume_instance->relative_permeability.type == MP_SINGLE_COMPLEX)
+        AH5_print_ft_singlecomplex(&(volume_instance->relative_permeability.data.singlecomplex), space + 3);
+    else if (volume_instance->relative_permeability.type == MP_GENERAL_RATIONAL_FUNCTION)
+        AH5_print_ft_generalrationalfunction(&(volume_instance->relative_permeability.data.generalrationalfunction), space + 3);
+    else if (volume_instance->relative_permeability.type == MP_ARRAYSET)
+        AH5_print_ft_arrayset(&(volume_instance->relative_permeability.data.arrayset), space + 3);
+    else if (volume_instance->relative_permeability.type == MP_DEBYE)
+    {
+        printf("%*s-relativePermeability (type=debye):\n", space + 3, "");
+        printf("%*s-@%s: %g\n", space + 7, "", AH5_A_ER_STATIC, volume_instance->relative_permeability.data.debye.stat);
+        printf("%*s-@%s: %g\n", space + 7, "", AH5_A_ER_LIMIT, volume_instance->relative_permeability.data.debye.limit);
+        for (i = 0; i < volume_instance->relative_permeability.data.debye.nb_gtau; i++)
+        {
+            printf("%*sId %lu: G=%g tau=%g\n", space + 5, "", (long unsigned) i, volume_instance->relative_permeability.data.debye.gtau[2*i], volume_instance->relative_permeability.data.debye.gtau[2*i+1]);
+        }
+    }
+    else if (volume_instance->relative_permeability.type == MP_LORENTZ)
+    {
+        printf("%*s-relativePermeability (type=lorentz):\n", space + 3, "");
+        printf("%*s-@%s: %g\n", space + 7, "", AH5_A_ER_STATIC, volume_instance->relative_permeability.data.lorentz.stat);
+        printf("%*s-@%s: %g\n", space + 7, "", AH5_A_ER_LIMIT, volume_instance->relative_permeability.data.lorentz.limit);
+        for (i = 0; i < volume_instance->relative_permeability.data.lorentz.nb_god; i++)
+            printf("%*sId %lu: G=%g omega=%g delta=%g\n", space + 5, "", (long unsigned) i, volume_instance->relative_permeability.data.lorentz.god[3*i], volume_instance->relative_permeability.data.lorentz.god[3*i+1], volume_instance->relative_permeability.data.lorentz.god[3*i+2]);
+    }
+
+    /* electric conductivity */
+    if (volume_instance->electric_conductivity.type == MP_SINGLE_REAL)
+        AH5_print_ft_singlereal(&(volume_instance->electric_conductivity.data.singlereal), space + 3);
+    else if (volume_instance->electric_conductivity.type == MP_ARRAYSET)
+        AH5_print_ft_arrayset(&(volume_instance->electric_conductivity.data.arrayset), space + 3);
+
+    /* magnetic conductivity */
+    if (volume_instance->magnetic_conductivity.type == MP_SINGLE_REAL)
+        AH5_print_ft_singlereal(&(volume_instance->magnetic_conductivity.data.singlereal), space + 3);
+    else if (volume_instance->magnetic_conductivity.type == MP_ARRAYSET)
+        AH5_print_ft_arrayset(&(volume_instance->magnetic_conductivity.data.arrayset), space + 3);
     printf("\n");
 }
 
@@ -472,6 +674,29 @@ void AH5_print_physicalmodel (const AH5_physicalmodel_t *physicalmodel)
 }
 
 
+// Free memory used by desired material property
+void AH5_free_phm_vimp (AH5_material_prop_t *material_prop)
+{
+    if (material_prop->type == MP_SINGLE_REAL)
+        AH5_free_ft_singlereal(&(material_prop->data.singlereal));
+    else if (material_prop->type == MP_SINGLE_COMPLEX)
+        AH5_free_ft_singlecomplex(&(material_prop->data.singlecomplex));
+    else if (material_prop->type == MP_GENERAL_RATIONAL_FUNCTION)
+        AH5_free_ft_generalrationalfunction(&(material_prop->data.generalrationalfunction));
+    else if (material_prop->type == MP_ARRAYSET)
+        AH5_free_ft_arrayset(&(material_prop->data.arrayset));
+    else if (material_prop->type == MP_DEBYE)
+    {
+        free(material_prop->data.debye.gtau);
+        material_prop->data.debye.gtau = NULL;
+    }
+    else if (material_prop->type == MP_LORENTZ)
+    {
+        free(material_prop->data.lorentz.god);
+        material_prop->data.lorentz.god = NULL;
+    }
+    material_prop->type = MP_INVALID;
+}
 
 
 // Free memory used by instance in physicalModel/volume
@@ -483,10 +708,10 @@ void AH5_free_phm_volume_instance (AH5_volume_instance_t *volume_instance)
         volume_instance->path = NULL;
     }
     AH5_free_opt_attrs(&(volume_instance->opt_attrs));
-    AH5_free_floatingtype(&(volume_instance->relative_permittivity));
-    AH5_free_floatingtype(&(volume_instance->relative_permeability));
-    AH5_free_floatingtype(&(volume_instance->electric_conductivity));
-    AH5_free_floatingtype(&(volume_instance->magnetic_conductivity));
+    AH5_free_phm_vimp(&(volume_instance->relative_permittivity));
+    AH5_free_phm_vimp(&(volume_instance->relative_permeability));
+    AH5_free_phm_vimp(&(volume_instance->electric_conductivity));
+    AH5_free_phm_vimp(&(volume_instance->magnetic_conductivity));
 }
 
 // Free memory used by instance in physicalModel/surface

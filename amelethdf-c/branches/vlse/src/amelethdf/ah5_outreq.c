@@ -5,10 +5,13 @@
 char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t *ort_instance)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_SUBJECT, AH5_A_OBJECT, AH5_A_OUTPUT};
+    AH5_lbl_dataset_t AH5_label_dataset;
     char rdata = TRUE;
+    unsigned int i;
 
     ort_instance->path = strdup(path);
     ort_instance->subject = NULL;
+    ort_instance->subject_name = NULL; /* for purposes of the module */
     ort_instance->object = NULL;
     ort_instance->output = NULL;
     ort_instance->opt_attrs.instances = NULL;
@@ -31,6 +34,22 @@ char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t 
             AH5_print_err_attr(AH5_C_OUTPUT_REQUEST, path, AH5_A_OUTPUT);
             rdata = FALSE;
         }
+
+        AH5_label_dataset.items = NULL;
+        AH5_label_dataset.path = NULL;
+        AH5_label_dataset.nb_items = 0;
+
+        if (rdata)
+            for(i = 0; i < ort_instance->opt_attrs.nb_instances; i++)
+            {
+                if (strcmp(ort_instance->opt_attrs.instances[i].name, "subject_id") == 0 &&
+                    ort_instance->opt_attrs.instances[i].type == H5T_INTEGER &&
+                    AH5_read_lbl_dataset(file_id, ort_instance->subject, &AH5_label_dataset))
+                {
+                    ort_instance->subject_name = strdup(AH5_label_dataset.items[atoi(ort_instance->opt_attrs.instances[i].value.s)]);
+                }
+                AH5_free_lbl_dataset(&AH5_label_dataset);
+            }
     }
     else
     {
@@ -168,6 +187,11 @@ void AH5_free_ort_instance (AH5_ort_instance_t *ort_instance)
     {
         free(ort_instance->subject);
         ort_instance->subject = NULL;
+    }
+    if (ort_instance->subject_name != NULL)
+    {
+        free(ort_instance->subject_name);
+        ort_instance->subject_name = NULL;
     }
     if (ort_instance->object != NULL)
     {

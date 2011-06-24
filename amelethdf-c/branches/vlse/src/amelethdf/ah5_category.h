@@ -90,7 +90,7 @@ extern "C" {
 
 
 /* ah5_fltype.h */
-#define AH5_A_FLOATING_TYPE             "floatingType"
+#define AH5_A_FLOATING_TYPE                 "floatingType"
 #define AH5_A_LABEL                         "label"
 #define AH5_A_PHYSICAL_NATURE               "physicalNature"
 #define AH5_A_UNIT                          "unit"
@@ -200,6 +200,7 @@ extern "C" {
 #define AH5_G_PERFECT_MAGNETIC_CONDUCTOR        "/perfectMagneticConductor"
 #define AH5_G_SURFACE                           "/surface"
 #define AH5_G_INTERFACE                         "/interface"
+#define AH5_G_LIST_OF_FUNCTIONS                 "/listOfFunctions"
 #define AH5_A_F_MIN                             "frequency_validity_min"
 #define AH5_A_F_MAX                             "frequency_validity_max"
 #define AH5_A_TYPE                              "type"
@@ -213,12 +214,15 @@ extern "C" {
 #define AH5_A_ZT2                               "Zt2"
 #define AH5_A_MEDIUM1                           "medium1"
 #define AH5_A_MEDIUM2                           "medium2"
+#define AH5_A_ER_LIMIT                          "epsilonLimit"
+#define AH5_A_ER_STATIC                         "epsilonStatic"
 #define AH5_V_THIN_DIELECTRIC_LAYER             "thinDielectricLayer"
 #define AH5_V_SIBC                              "SIBC"
 #define AH5_V_ZS                                "Zs"
 #define AH5_V_ZSZT                              "ZsZt"
 #define AH5_V_ZSZT2                             "ZsZt2"
-
+#define AH5_V_DEBYE                             "debye"
+#define AH5_V_LORENTZ                           "lorentz"
 
 /* ah5_simulation.h */
 #define AH5_A_MODULE    "module"

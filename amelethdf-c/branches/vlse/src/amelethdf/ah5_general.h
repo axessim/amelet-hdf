@@ -52,6 +52,7 @@ extern "C" {
     AH5_set_t AH5_add_to_set (AH5_set_t aset, char *aelement);
     int AH5_index_in_set (AH5_set_t aset, char *aelement, hsize_t *index);
     AH5_children_t AH5_read_children_name (hid_t file_id, const char *path);
+
     char *AH5_get_name_from_path (const char *path);
     char *AH5_get_base_from_path (const char *path);
 
@@ -72,12 +73,13 @@ extern "C" {
 
     char AH5_read_opt_attrs (hid_t file_id, const char *path, AH5_opt_attrs_t *opt_attrs, char mandatory_attrs[][AH5_ATTR_LENGTH], size_t nb_mandatory_attrs);
     void AH5_print_opt_attrs (const AH5_opt_attrs_t *opt_attrs, int space);
-    void AH5_free_opt_attrs(AH5_opt_attrs_t *opt_attrs);
+    void AH5_free_opt_attrs (AH5_opt_attrs_t *opt_attrs);
 
     void AH5_print_err_dset (const char *category, const char *path);
     void AH5_print_err_tble (const char *category, const char *path);
     void AH5_print_err_attr (const char *category, const char *path, const char *attr_name);
     void AH5_print_err_path (const char *category, const char *path);
+    void AH5_print_err_inv_attr (const char *category, const char *path, const char *attr_name);
     void AH5_print_wrn_attr (const char *category, const char *path, const char *attr_name);
 
 #ifdef __cplusplus
