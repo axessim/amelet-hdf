@@ -7,7 +7,11 @@
 
 #include "vtkAmeletHDFDataReader.h"
 
-
+extern "C" {
+    #include "amelethdf.h"
+    #include "arrayset.h"
+    #include "hdfpath.h"
+}
 
 #define TRUE            1
 #define FALSE           0
@@ -15,11 +19,14 @@
 int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
 {
     vtkFloatArray *array;
+    vtkIntArray *iarray;
     arrayset_t ars;
     children_t child;
     char  path[ABSOLUTE_PATH_NAME_LENGTH];
     char  attr_value[ELEMENT_NAME_LENGTH];
     char  attr[ELEMENT_NAME_LENGTH];
+    char  strtemp[ELEMENT_NAME_LENGTH];
+    char  strtemp2[ELEMENT_NAME_LENGTH];
     int xdim = -1; int ydim = -1; int zdim = -1;
     int nbdataarray=1;
     int max=1;
@@ -53,10 +60,21 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
 
     for(int i=0;i<ars.nbdims;i++)
     {
+      
       if(ars.dims[i].rvalue!=NULL)
       {
+        strcpy(strtemp,"dim");
+        std::ostringstream buf;
+        buf << i;
+        std::string buffer = buf.str();
+        char *buf2=new char[buffer.size()+1];
+        buf2[buffer.size()]=0;
+        memcpy(buf2,buffer.c_str(),buffer.size());
+        strcat(strtemp,buf2);
+        strcat(strtemp,"_");
+        strcat(strtemp,ars.dims[i].single.label);
         array = vtkFloatArray::New();
-        array->SetName(ars.dims[i].single.label);
+        array->SetName(strtemp);
         table->AddColumn(array);
         array->Delete();
       }
@@ -67,6 +85,23 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
         array->SetName(ars.dims[i].single.label);
         table->AddColumn(array);
         array->Delete();
+      }
+      else if(ars.dims[i].ivalue!=NULL)
+      {
+        strcpy(strtemp,"dim");
+        std::ostringstream buf;
+        buf << i;
+        std::string buffer = buf.str();
+        char *buf2=new char[buffer.size()+1];
+        buf2[buffer.size()]=0;
+        memcpy(buf2,buffer.c_str(),buffer.size());
+        strcat(strtemp,buf2);
+        strcat(strtemp,"_");
+        strcat(strtemp,ars.dims[i].single.label);
+        iarray = vtkIntArray::New();
+        iarray->SetName(strtemp);
+        table->AddColumn(iarray);
+        iarray->Delete();
       }
     }
     array = vtkFloatArray::New();
@@ -91,6 +126,10 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
           else if(ars.dims[j].svalue!=NULL)
           {
             table->SetValue(offset,j,float(k));
+          }
+          else if(ars.dims[j].ivalue!=NULL)
+          {
+            table->SetValue(offset,j,ars.dims[j].ivalue[k]);
           }
           offset=offset+1;
         }
