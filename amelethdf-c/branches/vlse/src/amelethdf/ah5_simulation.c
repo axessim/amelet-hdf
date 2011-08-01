@@ -5,6 +5,7 @@
 char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t *sim_instance)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_MODULE, AH5_A_VERSION};
+    char mandatory2[][AH5_ATTR_LENGTH] = {};
     char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
     H5T_class_t type_class;
     char success1 = FALSE, success2 = FALSE;
@@ -27,6 +28,7 @@ char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t 
             AH5_print_err_attr(AH5_C_SIMULATION, path, AH5_A_VERSION);
         strcpy(path2, path);
         strcat(path2, AH5_G_PARAMETER);
+        AH5_read_opt_attrs(file_id, path2, &(sim_instance->parameter), mandatory2, sizeof(mandatory2)/AH5_ATTR_LENGTH);
 
         // inputs
         sim_instance->nb_inputs = 1;  // in case of single value
@@ -39,6 +41,12 @@ char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t 
                         if (type_class == H5T_STRING)
                             if(AH5_read_string_dataset(file_id, path2, sim_instance->nb_inputs, length, &(sim_instance->inputs)))
                                 success1 = TRUE;
+    if (!success1)
+    {
+        AH5_print_err_dset(AH5_C_SIMULATION, path2);
+        sim_instance->nb_inputs = 0;
+        rdata = FALSE;
+    }
         // outputs
         sim_instance->nb_outputs = 1;  // in case of single value
         strcpy(path2, path);
@@ -51,18 +59,13 @@ char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t 
                             if(AH5_read_string_dataset(file_id, path2, sim_instance->nb_outputs, length, &(sim_instance->outputs)))
                                 success2 = TRUE;
     }
-    if (!success1)
-    {
-        AH5_print_err_dset(AH5_C_SIMULATION, path2);
-        sim_instance->nb_inputs = 0;
-        rdata = FALSE;
-    }
     if (!success2)
     {
         AH5_print_err_dset(AH5_C_SIMULATION, path2);
         sim_instance->nb_outputs = 0;
         rdata = FALSE;
     }
+
     return rdata;
 }
 
@@ -157,6 +160,7 @@ void AH5_free_sim_instance (AH5_sim_instance_t *sim_instance)
         sim_instance->path = NULL;
     }
     AH5_free_opt_attrs(&(sim_instance->opt_attrs));
+    AH5_free_opt_attrs(&(sim_instance->parameter));
     if (sim_instance->module != NULL)
     {
         free(sim_instance->module);

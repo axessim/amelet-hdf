@@ -11,6 +11,7 @@ extern "C" {
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
+        AH5_opt_attrs_t parameter;
         char            *module;
         char            *version;
         hsize_t         nb_inputs;
