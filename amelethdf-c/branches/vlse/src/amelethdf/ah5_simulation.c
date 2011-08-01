@@ -6,7 +6,7 @@ char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t 
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_MODULE, AH5_A_VERSION};
     char mandatory2[][AH5_ATTR_LENGTH] = {};
-    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path1[AH5_ABSOLUTE_PATH_LENGTH],path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
     H5T_class_t type_class;
     char success1 = FALSE, success2 = FALSE;
     size_t length;
@@ -32,21 +32,15 @@ char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t 
 
         // inputs
         sim_instance->nb_inputs = 1;  // in case of single value
-        strcpy(path2, path);
-        strcat(path2, AH5_G_INPUTS);
-        if (H5Lexists(file_id, path2, H5P_DEFAULT) == TRUE)
-            if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
+        strcpy(path1, path);
+        strcat(path1, AH5_G_INPUTS);
+        if (H5Lexists(file_id, path1, H5P_DEFAULT) == TRUE)
+            if (H5LTget_dataset_ndims(file_id, path1, &nb_dims) >= 0)
                 if (nb_dims <= 1)
-                    if (H5LTget_dataset_info(file_id, path2, &(sim_instance->nb_inputs), &type_class, &length) >= 0)
+                    if (H5LTget_dataset_info(file_id, path1, &(sim_instance->nb_inputs), &type_class, &length) >= 0)
                         if (type_class == H5T_STRING)
-                            if(AH5_read_string_dataset(file_id, path2, sim_instance->nb_inputs, length, &(sim_instance->inputs)))
+                            if(AH5_read_string_dataset(file_id, path1, sim_instance->nb_inputs, length, &(sim_instance->inputs)))
                                 success1 = TRUE;
-    if (!success1)
-    {
-        AH5_print_err_dset(AH5_C_SIMULATION, path2);
-        sim_instance->nb_inputs = 0;
-        rdata = FALSE;
-    }
         // outputs
         sim_instance->nb_outputs = 1;  // in case of single value
         strcpy(path2, path);
@@ -58,6 +52,12 @@ char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t 
                         if (type_class == H5T_STRING)
                             if(AH5_read_string_dataset(file_id, path2, sim_instance->nb_outputs, length, &(sim_instance->outputs)))
                                 success2 = TRUE;
+    }
+    if (!success1)
+    {
+        AH5_print_err_dset(AH5_C_SIMULATION, path1);
+        sim_instance->nb_inputs = 0;
+        rdata = FALSE;
     }
     if (!success2)
     {
