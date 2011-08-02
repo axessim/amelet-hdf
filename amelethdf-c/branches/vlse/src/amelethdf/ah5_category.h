@@ -19,6 +19,7 @@ extern "C" {
 
 
 /* ah5_general.h */
+#define AH5_A_ENTRY_POINT               "entryPoint"
 #define AH5_ABSOLUTE_PATH_LENGTH        111  // length in C (incl. '\0')
 #define AH5_ELEMENT_NAME_LENGTH         31
 #define AH5_ATTR_LENGTH                 31

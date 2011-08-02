@@ -308,7 +308,7 @@ char AH5_read_str_attr (hid_t file_id, const char *path, char *attr_name, char *
     size_t sdim;
     char success = FALSE;
 
-    if (H5Lexists(file_id, path, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, path, H5P_DEFAULT) == TRUE || strcmp(path, ".") == 0)
         if (H5Aexists_by_name(file_id, path, attr_name, H5P_DEFAULT) > 0)
         {
             attr_id = H5Aopen_by_name(file_id, path, attr_name, H5P_DEFAULT, H5P_DEFAULT);
