@@ -104,6 +104,7 @@ char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup)
             rdata = FALSE;
         }
         else
+        {
             if (success2)
                 if (strcmp(sgroup->type, AH5_V_ELEMENT) == 0)
                     if (strcmp(sgroup->entitytype, AH5_V_FACE) == 0)
@@ -131,6 +132,7 @@ char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup)
                             rdata = FALSE;
                         }
                     }
+        }
     }
     else
     {
@@ -381,21 +383,36 @@ char AH5_read_umsh_group (hid_t file_id, const char* path, AH5_ugroup_t *ugroup)
     size_t length;
     int nb_dims;
 
-    ugroup->nb_groupelts = 1;
+    ugroup->nb_groupelts = 1; /* see H5LTget_dataset_info() below */
     ugroup->path = strdup(path);
+    ugroup->type = NULL;
+    ugroup->entitytype = NULL;
+    ugroup->groupelts = NULL;
 
     if (AH5_path_valid(file_id, path))
-        if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
-            if (nb_dims <= 1)
-                if (H5LTget_dataset_info(file_id, path, &(ugroup->nb_groupelts), &type_class, &length) >= 0)
-                    if (type_class == H5T_INTEGER && length == 4)
-                        if (AH5_read_int_dataset(file_id, path, ugroup->nb_groupelts, &(ugroup->groupelts)))
-                            rdata = TRUE;
+    {
+        if(!AH5_read_str_attr(file_id, path, AH5_A_TYPE, &(ugroup->type)))
+            AH5_print_err_attr (AH5_C_MESH, path, AH5_A_TYPE);
+        else
+        {
+            if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
+                if (nb_dims <= 1)
+                    if (H5LTget_dataset_info(file_id, path, &(ugroup->nb_groupelts), &type_class, &length) >= 0)
+                        if (type_class == H5T_INTEGER && length == 4)
+                            if (AH5_read_int_dataset(file_id, path, ugroup->nb_groupelts, &(ugroup->groupelts)))
+                                rdata = TRUE;
+            if(!AH5_read_str_attr(file_id, path, AH5_A_ENTITY_TYPE, &(ugroup->entitytype)))
+                if (strcmp(ugroup->type, AH5_V_NODE) != 0)
+                {
+                    AH5_print_err_attr(AH5_C_MESH, path, AH5_A_ENTITY_TYPE);
+                    rdata = FALSE;
+                }
+        }
+    }
     if (!rdata)
     {
         AH5_print_err_dset(AH5_C_MESH, path);
         ugroup->nb_groupelts = 0;
-        ugroup->groupelts = NULL;
     }
     return rdata;
 }
@@ -1271,10 +1288,10 @@ void AH5_free_umesh (AH5_umesh_t *umesh)
     {
         for (i = 0; i < umesh->nb_groups; i++)    // for each group...
         {
-            if (umesh->groups[i].path != NULL)
-                free(umesh->groups[i].path);  // free group name
-            if (umesh->groups[i].groupelts != NULL)  // if group is not empty...
-                free(umesh->groups[i].groupelts);  // free group values (no need to assign NULL & set nb_groupelts to 0
+            free(umesh->groups[i].path);  // free group name
+            free(umesh->groups[i].type);
+            free(umesh->groups[i].entitytype);
+            free(umesh->groups[i].groupelts);  // free group values (no need to assign NULL & set nb_groupelts to 0
         }
         free(umesh->groups);  // free space for pointers to groups
         umesh->groups = NULL;

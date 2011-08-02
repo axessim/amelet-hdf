@@ -55,6 +55,8 @@ extern "C" {
     typedef struct _AH5_ugroup_t
     {
         char            *path;
+        char            *type;
+        char            *entitytype;
         hsize_t         nb_groupelts;
         int             *groupelts;
     } AH5_ugroup_t;
