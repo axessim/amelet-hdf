@@ -1,16 +1,36 @@
 #include "ah5_globenv.h"
 
 
+// Init globalEnvironment instance
+void AH5_init_global_environment_instance (AH5_gle_instance_t *gle_instance)
+{
+    gle_instance->path = NULL;
+    gle_instance->type = GE_INVALID;
+    gle_instance->data.type = FT_INVALID;
+    gle_instance->limit_conditions.nb_instances = 0;
+    gle_instance->limit_conditions.instances = NULL;
+}
+
+
+// Init globalEnvironment category
+void AH5_init_global_environment (AH5_global_environment_t *global_environment)
+{
+    global_environment->nb_instances = 0;
+    global_environment->instances = NULL;
+}
+
+
+
+
 // Read globalEnvironment instance
 char AH5_read_global_environment_instance (hid_t file_id, const char *path, AH5_gle_instance_t *gle_instance)
 {
     char path2[AH5_ABSOLUTE_PATH_LENGTH], path3[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
     char mandatory[][AH5_ATTR_LENGTH] = {};
 
+    AH5_init_global_environment_instance(gle_instance);
+
     gle_instance->path = strdup(path);
-    gle_instance->type = GE_INVALID;
-    gle_instance->limit_conditions.instances = NULL;
-    gle_instance->data.type = FT_INVALID;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -53,7 +73,7 @@ char AH5_read_global_environment (hid_t file_id, AH5_global_environment_t *globa
     AH5_children_t children;
     hsize_t i;
 
-    global_environment->instances = NULL;
+    AH5_init_global_environment(global_environment);
 
     if (H5Lexists(file_id, AH5_C_GLOBAL_ENVIRONMENT, H5P_DEFAULT) == TRUE)
     {
@@ -110,17 +130,11 @@ void AH5_print_global_environment (const AH5_global_environment_t *global_enviro
 // Free memory used by globalEnvironment instance
 void AH5_free_global_environment_instance (AH5_gle_instance_t *gle_instance)
 {
-    if (gle_instance->path != NULL)
-    {
-        free(gle_instance->path);
-        gle_instance->path = NULL;
-    }
+    free(gle_instance->path);
     if (gle_instance->type != GE_INVALID)
-    {
         AH5_free_floatingtype(&(gle_instance->data));
-        gle_instance->type = GE_INVALID;
-    }
     AH5_free_opt_attrs(&(gle_instance->limit_conditions));
+    AH5_init_global_environment_instance(gle_instance);
 }
 
 
@@ -134,8 +148,7 @@ void AH5_free_global_environment (AH5_global_environment_t *global_environment)
         for (i = 0; i < global_environment->nb_instances; i++)
             AH5_free_global_environment_instance(global_environment->instances + i);
         free(global_environment->instances);
-        global_environment->instances = NULL;
-        global_environment->nb_instances = 0;
     }
+    AH5_init_global_environment(global_environment);
 }
 

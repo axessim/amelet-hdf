@@ -1,6 +1,40 @@
 #include "ah5_outreq.h"
 
 
+// Init outputRequest instance
+void AH5_init_ort_instance (AH5_ort_instance_t *ort_instance)
+{
+    ort_instance->path = NULL;
+    ort_instance->opt_attrs.nb_instances = 0;
+    ort_instance->opt_attrs.instances = NULL;
+    ort_instance->subject = NULL;
+    ort_instance->object = NULL;
+    ort_instance->subject_name = NULL; /* for purposes of the module */
+    ort_instance->output = NULL;
+}
+
+
+// Init outputRequest group (group of instances)
+void AH5_init_ort_group (AH5_ort_group_t *ort_group)
+{
+    ort_group->path = NULL;
+    ort_group->opt_attrs.nb_instances = 0;
+    ort_group->opt_attrs.instances = NULL;
+    ort_group->nb_instances = 0;
+    ort_group->instances = NULL;
+}
+
+
+// Init outputRequest category (all groups/instances)
+void AH5_init_outputrequest(AH5_outputrequest_t *outputrequest)
+{
+    outputrequest->nb_groups = 0;
+    outputrequest->groups = NULL;
+}
+
+
+
+
 // Read outputRequest instance
 char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t *ort_instance)
 {
@@ -9,12 +43,8 @@ char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t 
     char rdata = TRUE;
     unsigned int i;
 
+    AH5_init_ort_instance(ort_instance);
     ort_instance->path = strdup(path);
-    ort_instance->subject = NULL;
-    ort_instance->subject_name = NULL; /* for purposes of the module */
-    ort_instance->object = NULL;
-    ort_instance->output = NULL;
-    ort_instance->opt_attrs.instances = NULL;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -68,9 +98,9 @@ char AH5_read_ort_group (hid_t file_id, const char *path, AH5_ort_group_t *ort_g
     AH5_children_t children;
     hsize_t i;
 
+    AH5_init_ort_group(ort_group);
+
     ort_group->path = strdup(path);
-    ort_group->instances = NULL;
-    ort_group->opt_attrs.instances = NULL;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -106,7 +136,7 @@ char AH5_read_outputrequest(hid_t file_id, AH5_outputrequest_t *outputrequest)
     AH5_children_t children;
     hsize_t i;
 
-    outputrequest->groups = NULL;
+    AH5_init_outputrequest(outputrequest);
 
     if (H5Lexists(file_id, AH5_C_OUTPUT_REQUEST, H5P_DEFAULT) == TRUE)
     {
@@ -177,32 +207,13 @@ void AH5_print_outputrequest (const AH5_outputrequest_t *outputrequest)
 // Free memory used by structure ort_instance
 void AH5_free_ort_instance (AH5_ort_instance_t *ort_instance)
 {
-    if (ort_instance->path != NULL)
-    {
-        free(ort_instance->path);
-        ort_instance->path = NULL;
-    }
+    free(ort_instance->path);
     AH5_free_opt_attrs(&(ort_instance->opt_attrs));
-    if (ort_instance->subject != NULL)
-    {
-        free(ort_instance->subject);
-        ort_instance->subject = NULL;
-    }
-    if (ort_instance->subject_name != NULL)
-    {
-        free(ort_instance->subject_name);
-        ort_instance->subject_name = NULL;
-    }
-    if (ort_instance->object != NULL)
-    {
-        free(ort_instance->object);
-        ort_instance->object = NULL;
-    }
-    if (ort_instance->output != NULL)
-    {
-        free(ort_instance->output);
-        ort_instance->output = NULL;
-    }
+    free(ort_instance->subject);
+    free(ort_instance->subject_name);
+    free(ort_instance->object);
+    free(ort_instance->output);
+    AH5_init_ort_instance(ort_instance);
 }
 
 
@@ -211,20 +222,15 @@ void AH5_free_ort_group (AH5_ort_group_t *ort_group)
 {
     hsize_t i;
 
-    if (ort_group->path != NULL)
-    {
-        free(ort_group->path);
-        ort_group->path = NULL;
-    }
+    free(ort_group->path);
     AH5_free_opt_attrs(&(ort_group->opt_attrs));
     if (ort_group->instances != NULL)
     {
         for (i = 0; i < ort_group->nb_instances; i++)
             AH5_free_ort_instance(ort_group->instances + i);
         free(ort_group->instances);
-        ort_group->instances = NULL;
-        ort_group->nb_instances = 0;
     }
+    AH5_init_ort_group(ort_group);
 }
 
 
@@ -236,12 +242,9 @@ void AH5_free_outputrequest (AH5_outputrequest_t *outputrequest)
     if (outputrequest->groups != NULL)
     {
         for (i = 0; i < outputrequest->nb_groups; i++)
-        {
             AH5_free_ort_group(outputrequest->groups + i);
-        }
         free(outputrequest->groups);
-        outputrequest->groups = NULL;
-        outputrequest->nb_groups = 0;
     }
+    AH5_init_outputrequest(outputrequest);
 }
 

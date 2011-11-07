@@ -1,5 +1,23 @@
 #include "ah5_label.h"
 
+// Init label dataset
+void AH5_init_lbl_dataset(AH5_lbl_dataset_t *lbl_dataset)
+{
+    lbl_dataset->path = NULL;
+    lbl_dataset->nb_items = 0;
+    lbl_dataset->items = NULL;
+}
+
+
+// Init label category (all datasets)
+void AH5_init_label(AH5_label_t *label)
+{
+    label->nb_datasets = 0;
+    label->datasets = NULL;
+}
+
+
+
 
 // Read label dataset
 char AH5_read_lbl_dataset(hid_t file_id, const char *path, AH5_lbl_dataset_t *lbl_dataset)
@@ -9,8 +27,8 @@ char AH5_read_lbl_dataset(hid_t file_id, const char *path, AH5_lbl_dataset_t *lb
     size_t length;
     int nb_dims;
 
+    AH5_init_lbl_dataset(lbl_dataset);
     lbl_dataset->path = strdup(path);
-    lbl_dataset->items = NULL;
 
     lbl_dataset->nb_items = 1;  // in case of single value
     if (AH5_path_valid(file_id, path))
@@ -36,7 +54,7 @@ char AH5_read_label(hid_t file_id, AH5_label_t *label)
     AH5_children_t children;
     hsize_t i;
 
-    label->datasets = NULL;
+    AH5_init_label(label);
 
     if (H5Lexists(file_id, AH5_C_LABEL, H5P_DEFAULT) == TRUE)
     {
@@ -96,20 +114,13 @@ void AH5_print_label(const AH5_label_t *label)
 // Free memory used by structure lbl_dataset
 void AH5_free_lbl_dataset (AH5_lbl_dataset_t *lbl_dataset)
 {
-    if (lbl_dataset->path != NULL)
-    {
-        free(lbl_dataset->path);
-        lbl_dataset->path = NULL;
-    }
-
+    free(lbl_dataset->path);
     if (lbl_dataset->items != NULL)
     {
         free(lbl_dataset->items[0]);
         free(lbl_dataset->items);
-        lbl_dataset->items = NULL;
-        lbl_dataset->nb_items = 0;
     }
-
+    AH5_init_lbl_dataset(lbl_dataset);
 }
 
 
@@ -123,7 +134,6 @@ void AH5_free_label (AH5_label_t *label)
         for (i = 0; i < label->nb_datasets; i++)
             AH5_free_lbl_dataset(label->datasets + i);
         free(label->datasets);
-        label->datasets = NULL;
-        label->nb_datasets = 0;
     }
+    AH5_init_label(label);
 }

@@ -32,6 +32,10 @@ extern "C" {
         AH5_ort_group_t *groups;
     } AH5_outputrequest_t;
 
+    void AH5_init_ort_instance (AH5_ort_instance_t *ort_instance);
+    void AH5_init_ort_group (AH5_ort_group_t *ort_group);
+    void AH5_init_outputrequest(AH5_outputrequest_t *outputrequest);
+
     char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t *ort_instance);
     char AH5_read_ort_group (hid_t file_id, const char *path, AH5_ort_group_t *ort_group);
     char AH5_read_outputrequest (hid_t file_id, AH5_outputrequest_t *outputrequest);

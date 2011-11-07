@@ -1,5 +1,23 @@
 #include "ah5_mesh.h"
 
+// Init mesh group
+void AH5_init_msh_group (AH5_msh_group_t *msh_group)
+{
+    msh_group->path = NULL;
+    msh_group->nb_msh_instances = 0;
+    msh_group->msh_instances = NULL;
+    msh_group->nb_mlk_instances = 0;
+    msh_group->mlk_instances = NULL;
+}
+
+// Init mesh category
+void AH5_init_mesh (AH5_mesh_t *mesh)
+{
+    mesh->nb_groups = 0;
+    mesh->groups = NULL;
+}
+
+
 
 // Read groupGroup (both the un/structured)
 char AH5_read_groupgroup (hid_t file_id, const char* path, AH5_groupgroup_t *groupgroup)
@@ -1404,28 +1422,21 @@ void AH5_free_msh_group (AH5_msh_group_t *msh_group)
 {
     hsize_t i;
 
-    if (msh_group->path != NULL)
-    {
-        free(msh_group->path);
-        msh_group->path = NULL;
-    }
+    free(msh_group->path);
 
     if (msh_group->msh_instances != NULL)
     {
         for (i = 0; i < msh_group->nb_msh_instances; i++)
             AH5_free_msh_instance(msh_group->msh_instances + i);
         free(msh_group->msh_instances);
-        msh_group->msh_instances = NULL;
-        msh_group->nb_msh_instances = 0;
     }
     if (msh_group->mlk_instances != NULL)
     {
         for (i = 0; i < msh_group->nb_mlk_instances; i++)
             AH5_free_mlk_instance(msh_group->mlk_instances + i);
         free(msh_group->mlk_instances);
-        msh_group->mlk_instances = NULL;
-        msh_group->nb_mlk_instances = 0;
     }
+    AH5_init_msh_group(msh_group);
 }
 
 
@@ -1439,8 +1450,7 @@ void AH5_free_mesh (AH5_mesh_t *mesh)
         for (i = 0; i < mesh->nb_groups; i++)
             AH5_free_msh_group(mesh->groups + i);
         free(mesh->groups);
-        mesh->groups = NULL;
-        mesh->nb_groups = 0;
     }
+    AH5_init_mesh(mesh);
 }
 

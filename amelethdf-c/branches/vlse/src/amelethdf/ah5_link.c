@@ -1,16 +1,45 @@
 #include "ah5_link.h"
 
 
+// Init link instance
+void AH5_init_lnk_instance (AH5_lnk_instance_t *lnk_instance)
+{
+    lnk_instance->path = NULL;
+    lnk_instance->opt_attrs.nb_instances = 0;
+    lnk_instance->opt_attrs.instances = NULL;
+    lnk_instance->subject = NULL;
+    lnk_instance->object = NULL;
+}
+
+// Init link group (group of instances)
+void AH5_init_lnk_group (AH5_lnk_group_t *lnk_group)
+{
+    lnk_group->path = NULL;
+    lnk_group->opt_attrs.nb_instances = 0;
+    lnk_group->opt_attrs.instances = NULL;
+    lnk_group->nb_instances = 0;
+    lnk_group->instances = NULL;
+}
+
+
+// Init link category (all groups/instances)
+void AH5_init_link (AH5_link_t *link)
+{
+    link->nb_groups = 0;
+    link->groups = NULL;
+}
+
+
+
+
 // Read link instance
 char AH5_read_lnk_instance (hid_t file_id, const char *path, AH5_lnk_instance_t *lnk_instance)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_SUBJECT, AH5_A_OBJECT};
     char rdata = TRUE;
 
+    AH5_init_lnk_instance(lnk_instance);
     lnk_instance->path = strdup(path);
-    lnk_instance->subject = NULL;
-    lnk_instance->object = NULL;
-    lnk_instance->opt_attrs.instances = NULL;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -43,9 +72,8 @@ char AH5_read_lnk_group (hid_t file_id, const char *path, AH5_lnk_group_t *lnk_g
     AH5_children_t children;
     hsize_t i;
 
+    AH5_init_lnk_group(lnk_group);
     lnk_group->path = strdup(path);
-    lnk_group->instances = NULL;
-    lnk_group->opt_attrs.instances = NULL;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -82,7 +110,7 @@ char AH5_read_link (hid_t file_id, AH5_link_t *link)
     AH5_children_t children;
     hsize_t i;
 
-    link->groups = NULL;
+    AH5_init_link(link);
 
     if (H5Lexists(file_id, AH5_C_LINK, H5P_DEFAULT) == TRUE)
     {
@@ -153,22 +181,11 @@ void AH5_print_link (const AH5_link_t *link)
 // Free memory used by structure lnk_instance
 void AH5_free_lnk_instance (AH5_lnk_instance_t *lnk_instance)
 {
-    if (lnk_instance->path != NULL)
-    {
-        free(lnk_instance->path);
-        lnk_instance->path = NULL;
-    }
+    free(lnk_instance->path);
     AH5_free_opt_attrs(&(lnk_instance->opt_attrs));
-    if (lnk_instance->subject != NULL)
-    {
-        free(lnk_instance->subject);
-        lnk_instance->subject = NULL;
-    }
-    if (lnk_instance->object != NULL)
-    {
-        free(lnk_instance->object);
-        lnk_instance->object = NULL;
-    }
+    free(lnk_instance->subject);
+    free(lnk_instance->object);
+    AH5_init_lnk_instance(lnk_instance);
 }
 
 
@@ -177,20 +194,15 @@ void AH5_free_lnk_group (AH5_lnk_group_t *lnk_group)
 {
     hsize_t i;
 
-    if (lnk_group->path != NULL)
-    {
-        free(lnk_group->path);
-        lnk_group->path = NULL;
-    }
+    free(lnk_group->path);
     AH5_free_opt_attrs(&(lnk_group->opt_attrs));
     if (lnk_group->instances != NULL)
     {
         for (i = 0; i < lnk_group->nb_instances; i++)
             AH5_free_lnk_instance(lnk_group->instances + i);
         free(lnk_group->instances);
-        lnk_group->instances = NULL;
-        lnk_group->nb_instances = 0;
     }
+    AH5_init_lnk_group(lnk_group);
 }
 
 
@@ -204,7 +216,6 @@ void AH5_free_link (AH5_link_t *link)
         for (i = 0; i < link->nb_groups; i++)
             AH5_free_lnk_group(link->groups + i);
         free(link->groups);
-        link->groups = NULL;
-        link->nb_groups = 0;
     }
+    AH5_init_link(link);
 }

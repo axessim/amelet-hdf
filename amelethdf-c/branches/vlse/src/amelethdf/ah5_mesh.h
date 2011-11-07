@@ -164,6 +164,9 @@ extern "C" {
         AH5_msh_group_t *groups;
     } AH5_mesh_t;
 
+    void AH5_init_msh_group (AH5_msh_group_t *msh_group);
+    void AH5_init_mesh (AH5_mesh_t *mesh);
+
     char AH5_read_groupgroup (hid_t file_id, const char* path, AH5_groupgroup_t *groupgroup);
     char AH5_read_smesh_axis (hid_t file_id, const char* path, AH5_axis_t *axis);
     char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup);
