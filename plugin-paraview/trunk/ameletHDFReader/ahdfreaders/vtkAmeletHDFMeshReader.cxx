@@ -868,8 +868,18 @@ int vtkAmeletHDFMeshReader::readUgrp(hid_t meshId, char *name, vtkUnstructuredGr
             for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
             {
                 int i=grp.eltgroup[igrp];
+                idnode=0;
+                for(int ielt=0;ielt<i; ielt++)
+                {
+                  if(umeshelttypes.elttypes[ielt]==1) idnode=idnode+2;
+                  else if(umeshelttypes.elttypes[ielt]==11) idnode=idnode+3;
+                  else if(umeshelttypes.elttypes[ielt]==13) idnode=idnode+4;
+                  else if(umeshelttypes.elttypes[ielt]==101) idnode=idnode+4;
+                }
+                       
                 if(umeshelttypes.elttypes[i]==1)
                 {
+                        
                         vtkLine * linecell = vtkLine::New();
                         linecell->GetPointIds()->SetId(0,umesheltnodes.eltnodes[idnode]);
                         linecell->GetPointIds()->SetId(1,umesheltnodes.eltnodes[idnode+1]);
