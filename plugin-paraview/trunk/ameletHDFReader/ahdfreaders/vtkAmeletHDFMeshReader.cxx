@@ -1101,16 +1101,23 @@ int vtkAmeletHDFMeshReader::readUgrpgrp(hid_t meshId, char *name, vtkUnstructure
             ugroup_t grp;
             char * type = read_string_attribute(group_id, grpGrp.groupGroupnames[j], "type");
             grp = readUGroup(grp_id,grpGrp.groupGroupnames[j]);
-       
             H5Dclose(grp_id);
             free(path2);
 
-            
+             
             if(strcmp(type,"node")!=0){
                 nbelt=nbelt+grp.nbeltgroup;
                 for(int igrp=0; igrp<grp.nbeltgroup;igrp++)
                 {
                     int i=grp.eltgroup[igrp];
+                    idnode=0;
+                    for(int ielt=0;ielt<i; ielt++)
+                    {
+                        if(umeshelttypes.elttypes[ielt]==1) idnode=idnode+2;
+                        else if(umeshelttypes.elttypes[ielt]==11) idnode=idnode+3;
+                        else if(umeshelttypes.elttypes[ielt]==13) idnode=idnode+4;
+                        else if(umeshelttypes.elttypes[ielt]==101) idnode=idnode+4;
+                    }
                     if(umeshelttypes.elttypes[i]==1)
                     {
                             vtkLine * linecell = vtkLine::New();
