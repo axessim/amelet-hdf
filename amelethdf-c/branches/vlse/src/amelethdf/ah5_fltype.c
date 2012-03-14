@@ -1055,8 +1055,6 @@ void AH5_free_ft_singlestring (AH5_singlestring_t *singlestring)
 // Free memory used by vector
 void AH5_free_ft_vector (AH5_vector_t *vector)
 {
-    hsize_t i;
-
     if (vector->path != NULL)
     {
         free(vector->path);
