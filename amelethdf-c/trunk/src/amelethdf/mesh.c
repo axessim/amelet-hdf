@@ -95,7 +95,7 @@ dimptsinelts_t readNbSemPtInElt(hid_t file_id, const char *path)
     hid_t table_id;
     hsize_t nfields_out;
     hsize_t nrecords_out;
-    int i;
+    int i, ok;
     children_t children;
     char *bufpath;
     
@@ -107,12 +107,11 @@ dimptsinelts_t readNbSemPtInElt(hid_t file_id, const char *path)
     {
         data.name[i] = (char *) malloc(ELEMENT_NAME_LENGTH * sizeof(char));
         bufpath = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-        strcpy(bufpath, path);
-        strcat(bufpath, "/");
-        strcat(bufpath, children.childnames[i]);    
+        snprintf(bufpath, ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",path,children.childnames[i]);
+    
         char * type;
-        type = malloc( ELEMENT_NAME_LENGTH * sizeof(char));
-        type = read_string_attribute(file_id, bufpath, A_TYPE);
+        //type = malloc( ELEMENT_NAME_LENGTH * sizeof(char));
+        ok = read_string_attribute(file_id, bufpath, A_TYPE, &type);
         
         if(strcmp(type,"pointInElement")==0){
           table_id = H5TBget_table_info(file_id, bufpath, &nfields_out,

@@ -35,7 +35,7 @@ children_t read_children_name(hid_t loc_id, const char* path);
 /*
  * Reads a string attribute at path
  */
-char * read_string_attribute(hid_t loc_id, const char* path, char* attr);
+int read_string_attribute(hid_t loc_id, const char* path, char* attr, char **out_attribute);
 
 /*
  * Reads a float attribute at path

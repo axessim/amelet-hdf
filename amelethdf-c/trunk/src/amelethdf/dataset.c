@@ -167,7 +167,6 @@ char * dataset_to_string(dataset_t ds)
 {
     char *s;
     s = (char *) malloc(200 * sizeof(char));
-    strcpy(s, "");
-    strcat(s, single_to_string(ds.single));
+    snprintf(s, 200,"%s",single_to_string(ds.single));
     return s;
 }

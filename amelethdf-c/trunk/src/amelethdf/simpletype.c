@@ -10,13 +10,14 @@ single_t read_single(hid_t loc_id, const char* path)
     single_t single;
     herr_t status;
     htri_t test;
+    int ok;
 
     single.label = (char*) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     strcpy(single.label, "");
     test = H5Aexists_by_name(loc_id, path, A_LABEL, H5P_DEFAULT);
     if (test > 0)
     {
-        strcpy(single.label, read_string_attribute(loc_id, path, A_LABEL));
+        ok = read_string_attribute(loc_id, path, A_LABEL,&single.label);
     }
 
     single.physical_nature = (char*) malloc(ABSOLUTE_PATH_NAME_LENGTH
@@ -25,8 +26,7 @@ single_t read_single(hid_t loc_id, const char* path)
     test = H5Aexists_by_name(loc_id, path, A_PHYSICAL_NATURE, H5P_DEFAULT);
     if (test > 0)
     {
-        strcpy(single.physical_nature, read_string_attribute(loc_id, path,
-                A_PHYSICAL_NATURE));
+        ok = read_string_attribute(loc_id, path,A_PHYSICAL_NATURE,&single.physical_nature);
     }
 
     single.unit = (char*) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
@@ -34,7 +34,7 @@ single_t read_single(hid_t loc_id, const char* path)
     test = H5Aexists_by_name(loc_id, path, A_UNIT, H5P_DEFAULT);
     if (test > 0)
     {
-        strcpy(single.unit, read_string_attribute(loc_id, path, A_UNIT));
+        ok = read_string_attribute(loc_id, path, A_UNIT, &single.unit);
     }
 
     single.comment = (char*) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
@@ -42,7 +42,7 @@ single_t read_single(hid_t loc_id, const char* path)
     test = H5Aexists_by_name(loc_id, path, A_COMMENT, H5P_DEFAULT);
     if (test > 0)
     {
-        strcpy(single.comment, read_string_attribute(loc_id, path, A_COMMENT));
+        ok = read_string_attribute(loc_id, path, A_COMMENT, &single.comment);
     }
     return single;
 }
@@ -98,17 +98,9 @@ singlecomplex_t read_singlecomplex(hid_t loc_id, const char *path)
 char* single_to_string(single_t single)
 {
     char *s;
-    s = (char *) malloc(180 * sizeof(char));
-    strcpy(s, "");
-    strcat(s, "Label : ");
-    strcat(s, single.label);
-    strcat(s, " , Physical nature : ");
-    strcat(s, single.physical_nature);
-    strcat(s, " , Unit : ");
-    strcat(s, single.unit);
-    strcat(s, " , Comment : ");
-    strcat(s, single.comment);
-    strcat(s, "\n");
+    s = (char *) malloc(200 * sizeof(char));
+    snprintf(s, 200,"Label : %s, Physical nature : %s, Unit : %s, Comment : %s\n",single.label,
+                   single.physical_nature,single.unit,single.comment);
     return s;
 }
 

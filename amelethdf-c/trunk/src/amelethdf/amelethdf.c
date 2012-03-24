@@ -30,51 +30,34 @@ children_t read_children_name(hid_t loc_id, const char* path)
     return child;
 }
 
-char * read_string_attribute(hid_t loc_id, const char* path, char* attr)
+int read_string_attribute(hid_t loc_id, const char* path, char* attr, char **rdata)
 {
-    herr_t status;
-    hsize_t dims[1] = { 1 };
+    hid_t attr_id, filetype, memtype;
     size_t sdim;
-    char **rdata; /* Read buffer */
-    char *attribute;
-    int ndims, i;
-    hid_t filetype, memtype, space, dset, attr_id;
+    char success = FALSE;
 
-    status = H5Aexists_by_name(loc_id, path, attr, H5P_DEFAULT);
-    if (status < 0)
-    {
-        printf("%s doesn't exist for %s\n", attr, path);
-        rdata = (char **) malloc(1 * sizeof(char*));
-        rdata[0] = (char *) malloc(ELEMENT_NAME_LENGTH * sdim * sizeof(char));
-        strcpy(rdata[0], "");
-	attribute = (char *) malloc(ELEMENT_NAME_LENGTH * sdim * sizeof(char));
-    }
-    else
-    {
-        dset = H5Oopen(loc_id, path, H5P_DEFAULT);
-        attr_id = H5Aopen(dset, attr, H5P_DEFAULT);
-        filetype = H5Aget_type(attr_id);
-        sdim = H5Tget_size(filetype);
-        sdim++;
-        space = H5Aget_space(attr_id);
-        ndims = H5Sget_simple_extent_dims(space, dims, NULL);
-        rdata = (char **) malloc(dims[0] * sizeof(char *));
-        rdata[0] = (char *) malloc(dims[0] * sdim * sizeof(char));
-	attribute = (char *) malloc(dims[0] * sdim * sizeof(char));
-        for (i = 1; i < dims[0]; i++)
-            rdata[i] = rdata[0] + i * sdim;
-        memtype = H5Tcopy(H5T_C_S1);
-        status = H5Tset_size(memtype, sdim);
-        status = H5Aread(attr_id, memtype, rdata[0]);
-        status = H5Oclose(dset);
-        status = H5Sclose(space);
-        status = H5Tclose(filetype);
-        status = H5Tclose(memtype);
-    }
-    strcpy(attribute,rdata[0]);
-    free(rdata[0]);
-    free(rdata);
-    return attribute;
+    if (H5Lexists(loc_id, path, H5P_DEFAULT) == TRUE || strcmp(path, ".") == 0)
+        if (H5Aexists_by_name(loc_id, path, attr, H5P_DEFAULT) > 0)
+        {
+            attr_id = H5Aopen_by_name(loc_id, path, attr, H5P_DEFAULT, H5P_DEFAULT);
+            filetype = H5Aget_type(attr_id);
+            sdim = H5Tget_size(filetype);
+            sdim++;  // make a space for null terminator
+            *rdata = (char *) malloc(sdim * sizeof(char));
+            memtype = H5Tcopy(H5T_C_S1);
+            H5Tset_size(memtype, sdim);
+            if (H5Aread(attr_id, memtype, *rdata) >= 0)
+                success = TRUE;
+            else
+                free(*rdata);
+            H5Tclose(memtype);
+            H5Tclose(filetype);
+            H5Aclose(attr_id);
+        }
+    if (!success)
+        *rdata = NULL;
+    return 0;
+
 }
 
 float read_float_attribute(hid_t loc_id, const char* path, char* attr)

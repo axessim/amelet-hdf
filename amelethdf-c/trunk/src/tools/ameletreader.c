@@ -58,15 +58,17 @@ int main(argc, argv)
     printf("\nReading simulation ...\n");
     for (idel=0;idel<children.nbchild; idel++)
       free(*(children.childnames + idel));
+    children.nbchild=0;
     if(H5Lexists(file_id, C_SIMULATION, H5P_DEFAULT) != FALSE)
     {
         children = read_children_name(file_id, C_SIMULATION);
         for (i = 0; i < children.nbchild; i++)
         {
             simus = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-            strcpy(simus, C_SIMULATION);
+/*            strcpy(simus, C_SIMULATION);
             strcat(simus, "/");
-            strcat(simus, children.childnames[i]);
+            strcat(simus, children.childnames[i]);*/
+            snprintf(simus, ABSOLUTE_PATH_NAME_LENGTH, "%s/%s",C_SIMULATION,children.childnames[i]);
             simulation = read_simulation(file_id, simus);
             print_simulation(simulation);
             free(simus);
@@ -77,7 +79,7 @@ int main(argc, argv)
     printf("\nReading Mesh ...\n");
     for (idel=0;idel<children.nbchild; idel++)
       free(*(children.childnames + idel));
- 
+    children.nbchild=0;
     if (H5Lexists(file_id, C_MESH, H5P_DEFAULT) != FALSE)
     {
         children = read_children_name(file_id, C_MESH);
@@ -85,18 +87,20 @@ int main(argc, argv)
 
         for (i = 0; i < children.nbchild; i++)
         {
-            strcpy(path, C_MESH);
+            /*strcpy(path, C_MESH);
             strcat(path, "/");
-            strcat(path, children.childnames[i]);
+            strcat(path, children.childnames[i]);*/
+            snprintf(path,ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",C_MESH,children.childnames[i]);
             printf("Mesh group : %s\n", path);
             children2 = read_children_name(file_id, path);
             for (j = 0; j < children2.nbchild; j++)
             {
                 path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH
                         * sizeof(char));
-                strcpy(path2, path);
+                /*strcpy(path2, path);
                 strcat(path2, "/");
-                strcat(path2, children2.childnames[j]);
+                strcat(path2, children2.childnames[j]);*/
+                snprintf(path2,ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",path,children2.childnames[j]);
                 printf("Reading %s\n", path2);
                 if (meshtype(file_id, path2) == UNSTRUCTURED)
                 {
@@ -120,7 +124,7 @@ int main(argc, argv)
             }
             for (idel=0;idel<children2.nbchild; idel++)
                free(*(children2.childnames + idel));
- 
+            children2.nbchild=0;
         }
     }
 
@@ -130,6 +134,7 @@ int main(argc, argv)
     {
         for (idel=0;idel<children.nbchild; idel++)
                free(*(children.childnames + idel));
+        children.nbchild=0;
         children = read_children_name(file_id, C_PHYSICAL_MODEL);
         for (i = 0; i < children.nbchild; i++)
             printf("Physical models : %s\n", children.childnames[i]);
@@ -140,13 +145,15 @@ int main(argc, argv)
     {
         for (idel=0;idel<children.nbchild; idel++)
             free(*(children.childnames + idel));
+        children.nbchild=0;
         children = read_children_name(file_id, C_ELECTROMAGNETIC_SOURCE);
         path = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
         for (i = 0; i < children.nbchild; i++)
         {
-            strcpy(path, C_ELECTROMAGNETIC_SOURCE);
+            /*strcpy(path, C_ELECTROMAGNETIC_SOURCE);
             strcat(path, "/");
-            strcat(path, children.childnames[i]);
+            strcat(path, children.childnames[i]);*/
+            snprintf(path,ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",C_ELECTROMAGNETIC_SOURCE,children.childnames[i]);
             printf("Electromagnetic Sources : %s\n", path);
             children2 = read_children_name(file_id, path);
 
@@ -156,9 +163,10 @@ int main(argc, argv)
                 {
                     path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH
                             * sizeof(char));
-                    strcpy(path2, path);
+                    /*strcpy(path2, path);
                     strcat(path2, "/");
-                    strcat(path2, children2.childnames[j]);
+                    strcat(path2, children2.childnames[j]);*/
+                    snprintf(path2,ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",path,children2.childnames[j]);
                     printf("%s\n", path2);
                     pw = read_planewave(file_id, path2);
                     printf("Theta = %f\n", pw.theta);
@@ -187,6 +195,7 @@ int main(argc, argv)
             }
             for (idel=0;idel<children2.nbchild; idel++)
                 free(*(children2.childnames + idel));
+            children2.nbchild=0;
 
         }
     }
@@ -196,12 +205,14 @@ int main(argc, argv)
     {
         for (idel=0;idel<children.nbchild; idel++)
             free(*(children.childnames + idel));
+        children.nbchild=0;
         children = read_children_name(file_id, "/externalElement");
         for (i = 0; i < children.nbchild; i++)
         {
             external_element_t extelt;
-            strcpy(path, "/externalElement/");
-            strcat(path, children.childnames[i]);
+            /*strcpy(path, "/externalElement/");
+            strcat(path, children.childnames[i]);*/
+            snprintf(path,ABSOLUTE_PATH_NAME_LENGTH,"/externalElement/%s",children.childnames[i]);
             extelt = read_external_elements(file_id, path);
             for (j = 0; j < extelt.nb_ext_el; j++)
             {
@@ -218,11 +229,13 @@ int main(argc, argv)
     {
         for (idel=0;idel<children.nbchild; idel++)
             free(*(children.childnames + idel));
+        children.nbchild=0;
         children = read_children_name(file_id, C_LABEL);
         for (i = 0; i < children.nbchild; i++)
         {
-            strcpy(path, C_LABEL);
-            strcat(path, children.childnames[i]);
+            /*strcpy(path, C_LABEL);
+            strcat(path, children.childnames[i]);*/
+            snprintf(path,ABSOLUTE_PATH_NAME_LENGTH,"%s%s",C_LABEL,children.childnames[i]);
             children_t children4;
             children4 = read_string_vector(file_id, path);
             printf("\nLabel %i :\n", i);
@@ -238,20 +251,23 @@ int main(argc, argv)
     {
         for (idel=0;idel<children.nbchild; idel++)
                free(*(children.childnames + idel));
+        children.nbchild=0;
         children = read_children_name(file_id, C_LINK);
         for (i = 0; i < children.nbchild; i++)
         {
-            strcpy(path, C_LINK);
-            strcat(path, children.childnames[i]);
+            /*strcpy(path, C_LINK);
+            strcat(path, children.childnames[i]);*/
+            snprintf(path,ABSOLUTE_PATH_NAME_LENGTH,"%s%s",C_LINK,children.childnames[i]);
             printf("Link group : %s\n", path);
             children2 = read_children_name(file_id, path);
             for (j = 0; j < children2.nbchild; j++)
             {
                 path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH
                         * sizeof(char));
-                strcpy(path2, path);
+                /*strcpy(path2, path);
                 strcat(path2, "/");
-                strcat(path2, children2.childnames[j]);
+                strcat(path2, children2.childnames[j]);*/
+                snprintf(path2,ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",path,children2.childnames[j]);
                 printf("Link : %s\n", path2);
                 link_t lnk;
                 lnk = read_link(file_id, path2);
@@ -272,20 +288,23 @@ int main(argc, argv)
     {
         for (idel=0;idel<children.nbchild; idel++)
                free(*(children.childnames + idel));
+        children.nbchild=0;
         children = read_children_name(file_id, C_OUTPUT_REQUEST);
         for (i = 0; i < children.nbchild; i++)
         {
-            strcpy(path, C_OUTPUT_REQUEST);
-            strcat(path, children.childnames[i]);
+            /*strcpy(path, C_OUTPUT_REQUEST);
+            strcat(path, children.childnames[i]);*/
+            snprintf(path,ABSOLUTE_PATH_NAME_LENGTH,"%s%s",C_OUTPUT_REQUEST,children.childnames[i]);
             printf("Output request group : %s\n", path);
             children2 = read_children_name(file_id, path);
             for (j = 0; j < children2.nbchild; j++)
             {
                 path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH
                         * sizeof(char));
-                strcpy(path2, path);
+                /*strcpy(path2, path);
                 strcat(path2, "/");
-                strcat(path2, children2.childnames[j]);
+                strcat(path2, children2.childnames[j]);*/
+                snprintf(path2,ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",path,children2.childnames[j]);
                 printf("Output request : %s\n", path2);
                 link_t lnk;
                 lnk = read_link(file_id, path2);
@@ -303,7 +322,7 @@ int main(argc, argv)
 
     for (idel=0;idel<children.nbchild; idel++)
                free(*(children.childnames + idel));
-
+    children.nbchild=0;
     free(filename);
     status = H5Fclose(file_id);
     return 0;

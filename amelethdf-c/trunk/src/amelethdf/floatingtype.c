@@ -25,11 +25,12 @@ int get_type_ft(hid_t loc_id, const char* path)
 {
     char* buf;
     int type;
-
+    int ok;
     type = -1;
 
-    buf = (char *) malloc(200 * sizeof(char));
-    buf = read_string_attribute(loc_id, path, A_FLOATING_TYPE);
+    //buf = (char *) malloc(ELEMENT_NAME_LENGTH * sizeof(char));
+    ok = read_string_attribute(loc_id, path, A_FLOATING_TYPE, &buf);
+    printf("ft type = %s %i\n", buf, ok);
     if (strcmp(buf, V_SINGLE_REAL) == 0)
         type = E_SINGLE_REAL;
     else if (strcmp(buf, V_SINGLE_COMPLEX) == 0)

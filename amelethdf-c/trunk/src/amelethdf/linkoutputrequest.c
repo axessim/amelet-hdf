@@ -7,8 +7,8 @@ link_t read_link(hid_t loc_id, char * path)
     int ok;
     link_t link;
 
-    link.subject = read_string_attribute(loc_id, path, A_SUBJECT);
-    link.object = read_string_attribute(loc_id, path, A_OBJECT);
+    ok = read_string_attribute(loc_id, path, A_SUBJECT, &link.subject);
+    ok = read_string_attribute(loc_id, path, A_OBJECT, &link.object);
     return link;
 }
 

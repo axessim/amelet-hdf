@@ -69,10 +69,9 @@ char * get_file_ext_elt(external_element_t ext_elt, char* path)
     int id;
 
     filename = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-    strcpy(filename, "");
     id = get_index_ext_elt(ext_elt, path);
     if (id > -1)
-        strcat(filename, ext_elt.file_name[id]);
+        snprintf(filename, ABSOLUTE_PATH_NAME_LENGTH,"%s",ext_elt.file_name[id]);
     return filename;
 }
 
@@ -94,10 +93,9 @@ char * get_external_name(external_element_t ext_elt, char* path)
     int id;
 
     external_name = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-    strcpy(external_name, "");
     id = get_index_ext_elt(ext_elt, path);
     if (id > -1)
-        strcat(external_name, ext_elt.external_name[id]);
+        snprintf(external_name, ABSOLUTE_PATH_NAME_LENGTH,"%s",ext_elt.external_name[id]);
     return external_name;
 }
 
@@ -148,7 +146,6 @@ herr_t close_external_files(external_element_t ext_elt)
     herr_t status, status2;
     status = 0;
     name = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-    strcpy(name, "");
     buf.array = (char **) malloc(ext_elt.nb_ext_el * sizeof(char *));
     buf.array[0] = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH
             * ext_elt.nb_ext_el * sizeof(char));
@@ -156,7 +153,7 @@ herr_t close_external_files(external_element_t ext_elt)
         buf.array[i] = buf.array[0] + i * ABSOLUTE_PATH_NAME_LENGTH;
     for (i = 0; ext_elt.nb_ext_el; i++)
     {
-        strcat(name, ext_elt.file_name[i]);
+        snprintf(name, ABSOLUTE_PATH_NAME_LENGTH,"%s",ext_elt.file_name[i]);
         if (!in(buf, name))
         {
             file_id = ext_elt.file_id[i];

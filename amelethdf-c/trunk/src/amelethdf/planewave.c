@@ -32,9 +32,7 @@ planewave_t read_planewave(hid_t file_id, const char* path)
                 A_LINEAR_POLARIZATION);
     }
     path2 = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
-    strcpy(path2, path);
-    strcat(path2, "/");
-    strcat(path2, F_MAGNITUDE);
+    snprintf(path2, ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",path,F_MAGNITUDE);
     pw.magnitude = read_floatingtype(file_id, path2);
     free(path2);
     return pw;

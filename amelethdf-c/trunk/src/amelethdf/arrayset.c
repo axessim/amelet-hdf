@@ -15,10 +15,7 @@ arrayset_t read_arrayset(hid_t file_id, const char* path)
     dims  = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
     dim = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
 
-    strcpy(params, "");
-    strcat(params, path);
-    strcat(params, "/");
-    strcat(params, P_DATA);
+    snprintf(params, ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",path,P_DATA);
 
     ars.single.comment = (char *) malloc(ELEMENT_NAME_LENGTH * sizeof(char));
     ars.single.label = (char *) malloc(ELEMENT_NAME_LENGTH * sizeof(char));
@@ -34,10 +31,7 @@ arrayset_t read_arrayset(hid_t file_id, const char* path)
 
     ars.data = read_dataset(file_id, params);
 
-    strcpy(dims, "");
-    strcat(dims, path);
-    strcat(dims, "/");
-    strcat(dims, P_DIMS);
+    snprintf(dims, ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",path,P_DIMS);
 
     nbdims = read_number_of_children(file_id, (const char*) dims);
 
@@ -49,11 +43,8 @@ arrayset_t read_arrayset(hid_t file_id, const char* path)
         buf = (char *) malloc(2* sizeof(char));
         //= strdup("");
         sprintf(buf, "%i", i + 1);
-        strcpy(dim, "");
-        strcat(dim, path);
-        strcat(dim, "/");
-        strcat(dim, P_DIM);
-        strcat(dim, buf);
+        snprintf(dim, ABSOLUTE_PATH_NAME_LENGTH,"%s/%s%s",path,P_DIM,buf);
+
         ars.dims[i] = read_vector(file_id, dim);
 	free(buf);
     }
@@ -84,16 +75,12 @@ arrayset2_t read_arrayset2(hid_t loc_id, const char* path)
     char datapath[ABSOLUTE_PATH_NAME_LENGTH];
     char dimpath[ABSOLUTE_PATH_NAME_LENGTH];
 
-    strcpy(datapath, "");
-    strcat(datapath, path);
-    strcat(datapath, "/");
-    strcat(datapath, P_DATA);
+    snprintf(datapath, ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",path,P_DATA);
+
     ars2.data = read_vector(loc_id, datapath);
 
-    strcpy(dimpath, "");
-    strcat(dimpath, path);
-    strcat(dimpath, "/");
-    strcat(dimpath, P_DIM1);
+    snprintf(dimpath, ABSOLUTE_PATH_NAME_LENGTH,"%s/%s",path,P_DIM1);
+
     ars2.dim1 = read_vector(loc_id, dimpath);
     return ars2;
 }
