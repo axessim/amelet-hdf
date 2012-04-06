@@ -44,6 +44,7 @@ char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t 
     unsigned int i;
 
     AH5_init_ort_instance(ort_instance);
+    AH5_init_lbl_dataset(&AH5_label_dataset);
     ort_instance->path = strdup(path);
 
     if (AH5_path_valid(file_id, path))
@@ -64,10 +65,6 @@ char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t 
             AH5_print_err_attr(AH5_C_OUTPUT_REQUEST, path, AH5_A_OUTPUT);
             rdata = FALSE;
         }
-
-        AH5_label_dataset.items = NULL;
-        AH5_label_dataset.path = NULL;
-        AH5_label_dataset.nb_items = 0;
 
         if (rdata)
             for(i = 0; i < ort_instance->opt_attrs.nb_instances; i++)

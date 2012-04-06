@@ -6,12 +6,14 @@ extern "C" {
 #endif
 
 #include "ah5_general.h"
+#include "ah5_label.h"
 
     typedef struct _AH5_lnk_instance_t
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
         char            *subject;
+        char            *subject_name;
         char            *object;
     } AH5_lnk_instance_t;
 
