@@ -11,6 +11,11 @@ void AH5_init_ort_instance (AH5_ort_instance_t *ort_instance)
     ort_instance->object = NULL;
     ort_instance->subject_name = NULL; /* for purposes of the module */
     ort_instance->output = NULL;
+    ort_instance->nb_elements = 0;
+    ort_instance->nb_cpes = NULL;
+    ort_instance->cpes = NULL;
+    ort_instance->ccpes = NULL;
+    ort_instance->data = NULL;
 }
 
 
@@ -70,8 +75,8 @@ char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t 
             for(i = 0; i < ort_instance->opt_attrs.nb_instances; i++)
             {
                 if (strcmp(ort_instance->opt_attrs.instances[i].name, "subject_id") == 0 &&
-                    ort_instance->opt_attrs.instances[i].type == H5T_INTEGER &&
-                    AH5_read_lbl_dataset(file_id, ort_instance->subject, &AH5_label_dataset))
+                        ort_instance->opt_attrs.instances[i].type == H5T_INTEGER &&
+                        AH5_read_lbl_dataset(file_id, ort_instance->subject, &AH5_label_dataset))
                 {
                     ort_instance->subject_name = strdup(AH5_label_dataset.items[ort_instance->opt_attrs.instances[i].value.i]);
                 }
@@ -204,12 +209,28 @@ void AH5_print_outputrequest (const AH5_outputrequest_t *outputrequest)
 // Free memory used by structure ort_instance
 void AH5_free_ort_instance (AH5_ort_instance_t *ort_instance)
 {
+    hsize_t i;
+
     free(ort_instance->path);
     AH5_free_opt_attrs(&(ort_instance->opt_attrs));
     free(ort_instance->subject);
     free(ort_instance->subject_name);
     free(ort_instance->object);
     free(ort_instance->output);
+    if (ort_instance->nb_elements > 0)
+    {
+        for (i = 0; i < ort_instance->nb_elements; i++)
+        {
+            if (ort_instance->cpes != NULL)
+                free(ort_instance->cpes[i]);
+            if (ort_instance->ccpes != NULL)
+                free(ort_instance->ccpes[i]);
+        }
+        free(ort_instance->nb_cpes);
+        free(ort_instance->cpes);
+        free(ort_instance->ccpes);
+        free(ort_instance->data);
+    }
     AH5_init_ort_instance(ort_instance);
 }
 

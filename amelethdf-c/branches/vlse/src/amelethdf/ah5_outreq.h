@@ -16,6 +16,11 @@ extern "C" {
         char            *object;
         char            *subject_name;
         char            *output;
+        hsize_t         nb_elements;  // solver specific: number of elements
+        unsigned int    *nb_cpes;  // solver specific: number of computational elements per point
+        unsigned int    **cpes;  // solver specific: tetrahedron IDs
+        double          **ccpes;  // solver specific: computational coefficients
+        float           *data;  // solver specific: output data
     } AH5_ort_instance_t;
 
     typedef struct _AH5_ort_group_t
