@@ -20,6 +20,8 @@ extern "C" {
         unsigned int    *nb_cpes;  // solver specific: number of computational elements per point
         unsigned int    **cpes;  // solver specific: tetrahedron IDs
         double          **ccpes;  // solver specific: computational coefficients
+        hsize_t         output_dims[3];  // solver specific: dimensions of the output data
+        int             rank;  // solver specific: dimensionality of the output data
         float           *data;  // solver specific: output data
     } AH5_ort_instance_t;
 

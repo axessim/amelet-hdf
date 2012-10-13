@@ -15,6 +15,10 @@ void AH5_init_ort_instance (AH5_ort_instance_t *ort_instance)
     ort_instance->nb_cpes = NULL;
     ort_instance->cpes = NULL;
     ort_instance->ccpes = NULL;
+    ort_instance->output_dims[0] = 1;
+    ort_instance->output_dims[1] = 3;
+    ort_instance->output_dims[2] = 0;
+    ort_instance->rank = 0;
     ort_instance->data = NULL;
 }
 
