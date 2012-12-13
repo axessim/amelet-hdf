@@ -263,17 +263,29 @@ int main(argc, argv)
 
     // Writes simulation/this_simulation/outputs
     printf("/simulation/this_simulation/outputs creation ...\n");
-    char *outputs[1];
-    outputs[0] = (char *) malloc(ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    char **outputs;
+    outputs = (char **) malloc(2 * sizeof(char*));
+    outputs[0] = (char *) malloc(2 * ABSOLUTE_PATH_NAME_LENGTH * sizeof(char));
+    for (i=1;i<2;i++)
+       outputs[i] = outputs[0] + ABSOLUTE_PATH_NAME_LENGTH * i;
+    printf("test1\n");
     strcpy(outputs[0], "/floatingType/an_arrayset");
-
-    status = H5LTmake_dataset_string(file_id,
-            "simulation/this_simulation/outputs", outputs[0]);
-    if (status < 0)
-    {
-        printf("Can't create string dataset !!!\n");
-        exit(-1);
-    }
+    printf("test2\n");
+    strcpy(outputs[1], "/floatingType/a_second_arrayset");
+    printf("test3\n");
+    int istr;
+    for(istr=0;istr<2;istr++)
+      printf("outputs[%i] = %s \n",istr,outputs[istr]);
+    hsize_t dims3[1] = {2};
+    write_string_dataset(file_id, "simulation/this_simulation/outputs", ABSOLUTE_PATH_NAME_LENGTH, 1,
+        dims3, outputs[0]);
+//    status = H5LTmake_dataset_string(file_id,
+//            "simulation/this_simulation/outputs", outputs[0]);
+//    if (status < 0)
+//    {
+//        printf("Can't create string dataset !!!\n");
+//        exit(-1);
+//    }
 
     H5Fclose(file_id);
 
