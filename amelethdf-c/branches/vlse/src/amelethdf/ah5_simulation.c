@@ -5,7 +5,7 @@
 char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t *sim_instance)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_MODULE, AH5_A_VERSION};
-    char mandatory2[][AH5_ATTR_LENGTH] = {};
+/*    char mandatory2[][AH5_ATTR_LENGTH] = {}; */
     char path1[AH5_ABSOLUTE_PATH_LENGTH],path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
     H5T_class_t type_class;
     char success1 = FALSE, success2 = FALSE;
@@ -28,7 +28,7 @@ char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t 
             AH5_print_err_attr(AH5_C_SIMULATION, path, AH5_A_VERSION);
         strcpy(path2, path);
         strcat(path2, AH5_G_PARAMETER);
-        AH5_read_opt_attrs(file_id, path2, &(sim_instance->parameter), mandatory2, sizeof(mandatory2)/AH5_ATTR_LENGTH);
+        AH5_read_opt_attrs(file_id, path2, &(sim_instance->parameter), NULL, 0);
 
         // inputs
         sim_instance->nb_inputs = 1;  // in case of single value

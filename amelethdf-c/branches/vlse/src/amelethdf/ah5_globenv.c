@@ -26,7 +26,7 @@ void AH5_init_global_environment (AH5_global_environment_t *global_environment)
 char AH5_read_global_environment_instance (hid_t file_id, const char *path, AH5_gle_instance_t *gle_instance)
 {
     char path2[AH5_ABSOLUTE_PATH_LENGTH], path3[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
-    char mandatory[][AH5_ATTR_LENGTH] = {};
+/*    char mandatory[][AH5_ATTR_LENGTH] = {}; */
 
     AH5_init_global_environment_instance(gle_instance);
 
@@ -36,7 +36,7 @@ char AH5_read_global_environment_instance (hid_t file_id, const char *path, AH5_
     {
         strcpy(path2, path);
         strcat(path2, AH5_G_LIMIT_CONDITIONS);
-        AH5_read_opt_attrs(file_id, path2, &(gle_instance->limit_conditions), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
+        AH5_read_opt_attrs(file_id, path2, &(gle_instance->limit_conditions), NULL, 0);
 
         strcpy(path2, path);
         strcpy(path3, path);

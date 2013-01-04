@@ -326,7 +326,7 @@ char AH5_read_ft_generalrationalfunction (hid_t file_id, const char *path, AH5_g
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE};
     H5T_class_t type_class;
     char rdata = FALSE;
-    complex float *buf;
+    AH5_complex_t *buf;
     hsize_t dims[2], i;
     size_t length;
     int nb_dims;
@@ -336,8 +336,8 @@ char AH5_read_ft_generalrationalfunction (hid_t file_id, const char *path, AH5_g
             if (H5LTget_dataset_info(file_id, path, dims, &type_class, &length) >= 0)
                 if (dims[0] > 0 && dims[1] == 2 && type_class == H5T_COMPOUND)
                 {
-                    generalrationalfunction->numerator = (complex float *) malloc(dims[0] * sizeof(complex float));
-                    generalrationalfunction->denominator = (complex float *) malloc(dims[0] * sizeof(complex float));
+                    generalrationalfunction->numerator = (AH5_complex_t *) malloc(dims[0] * sizeof(AH5_complex_t));
+                    generalrationalfunction->denominator = (AH5_complex_t *) malloc(dims[0] * sizeof(AH5_complex_t));
                     if (AH5_read_complex_dataset(file_id, path, dims[0] * dims[1], &(buf)))
                     {
                         for (i = 0; i < dims[0]; i++)

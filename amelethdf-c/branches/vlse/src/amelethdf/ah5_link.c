@@ -83,7 +83,7 @@ char AH5_read_lnk_instance (hid_t file_id, const char *path, AH5_lnk_instance_t 
 char AH5_read_lnk_group (hid_t file_id, const char *path, AH5_lnk_group_t *lnk_group)
 {
     char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
-    char mandatory[][AH5_ATTR_LENGTH] = {};
+/*    char mandatory[][AH5_ATTR_LENGTH] = {}; */
     AH5_children_t children;
     hsize_t i;
 
@@ -92,7 +92,7 @@ char AH5_read_lnk_group (hid_t file_id, const char *path, AH5_lnk_group_t *lnk_g
 
     if (AH5_path_valid(file_id, path))
     {
-        AH5_read_opt_attrs(file_id, path, &(lnk_group->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
+        AH5_read_opt_attrs(file_id, path, &(lnk_group->opt_attrs), NULL, 0);
         children = AH5_read_children_name(file_id, path);
         lnk_group->nb_instances = children.nb_children;
         if (children.nb_children > 0)

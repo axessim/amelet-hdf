@@ -144,7 +144,7 @@ char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *ma
 char AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_instance_t *volume_instance)
 {
     char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
-    char mandatory[][AH5_ATTR_LENGTH] = {};
+/*    char mandatory[][AH5_ATTR_LENGTH] = {}; */
 
     volume_instance->path = strdup(path);
     volume_instance->opt_attrs.instances = NULL;
@@ -155,7 +155,7 @@ char AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_i
 
     if (AH5_path_valid(file_id, path))
     {
-        AH5_read_opt_attrs(file_id, path, &(volume_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
+        AH5_read_opt_attrs(file_id, path, &(volume_instance->opt_attrs), NULL, 0);
         strcpy(path2, path);
         strcat(path2, AH5_G_RELATIVE_PERMITTIVITY);
         if (!AH5_read_phm_vimp(file_id, path2, &(volume_instance->relative_permittivity)))

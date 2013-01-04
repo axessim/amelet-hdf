@@ -45,7 +45,7 @@ extern "C" {
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
-        complex float   value;
+        AH5_complex_t   value;
     } AH5_singlecomplex_t;
 
     typedef struct _AH5_singlestring_t
@@ -59,7 +59,7 @@ extern "C" {
     {
         int             *i;
         float           *f;
-        complex float   *c;
+        AH5_complex_t   *c;
         char            **s;
     } AH5_datasetx_t;
 
@@ -133,8 +133,8 @@ extern "C" {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
         int             nb_degrees;
-        complex float   *numerator;
-        complex float   *denominator;
+        AH5_complex_t   *numerator;
+        AH5_complex_t   *denominator;
     } AH5_generalrationalfunction_t;
 
     typedef union _AH5_ftr_data_t

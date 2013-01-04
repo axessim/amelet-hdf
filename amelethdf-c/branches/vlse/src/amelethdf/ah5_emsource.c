@@ -229,7 +229,8 @@ char AH5_read_els_dipole (hid_t file_id, const char *path, AH5_dipole_t *dipole)
 // Read instance in /electromagneticSource/antenna
 char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *antenna)
 {
-    char mandatory[][AH5_ATTR_LENGTH] = {}, model_man[][AH5_ATTR_LENGTH] = {AH5_A_TYPE};
+/*    char mandatory[][AH5_ATTR_LENGTH] = {}; */
+	char model_man[][AH5_ATTR_LENGTH] = {AH5_A_TYPE};
     char path2[AH5_ABSOLUTE_PATH_LENGTH], *type, rdata = TRUE;
 
     antenna->path = strdup(path);
@@ -245,7 +246,7 @@ char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *anten
 
     if (AH5_path_valid(file_id, path))
     {
-        AH5_read_opt_attrs(file_id, path, &(antenna->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
+        AH5_read_opt_attrs(file_id, path, &(antenna->opt_attrs), NULL, 0);
 
         strcpy(path2, path);
         strcat(path2, AH5_G_INPUT_IMPEDANCE);
@@ -297,13 +298,13 @@ char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *anten
             {
                 antenna->model.type = ANT_RECTANGULAR_HORN;
                 strcat(path2, AH5_G_PARABOLIC_REFLECTOR);
-                AH5_read_opt_attrs(file_id, path2, &(antenna->model.data.parreflct), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
+                AH5_read_opt_attrs(file_id, path2, &(antenna->model.data.parreflct), NULL, 0);
             }
             else if (strcmp(type, AH5_V_CIRCULAR_HORN) == 0)
             {
                 antenna->model.type = ANT_CIRCULAR_HORN;
                 strcat(path2, AH5_G_PARABOLIC_REFLECTOR);
-                AH5_read_opt_attrs(file_id, path2, &(antenna->model.data.parreflct), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
+                AH5_read_opt_attrs(file_id, path2, &(antenna->model.data.parreflct), NULL, 0);
             }
             else if (strcmp(type, AH5_V_LOG_PERIODIC) == 0)
                 antenna->model.type = ANT_LOAH5_G_PERIODIC;

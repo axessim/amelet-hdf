@@ -13,6 +13,21 @@
     TRUE = AH5_version_minimum("2", "2.5");
     TRUE = AH5_version_minimum("2.0.5.0", "2.1");
 */
+
+AH5_complex_t AH5_set_complex(float real, float imag)
+{
+	AH5_complex_t rdata;
+
+#ifndef _MSC_VER
+	rdata =  real + imag * _Complex_I;
+#else
+	rdata.re = real;
+	rdata.im = imag;
+#endif /*__MSC_VER__*/
+
+	return rdata;
+}
+
 char AH5_version_minimum (const char *required_version, const char *sim_version)
 {
     char rdata = FALSE;
@@ -274,7 +289,7 @@ char AH5_read_flt_attr (hid_t file_id, const char* path, char* attr_name, float 
 
 
 // Read complex attribute <attr_name> given by address <path>
-char AH5_read_cpx_attr (hid_t file_id, const char* path, char* attr_name, complex float *rdata)
+char AH5_read_cpx_attr (hid_t file_id, const char* path, char* attr_name, AH5_complex_t *rdata)
 {
     hid_t attr_id, type_id;
     float buf[2];
@@ -289,14 +304,14 @@ char AH5_read_cpx_attr (hid_t file_id, const char* path, char* attr_name, comple
             H5Tinsert(type_id, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
             if (H5Aread(attr_id, type_id, buf) >= 0)
             {
-                *rdata = buf[0] + buf[1] * _Complex_I;
+                *rdata = AH5_set_complex(buf[0], buf[1]);
                 success = TRUE;
             }
             H5Tclose(type_id);
             H5Aclose(attr_id);
         }
     if (!success)
-        *rdata = 0 + 0 * _Complex_I;
+        *rdata = AH5_set_complex(0, 0);
     return success;
 }
 
@@ -348,7 +363,7 @@ void AH5_print_flt_attr (char *name, float value, int space)
 
 
 // Print complex attribute
-void AH5_print_cpx_attr (char *name, complex float value, int space)
+void AH5_print_cpx_attr (char *name, AH5_complex_t value, int space)
 {
     printf("%*s-@%s: %g%+gi\n", space, "", name, creal(value), cimag(value));
 }
@@ -403,14 +418,14 @@ char AH5_read_float_dataset (hid_t file_id, const char *path, const hsize_t mn, 
 
 
 // Read complex float dataset
-char AH5_read_complex_dataset (hid_t file_id, const char *path, const hsize_t mn, complex float **rdata)
+char AH5_read_complex_dataset (hid_t file_id, const char *path, const hsize_t mn, AH5_complex_t **rdata)
 {
     char success = FALSE;
     hid_t dset_id, type_id;
     hsize_t i;
     float *buf;
 
-    *rdata = (complex float *) malloc(mn * sizeof(complex float));
+    *rdata = (AH5_complex_t *) malloc(mn * sizeof(AH5_complex_t));
     buf = (float *) malloc(mn * 2 * sizeof(float));
     type_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
     H5Tinsert(type_id, "r", 0, H5T_NATIVE_FLOAT);
@@ -420,7 +435,7 @@ char AH5_read_complex_dataset (hid_t file_id, const char *path, const hsize_t mn
     {
         success = TRUE;
         for (i = 0; i < mn; i++)
-            rdata[0][i] = buf[2 * i] + buf[2 * i + 1] * _Complex_I;
+            rdata[0][i] = AH5_set_complex(buf[2*i], buf[2*i+1]);
     }
     H5Dclose(dset_id);
     H5Tclose(type_id);
@@ -513,13 +528,13 @@ char AH5_read_opt_attrs (hid_t file_id, const char *path, AH5_opt_attrs_t *opt_a
                         success = TRUE;
                     break;
                 case H5T_COMPOUND:
-                    opt_attrs->instances[k].value.c = 0 + 0 * _Complex_I;
+                    opt_attrs->instances[k].value.c = AH5_set_complex(0, 0);
                     type_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
                     H5Tinsert(type_id, "r", 0, H5T_NATIVE_FLOAT);
                     H5Tinsert(type_id, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
                     if (H5Aread(attr_id, type_id, buf) >= 0)
                     {
-                        opt_attrs->instances[k].value.c = buf[0] + buf[1] * _Complex_I;
+						opt_attrs->instances[k].value.c = AH5_set_complex(buf[0], buf[1]);
                         success = TRUE;
                     }
                     H5Tclose(type_id);
