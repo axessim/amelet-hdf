@@ -25,8 +25,8 @@ extern "C" {
 #define AH5_ATTR_LENGTH                 31
 #define AH5_TABLE_FIELD_NAME_LENGTH     31
 #define AH5_V_INVALID                   "INVALID"
-#define TRUE                            1
-#define FALSE                           0
+#define AH5_TRUE                        1
+#define AH5_FALSE                       0
 
 
 /* ah5_emsource.h */
