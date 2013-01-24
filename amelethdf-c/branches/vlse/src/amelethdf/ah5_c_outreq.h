@@ -1,12 +1,12 @@
-#ifndef AH5_OUTREQ_H
-#define AH5_OUTREQ_H
+#ifndef AH5_C_OUTREQ_H
+#define AH5_C_OUTREQ_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "ah5_general.h"
-#include "ah5_label.h"
+#include "ah5_c_label.h"
 
     typedef struct _AH5_ort_instance_t
     {
@@ -59,4 +59,4 @@ extern "C" {
 }
 #endif
 
-#endif // AH5_OUTREQ_H
+#endif // AH5_C_OUTREQ_H

@@ -1,4 +1,4 @@
-#include "ah5_label.h"
+#include "ah5_c_label.h"
 
 // Init label dataset
 void AH5_init_lbl_dataset(AH5_lbl_dataset_t *lbl_dataset)
@@ -23,7 +23,7 @@ void AH5_init_label(AH5_label_t *label)
 char AH5_read_lbl_dataset(hid_t file_id, const char *path, AH5_lbl_dataset_t *lbl_dataset)
 {
     H5T_class_t type_class;
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
     size_t length;
     int nb_dims;
 
@@ -36,8 +36,8 @@ char AH5_read_lbl_dataset(hid_t file_id, const char *path, AH5_lbl_dataset_t *lb
             if (nb_dims <= 1)
                 if (H5LTget_dataset_info(file_id, path, &(lbl_dataset->nb_items), &type_class, &length) >= 0)
                     if (type_class == H5T_STRING)
-                        if(AH5_read_string_dataset(file_id, path, lbl_dataset->nb_items, length, &(lbl_dataset->items)))
-                            rdata = TRUE;
+                        if(AH5_read_str_dataset(file_id, path, lbl_dataset->nb_items, length, &(lbl_dataset->items)))
+                            rdata = AH5_TRUE;
     if (!rdata)
     {
         AH5_print_err_dset(AH5_C_LABEL, path);
@@ -50,13 +50,13 @@ char AH5_read_lbl_dataset(hid_t file_id, const char *path, AH5_lbl_dataset_t *lb
 // Read label category (all datasets)
 char AH5_read_label(hid_t file_id, AH5_label_t *label)
 {
-    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
     AH5_children_t children;
     hsize_t i;
 
     AH5_init_label(label);
 
-    if (H5Lexists(file_id, AH5_C_LABEL, H5P_DEFAULT) == TRUE)
+    if (AH5_path_valid(file_id, AH5_C_LABEL))
     {
         children = AH5_read_children_name(file_id, AH5_C_LABEL);
         label->nb_datasets = children.nb_children;
@@ -68,7 +68,7 @@ char AH5_read_label(hid_t file_id, AH5_label_t *label)
                 strcpy(path, AH5_C_LABEL);
                 strcat(path, children.childnames[i]);
                 if(!AH5_read_lbl_dataset(file_id, path, label->datasets + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -77,7 +77,7 @@ char AH5_read_label(hid_t file_id, AH5_label_t *label)
     else
     {
         AH5_print_err_path(AH5_C_LABEL, AH5_C_LABEL);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }

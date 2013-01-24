@@ -1,4 +1,4 @@
-#include "ah5_link.h"
+#include "ah5_c_link.h"
 
 
 // Init link instance
@@ -38,7 +38,7 @@ char AH5_read_lnk_instance (hid_t file_id, const char *path, AH5_lnk_instance_t 
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_SUBJECT, AH5_A_OBJECT};
     AH5_lbl_dataset_t AH5_label_dataset;
-    char rdata = TRUE;
+    char rdata = AH5_TRUE;
     unsigned int i;
 
     AH5_init_lnk_instance(lnk_instance);
@@ -51,12 +51,12 @@ char AH5_read_lnk_instance (hid_t file_id, const char *path, AH5_lnk_instance_t 
         if (!AH5_read_str_attr(file_id, path, AH5_A_SUBJECT, &(lnk_instance->subject)))
         {
             AH5_print_err_attr(AH5_C_LINK, path, AH5_A_SUBJECT);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_str_attr(file_id, path, AH5_A_OBJECT, &(lnk_instance->object)))
         {
             AH5_print_err_attr(AH5_C_LINK, path, AH5_A_OBJECT);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (rdata)
             for(i = 0; i < lnk_instance->opt_attrs.nb_instances; i++)
@@ -73,7 +73,7 @@ char AH5_read_lnk_instance (hid_t file_id, const char *path, AH5_lnk_instance_t 
     else
     {
         AH5_print_err_path(AH5_C_LINK, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -82,7 +82,7 @@ char AH5_read_lnk_instance (hid_t file_id, const char *path, AH5_lnk_instance_t 
 // Read link group (group of instances)
 char AH5_read_lnk_group (hid_t file_id, const char *path, AH5_lnk_group_t *lnk_group)
 {
-    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
 /*    char mandatory[][AH5_ATTR_LENGTH] = {}; */
     AH5_children_t children;
     hsize_t i;
@@ -103,7 +103,7 @@ char AH5_read_lnk_group (hid_t file_id, const char *path, AH5_lnk_group_t *lnk_g
                 strcpy(path2, path);
                 strcat(path2, children.childnames[i]);
                 if (!AH5_read_lnk_instance(file_id, path2, lnk_group->instances + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -112,7 +112,7 @@ char AH5_read_lnk_group (hid_t file_id, const char *path, AH5_lnk_group_t *lnk_g
     else
     {
         AH5_print_err_path(AH5_C_LINK, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -121,13 +121,13 @@ char AH5_read_lnk_group (hid_t file_id, const char *path, AH5_lnk_group_t *lnk_g
 // Read link category (all groups/instances)
 char AH5_read_link (hid_t file_id, AH5_link_t *link)
 {
-    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
     AH5_children_t children;
     hsize_t i;
 
     AH5_init_link(link);
 
-    if (H5Lexists(file_id, AH5_C_LINK, H5P_DEFAULT) == TRUE)
+    if (AH5_path_valid(file_id, AH5_C_LINK))
     {
         children = AH5_read_children_name(file_id, AH5_C_LINK);
         link->nb_groups = children.nb_children;
@@ -139,7 +139,7 @@ char AH5_read_link (hid_t file_id, AH5_link_t *link)
                 strcpy(path, AH5_C_LINK);
                 strcat(path, children.childnames[i]);
                 if (!AH5_read_lnk_group(file_id, path, link->groups + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -148,7 +148,7 @@ char AH5_read_link (hid_t file_id, AH5_link_t *link)
     else
     {
         AH5_print_err_path(AH5_C_LINK, AH5_C_LINK);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }

@@ -1,4 +1,4 @@
-#include "ah5_globenv.h"
+#include "ah5_c_globenv.h"
 
 
 // Init globalEnvironment instance
@@ -25,7 +25,7 @@ void AH5_init_global_environment (AH5_global_environment_t *global_environment)
 // Read globalEnvironment instance
 char AH5_read_global_environment_instance (hid_t file_id, const char *path, AH5_gle_instance_t *gle_instance)
 {
-    char path2[AH5_ABSOLUTE_PATH_LENGTH], path3[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path2[AH5_ABSOLUTE_PATH_LENGTH], path3[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
 /*    char mandatory[][AH5_ATTR_LENGTH] = {}; */
 
     AH5_init_global_environment_instance(gle_instance);
@@ -42,25 +42,25 @@ char AH5_read_global_environment_instance (hid_t file_id, const char *path, AH5_
         strcpy(path3, path);
         strcat(path2, AH5_G_FREQUENCY);
         strcat(path3, AH5_G_TIME);
-        if (H5Lexists(file_id, path2, H5P_DEFAULT) == TRUE && H5Lexists(file_id, path3, H5P_DEFAULT) != TRUE)  // only frequency...
+        if (AH5_path_valid(file_id, path2) && !AH5_path_valid(file_id, path3))
         {
             gle_instance->type = GE_FREQUENCY;
             if (!AH5_read_floatingtype(file_id, path2, &(gle_instance->data)))
-                rdata = FALSE;
+                rdata = AH5_FALSE;
         }
-        else if (H5Lexists(file_id, path3, H5P_DEFAULT) == TRUE && H5Lexists(file_id, path2, H5P_DEFAULT) != TRUE)  // only time...
+        else if (AH5_path_valid(file_id, path3) && !AH5_path_valid(file_id, path2))
         {
             gle_instance->type = GE_TIME;
             if (!AH5_read_floatingtype(file_id, path3, &(gle_instance->data)))
-                rdata = FALSE;
+                rdata = AH5_FALSE;
         }
         else
-            rdata = FALSE;
+            rdata = AH5_FALSE;
     }
     else
     {
         AH5_print_err_path(AH5_C_GLOBAL_ENVIRONMENT, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -69,13 +69,13 @@ char AH5_read_global_environment_instance (hid_t file_id, const char *path, AH5_
 // Read globalEnvironment category
 char AH5_read_global_environment (hid_t file_id, AH5_global_environment_t *global_environment)
 {
-    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
     AH5_children_t children;
     hsize_t i;
 
     AH5_init_global_environment(global_environment);
 
-    if (H5Lexists(file_id, AH5_C_GLOBAL_ENVIRONMENT, H5P_DEFAULT) == TRUE)
+    if (AH5_path_valid(file_id, AH5_C_GLOBAL_ENVIRONMENT))
     {
         children = AH5_read_children_name(file_id, AH5_C_GLOBAL_ENVIRONMENT);
         global_environment->nb_instances = children.nb_children;
@@ -87,7 +87,7 @@ char AH5_read_global_environment (hid_t file_id, AH5_global_environment_t *globa
                 strcpy(path, AH5_C_GLOBAL_ENVIRONMENT);
                 strcat(path, children.childnames[i]);
                 if (!AH5_read_global_environment_instance(file_id, path, global_environment->instances + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -96,7 +96,7 @@ char AH5_read_global_environment (hid_t file_id, AH5_global_environment_t *globa
     else
     {
         AH5_print_err_path(AH5_C_GLOBAL_ENVIRONMENT, AH5_C_GLOBAL_ENVIRONMENT);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }

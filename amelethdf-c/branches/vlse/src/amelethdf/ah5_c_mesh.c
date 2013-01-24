@@ -1,4 +1,4 @@
-#include "ah5_mesh.h"
+#include "ah5_c_mesh.h"
 
 // Init mesh group
 void AH5_init_msh_group (AH5_msh_group_t *msh_group)
@@ -25,7 +25,7 @@ char AH5_read_groupgroup (hid_t file_id, const char* path, AH5_groupgroup_t *gro
     int nb_dims;
     H5T_class_t type_class;
     size_t length;
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
 
     groupgroup->nb_groupgroupnames = 1;  /* in case of single value */
     groupgroup->path = strdup(path);
@@ -34,8 +34,8 @@ char AH5_read_groupgroup (hid_t file_id, const char* path, AH5_groupgroup_t *gro
             if (nb_dims <= 1)
                 if (H5LTget_dataset_info(file_id, path, &(groupgroup->nb_groupgroupnames), &type_class, &length) >= 0)
                     if (type_class == H5T_STRING)
-                        if(AH5_read_string_dataset(file_id, path, groupgroup->nb_groupgroupnames, length, &(groupgroup->groupgroupnames)))
-                            rdata = TRUE;
+                        if(AH5_read_str_dataset(file_id, path, groupgroup->nb_groupgroupnames, length, &(groupgroup->groupgroupnames)))
+                            rdata = AH5_TRUE;
     if (!rdata)
     {
         AH5_print_err_dset(AH5_C_MESH, path);
@@ -53,7 +53,7 @@ char AH5_read_smesh_axis (hid_t file_id, const char* path, AH5_axis_t *axis)
     H5T_class_t type_class;
     int nb_dims;
     size_t length;
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
 
     axis->nb_nodes = 1;
     if (AH5_path_valid(file_id, path))
@@ -61,8 +61,8 @@ char AH5_read_smesh_axis (hid_t file_id, const char* path, AH5_axis_t *axis)
             if (nb_dims <= 1)
                 if (H5LTget_dataset_info(file_id, path, &(axis->nb_nodes), &type_class, &length) >= 0)
                     if (type_class == H5T_FLOAT && length == 4)
-                        if (AH5_read_float_dataset(file_id, path, axis->nb_nodes, &(axis->nodes)))
-                            rdata = TRUE;
+                        if (AH5_read_flt_dataset(file_id, path, axis->nb_nodes, &(axis->nodes)))
+                            rdata = AH5_TRUE;
     if (!rdata)
     {
         /* print error only in case of missing "x" */
@@ -78,7 +78,7 @@ char AH5_read_smesh_axis (hid_t file_id, const char* path, AH5_axis_t *axis)
 // Read group in structured mesh (+normals)
 char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup)
 {
-    char *temp, success1 = FALSE, success2 = TRUE, success3 = FALSE, rdata = TRUE;
+    char *temp, success1 = AH5_FALSE, success2 = AH5_TRUE, success3 = AH5_FALSE, rdata = AH5_TRUE;
     char normalpath[AH5_ABSOLUTE_PATH_LENGTH];
     hsize_t dims[2] = {1, 1};
     H5T_class_t type_class;
@@ -98,20 +98,20 @@ char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup)
         if (!AH5_read_str_attr(file_id, path, AH5_A_TYPE, &(sgroup->type)))
         {
             AH5_print_err_attr(AH5_C_MESH, path, AH5_A_TYPE);
-            success2 = FALSE;
+            success2 = AH5_FALSE;
         }
         if (!AH5_read_str_attr(file_id, path, AH5_A_ENTITY_TYPE, &(sgroup->entitytype)))
             if (strcmp(sgroup->type, AH5_V_NODE) != 0)
             {
                 AH5_print_err_attr(AH5_C_MESH, path, AH5_A_ENTITY_TYPE);
-                success2 = FALSE;
+                success2 = AH5_FALSE;
             }
         if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
             if (nb_dims == 2)
                 if (H5LTget_dataset_info(file_id, path, sgroup->dims, &type_class, &length) >= 0)
                     if (sgroup->dims[1] >= 1 && sgroup->dims[1] <= 6 && type_class == H5T_INTEGER && length == 4)
                         if (AH5_read_int_dataset(file_id, path, sgroup->dims[0] * sgroup->dims[1], &(sgroup->elements)))
-                            success1 = TRUE;
+                            success1 = AH5_TRUE;
         if (!success1)
         {
             AH5_print_err_dset(AH5_C_MESH, path);
@@ -119,7 +119,7 @@ char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup)
             sgroup->dims[1] = 0;
             sgroup->normals = NULL;
             sgroup->elements = NULL;
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         else
         {
@@ -137,17 +137,17 @@ char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup)
                         strcat(normalpath, temp);
                         /* normalpath = <mesh_path>/normal/<group_name> */
 
-                        if (H5Lexists(file_id, normalpath, H5P_DEFAULT) == TRUE)
+                        if (AH5_path_valid(file_id, normalpath))
                             if (H5LTget_dataset_ndims(file_id, normalpath, &nb_dims) >= 0)
                                 if (nb_dims <= 1)
                                     if (H5LTget_dataset_info(file_id, normalpath, dims, &type_class, &length) >= 0)
                                         if (dims[0] == sgroup->dims[0] && type_class == H5T_STRING && length == 2)
-                                            if(AH5_read_string_dataset(file_id, normalpath, dims[0], length, &(sgroup->normals)))
-                                                success3 = TRUE;
+                                            if(AH5_read_str_dataset(file_id, normalpath, dims[0], length, &(sgroup->normals)))
+                                                success3 = AH5_TRUE;
                         if (!success3)
                         {
                             AH5_print_err_dset(AH5_C_MESH, normalpath);
-                            rdata = FALSE;
+                            rdata = AH5_FALSE;
                         }
                     }
         }
@@ -155,7 +155,7 @@ char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup)
     else
     {
         AH5_print_err_path(AH5_C_MESH, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -164,7 +164,7 @@ char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup)
 char AH5_read_ssom_pie_table (hid_t file_id, const char *path, AH5_ssom_pie_table_t *ssom_pie_table)
 {
     hsize_t nfields, nrecords, i;
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
     char **field_names;
     size_t *field_sizes;
     size_t *field_offsets;
@@ -194,7 +194,7 @@ char AH5_read_ssom_pie_table (hid_t file_id, const char *path, AH5_ssom_pie_tabl
                                 && strcmp(field_names[1], AH5_F_IMAX) == 0
                                 && strcmp(field_names[2], AH5_F_V1) == 0)
                         {
-                            rdata = TRUE;
+                            rdata = AH5_TRUE;
                             field_index2[0] = 2;
                         }
                     }
@@ -208,7 +208,7 @@ char AH5_read_ssom_pie_table (hid_t file_id, const char *path, AH5_ssom_pie_tabl
                                 && strcmp(field_names[4], AH5_F_V1) == 0
                                 && strcmp(field_names[5], AH5_F_V2) == 0)
                         {
-                            rdata = TRUE;
+                            rdata = AH5_TRUE;
                             field_index2[0] = 4;
                             field_index2[1] = 5;
                         }
@@ -226,7 +226,7 @@ char AH5_read_ssom_pie_table (hid_t file_id, const char *path, AH5_ssom_pie_tabl
                                 && strcmp(field_names[7], AH5_F_V2) == 0
                                 && strcmp(field_names[8], AH5_F_V3) == 0)
                         {
-                            rdata = TRUE;
+                            rdata = AH5_TRUE;
                             field_index2[0] = 6;
                             field_index2[1] = 7;
                             field_index2[2] = 8;
@@ -254,7 +254,7 @@ char AH5_read_ssom_pie_table (hid_t file_id, const char *path, AH5_ssom_pie_tabl
                         free(ssom_pie_table->elements);
                         free(ssom_pie_table->vectors[0]);
                         free(ssom_pie_table->vectors);
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                     }
                     else
                         ssom_pie_table->nb_points = nrecords;
@@ -281,7 +281,7 @@ char AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh)
 {
     char path2[AH5_ABSOLUTE_PATH_LENGTH], path3[AH5_ABSOLUTE_PATH_LENGTH];
     AH5_children_t children;
-    char *type, success, rdata = TRUE;
+    char *type, success, rdata = AH5_TRUE;
     hsize_t i;
 
     smesh->groups = NULL;
@@ -295,7 +295,7 @@ char AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh)
         strcat(path2, AH5_G_CARTESIAN_GRID);
         strcat(path2, AH5_G_X);
         if (!AH5_read_smesh_axis(file_id, path2, &(smesh->x)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
 
         // Y Axis
         strcpy(path2, path);
@@ -324,7 +324,7 @@ char AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh)
                 strcpy(path3, path2);
                 strcat(path3, children.childnames[i]);
                 if (!AH5_read_smsh_group(file_id, path3, smesh->groups + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -343,7 +343,7 @@ char AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh)
                 strcpy(path3, path2);
                 strcat(path3, children.childnames[i]);
                 if (!AH5_read_groupgroup(file_id, path3, smesh->groupgroups + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -359,14 +359,14 @@ char AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh)
             smesh->som_tables = (AH5_ssom_pie_table_t *) malloc(children.nb_children * sizeof(AH5_ssom_pie_table_t));
             for (i = 0; i < children.nb_children; i++)
             {
-                success = FALSE;
+                success = AH5_FALSE;
                 strcpy(path3, path2);
                 strcat(path3, children.childnames[i]);
                 if (AH5_read_str_attr(file_id, path3, AH5_A_TYPE, &type))
                 {
                     if (strcmp(type,AH5_V_POINT_IN_ELEMENT) == 0)
                         if (AH5_read_ssom_pie_table(file_id, path3, smesh->som_tables + i))
-                            success = TRUE;
+                            success = AH5_TRUE;
                     free(type);
                 }
                 if (!success)
@@ -377,7 +377,7 @@ char AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh)
                     smesh->som_tables[i].nb_points = 0;
                     smesh->som_tables[i].elements = NULL;
                     smesh->som_tables[i].vectors = NULL;
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 }
                 free(children.childnames[i]);
             }
@@ -387,7 +387,7 @@ char AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh)
     else
     {
         AH5_print_err_path(AH5_C_MESH, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -397,7 +397,7 @@ char AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh)
 char AH5_read_umsh_group (hid_t file_id, const char* path, AH5_ugroup_t *ugroup)
 {
     H5T_class_t type_class;
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
     size_t length;
     int nb_dims;
 
@@ -418,12 +418,12 @@ char AH5_read_umsh_group (hid_t file_id, const char* path, AH5_ugroup_t *ugroup)
                     if (H5LTget_dataset_info(file_id, path, &(ugroup->nb_groupelts), &type_class, &length) >= 0)
                         if (type_class == H5T_INTEGER && length == 4)
                             if (AH5_read_int_dataset(file_id, path, ugroup->nb_groupelts, &(ugroup->groupelts)))
-                                rdata = TRUE;
+                                rdata = AH5_TRUE;
             if(!AH5_read_str_attr(file_id, path, AH5_A_ENTITY_TYPE, &(ugroup->entitytype)))
                 if (strcmp(ugroup->type, AH5_V_NODE) != 0)
                 {
                     AH5_print_err_attr(AH5_C_MESH, path, AH5_A_ENTITY_TYPE);
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 }
         }
     }
@@ -440,7 +440,7 @@ char AH5_read_umsh_group (hid_t file_id, const char* path, AH5_ugroup_t *ugroup)
 char AH5_read_usom_pie_table (hid_t file_id, const char *path, AH5_usom_pie_table_t *usom_pie_table)
 {
     hsize_t nfields, nrecords, i;
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
     char **field_names;
     size_t *field_sizes;
     size_t *field_offsets;
@@ -479,7 +479,7 @@ char AH5_read_usom_pie_table (hid_t file_id, const char *path, AH5_usom_pie_tabl
                         {
                             usom_pie_table->nb_points = nrecords;
                             usom_pie_table->nb_dims = (char) nfields - 1;
-                            rdata = TRUE;
+                            rdata = AH5_TRUE;
                         }
                     }
                 free(field_names[0]);
@@ -505,7 +505,7 @@ char AH5_read_usom_ef_table (hid_t file_id, const char *path, AH5_usom_ef_table_
     int nb_dims;
     H5T_class_t type_class;
     size_t length;
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
 
     usom_ef_table->dims[0] = 1;
     usom_ef_table->dims[1] = 1;
@@ -516,7 +516,7 @@ char AH5_read_usom_ef_table (hid_t file_id, const char *path, AH5_usom_ef_table_
                 if (H5LTget_dataset_info(file_id, path, usom_ef_table->dims, &type_class, &length) >= 0)
                     if (type_class == H5T_INTEGER && length == 4)
                         if (AH5_read_int_dataset(file_id, path, usom_ef_table->dims[0] * usom_ef_table->dims[1], &(usom_ef_table->items)))
-                            rdata = TRUE;
+                            rdata = AH5_TRUE;
     if (!rdata)
     {
         AH5_print_err_dset(AH5_C_MESH, path);
@@ -531,7 +531,7 @@ char AH5_read_usom_ef_table (hid_t file_id, const char *path, AH5_usom_ef_table_
 // Read selector on mesh (unstructured mesh)
 char AH5_read_umesh_som_table (hid_t file_id, const char *path, AH5_usom_table_t *usom_table)
 {
-    char *type, rdata = TRUE;
+    char *type, rdata = AH5_TRUE;
 
     usom_table->path = strdup(path);
     usom_table->type = SOM_INVALID;
@@ -544,32 +544,32 @@ char AH5_read_umesh_som_table (hid_t file_id, const char *path, AH5_usom_table_t
             {
                 usom_table->type = SOM_POINT_IN_ELEMENT;
                 if (!AH5_read_usom_pie_table(file_id, path, &(usom_table->data.pie)))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else if (strcmp(type, AH5_V_EDGE) == 0)
             {
                 usom_table->type = SOM_EDGE;
                 if (!AH5_read_usom_ef_table(file_id, path, &(usom_table->data.ef)))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else if (strcmp(type, AH5_V_FACE) == 0)
             {
                 usom_table->type = SOM_FACE;
                 if (!AH5_read_usom_ef_table(file_id, path, &(usom_table->data.ef)))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             free(type);
         }
         else
         {
             AH5_print_err_attr(AH5_C_MESH, path, AH5_A_TYPE);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
     }
     else
     {
         AH5_print_err_path(AH5_C_MESH, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -579,7 +579,7 @@ char AH5_read_umesh_som_table (hid_t file_id, const char *path, AH5_usom_table_t
 char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh)
 {
     char path2[AH5_ABSOLUTE_PATH_LENGTH], path3[AH5_ABSOLUTE_PATH_LENGTH];
-    char rdata = TRUE, success = FALSE;
+    char rdata = AH5_TRUE, success = AH5_FALSE;
     hsize_t i;
     int nb_dims;
     H5T_class_t type_class;
@@ -600,27 +600,27 @@ char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh)
         umesh->nb_elementnodes = 1;
         strcpy(path2, path);
         strcat(path2, AH5_G_ELEMENT_NODES);
-        if (H5Lexists(file_id, path2, H5P_DEFAULT) == TRUE)
+        if (AH5_path_valid(file_id, path2))        
             if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
                 if (nb_dims <= 1)
                     if (H5LTget_dataset_info(file_id, path2, &(umesh->nb_elementnodes), &type_class, &length) >= 0)
                         if (type_class == H5T_INTEGER && length == 4)
                             if (AH5_read_int_dataset(file_id, path2, umesh->nb_elementnodes, &(umesh->elementnodes)))
-                                success = TRUE;
+                                success = AH5_TRUE;
         if (!success)
         {
             AH5_print_err_dset(AH5_C_MESH, path2);
             umesh->nb_elementnodes = 0;
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
-        success = FALSE;
+        success = AH5_FALSE;
 
         // Read m x 1 dataset "elementTypes" (8-bit signed char)
         umesh->nb_elementtypes = 1;
         strcpy(path2, path);
         strcat(path2, AH5_G_ELEMENT_TYPES);
-        if (H5Lexists(file_id, path2, H5P_DEFAULT) == TRUE)
+        if (AH5_path_valid(file_id, path2))
             if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
                 if (nb_dims <= 1)
                     if (H5LTget_dataset_info(file_id, path2, &(umesh->nb_elementtypes), &type_class, &length) >= 0)
@@ -629,7 +629,7 @@ char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh)
                             umesh->elementtypes = (char *) malloc((umesh->nb_elementtypes * sizeof(char)));
                             dset_id = H5Dopen(file_id, path2, H5P_DEFAULT);
                             if (H5Dread(dset_id, H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, H5P_DEFAULT, umesh->elementtypes) >= 0)
-                                success = TRUE;
+                                success = AH5_TRUE;
                             H5Dclose(dset_id);
                             if (!success)
                             {
@@ -641,28 +641,28 @@ char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh)
         {
             AH5_print_err_dset(AH5_C_MESH, path2);
             umesh->nb_elementtypes = 0;
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
-        success = FALSE;
+        success = AH5_FALSE;
         umesh->nb_nodes[0] = 1;
         umesh->nb_nodes[1] = 1;
         // Read m x n dataset "nodes" (32-bit signed float)
         strcpy(path2, path);
         strcat(path2, AH5_G_NODES);
-        if (H5Lexists(file_id, path2, H5P_DEFAULT) == TRUE)
+        if (AH5_path_valid(file_id, path2))        
             if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
                 if (nb_dims == 2)
                     if (H5LTget_dataset_info(file_id, path2, umesh->nb_nodes, &type_class, &length) >= 0)
                         if (umesh->nb_nodes[1] <= 3 && type_class == H5T_FLOAT && length == 4)
-                            if (AH5_read_float_dataset(file_id, path2, umesh->nb_nodes[0] * umesh->nb_nodes[1], &(umesh->nodes)))
-                                success = TRUE;
+                            if (AH5_read_flt_dataset(file_id, path2, umesh->nb_nodes[0] * umesh->nb_nodes[1], &(umesh->nodes)))
+                                success = AH5_TRUE;
         if (!success)
         {
             AH5_print_err_dset(AH5_C_MESH, path2);
             umesh->nb_nodes[0] = 0;
             umesh->nb_nodes[1] = 0;
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
         // read groupGroup if exists
@@ -678,7 +678,7 @@ char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh)
                 strcpy(path3, path2);
                 strcat(path3, children.childnames[i]);
                 if (!AH5_read_groupgroup(file_id, path3, umesh->groupgroups + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -697,7 +697,7 @@ char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh)
                 strcpy(path3, path2);
                 strcat(path3, children.childnames[i]);
                 if (!AH5_read_umsh_group(file_id, path3, umesh->groups + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -716,7 +716,7 @@ char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh)
                 strcpy(path3, path2);
                 strcat(path3, children.childnames[i]);
                 if (!AH5_read_umesh_som_table(file_id, path3, umesh->som_tables + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -725,7 +725,7 @@ char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh)
     else
     {
         AH5_print_err_path(AH5_C_MESH, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -734,7 +734,7 @@ char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh)
 // Read mesh instance
 char AH5_read_msh_instance (hid_t file_id, const char *path, AH5_msh_instance_t *msh_instance)
 {
-    char *type, rdata = TRUE;
+    char *type, rdata = AH5_TRUE;
 
     msh_instance->path = strdup(path);
     msh_instance->type = MSH_INVALID;
@@ -747,18 +747,18 @@ char AH5_read_msh_instance (hid_t file_id, const char *path, AH5_msh_instance_t 
             {
                 msh_instance->type = MSH_STRUCTURED;
                 if (!AH5_read_smesh(file_id, path, &(msh_instance->data.structured)))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else if (strcmp(type, AH5_V_UNSTRUCTURED) == 0)
             {
                 msh_instance->type = MSH_UNSTRUCTURED;
                 if (!AH5_read_umesh(file_id, path, &(msh_instance->data.unstructured)))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else
             {
                 printf("***** ERROR(%s): Unexpected attribute value of \"%s@%s\". *****\n\n", AH5_C_MESH, path, AH5_A_TYPE);
-                rdata = FALSE;
+                rdata = AH5_FALSE;
             }
             free(type);
         }
@@ -766,13 +766,13 @@ char AH5_read_msh_instance (hid_t file_id, const char *path, AH5_msh_instance_t 
         {
             msh_instance->type = MSH_INVALID;
             AH5_print_err_attr(AH5_C_MESH, path, AH5_A_TYPE);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
     }
     else
     {
         AH5_print_err_path(AH5_C_MESH, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -781,7 +781,7 @@ char AH5_read_msh_instance (hid_t file_id, const char *path, AH5_msh_instance_t 
 // Read meshLink instance
 char AH5_read_mlk_instance (hid_t file_id, const char *path, AH5_mlk_instance_t *mlk_instance)
 {
-    char *type, dataset_read = FALSE, rdata = TRUE;
+    char *type, dataset_read = AH5_FALSE, rdata = AH5_TRUE;
     H5T_class_t type_class;
     size_t length;
     int nb_dims;
@@ -797,33 +797,33 @@ char AH5_read_mlk_instance (hid_t file_id, const char *path, AH5_mlk_instance_t 
         if (!AH5_read_str_attr(file_id, path, AH5_A_MESH1, &(mlk_instance->mesh1)))
         {
             AH5_print_err_attr(AH5_C_MESH, path, AH5_A_MESH1);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_str_attr(file_id, path, AH5_A_MESH2, &(mlk_instance->mesh2)))
         {
             AH5_print_err_attr(AH5_C_MESH, path, AH5_A_MESH2);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
         if (!AH5_read_str_attr(file_id, path, AH5_A_TYPE, &type))
         {
             AH5_print_err_attr(AH5_C_MESH, path, AH5_A_TYPE);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
-        if (H5Lexists(file_id, path, H5P_DEFAULT) == TRUE)
+        if (AH5_path_valid(file_id, path))
             if (H5LTget_dataset_ndims(file_id, path, &nb_dims) >= 0)
                 if (nb_dims == 2)
                     if (H5LTget_dataset_info(file_id, path, mlk_instance->dims, &type_class, &length) >= 0)
                         if (type_class == H5T_INTEGER)
                             if (AH5_read_int_dataset(file_id, path, mlk_instance->dims[0] * mlk_instance->dims[1], &(mlk_instance->data)))
-                                dataset_read = TRUE;
+                                dataset_read = AH5_TRUE;
         if (!dataset_read)
         {
             AH5_print_err_dset(AH5_C_MESH, path);
             mlk_instance->dims[0] = 0;
             mlk_instance->dims[1] = 0;
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
         if (rdata)
@@ -848,7 +848,7 @@ char AH5_read_mlk_instance (hid_t file_id, const char *path, AH5_mlk_instance_t 
     else
     {
         AH5_print_err_path(AH5_C_MESH, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -858,7 +858,7 @@ char AH5_read_mlk_instance (hid_t file_id, const char *path, AH5_mlk_instance_t 
 // Read mesh group
 char AH5_read_msh_group (hid_t file_id, const char *path, AH5_msh_group_t *msh_group)
 {
-    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
     char path3[AH5_ABSOLUTE_PATH_LENGTH];
     AH5_children_t children;
     hsize_t i, j = 0;
@@ -884,7 +884,7 @@ char AH5_read_msh_group (hid_t file_id, const char *path, AH5_msh_group_t *msh_g
                     strcpy(path2, path);
                     strcat(path2, children.childnames[i]);
                     if (!AH5_read_msh_instance(file_id, path2, msh_group->msh_instances + j++))
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                 }
                 free(children.childnames[i]);
             }
@@ -903,7 +903,7 @@ char AH5_read_msh_group (hid_t file_id, const char *path, AH5_msh_group_t *msh_g
                 strcpy(path3, path2);
                 strcat(path3, children.childnames[i]);
                 if (!AH5_read_mlk_instance(file_id, path3, msh_group->mlk_instances + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -912,7 +912,7 @@ char AH5_read_msh_group (hid_t file_id, const char *path, AH5_msh_group_t *msh_g
     else
     {
         AH5_print_err_path(AH5_C_MESH, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -921,13 +921,13 @@ char AH5_read_msh_group (hid_t file_id, const char *path, AH5_msh_group_t *msh_g
 // Read mesh category
 char AH5_read_mesh (hid_t file_id, AH5_mesh_t *mesh)
 {
-    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
     AH5_children_t children;
     hsize_t i;
 
     mesh->groups = NULL;
 
-    if (H5Lexists(file_id, AH5_C_MESH, H5P_DEFAULT) == TRUE)
+    if (AH5_path_valid(file_id, AH5_C_MESH))    
     {
         children = AH5_read_children_name(file_id, AH5_C_MESH);
         mesh->nb_groups = children.nb_children;
@@ -939,7 +939,7 @@ char AH5_read_mesh (hid_t file_id, AH5_mesh_t *mesh)
                 strcpy(path, AH5_C_MESH);
                 strcat(path, children.childnames[i]);
                 if (!AH5_read_msh_group(file_id, path, mesh->groups + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -948,7 +948,7 @@ char AH5_read_mesh (hid_t file_id, AH5_mesh_t *mesh)
     else
     {
         AH5_print_err_path(AH5_C_MESH, AH5_C_MESH);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }

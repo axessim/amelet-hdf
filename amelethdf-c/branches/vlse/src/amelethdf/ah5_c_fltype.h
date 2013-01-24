@@ -1,5 +1,5 @@
-#ifndef AH5_FLTYPE_H
-#define AH5_FLTYPE_H
+#ifndef AH5_C_FLTYPE_H
+#define AH5_C_FLTYPE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -258,4 +258,4 @@ extern "C" {
 }
 #endif
 
-#endif // AH5_FLTYPE_H
+#endif // AH5_C_FLTYPE_H

@@ -1,11 +1,11 @@
-#ifndef AH5_PHMODEL_H
-#define AH5_PHMODEL_H
+#ifndef AH5_C_PHMODEL_H
+#define AH5_C_PHMODEL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "ah5_fltype.h"
+#include "ah5_c_fltype.h"
 
     typedef enum _AH5_surface_class_t
     {
@@ -129,4 +129,4 @@ extern "C" {
 }
 #endif
 
-#endif // AH5_PHMODEL_H
+#endif // AH5_C_PHMODEL_H

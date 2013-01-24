@@ -1,11 +1,11 @@
-#include "ah5_extelt.h"
+#include "ah5_c_extelt.h"
 
 
 // Read dataset in externalElement and open external files
 char AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *eet_dataset)
 {
     H5T_class_t type_class;
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
     hsize_t dims[2], i;
     size_t length;
     int nb_dims;
@@ -17,10 +17,10 @@ char AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *e
             if (nb_dims == 2)
                 if (H5LTget_dataset_info(file_id, path, dims, &type_class, &length) >= 0)
                     if (dims[0] > 0 && dims[1] == 3 && type_class == H5T_STRING)
-                        if(AH5_read_string_dataset(file_id, path, dims[0] * dims[1], length, &(eet_dataset->eed_items)))
+                        if(AH5_read_str_dataset(file_id, path, dims[0] * dims[1], length, &(eet_dataset->eed_items)))
                         {
                             eet_dataset->nb_eed_items = dims[0];
-                            rdata = TRUE;
+                            rdata = AH5_TRUE;
                             eet_dataset->file_id = (hid_t *) malloc(eet_dataset->nb_eed_items * sizeof(hid_t));
                             for (i = 0; i < eet_dataset->nb_eed_items; i++)
                                 eet_dataset->file_id[i] = -1;
@@ -34,7 +34,7 @@ char AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *e
     }
     else
         if (!AH5_open_external_files(eet_dataset))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
     return rdata;
 }
 
@@ -42,13 +42,13 @@ char AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *e
 // Read externalElement category (all datasets)
 char AH5_read_external_element (hid_t file_id, AH5_external_element_t *external_element)
 {
-    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
     AH5_children_t children;
     hsize_t i;
 
     external_element->datasets = NULL;
 
-    if (H5Lexists(file_id, AH5_C_EXTERNAL_ELEMENT, H5P_DEFAULT) == TRUE)
+    if (AH5_path_valid(file_id, AH5_C_EXTERNAL_ELEMENT))
     {
         children = AH5_read_children_name(file_id, AH5_C_EXTERNAL_ELEMENT);
         external_element->nb_datasets = children.nb_children;
@@ -60,7 +60,7 @@ char AH5_read_external_element (hid_t file_id, AH5_external_element_t *external_
                 strcpy(path, AH5_C_EXTERNAL_ELEMENT);
                 strcat(path, children.childnames[i]);
                 if (!AH5_read_eet_dataset(file_id, path, external_element->datasets + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -69,7 +69,7 @@ char AH5_read_external_element (hid_t file_id, AH5_external_element_t *external_
     else
     {
         AH5_print_err_path(AH5_C_EXTERNAL_ELEMENT, AH5_C_EXTERNAL_ELEMENT);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -152,7 +152,7 @@ void AH5_free_external_element (AH5_external_element_t *external_element)
 // Open all external files and store the id
 char AH5_open_external_files(AH5_eet_dataset_t *eet_dataset)
 {
-    char success = TRUE;
+    char success = AH5_TRUE;
     hid_t file_id;
     hid_t *buf_id;
     AH5_set_t buf = {NULL, 0};
@@ -181,7 +181,7 @@ char AH5_open_external_files(AH5_eet_dataset_t *eet_dataset)
             if (file_id < 0)
             {
                 printf("***** ERROR(%s): Cannot open file \"%s\". *****\n\n", AH5_C_EXTERNAL_ELEMENT, name);
-                success = FALSE;
+                success = AH5_FALSE;
             }
         }
         else
@@ -203,7 +203,7 @@ char AH5_open_external_files(AH5_eet_dataset_t *eet_dataset)
 // Close all external files and set their id to -1
 char AH5_close_external_files(AH5_eet_dataset_t *eet_dataset)
 {
-    char success = TRUE;
+    char success = AH5_TRUE;
     hsize_t i, j;
     hid_t file_id;
 
@@ -224,7 +224,7 @@ char AH5_close_external_files(AH5_eet_dataset_t *eet_dataset)
             }
             else
             {
-                success = FALSE;
+                success = AH5_FALSE;
             }
         }
     }

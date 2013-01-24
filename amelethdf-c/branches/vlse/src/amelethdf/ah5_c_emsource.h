@@ -1,11 +1,11 @@
-#ifndef AH5_EMSOURCE_H
-#define AH5_EMSOURCE_H
+#ifndef AH5_C_EMSOURCE_H
+#define AH5_C_EMSOURCE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    #include "ah5_fltype.h"
+    #include "ah5_c_fltype.h"
 
     typedef struct _AH5_planewave_t
     {
@@ -177,4 +177,4 @@ extern "C" {
 }
 #endif
 
-#endif // AH5_EMSOURCE_H
+#endif // AH5_C_EMSOURCE_H

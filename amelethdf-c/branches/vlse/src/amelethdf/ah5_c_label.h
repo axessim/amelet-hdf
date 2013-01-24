@@ -1,5 +1,5 @@
-#ifndef AH5_LABEL_H
-#define AH5_LABEL_H
+#ifndef AH5_C_LABEL_H
+#define AH5_C_LABEL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,4 +36,4 @@ extern "C" {
 }
 #endif
 
-#endif // AH5_LABEL_H
+#endif // AH5_C_LABEL_H

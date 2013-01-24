@@ -1,5 +1,5 @@
-#ifndef AH5_SIMULATION_H
-#define AH5_SIMULATION_H
+#ifndef AH5_C_SIMULATION_H
+#define AH5_C_SIMULATION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,4 +39,4 @@ extern "C" {
 }
 #endif
 
-#endif // AH5_SIMULATION_H
+#endif // AH5_C_SIMULATION_H

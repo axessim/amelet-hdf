@@ -1,11 +1,11 @@
-#ifndef AH5_GLOBENAH5_V_H
-#define AH5_GLOBENAH5_V_H
+#ifndef AH5_C_GLOBENV_H
+#define AH5_C_GLOBENV_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "ah5_fltype.h"
+#include "ah5_c_fltype.h"
 
     typedef enum _AH5_gle_class_t
     {
@@ -44,4 +44,4 @@ extern "C" {
 }
 #endif
 
-#endif // AH5_GLOBENAH5_V_H
+#endif // AH5_C_GLOBENV_H

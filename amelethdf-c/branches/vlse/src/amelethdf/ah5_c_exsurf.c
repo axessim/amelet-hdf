@@ -1,10 +1,10 @@
-#include "ah5_exsurf.h"
+#include "ah5_c_exsurf.h"
 
 
 // Read exchangeSurface group
 char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_group)
 {
-    char path2[AH5_ABSOLUTE_PATH_LENGTH], *temp, rdata = TRUE;
+    char path2[AH5_ABSOLUTE_PATH_LENGTH], *temp, rdata = AH5_TRUE;
     AH5_children_t children;
     hsize_t i;
 
@@ -26,7 +26,7 @@ char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_g
             else
             {
                 AH5_print_wrn_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_TYPE);
-                rdata = FALSE;
+                rdata = AH5_FALSE;
             }
             free(temp);
         }
@@ -34,7 +34,7 @@ char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_g
         {
             exs_group->type = EXS_TYPE_INVALID;
             AH5_print_err_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_TYPE);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
         if (AH5_read_str_attr(file_id, path, AH5_A_NATURE, &temp))
@@ -46,7 +46,7 @@ char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_g
             else
             {
                 AH5_print_wrn_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_NATURE);
-                rdata = FALSE;
+                rdata = AH5_FALSE;
             }
             free(temp);
         }
@@ -54,7 +54,7 @@ char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_g
         {
             exs_group->nature = EXS_NATURE_INVALID;
             AH5_print_err_attr(AH5_C_EXCHANGE_SURFACE, path, AH5_A_NATURE);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
         children = AH5_read_children_name(file_id, path);
@@ -66,11 +66,11 @@ char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_g
             {
                 strcpy(path2, path);
                 strcat(path2, children.childnames[i]);
-                if (H5Lexists(file_id, path2, H5P_DEFAULT) != TRUE)
-                    rdata = FALSE;
+                if (!AH5_path_valid(file_id, path2))
+                    rdata = AH5_FALSE;
                 else
                     if (!AH5_read_ft_arrayset(file_id, path2, exs_group->instances + i))
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -79,7 +79,7 @@ char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_g
     else
     {
         AH5_print_err_path(AH5_C_GLOBAL_ENVIRONMENT, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -88,13 +88,13 @@ char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_g
 // Read exchangeSurface category
 char AH5_read_exchange_surface (hid_t file_id, AH5_exchange_surface_t *exchange_surface)
 {
-    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
     AH5_children_t children;
     hsize_t i;
 
     exchange_surface->groups = NULL;
 
-    if (H5Lexists(file_id, AH5_C_EXCHANGE_SURFACE, H5P_DEFAULT) == TRUE)
+    if (AH5_path_valid(file_id, AH5_C_EXCHANGE_SURFACE))
     {
         children = AH5_read_children_name(file_id, AH5_C_EXCHANGE_SURFACE);
         exchange_surface->nb_groups = children.nb_children;
@@ -106,7 +106,7 @@ char AH5_read_exchange_surface (hid_t file_id, AH5_exchange_surface_t *exchange_
                 strcpy(path, AH5_C_EXCHANGE_SURFACE);
                 strcat(path, children.childnames[i]);
                 if (!AH5_read_exs_group(file_id, path, exchange_surface->groups + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -115,7 +115,7 @@ char AH5_read_exchange_surface (hid_t file_id, AH5_exchange_surface_t *exchange_
     else
     {
         AH5_print_err_path(AH5_C_EXCHANGE_SURFACE, AH5_C_EXCHANGE_SURFACE);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }

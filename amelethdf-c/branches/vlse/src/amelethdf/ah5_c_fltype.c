@@ -1,11 +1,11 @@
-#include "ah5_fltype.h"
+#include "ah5_c_fltype.h"
 
 
-// Read singleInteger, return TRUE (all OK) or FALSE (no malloc)
+// Read singleInteger, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_singleinteger (hid_t file_id, const char *path, AH5_singleinteger_t *singleinteger)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE, AH5_A_VALUE};
-    char rdata = TRUE;
+    char rdata = AH5_TRUE;
 
     if (AH5_read_int_attr(file_id, path, AH5_A_VALUE, &(singleinteger->value)))
     {
@@ -15,17 +15,17 @@ char AH5_read_ft_singleinteger (hid_t file_id, const char *path, AH5_singleinteg
     else
     {
         AH5_print_err_attr("", path, AH5_A_VALUE);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
 
 
-// Read singleReal, return TRUE (all OK) or FALSE (no malloc)
+// Read singleReal, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_singlereal (hid_t file_id, const char *path, AH5_singlereal_t *singlereal)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE, AH5_A_VALUE};
-    char rdata = TRUE;
+    char rdata = AH5_TRUE;
 
     if (AH5_read_flt_attr(file_id, path, AH5_A_VALUE, &(singlereal->value)))
     {
@@ -35,17 +35,17 @@ char AH5_read_ft_singlereal (hid_t file_id, const char *path, AH5_singlereal_t *
     else
     {
         AH5_print_err_attr("", path, AH5_A_VALUE);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
 
 
-// Read singleComplex, return TRUE (all OK) or FALSE (no malloc)
+// Read singleComplex, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_singlecomplex (hid_t file_id, const char *path, AH5_singlecomplex_t *singlecomplex)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE, AH5_A_VALUE};
-    char rdata = TRUE;
+    char rdata = AH5_TRUE;
 
     if (AH5_read_cpx_attr(file_id, path, AH5_A_VALUE, &(singlecomplex->value)))
     {
@@ -55,17 +55,17 @@ char AH5_read_ft_singlecomplex (hid_t file_id, const char *path, AH5_singlecompl
     else
     {
         AH5_print_err_attr("", path, AH5_A_VALUE);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
 
 
-// Read singleString, return TRUE (all OK) or FALSE (no malloc)
+// Read singleString, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_singlestring (hid_t file_id, const char *path, AH5_singlestring_t *singlestring)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE, AH5_A_VALUE};
-    char rdata = TRUE;
+    char rdata = AH5_TRUE;
 
     if(AH5_read_str_attr(file_id, path, AH5_A_VALUE, &(singlestring->value)))
     {
@@ -75,17 +75,17 @@ char AH5_read_ft_singlestring (hid_t file_id, const char *path, AH5_singlestring
     else
     {
         AH5_print_err_attr("", path, AH5_A_VALUE);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
 
 
-// Read vector, return TRUE (all OK) or FALSE (no malloc)
+// Read vector, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_vector (hid_t file_id, const char *path, AH5_vector_t *vector)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE};
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
     size_t length;
     int nb_dims;
 
@@ -97,19 +97,19 @@ char AH5_read_ft_vector (hid_t file_id, const char *path, AH5_vector_t *vector)
                 {
                 case H5T_INTEGER:
                     if (AH5_read_int_dataset(file_id, path, vector->nb_values, &(vector->values.i)))
-                        rdata = TRUE;
+                        rdata = AH5_TRUE;
                     break;
                 case H5T_FLOAT:
-                    if (AH5_read_float_dataset(file_id, path, vector->nb_values, &(vector->values.f)))
-                        rdata = TRUE;
+                    if (AH5_read_flt_dataset(file_id, path, vector->nb_values, &(vector->values.f)))
+                        rdata = AH5_TRUE;
                     break;
                 case H5T_COMPOUND:
-                    if (AH5_read_complex_dataset(file_id, path, vector->nb_values, &(vector->values.c)))
-                        rdata = TRUE;
+                    if (AH5_read_cpx_dataset(file_id, path, vector->nb_values, &(vector->values.c)))
+                        rdata = AH5_TRUE;
                     break;
                 case H5T_STRING:
-                    if (AH5_read_string_dataset(file_id, path, vector->nb_values, length, &(vector->values.s)))
-                        rdata = TRUE;
+                    if (AH5_read_str_dataset(file_id, path, vector->nb_values, length, &(vector->values.s)))
+                        rdata = AH5_TRUE;
                     break;
                 default:
                     break;
@@ -128,21 +128,21 @@ char AH5_read_ft_vector (hid_t file_id, const char *path, AH5_vector_t *vector)
 }
 
 
-// Read linearListOfReal1, return TRUE (all OK) or FALSE (no malloc)
+// Read linearListOfReal1, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_linearlistofreal1 (hid_t file_id, const char *path, AH5_linearlistofreal1_t *linearlistofreal1)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE, AH5_A_FIRST, AH5_A_LAST, AH5_A_NUMBER_OF_VALUES};
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
 
     linearlistofreal1->first = 0;
     linearlistofreal1->last = 0;
     linearlistofreal1->number_of_values = 0;
     if (H5Aexists_by_name(file_id, path, AH5_A_FIRST, H5P_DEFAULT) > 0 && H5Aexists_by_name(file_id, path, AH5_A_LAST, H5P_DEFAULT) > 0)  // interval doesn't have AH5_A_NUMBER_OF_VALUES
         if (H5LTget_attribute_float(file_id, path, AH5_A_FIRST, &(linearlistofreal1->first)) >= 0 && H5LTget_attribute_float(file_id, path, AH5_A_LAST, &(linearlistofreal1->last)) >= 0)
-            rdata = TRUE;
+            rdata = AH5_TRUE;
     if (H5Aexists_by_name(file_id, path, AH5_A_NUMBER_OF_VALUES, H5P_DEFAULT) > 0)
         if (H5LTget_attribute_int(file_id, path, AH5_A_NUMBER_OF_VALUES, &(linearlistofreal1->number_of_values)) < 0)  // AH5_A_NUMBER_OF_VALUES is present -> must be read
-            rdata = FALSE;
+            rdata = AH5_FALSE;
     if (rdata)
     {
         linearlistofreal1->path = strdup(path);
@@ -154,11 +154,11 @@ char AH5_read_ft_linearlistofreal1 (hid_t file_id, const char *path, AH5_linearl
 }
 
 
-// Read linearListOfReal2, return TRUE (all OK) or FALSE (no malloc)
+// Read linearListOfReal2, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_linearlistofreal2 (hid_t file_id, const char *path, AH5_linearlistofreal2_t *linearlistofreal2)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE, AH5_A_FIRST, AH5_A_STEP, AH5_A_NUMBER_OF_VALUES};
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
 
     linearlistofreal2->first = 0;
     linearlistofreal2->step = 0;
@@ -169,7 +169,7 @@ char AH5_read_ft_linearlistofreal2 (hid_t file_id, const char *path, AH5_linearl
         if (H5LTget_attribute_float(file_id, path, AH5_A_FIRST, &(linearlistofreal2->first)) >= 0
                 && H5LTget_attribute_float(file_id, path, AH5_A_STEP, &(linearlistofreal2->step)) >= 0
                 && H5LTget_attribute_int(file_id, path, AH5_A_NUMBER_OF_VALUES, &(linearlistofreal2->number_of_values)) >= 0)
-            rdata = TRUE;
+            rdata = AH5_TRUE;
     if (rdata)
     {
         linearlistofreal2->path = strdup(path);
@@ -181,11 +181,11 @@ char AH5_read_ft_linearlistofreal2 (hid_t file_id, const char *path, AH5_linearl
 }
 
 
-// Read logarithmListOfReal, return TRUE (all OK) or FALSE (no malloc)
+// Read logarithmListOfReal, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_logarithmlistofreal (hid_t file_id, const char *path, AH5_logarithmlistofreal_t *logarithmlistofreal)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE, AH5_A_FIRST, AH5_A_LAST, AH5_A_NUMBER_OF_VALUES};
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
 
     logarithmlistofreal->first = 0;
     logarithmlistofreal->last = 0;
@@ -196,7 +196,7 @@ char AH5_read_ft_logarithmlistofreal (hid_t file_id, const char *path, AH5_logar
         if (H5LTget_attribute_float(file_id, path, AH5_A_FIRST, &(logarithmlistofreal->first)) >= 0
                 && H5LTget_attribute_float(file_id, path, AH5_A_LAST, &(logarithmlistofreal->last)) >= 0
                 && H5LTget_attribute_int(file_id, path, AH5_A_NUMBER_OF_VALUES, &(logarithmlistofreal->number_of_values)) >= 0)
-            rdata = TRUE;
+            rdata = AH5_TRUE;
     if (rdata)
     {
         logarithmlistofreal->path = strdup(path);
@@ -208,11 +208,11 @@ char AH5_read_ft_logarithmlistofreal (hid_t file_id, const char *path, AH5_logar
 }
 
 
-// Read perDecadeListOfReal, return TRUE (all OK) or FALSE (no malloc)
+// Read perDecadeListOfReal, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_perdecadelistofreal (hid_t file_id, const char *path, AH5_perdecadelistofreal_t *perdecadelistofreal)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE, AH5_A_NUMBER_OF_DECADES, AH5_A_NUMBER_OF_VALUES_PER_DECADE};
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
 
     perdecadelistofreal->first = 0;
     perdecadelistofreal->number_of_decades = 0;
@@ -223,7 +223,7 @@ char AH5_read_ft_perdecadelistofreal (hid_t file_id, const char *path, AH5_perde
         if (H5LTget_attribute_float(file_id, path, AH5_A_FIRST, &(perdecadelistofreal->first)) >= 0
                 && H5LTget_attribute_int(file_id, path, AH5_A_NUMBER_OF_DECADES, &(perdecadelistofreal->number_of_decades)) >= 0
                 && H5LTget_attribute_int(file_id, path, AH5_A_NUMBER_OF_VALUES_PER_DECADE, &(perdecadelistofreal->number_of_values_per_decade)) >= 0)
-            rdata = TRUE;
+            rdata = AH5_TRUE;
     if (rdata)
     {
         perdecadelistofreal->path = strdup(path);
@@ -235,11 +235,11 @@ char AH5_read_ft_perdecadelistofreal (hid_t file_id, const char *path, AH5_perde
 }
 
 
-// Read linearListOfInteger2, return TRUE (all OK) or FALSE (no malloc)
+// Read linearListOfInteger2, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_linearlistofinteger2 (hid_t file_id, const char *path, AH5_linearlistofinteger2_t *linearlistofinteger2)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE, AH5_A_FIRST, AH5_A_STEP, AH5_A_NUMBER_OF_VALUES};
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
 
     linearlistofinteger2->first = 0;
     linearlistofinteger2->step = 0;
@@ -250,7 +250,7 @@ char AH5_read_ft_linearlistofinteger2 (hid_t file_id, const char *path, AH5_line
         if (H5LTget_attribute_int(file_id, path, AH5_A_FIRST, &(linearlistofinteger2->first)) >= 0
                 && H5LTget_attribute_int(file_id, path, AH5_A_STEP, &(linearlistofinteger2->step)) >= 0
                 && H5LTget_attribute_int(file_id, path, AH5_A_NUMBER_OF_VALUES, &(linearlistofinteger2->number_of_values)) >= 0)
-            rdata = TRUE;
+            rdata = AH5_TRUE;
     if (rdata)
     {
         linearlistofinteger2->path = strdup(path);
@@ -262,13 +262,13 @@ char AH5_read_ft_linearlistofinteger2 (hid_t file_id, const char *path, AH5_line
 }
 
 
-// Read rationalFunction, return TRUE (all OK) or FALSE (no malloc)
+// Read rationalFunction, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_rationalfunction (hid_t file_id, const char *path, AH5_rationalfunction_t *rationalfunction)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE};
     int type = 0, a = 1, b = 2, f = 3;
     size_t *field_offsets;
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
     size_t *field_sizes;
     char **field_names;
     hsize_t nfields, i;
@@ -295,7 +295,7 @@ char AH5_read_ft_rationalfunction (hid_t file_id, const char *path, AH5_rational
                             && H5TBread_fields_index(file_id, path, 1, &a, 0, rationalfunction->nb_types, sizeof(float), field_offsets, field_sizes, rationalfunction->a) >= 0
                             && H5TBread_fields_index(file_id, path, 1, &b, 0, rationalfunction->nb_types, sizeof(float), field_offsets, field_sizes, rationalfunction->b) >= 0
                             && H5TBread_fields_index(file_id, path, 1, &f, 0, rationalfunction->nb_types, sizeof(float), field_offsets, field_sizes, rationalfunction->f) >= 0)
-                        rdata = TRUE;
+                        rdata = AH5_TRUE;
                     else
                     {
                         free(rationalfunction->types);
@@ -320,12 +320,12 @@ char AH5_read_ft_rationalfunction (hid_t file_id, const char *path, AH5_rational
 }
 
 
-// Read generalRationalFunction, return TRUE (all OK) or FALSE (no malloc)
+// Read generalRationalFunction, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_generalrationalfunction (hid_t file_id, const char *path, AH5_generalrationalfunction_t *generalrationalfunction)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE};
     H5T_class_t type_class;
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
     AH5_complex_t *buf;
     hsize_t dims[2], i;
     size_t length;
@@ -338,14 +338,14 @@ char AH5_read_ft_generalrationalfunction (hid_t file_id, const char *path, AH5_g
                 {
                     generalrationalfunction->numerator = (AH5_complex_t *) malloc(dims[0] * sizeof(AH5_complex_t));
                     generalrationalfunction->denominator = (AH5_complex_t *) malloc(dims[0] * sizeof(AH5_complex_t));
-                    if (AH5_read_complex_dataset(file_id, path, dims[0] * dims[1], &(buf)))
+                    if (AH5_read_cpx_dataset(file_id, path, dims[0] * dims[1], &(buf)))
                     {
                         for (i = 0; i < dims[0]; i++)
                         {
                             generalrationalfunction->numerator[i] = buf[2*i];
                             generalrationalfunction->denominator[i] = buf[2*i + 1];
                         }
-                        rdata = TRUE;
+                        rdata = AH5_TRUE;
                         free(buf);
                     }
                     else
@@ -366,14 +366,14 @@ char AH5_read_ft_generalrationalfunction (hid_t file_id, const char *path, AH5_g
 }
 
 
-// Read rational, return TRUE (all OK) or FALSE (no malloc)
+// Read rational, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rational)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE};
     char path2[AH5_ABSOLUTE_PATH_LENGTH];
-    char *buf, rdata = FALSE;
+    char *buf, rdata = AH5_FALSE;
     hsize_t i, invalid_nb = -1;
-    char invalid = FALSE;
+    char invalid = AH5_FALSE;
     H5T_class_t type_class;
     AH5_children_t children;
     size_t length;
@@ -402,7 +402,7 @@ char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rati
                         if(!AH5_read_ft_rationalfunction(file_id, path2, &(rational->functions[i].data.rf)))
                         {
                             invalid_nb = i;
-                            invalid = TRUE;
+                            invalid = AH5_TRUE;
                         }
                     }
                     else if (strcmp(buf, AH5_V_GENERAL_RATIONAL_FUNCTION) == 0)
@@ -411,13 +411,13 @@ char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rati
                         if(!AH5_read_ft_generalrationalfunction(file_id, path2, &(rational->functions[i].data.grf)))
                         {
                             invalid_nb = i;
-                            invalid = TRUE;
+                            invalid = AH5_TRUE;
                         }                    }
                     else
                     {
                         printf("***** WARNING: Invalid attribute \"floatingType\" in \"%s\". *****\n\n", path2);
                         invalid_nb = i;
-                        invalid = TRUE;
+                        invalid = AH5_TRUE;
                     }
                     free(buf);
                     buf = NULL;
@@ -451,13 +451,13 @@ char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rati
             // Read rational/data
             strcpy(path2, path);
             strcat(path2, AH5_G_DATA);
-            if (H5Lexists(file_id, path2, H5P_DEFAULT) == TRUE)
+            if (AH5_path_valid(file_id, path2))
                 if (H5LTget_dataset_ndims(file_id, path2, &nb_dims) >= 0)
                     if (nb_dims == 2)
                         if (H5LTget_dataset_info(file_id, path2, rational->dims, &type_class, &length) >= 0)
                             if (type_class == H5T_STRING)
-                                if (AH5_read_string_dataset(file_id, path2, (rational->dims[0]) * (rational->dims[1]), length, &(rational->data)))
-                                    rdata = TRUE;
+                                if (AH5_read_str_dataset(file_id, path2, (rational->dims[0]) * (rational->dims[1]), length, &(rational->data)))
+                                    rdata = AH5_TRUE;
         }
     }
     if (rdata)
@@ -471,12 +471,12 @@ char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rati
 }
 
 
-// Read dataset, return TRUE (all OK) or FALSE (no malloc)
+// Read dataset, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_dataset (hid_t file_id, const char *path, AH5_dataset_t *dataset)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE};
     hsize_t total_size = 1;
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
     size_t length;
     int i;
 
@@ -492,19 +492,19 @@ char AH5_read_ft_dataset (hid_t file_id, const char *path, AH5_dataset_t *datase
                 {
                 case H5T_INTEGER:
                     if (AH5_read_int_dataset(file_id, path, total_size, &(dataset->values.i)))
-                        rdata = TRUE;
+                        rdata = AH5_TRUE;
                     break;
                 case H5T_FLOAT:
-                    if (AH5_read_float_dataset(file_id, path, total_size, &(dataset->values.f)))
-                        rdata = TRUE;
+                    if (AH5_read_flt_dataset(file_id, path, total_size, &(dataset->values.f)))
+                        rdata = AH5_TRUE;
                     break;
                 case H5T_COMPOUND:
-                    if (AH5_read_complex_dataset(file_id, path, total_size, &(dataset->values.c)))
-                        rdata = TRUE;
+                    if (AH5_read_cpx_dataset(file_id, path, total_size, &(dataset->values.c)))
+                        rdata = AH5_TRUE;
                     break;
                 case H5T_STRING:
-                    if (AH5_read_string_dataset(file_id, path, total_size, length, &(dataset->values.s)))
-                        rdata = TRUE;
+                    if (AH5_read_str_dataset(file_id, path, total_size, length, &(dataset->values.s)))
+                        rdata = AH5_TRUE;
                     break;
                 default:
                     break;
@@ -524,14 +524,14 @@ char AH5_read_ft_dataset (hid_t file_id, const char *path, AH5_dataset_t *datase
 }
 
 
-// Read arraySet, return TRUE (all OK) or FALSE (no malloc)
+// Read arraySet, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_ft_arrayset (hid_t file_id, const char *path, AH5_arrayset_t *arrayset)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_FLOATING_TYPE};
     char path2[AH5_ABSOLUTE_PATH_LENGTH];
     hsize_t i, invalid_nb = -1;
-    char invalid = FALSE;
-    char rdata = FALSE;
+    char invalid = AH5_FALSE;
+    char rdata = AH5_FALSE;
     AH5_children_t children;
 
     strcpy(path2, path);
@@ -553,7 +553,7 @@ char AH5_read_ft_arrayset (hid_t file_id, const char *path, AH5_arrayset_t *arra
                 if(!AH5_read_ft_vector(file_id, path2, arrayset->dims + i))
                 {
                     invalid_nb = i;
-                    invalid = TRUE;
+                    invalid = AH5_TRUE;
                 }
             }
             free(children.childnames[i]);
@@ -567,7 +567,7 @@ char AH5_read_ft_arrayset (hid_t file_id, const char *path, AH5_arrayset_t *arra
             free(arrayset->dims);
         }
         else
-            rdata = TRUE;
+            rdata = AH5_TRUE;
     }
     if (rdata)
     {
@@ -579,10 +579,10 @@ char AH5_read_ft_arrayset (hid_t file_id, const char *path, AH5_arrayset_t *arra
     return rdata;
 }
 
-// Read floatingType structure, return TRUE (all OK) or FALSE (no malloc)
+// Read floatingType structure, return AH5_TRUE (all OK) or AH5_FALSE (no malloc)
 char AH5_read_floatingtype(hid_t file_id, const char *path, AH5_ft_t *floatingtype)
 {
-    char rdata = FALSE;
+    char rdata = AH5_FALSE;
     char* buf;
 
     if (AH5_path_valid(file_id, path))
@@ -593,91 +593,91 @@ char AH5_read_floatingtype(hid_t file_id, const char *path, AH5_ft_t *floatingty
             {
                 floatingtype->type = FT_SINGLE_INTEGER;
                 if (AH5_read_ft_singleinteger(file_id, path, &(floatingtype->data.singleinteger)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_SINGLE_REAL) == 0)
             {
                 floatingtype->type = FT_SINGLE_REAL;
                 if (AH5_read_ft_singlereal(file_id, path, &(floatingtype->data.singlereal)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_SINGLE_COMPLEX) == 0)
             {
                 floatingtype->type = FT_SINGLE_COMPLEX;
                 if (AH5_read_ft_singlecomplex(file_id, path, &(floatingtype->data.singlecomplex)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_SINGLE_STRING) == 0)
             {
                 floatingtype->type = FT_SINGLE_STRING;
                 if (AH5_read_ft_singlestring(file_id, path, &(floatingtype->data.singlestring)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_VECTOR) == 0)
             {
                 floatingtype->type = FT_VECTOR;
                 if (AH5_read_ft_vector(file_id, path, &(floatingtype->data.vector)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_LINEARLISTOFREAL1) == 0)
             {
                 floatingtype->type = FT_LINEARLISTOFREAL1;
                 if (AH5_read_ft_linearlistofreal1(file_id, path, &(floatingtype->data.linearlistofreal1)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_LINEARLISTOFREAL2) == 0)
             {
                 floatingtype->type = FT_LINEARLISTOFREAL2;
                 if (AH5_read_ft_linearlistofreal2(file_id, path, &(floatingtype->data.linearlistofreal2)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_LOGARITHMLISTOFREAL) == 0)
             {
                 floatingtype->type = FT_LOGARITHMLISTOFREAL;
                 if (AH5_read_ft_logarithmlistofreal(file_id, path, &(floatingtype->data.logarithmlistofreal)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_PERDECADELISTOFREAL) == 0)
             {
                 floatingtype->type = FT_PERDECADELISTOFREAL;
                 if (AH5_read_ft_perdecadelistofreal(file_id, path, &(floatingtype->data.perdecadelistofreal)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_LINEARLISTOFINTEGER2) == 0)
             {
                 floatingtype->type = FT_LINEARLISTOFINTEGER2;
                 if (AH5_read_ft_linearlistofinteger2(file_id, path, &(floatingtype->data.linearlistofinteger2)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_RATIONAL_FUNCTION) == 0)
             {
                 floatingtype->type = FT_RATIONAL_FUNCTION;
                 if (AH5_read_ft_rationalfunction(file_id, path, &(floatingtype->data.rationalfunction)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_GENERAL_RATIONAL_FUNCTION) == 0)
             {
                 floatingtype->type = FT_GENERAL_RATIONAL_FUNCTION;
                 if (AH5_read_ft_generalrationalfunction(file_id, path, &(floatingtype->data.generalrationalfunction)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_RATIONAL) == 0)
             {
                 floatingtype->type = FT_RATIONAL;
                 if (AH5_read_ft_rational (file_id, path, &(floatingtype->data.rational)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_DATASET) == 0)
             {
                 floatingtype->type = FT_DATASET;
                 if (AH5_read_ft_dataset(file_id, path, &(floatingtype->data.dataset)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_ARRAYSET) == 0)
             {
                 floatingtype->type = FT_ARRAYSET;
                 if (AH5_read_ft_arrayset(file_id, path, &(floatingtype->data.arrayset)))
-                    rdata = TRUE;
+                    rdata = AH5_TRUE;
             }
             else
                 printf("***** ERROR: Invalid attribute \"floatingType\" in \"%s\". *****\n\n", path);

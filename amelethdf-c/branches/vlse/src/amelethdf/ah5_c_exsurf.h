@@ -1,11 +1,11 @@
-#ifndef AH5_EXSURF_H
-#define AH5_EXSURF_H
+#ifndef AH5_C_EXSURF_H
+#define AH5_C_EXSURF_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "ah5_fltype.h"
+#include "ah5_c_fltype.h"
 
     typedef enum _AH5_exs_type_class_t
     {
@@ -50,4 +50,4 @@ extern "C" {
 }
 #endif
 
-#endif // AH5_EXSURF_H
+#endif // AH5_C_EXSURF_H

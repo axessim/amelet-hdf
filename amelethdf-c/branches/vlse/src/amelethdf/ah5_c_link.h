@@ -1,12 +1,12 @@
-#ifndef AH5_LINK_H
-#define AH5_LINK_H
+#ifndef AH5_C_LINK_H
+#define AH5_C_LINK_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "ah5_general.h"
-#include "ah5_label.h"
+#include "ah5_c_label.h"
 
     typedef struct _AH5_lnk_instance_t
     {
@@ -51,4 +51,4 @@ extern "C" {
 }
 #endif
 
-#endif // AH5_LINK_H
+#endif // AH5_C_LINK_H

@@ -1,5 +1,5 @@
-#ifndef AH5_EXTELT_H
-#define AH5_EXTELT_H
+#ifndef AH5_C_EXTELT_H
+#define AH5_C_EXTELT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,4 +42,4 @@ extern "C" {
 }
 #endif
 
-#endif // AH5_EXTELT_H
+#endif // AH5_C_EXTELT_H

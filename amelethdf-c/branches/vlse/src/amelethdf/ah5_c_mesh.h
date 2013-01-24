@@ -1,5 +1,5 @@
-#ifndef AH5_MESH_H
-#define AH5_MESH_H
+#ifndef AH5_C_MESH_H
+#define AH5_C_MESH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -202,4 +202,4 @@ extern "C" {
 }
 #endif
 
-#endif // MESH_H
+#endif // AH5_C_MESH_H

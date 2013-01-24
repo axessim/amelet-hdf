@@ -1,5 +1,5 @@
-#ifndef AH5_LOCSYS_H
-#define AH5_LOCSYS_H
+#ifndef AH5_C_LOCSYS_H
+#define AH5_C_LOCSYS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,4 +53,4 @@ extern "C" {
 }
 #endif
 
-#endif // AH5_LOCSYS_H
+#endif // AH5_C_LOCSYS_H

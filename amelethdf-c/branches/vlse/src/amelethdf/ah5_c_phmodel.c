@@ -1,8 +1,8 @@
-#include "ah5_phmodel.h"
+#include "ah5_c_phmodel.h"
 
 char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *material_prop)
 {
-    char rdata = TRUE, *buf = NULL, path2[AH5_ABSOLUTE_PATH_LENGTH], datasetok = FALSE;
+    char rdata = AH5_TRUE, *buf = NULL, path2[AH5_ABSOLUTE_PATH_LENGTH], datasetok = AH5_FALSE;
     int nb_dims;
     hsize_t dims[2] = {1, 1};
     H5T_class_t type_class;
@@ -20,24 +20,24 @@ char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *ma
                 {
                     material_prop->type = MP_SINGLE_COMPLEX;
                     if (!AH5_read_ft_singlecomplex(file_id, path, &(material_prop->data.singlecomplex)))
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                 }
                 else if (strcmp(buf, AH5_V_ARRAYSET) == 0)
                 {
                     material_prop->type = MP_ARRAYSET;
                     if (!AH5_read_ft_arrayset(file_id, path, &(material_prop->data.arrayset)))
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                 }
                 else if (strcmp(buf, AH5_V_GENERAL_RATIONAL_FUNCTION) == 0)
                 {
                     material_prop->type = MP_GENERAL_RATIONAL_FUNCTION;
                     if (!AH5_read_ft_generalrationalfunction(file_id, path, &(material_prop->data.generalrationalfunction)))
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                 }
                 else
                 {
                     AH5_print_err_inv_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_FLOATING_TYPE);
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 }
             }
             else if (AH5_read_str_attr(file_id, path, AH5_A_TYPE, &buf))
@@ -47,9 +47,9 @@ char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *ma
                 {
                     material_prop->type = MP_DEBYE;
                     if (!AH5_read_flt_attr(file_id, path, AH5_A_ER_LIMIT, &(material_prop->data.debye.limit)))
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                     if (!AH5_read_flt_attr(file_id, path, AH5_A_ER_STATIC, &(material_prop->data.debye.stat)))
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                     strcpy(path2, path);
                     strcat(path2, AH5_G_LIST_OF_FUNCTIONS);
                     if (AH5_path_valid(file_id, path2) && rdata)
@@ -57,21 +57,21 @@ char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *ma
                             if (nb_dims == 2)
                                 if (H5LTget_dataset_info(file_id, path2, dims, &type_class, &length) >= 0)
                                     if (type_class == H5T_FLOAT && length == 4)
-                                        if (AH5_read_float_dataset(file_id, path2, dims[0]*dims[1], &(material_prop->data.debye.gtau)))
+                                        if (AH5_read_flt_dataset(file_id, path2, dims[0]*dims[1], &(material_prop->data.debye.gtau)))
                                         {
                                             material_prop->data.debye.nb_gtau = dims[0];
-                                            datasetok = TRUE;
+                                            datasetok = AH5_TRUE;
                                         }
                     if (!datasetok)
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                 }
                 else if (strcmp(buf, AH5_V_LORENTZ) == 0)
                 {
                     material_prop->type = MP_LORENTZ;
                     if (!AH5_read_flt_attr(file_id, path, AH5_A_ER_LIMIT, &(material_prop->data.lorentz.limit)))
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                     if (!AH5_read_flt_attr(file_id, path, AH5_A_ER_STATIC, &(material_prop->data.lorentz.stat)))
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                     strcpy(path2, path);
                     strcat(path2, AH5_G_LIST_OF_FUNCTIONS);
                     if (AH5_path_valid(file_id, path2))
@@ -79,24 +79,24 @@ char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *ma
                             if (nb_dims == 2)
                                 if (H5LTget_dataset_info(file_id, path2, dims, &type_class, &length) >= 0)
                                     if (type_class == H5T_FLOAT && length == 4)
-                                        if (AH5_read_float_dataset(file_id, path2, dims[0]*dims[1], &(material_prop->data.lorentz.god)))
+                                        if (AH5_read_flt_dataset(file_id, path2, dims[0]*dims[1], &(material_prop->data.lorentz.god)))
                                         {
                                             material_prop->data.lorentz.nb_god = dims[0];
-                                            datasetok = TRUE;
+                                            datasetok = AH5_TRUE;
                                         }
                     if (!datasetok)
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                 }
                 else
                 {
                     AH5_print_err_inv_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_TYPE);
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 }
             }
             else
             {
                 printf("***** ERROR(%s): Missing attribute \"floatingType\" or \"type\" in \"%s\". *****\n\n", AH5_C_PHYSICAL_MODEL, path);
-                rdata = FALSE;
+                rdata = AH5_FALSE;
             }
         }
         else
@@ -109,25 +109,25 @@ char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *ma
                     if (AH5_read_ft_singlereal(file_id, path, &(material_prop->data.singlereal)))
                         material_prop->type = MP_SINGLE_REAL;
                     else
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                 }
                 else if (strcmp(buf, AH5_V_ARRAYSET) == 0)
                 {
                     if (AH5_read_ft_arrayset(file_id, path, &(material_prop->data.arrayset)))
                         material_prop->type = MP_ARRAYSET;
                     else
-                        rdata = FALSE;
+                        rdata = AH5_FALSE;
                 }
                 else
                 {
                     AH5_print_err_inv_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_FLOATING_TYPE);
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 }
             }
             else
             {
                 AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_FLOATING_TYPE);
-                rdata = FALSE;
+                rdata = AH5_FALSE;
             }
         }
         free(buf);
@@ -135,7 +135,7 @@ char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *ma
     else
     {
         AH5_print_err_path(AH5_C_PHYSICAL_MODEL, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -143,7 +143,7 @@ char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *ma
 // Read instance in physicalModel/volume
 char AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_instance_t *volume_instance)
 {
-    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
 /*    char mandatory[][AH5_ATTR_LENGTH] = {}; */
 
     volume_instance->path = strdup(path);
@@ -159,24 +159,24 @@ char AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_i
         strcpy(path2, path);
         strcat(path2, AH5_G_RELATIVE_PERMITTIVITY);
         if (!AH5_read_phm_vimp(file_id, path2, &(volume_instance->relative_permittivity)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         strcpy(path2, path);
         strcat(path2, AH5_G_RELATIVE_PERMEABILITY);
         if (!AH5_read_phm_vimp(file_id, path2, &(volume_instance->relative_permeability)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         strcpy(path2, path);
         strcat(path2, AH5_G_ELECTRIC_CONDUCTIVITY);
         if (!AH5_read_phm_vimp(file_id, path2, &(volume_instance->electric_conductivity)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         strcpy(path2, path);
         strcat(path2, AH5_G_MAGNETIC_CONDUCTIVITY);
         if (!AH5_read_phm_vimp(file_id, path2, &(volume_instance->magnetic_conductivity)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
     }
     else
     {
         AH5_print_err_path(AH5_C_PHYSICAL_MODEL, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -186,7 +186,7 @@ char AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_i
 char AH5_read_phm_surface_instance_tdl (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_PHYSICAL_MODEL, AH5_A_THICKNESS};
-    char rdata = TRUE;
+    char rdata = AH5_TRUE;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -194,19 +194,19 @@ char AH5_read_phm_surface_instance_tdl (hid_t file_id, const char *path, AH5_sur
         if(!AH5_read_str_attr(file_id, path, AH5_A_PHYSICAL_MODEL, &(surface_instance->physicalmodel)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_PHYSICAL_MODEL);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if(!AH5_read_flt_attr(file_id, path, AH5_A_THICKNESS, &(surface_instance->thickness)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_THICKNESS);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         AH5_read_opt_attrs(file_id, path, &(surface_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
     }
     else
     {
         AH5_print_err_path(AH5_C_PHYSICAL_MODEL, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -216,7 +216,7 @@ char AH5_read_phm_surface_instance_tdl (hid_t file_id, const char *path, AH5_sur
 char AH5_read_phm_surface_instance_sibc (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_PHYSICAL_MODEL, AH5_A_THICKNESS};
-    char rdata = TRUE;
+    char rdata = AH5_TRUE;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -224,19 +224,19 @@ char AH5_read_phm_surface_instance_sibc (hid_t file_id, const char *path, AH5_su
         if(!AH5_read_str_attr(file_id, path, AH5_A_PHYSICAL_MODEL, &(surface_instance->physicalmodel)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_PHYSICAL_MODEL);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if(!AH5_read_flt_attr(file_id, path, AH5_A_THICKNESS, &(surface_instance->thickness)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_THICKNESS);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         AH5_read_opt_attrs(file_id, path, &(surface_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
     }
     else
     {
         AH5_print_err_path(AH5_C_PHYSICAL_MODEL, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -245,7 +245,7 @@ char AH5_read_phm_surface_instance_sibc (hid_t file_id, const char *path, AH5_su
 // Read "ZS" values of instance in physicalModel/surface
 char AH5_read_phm_surface_instance_zs (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance)
 {
-    char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_ZS}, rdata = TRUE;
+    char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_ZS}, rdata = AH5_TRUE;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -253,14 +253,14 @@ char AH5_read_phm_surface_instance_zs (hid_t file_id, const char *path, AH5_surf
         if(!AH5_read_str_attr(file_id, path, AH5_A_ZS, &(surface_instance->zs)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_ZS);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         AH5_read_opt_attrs(file_id, path, &(surface_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
     }
     else
     {
         AH5_print_err_path(AH5_C_PHYSICAL_MODEL, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -269,7 +269,7 @@ char AH5_read_phm_surface_instance_zs (hid_t file_id, const char *path, AH5_surf
 // Read "ZSZT" values of instance in physicalModel/surface
 char AH5_read_phm_surface_instance_zszt (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance)
 {
-    char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_ZS, AH5_A_ZT}, rdata = TRUE;
+    char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_ZS, AH5_A_ZT}, rdata = AH5_TRUE;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -277,19 +277,19 @@ char AH5_read_phm_surface_instance_zszt (hid_t file_id, const char *path, AH5_su
         if(!AH5_read_str_attr(file_id, path, AH5_A_ZS, &(surface_instance->zs)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_ZS);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if(!AH5_read_str_attr(file_id, path, AH5_A_ZT, &(surface_instance->zt)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_ZT);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         AH5_read_opt_attrs(file_id, path, &(surface_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
     }
     else
     {
         AH5_print_err_path(AH5_C_PHYSICAL_MODEL, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -299,7 +299,7 @@ char AH5_read_phm_surface_instance_zszt (hid_t file_id, const char *path, AH5_su
 char AH5_read_phm_surface_instance_zszt2 (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_ZS1, AH5_A_ZT1, AH5_A_ZS2, AH5_A_ZT2};
-    char rdata = TRUE;
+    char rdata = AH5_TRUE;
 
     if (AH5_path_valid(file_id, path))
     {
@@ -307,29 +307,29 @@ char AH5_read_phm_surface_instance_zszt2 (hid_t file_id, const char *path, AH5_s
         if(!AH5_read_str_attr(file_id, path, AH5_A_ZS1, &(surface_instance->zs1)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_ZS1);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if(!AH5_read_str_attr(file_id, path, AH5_A_ZT1, &(surface_instance->zt1)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_ZT1);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if(!AH5_read_str_attr(file_id, path, AH5_A_ZS2, &(surface_instance->zs2)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_ZS2);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if(!AH5_read_str_attr(file_id, path, AH5_A_ZT2, &(surface_instance->zt2)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_ZT2);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         AH5_read_opt_attrs(file_id, path, &(surface_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
     }
     else
     {
         AH5_print_err_path(AH5_C_PHYSICAL_MODEL, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -338,7 +338,7 @@ char AH5_read_phm_surface_instance_zszt2 (hid_t file_id, const char *path, AH5_s
 // Read instance in physicalModel/surface
 char AH5_read_phm_surface_instance (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance)
 {
-    char *temp, rdata = TRUE;
+    char *temp, rdata = AH5_TRUE;
 
     surface_instance->path = strdup(path);
     surface_instance->physicalmodel = NULL;
@@ -359,32 +359,32 @@ char AH5_read_phm_surface_instance (hid_t file_id, const char *path, AH5_surface
             if (strcmp(temp, AH5_V_THIN_DIELECTRIC_LAYER) == 0)
             {
                 if (!AH5_read_phm_surface_instance_tdl(file_id, path, surface_instance))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else if (strcmp(temp, AH5_V_SIBC) == 0)
             {
                 if (!AH5_read_phm_surface_instance_sibc(file_id, path, surface_instance))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else if (strcmp(temp, AH5_V_ZS) == 0)
             {
                 if (!AH5_read_phm_surface_instance_zs(file_id, path, surface_instance))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else if (strcmp(temp, AH5_V_ZSZT) == 0)
             {
                 if (!AH5_read_phm_surface_instance_zszt(file_id, path, surface_instance))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else if (strcmp(temp, AH5_V_ZSZT2) == 0)
             {
                 if (!AH5_read_phm_surface_instance_zszt2(file_id, path, surface_instance))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else
             {
                 AH5_print_wrn_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_TYPE);
-                rdata = FALSE;
+                rdata = AH5_FALSE;
             }
             free(temp);
         }
@@ -392,13 +392,13 @@ char AH5_read_phm_surface_instance (hid_t file_id, const char *path, AH5_surface
         {
             surface_instance->type = S_INVALID;
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_TYPE);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
     }
     else
     {
         AH5_print_err_path(AH5_C_PHYSICAL_MODEL, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -408,7 +408,7 @@ char AH5_read_phm_surface_instance (hid_t file_id, const char *path, AH5_surface
 char AH5_read_phm_interface_instance (hid_t file_id, const char *path, AH5_interface_instance_t *interface_instance)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_MEDIUM1, AH5_A_MEDIUM2};
-    char rdata = TRUE;
+    char rdata = AH5_TRUE;
 
     interface_instance->path = strdup(path);
     interface_instance->opt_attrs.instances = NULL;
@@ -420,19 +420,19 @@ char AH5_read_phm_interface_instance (hid_t file_id, const char *path, AH5_inter
         if (!AH5_read_str_attr(file_id, path, AH5_A_MEDIUM1, &(interface_instance->medium1)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_MEDIUM1);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_str_attr(file_id, path, AH5_A_MEDIUM2, &(interface_instance->medium2)))
         {
             AH5_print_err_attr(AH5_C_PHYSICAL_MODEL, path, AH5_A_MEDIUM2);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         AH5_read_opt_attrs(file_id, path, &(interface_instance->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
     }
     else
     {
         AH5_print_err_path(AH5_C_PHYSICAL_MODEL, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -441,7 +441,7 @@ char AH5_read_phm_interface_instance (hid_t file_id, const char *path, AH5_inter
 // Read physicalModel category
 char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel)
 {
-    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
     AH5_children_t children;
     hsize_t i;
 
@@ -449,7 +449,7 @@ char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel)
     physicalmodel->surface_instances = NULL;
     physicalmodel->interface_instances = NULL;
 
-    if (H5Lexists(file_id, AH5_C_PHYSICAL_MODEL, H5P_DEFAULT) == TRUE)
+    if (AH5_path_valid(file_id, AH5_C_PHYSICAL_MODEL))
     {
         strcpy(path, AH5_C_PHYSICAL_MODEL);
         strcat(path, AH5_G_VOLUME);
@@ -464,7 +464,7 @@ char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel)
                 strcat(path, AH5_G_VOLUME);
                 strcat(path, children.childnames[i]);
                 if (!AH5_read_phm_volume_instance(file_id, path, physicalmodel->volume_instances + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -483,7 +483,7 @@ char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel)
                 strcat(path, AH5_G_SURFACE);
                 strcat(path, children.childnames[i]);
                 if (!AH5_read_phm_surface_instance(file_id, path, physicalmodel->surface_instances + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -502,7 +502,7 @@ char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel)
                 strcat(path, AH5_G_INTERFACE);
                 strcat(path, children.childnames[i]);
                 if (!AH5_read_phm_interface_instance(file_id, path, physicalmodel->interface_instances + i))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
                 free(children.childnames[i]);
             }
             free(children.childnames);
@@ -511,7 +511,7 @@ char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel)
     else
     {
         AH5_print_err_path(AH5_C_PHYSICAL_MODEL, AH5_C_PHYSICAL_MODEL);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }

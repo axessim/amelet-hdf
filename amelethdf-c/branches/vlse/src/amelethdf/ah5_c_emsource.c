@@ -1,11 +1,11 @@
-#include "ah5_emsource.h"
+#include "ah5_c_emsource.h"
 
 
 // Read instance in /electromagneticSource/planeWave
 char AH5_read_els_planewave (hid_t file_id, const char *path, AH5_planewave_t *planewave)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_XO, AH5_A_YO, AH5_A_ZO, AH5_A_THETA, AH5_A_PHI};
-    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
 
     planewave->path = strdup(path);
     planewave->opt_attrs.instances = NULL;
@@ -17,41 +17,41 @@ char AH5_read_els_planewave (hid_t file_id, const char *path, AH5_planewave_t *p
         if (!AH5_read_flt_attr(file_id, path, AH5_A_XO, &(planewave->xo)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_XO);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
         if (!AH5_read_flt_attr(file_id, path, AH5_A_YO, &(planewave->yo)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_YO);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
         if (!AH5_read_flt_attr(file_id, path, AH5_A_ZO, &(planewave->zo)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_ZO);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
         if (!AH5_read_flt_attr(file_id, path, AH5_A_THETA, &(planewave->theta)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_THETA);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_flt_attr(file_id, path, AH5_A_PHI, &(planewave->phi)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_PHI);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
         strcpy(path2, path);
         strcat(path2, AH5_G_MAGNITUDE);
         if (!AH5_read_floatingtype(file_id, path2, &(planewave->magnitude)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
     }
     else
     {
         AH5_print_err_path(AH5_C_ELECTROMAGNETIC_SOURCE, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -60,7 +60,7 @@ char AH5_read_els_planewave (hid_t file_id, const char *path, AH5_planewave_t *p
 // Read instance in /electromagneticSource/sphericalWave
 char AH5_read_els_sphericalwave (hid_t file_id, const char *path, AH5_sphericalwave_t *sphericalwave)
 {
-    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
 
     sphericalwave->path = strdup(path);
     sphericalwave->magnitude.type = FT_INVALID;
@@ -70,27 +70,27 @@ char AH5_read_els_sphericalwave (hid_t file_id, const char *path, AH5_sphericalw
         if (!AH5_read_flt_attr(file_id, path, AH5_A_XO, &(sphericalwave->xo)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_XO);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_flt_attr(file_id, path, AH5_A_YO, &(sphericalwave->yo)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_YO);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_flt_attr(file_id, path, AH5_A_ZO, &(sphericalwave->zo)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_ZO);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         strcpy(path2, path);
         strcat(path2, AH5_G_MAGNITUDE);
         if (!AH5_read_floatingtype(file_id, path2, &(sphericalwave->magnitude)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
     }
     else
     {
         AH5_print_err_path(AH5_C_ELECTROMAGNETIC_SOURCE, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -99,7 +99,7 @@ char AH5_read_els_sphericalwave (hid_t file_id, const char *path, AH5_sphericalw
 // Read instance in /electromagneticSource/generator
 char AH5_read_els_generator (hid_t file_id, const char *path, AH5_generator_t *generator)
 {
-    char *type, path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char *type, path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_TYPE};
 
     generator->path = strdup(path);
@@ -126,23 +126,23 @@ char AH5_read_els_generator (hid_t file_id, const char *path, AH5_generator_t *g
         else
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_TYPE);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
         strcpy(path2, path);
         strcat(path2, AH5_G_INNER_IMPEDANCE);
         if (!AH5_read_floatingtype(file_id, path2, &(generator->inner_impedance)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
 
         strcpy(path2, path);
         strcat(path2, AH5_G_MAGNITUDE);
         if (!AH5_read_floatingtype(file_id, path2, &(generator->magnitude)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
     }
     else
     {
         AH5_print_err_path(AH5_C_ELECTROMAGNETIC_SOURCE, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -152,7 +152,7 @@ char AH5_read_els_generator (hid_t file_id, const char *path, AH5_generator_t *g
 char AH5_read_els_dipole (hid_t file_id, const char *path, AH5_dipole_t *dipole)
 {
     char mandatory[][AH5_ATTR_LENGTH] = {AH5_A_TYPE, AH5_A_X, AH5_A_Y, AH5_A_Z, AH5_A_THETA, AH5_A_PHI, AH5_A_WIRE_RADIUS};
-    char *type, path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = TRUE;
+    char *type, path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
 
     dipole->path = strdup(path);
     dipole->type = DIPOLE_INVALID;
@@ -174,53 +174,53 @@ char AH5_read_els_dipole (hid_t file_id, const char *path, AH5_dipole_t *dipole)
         else
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_TYPE);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_flt_attr(file_id, path, AH5_A_X, &(dipole->x)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_X);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_flt_attr(file_id, path, AH5_A_Y, &(dipole->y)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_Y);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_flt_attr(file_id, path, AH5_A_Z, &(dipole->z)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_Z);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_flt_attr(file_id, path, AH5_A_THETA, &(dipole->theta)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_THETA);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_flt_attr(file_id, path, AH5_A_PHI, &(dipole->phi)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_PHI);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
         if (!AH5_read_flt_attr(file_id, path, AH5_A_WIRE_RADIUS, &(dipole->wire_radius)))
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_WIRE_RADIUS);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
 
         strcpy(path2, path);
         strcat(path2, AH5_G_INNER_IMPEDANCE);
         if (!AH5_read_floatingtype(file_id, path2, &(dipole->inner_impedance)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
 
         strcpy(path2, path);
         strcat(path2, AH5_G_MAGNITUDE);
         if (!AH5_read_floatingtype(file_id, path2, &(dipole->magnitude)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
     }
     else
     {
         AH5_print_err_path(AH5_C_ELECTROMAGNETIC_SOURCE, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -231,7 +231,7 @@ char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *anten
 {
 /*    char mandatory[][AH5_ATTR_LENGTH] = {}; */
 	char model_man[][AH5_ATTR_LENGTH] = {AH5_A_TYPE};
-    char path2[AH5_ABSOLUTE_PATH_LENGTH], *type, rdata = TRUE;
+    char path2[AH5_ABSOLUTE_PATH_LENGTH], *type, rdata = AH5_TRUE;
 
     antenna->path = strdup(path);
     antenna->model.type = ANT_INVALID;
@@ -251,22 +251,22 @@ char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *anten
         strcpy(path2, path);
         strcat(path2, AH5_G_INPUT_IMPEDANCE);
         if (!AH5_read_floatingtype(file_id, path2, &(antenna->input_impedance)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
 
         strcpy(path2, path);
         strcat(path2, AH5_G_LOAD_IMPEDANCE);
         if (!AH5_read_floatingtype(file_id, path2, &(antenna->load_impedance)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
 
         strcpy(path2, path);
         strcat(path2, AH5_G_FEEDER_IMPEDANCE);
         if (!AH5_read_floatingtype(file_id, path2, &(antenna->feeder_impedance)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
 
         strcpy(path2, path);
         strcat(path2, AH5_G_MAGNITUDE);
         if (!AH5_read_floatingtype(file_id, path2, &(antenna->magnitude)))
-            rdata = FALSE;
+            rdata = AH5_FALSE;
 
         strcpy(path2, path);
         strcat(path2, AH5_G_MODEL);
@@ -278,21 +278,21 @@ char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *anten
                 antenna->model.type = ANT_GAIN;
                 strcat(path2, AH5_G_GAIN);
                 if (!AH5_read_floatingtype(file_id, path2, &(antenna->model.data.gain)))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else if (strcmp(type, AH5_V_EFFECTIVE_AREA) == 0)
             {
                 antenna->model.type = ANT_EFFECTIVE_AREA;
                 strcat(path2, AH5_G_EFFECTIVE_AREA);
                 if (!AH5_read_floatingtype(file_id, path2, &(antenna->model.data.effarea)))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else if (strcmp(type, AH5_V_FAR_FIELD) == 0)
             {
                 antenna->model.type = ANT_FAR_FIELD;
                 strcat(path2, AH5_G_FAR_FIELD);
                 if (!AH5_read_floatingtype(file_id, path2, &(antenna->model.data.farfield)))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else if (strcmp(type, AH5_V_RECTANGULAR_HORN) == 0)
             {
@@ -315,19 +315,19 @@ char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *anten
             else if (strcmp(type, AH5_V_EXCHANGE_SURFACE) == 0)
                 antenna->model.type = ANT_EXCHANGE_SURFACE;
             else
-                rdata = FALSE;
+                rdata = AH5_FALSE;
             free(type);
         }
         else
         {
             antenna->model.type = ANT_INVALID;
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
     }
     else
     {
         AH5_print_err_path(AH5_C_ELECTROMAGNETIC_SOURCE, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -336,7 +336,7 @@ char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *anten
 // Read instance in /electromagneticSource/sourceOnMesh
 char AH5_read_els_sourceonmesh (hid_t file_id, const char *path, AH5_sourceonmesh_t *sourceonmesh)
 {
-    char *type, rdata = TRUE;
+    char *type, rdata = AH5_TRUE;
 
     sourceonmesh->path = strdup(path);
     sourceonmesh->type = SCOM_INVALID;
@@ -349,26 +349,26 @@ char AH5_read_els_sourceonmesh (hid_t file_id, const char *path, AH5_sourceonmes
             {
                 sourceonmesh->type = SCOM_ARRAYSET;
                 if (!AH5_read_ft_arrayset(file_id, path, &(sourceonmesh->data.arrayset)))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             else if (strcmp(type, AH5_V_EXCHANGE_SURFACE) == 0)
             {
                 sourceonmesh->type = SCOM_EXCHANGE_SURFACE;
                 if (!AH5_read_str_attr(file_id, path, AH5_A_EXCHANGE_SURFACE, &(sourceonmesh->data.exchange_surface)))
-                    rdata = FALSE;
+                    rdata = AH5_FALSE;
             }
             free(type);
         }
         else
         {
             AH5_print_err_attr(AH5_C_ELECTROMAGNETIC_SOURCE, path, AH5_A_TYPE);
-            rdata = FALSE;
+            rdata = AH5_FALSE;
         }
     }
     else
     {
         AH5_print_err_path(AH5_C_ELECTROMAGNETIC_SOURCE, path);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
@@ -379,7 +379,7 @@ char AH5_read_electromagnetic_source (hid_t file_id, AH5_em_source_t *em_source)
 {
     char path[AH5_ABSOLUTE_PATH_LENGTH], path2[AH5_ABSOLUTE_PATH_LENGTH];
     AH5_children_t children, children2;
-    char rdata = TRUE;
+    char rdata = AH5_TRUE;
     hsize_t i, j;
 
     em_source->nb_pw_sources = 0;
@@ -395,7 +395,7 @@ char AH5_read_electromagnetic_source (hid_t file_id, AH5_em_source_t *em_source)
     em_source->an_sources = NULL;
     em_source->sm_sources = NULL;
 
-    if (H5Lexists(file_id, AH5_C_ELECTROMAGNETIC_SOURCE, H5P_DEFAULT) == TRUE)
+    if (AH5_path_valid(file_id, AH5_C_ELECTROMAGNETIC_SOURCE))
     {
         children = AH5_read_children_name(file_id, AH5_C_ELECTROMAGNETIC_SOURCE);
         if (children.nb_children > 0)
@@ -444,32 +444,32 @@ char AH5_read_electromagnetic_source (hid_t file_id, AH5_em_source_t *em_source)
                         if (strcmp(children.childnames[i], AH5_G_PLANE_WAVE) == 0)
                         {
                             if(!AH5_read_els_planewave(file_id, path2, em_source->pw_sources +j))
-                                rdata = FALSE;
+                                rdata = AH5_FALSE;
                         }
                         else if (strcmp(children.childnames[i], AH5_G_SPHERICAL_WAVE) == 0)
                         {
                             if (!AH5_read_els_sphericalwave(file_id, path2, em_source->sw_sources +j))
-                                rdata = FALSE;
+                                rdata = AH5_FALSE;
                         }
                         else if (strcmp(children.childnames[i], AH5_G_GENERATOR) == 0)
                         {
                             if (!AH5_read_els_generator(file_id, path2, em_source->ge_sources +j))
-                                rdata = FALSE;
+                                rdata = AH5_FALSE;
                         }
                         else if (strcmp(children.childnames[i], AH5_G_DIPOLE) == 0)
                         {
                             if (!AH5_read_els_dipole(file_id, path2, em_source->di_sources +j))
-                                rdata = FALSE;
+                                rdata = AH5_FALSE;
                         }
                         else if (strcmp(children.childnames[i], AH5_G_ANTENNA) == 0)
                         {
                             if (!AH5_read_els_antenna(file_id, path2, em_source->an_sources +j))
-                                rdata = FALSE;
+                                rdata = AH5_FALSE;
                         }
                         else if (strcmp(children.childnames[i], AH5_G_SOURCE_ON_MESH) == 0)
                         {
                             if (!AH5_read_els_sourceonmesh(file_id, path2, em_source->sm_sources +j))
-                                rdata = FALSE;
+                                rdata = AH5_FALSE;
                         }
                         free(children2.childnames[j]);
                     }
@@ -483,7 +483,7 @@ char AH5_read_electromagnetic_source (hid_t file_id, AH5_em_source_t *em_source)
     else
     {
         AH5_print_err_path(AH5_C_ELECTROMAGNETIC_SOURCE, AH5_C_ELECTROMAGNETIC_SOURCE);
-        rdata = FALSE;
+        rdata = AH5_FALSE;
     }
     return rdata;
 }
