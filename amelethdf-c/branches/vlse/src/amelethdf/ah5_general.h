@@ -57,13 +57,22 @@ extern "C" {
 
     char *AH5_get_name_from_path(const char *path);
     char *AH5_get_base_from_path(const char *path);
+    char *AH5_join_path(char *base, const char *head);
+    char* AH5_trim_path(char *path);
 
     void AH5_print_err_dset(const char *category, const char *path);
     void AH5_print_err_tble(const char *category, const char *path);
     void AH5_print_err_attr(const char *category, const char *path, const char *attr_name);
     void AH5_print_err_path(const char *category, const char *path);
     void AH5_print_err_inv_attr(const char *category, const char *path, const char *attr_name);
+    void AH5_print_err_func_not_implemented(const char *category, const char *func_name);
     void AH5_print_wrn_attr(const char *category, const char *path, const char *attr_name);
+    
+
+// Some helpers macros of manage error.
+#define AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED(category) \
+  AH5_print_err_func_not_implemented(category, (__FUNCTION__))
+
 
 #ifdef __cplusplus
 }

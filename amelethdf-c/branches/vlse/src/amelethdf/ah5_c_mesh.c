@@ -1,7 +1,7 @@
 #include "ah5_c_mesh.h"
 
 // Init mesh group
-void AH5_init_msh_group (AH5_msh_group_t *msh_group)
+void AH5_init_msh_group(AH5_msh_group_t *msh_group)
 {
     msh_group->path = NULL;
     msh_group->nb_msh_instances = 0;
@@ -11,7 +11,7 @@ void AH5_init_msh_group (AH5_msh_group_t *msh_group)
 }
 
 // Init mesh category
-void AH5_init_mesh (AH5_mesh_t *mesh)
+void AH5_init_mesh(AH5_mesh_t *mesh)
 {
     mesh->nb_groups = 0;
     mesh->groups = NULL;
@@ -20,7 +20,7 @@ void AH5_init_mesh (AH5_mesh_t *mesh)
 
 
 // Read groupGroup (both the un/structured)
-char AH5_read_groupgroup (hid_t file_id, const char* path, AH5_groupgroup_t *groupgroup)
+char AH5_read_groupgroup(hid_t file_id, const char* path, AH5_groupgroup_t *groupgroup)
 {
     int nb_dims;
     H5T_class_t type_class;
@@ -48,7 +48,7 @@ char AH5_read_groupgroup (hid_t file_id, const char* path, AH5_groupgroup_t *gro
 
 
 // Read m x n dataset "/x, /y or /z" (32-bit signed float)
-char AH5_read_smesh_axis (hid_t file_id, const char* path, AH5_axis_t *axis)
+char AH5_read_smesh_axis(hid_t file_id, const char* path, AH5_axis_t *axis)
 {
     H5T_class_t type_class;
     int nb_dims;
@@ -76,7 +76,7 @@ char AH5_read_smesh_axis (hid_t file_id, const char* path, AH5_axis_t *axis)
 
 
 // Read group in structured mesh (+normals)
-char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup)
+char AH5_read_smsh_group(hid_t file_id, const char *path, AH5_sgroup_t *sgroup)
 {
     char *temp, success1 = AH5_FALSE, success2 = AH5_TRUE, success3 = AH5_FALSE, rdata = AH5_TRUE;
     char normalpath[AH5_ABSOLUTE_PATH_LENGTH];
@@ -161,7 +161,7 @@ char AH5_read_smsh_group (hid_t file_id, const char *path, AH5_sgroup_t *sgroup)
 }
 
 // Read table of type "pointInElement" from /selectorOnMesh (structured) (element: 32-bit unsigned int, vector: 32-bit signed float)
-char AH5_read_ssom_pie_table (hid_t file_id, const char *path, AH5_ssom_pie_table_t *ssom_pie_table)
+char AH5_read_ssom_pie_table(hid_t file_id, const char *path, AH5_ssom_pie_table_t *ssom_pie_table)
 {
     hsize_t nfields, nrecords, i;
     char rdata = AH5_FALSE;
@@ -277,7 +277,7 @@ char AH5_read_ssom_pie_table (hid_t file_id, const char *path, AH5_ssom_pie_tabl
 
 
 // Read structured mesh
-char AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh)
+char AH5_read_smesh(hid_t file_id, const char* path, AH5_smesh_t *smesh)
 {
     char path2[AH5_ABSOLUTE_PATH_LENGTH], path3[AH5_ABSOLUTE_PATH_LENGTH];
     AH5_children_t children;
@@ -394,7 +394,7 @@ char AH5_read_smesh (hid_t file_id, const char* path, AH5_smesh_t *smesh)
 
 
 // Read group in unstructured mesh
-char AH5_read_umsh_group (hid_t file_id, const char* path, AH5_ugroup_t *ugroup)
+char AH5_read_umsh_group(hid_t file_id, const char* path, AH5_ugroup_t *ugroup)
 {
     H5T_class_t type_class;
     char rdata = AH5_FALSE;
@@ -437,7 +437,7 @@ char AH5_read_umsh_group (hid_t file_id, const char* path, AH5_ugroup_t *ugroup)
 
 
 // Read table of type "pointInElement" from /selectorOnMesh (unstructured) (index: 32-bit signed int, vector: 32-bit signed float)
-char AH5_read_usom_pie_table (hid_t file_id, const char *path, AH5_usom_pie_table_t *usom_pie_table)
+char AH5_read_usom_pie_table(hid_t file_id, const char *path, AH5_usom_pie_table_t *usom_pie_table)
 {
     hsize_t nfields, nrecords, i;
     char rdata = AH5_FALSE;
@@ -500,7 +500,7 @@ char AH5_read_usom_pie_table (hid_t file_id, const char *path, AH5_usom_pie_tabl
 
 
 // Read dataset of type "edge" or "face" from /selectorOnMesh (32-bit signed int)
-char AH5_read_usom_ef_table (hid_t file_id, const char *path, AH5_usom_ef_table_t *usom_ef_table)
+char AH5_read_usom_ef_table(hid_t file_id, const char *path, AH5_usom_ef_table_t *usom_ef_table)
 {
     int nb_dims;
     H5T_class_t type_class;
@@ -529,7 +529,7 @@ char AH5_read_usom_ef_table (hid_t file_id, const char *path, AH5_usom_ef_table_
 
 
 // Read selector on mesh (unstructured mesh)
-char AH5_read_umesh_som_table (hid_t file_id, const char *path, AH5_usom_table_t *usom_table)
+char AH5_read_umesh_som_table(hid_t file_id, const char *path, AH5_usom_table_t *usom_table)
 {
     char *type, rdata = AH5_TRUE;
 
@@ -576,7 +576,7 @@ char AH5_read_umesh_som_table (hid_t file_id, const char *path, AH5_usom_table_t
 
 
 // Read unstructured mesh
-char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh)
+char AH5_read_umesh(hid_t file_id, const char* path, AH5_umesh_t *umesh)
 {
     char path2[AH5_ABSOLUTE_PATH_LENGTH], path3[AH5_ABSOLUTE_PATH_LENGTH];
     char rdata = AH5_TRUE, success = AH5_FALSE;
@@ -732,7 +732,7 @@ char AH5_read_umesh (hid_t file_id, const char* path, AH5_umesh_t *umesh)
 
 
 // Read mesh instance
-char AH5_read_msh_instance (hid_t file_id, const char *path, AH5_msh_instance_t *msh_instance)
+char AH5_read_msh_instance(hid_t file_id, const char *path, AH5_msh_instance_t *msh_instance)
 {
     char *type, rdata = AH5_TRUE;
 
@@ -779,7 +779,7 @@ char AH5_read_msh_instance (hid_t file_id, const char *path, AH5_msh_instance_t 
 
 
 // Read meshLink instance
-char AH5_read_mlk_instance (hid_t file_id, const char *path, AH5_mlk_instance_t *mlk_instance)
+char AH5_read_mlk_instance(hid_t file_id, const char *path, AH5_mlk_instance_t *mlk_instance)
 {
     char *type, dataset_read = AH5_FALSE, rdata = AH5_TRUE;
     H5T_class_t type_class;
@@ -856,7 +856,7 @@ char AH5_read_mlk_instance (hid_t file_id, const char *path, AH5_mlk_instance_t 
 
 
 // Read mesh group
-char AH5_read_msh_group (hid_t file_id, const char *path, AH5_msh_group_t *msh_group)
+char AH5_read_msh_group(hid_t file_id, const char *path, AH5_msh_group_t *msh_group)
 {
     char path2[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
     char path3[AH5_ABSOLUTE_PATH_LENGTH];
@@ -919,7 +919,7 @@ char AH5_read_msh_group (hid_t file_id, const char *path, AH5_msh_group_t *msh_g
 
 
 // Read mesh category
-char AH5_read_mesh (hid_t file_id, AH5_mesh_t *mesh)
+char AH5_read_mesh(hid_t file_id, AH5_mesh_t *mesh)
 {
     char path[AH5_ABSOLUTE_PATH_LENGTH], rdata = AH5_TRUE;
     AH5_children_t children;
@@ -954,10 +954,226 @@ char AH5_read_mesh (hid_t file_id, AH5_mesh_t *mesh)
 }
 
 
+// Write structured mesh
+char AH5_write_smesh(hid_t file_id, const char *path, const AH5_smesh_t *smesh)
+{
+    char success = AH5_FALSE;
+    
+    AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED(AH5_C_MESH);
+    
+    return success;
+}
+
+// Write groupGroup
+char AH5_write_groupgroup(hid_t file_id, const char *path, const AH5_groupgroup_t *groupgroup, int nb_ggrp)
+{
+    char success = AH5_TRUE;
+    hid_t grp;
+    int i;
+    char *ggrp_name;
+
+    // NMT: I prefer build an empty group, because I am not sure that everyone check that the group exist before to open it.
+    grp = H5Gcreate(file_id, path, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    if (nb_ggrp > 0)
+    {
+        for (i = 0; i < nb_ggrp; i++)
+        {
+            ggrp_name = AH5_get_name_from_path(groupgroup[i].path);
+            success &= AH5_write_str_dataset(grp, ggrp_name, groupgroup[i].nb_groupgroupnames, strlen(groupgroup[i].groupgroupnames[0]), groupgroup[i].groupgroupnames[0]);
+        }
+    }
+    return success;
+}
+
+// Write group in unstructured mesh
+char AH5_write_umsh_group(hid_t file_id, const char *path, const AH5_ugroup_t *ugroup, int nb_ugroup)
+{
+    char success = AH5_FALSE;
+    int i;
+    hid_t root;
+    
+    // NMT: I prefer build an empty group, because I am not sure that everyone check that the group exist before to open it.
+    root = H5Gcreate(file_id, path, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    for (i = 0; i < nb_ugroup; i++)
+    {
+        if (ugroup->nb_groupelts > 0)
+        {
+            if (AH5_write_int_dataset(root, ugroup[i].path, ugroup[i].nb_groupelts, ugroup[i].groupelts))
+            {
+                if (AH5_write_str_attr(root, ugroup[i].path, AH5_A_TYPE, ugroup[i].type))
+                    if (strcmp(ugroup[i].type, AH5_V_NODE))
+                      success = AH5_write_str_attr(root, ugroup[i].path, AH5_A_ENTITY_TYPE, ugroup[i].entitytype);
+            }
+            if (!success)
+              return success;
+        }
+    }
+    return success;
+}
+
+// Write table of type "pointInElement" from /selectorOnMesh (unstructured) (index: 32-bit signed int, vector: 32-bit signed float)
+char AH5_write_usom_pie_table(hid_t file_id, const char *path, const AH5_usom_pie_table_t *usom_pie_table)
+{
+    char success = AH5_FALSE;
+  
+    AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED(AH5_C_MESH);
+  
+    return success;
+}
+
+// Read dataset of type "edge" or "face" from /selectorOnMesh (32-bit signed int)
+char AH5_write_usom_ef_table(hid_t file_id, const char *path, const AH5_usom_ef_table_t *usom_ef_table)
+{
+    char success = AH5_FALSE;
+  
+    AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED(AH5_C_MESH);
+  
+    return success;
+}
+
+// Read selector on mesh (unstructured mesh)
+char AH5_write_umesh_som_table(hid_t file_id, const char *path, const AH5_usom_table_t *usom_table, int nb_som)
+{
+    char success = AH5_FALSE;
+  
+    AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED(AH5_C_MESH);
+  
+    return success;
+}
+
+/** Write unstructured mesh */
+char AH5_write_umesh(hid_t file_id, const char *path, const AH5_umesh_t *umesh)
+{
+    char success = AH5_FALSE;
+    
+    hid_t msh;
+    hsize_t dims1[1], dims2[2];
+  
+    // Check umesh sanity first
+    if (umesh == NULL
+        || umesh->elementnodes == NULL
+        || umesh->elementtypes == NULL
+        || umesh->nodes == NULL)
+        return success;
+
+    msh = H5Gcreate(file_id, path, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    if (!AH5_write_str_attr(msh, ".", AH5_A_TYPE, AH5_V_UNSTRUCTURED))
+        return success;
+  
+    // Write m x 1 dataset "elementNodes" (32-bit signed integer)
+    if (!AH5_write_int_dataset(msh, AH5_GROUP_NAME(AH5_G_ELEMENT_NODES), umesh->nb_elementnodes, umesh->elementnodes))
+        return success;
+  
+    // Write m x 1 dataset "elementTypes" (8-bit signed char)
+    if (!AH5_write_char_dataset(msh, AH5_GROUP_NAME(AH5_G_ELEMENT_TYPES), umesh->nb_elementtypes, umesh->elementtypes))
+        return success;
+  
+    // Write m x n dataset "nodes" (32-bit signed float)
+    if (!AH5_write_flt_array(msh, AH5_GROUP_NAME(AH5_G_NODES), 2, umesh->nb_nodes, umesh->nodes))
+        return success;
+  
+    // Write groupGroups
+    if (!AH5_write_groupgroup(msh, AH5_GROUP_NAME(AH5_G_GROUPGROUP), umesh->groupgroups, umesh->nb_groupgroups))
+        // handled error
+      return success;
+  
+    // Write groups
+    if (!AH5_write_umsh_group(msh, AH5_GROUP_NAME(AH5_G_GROUP), umesh->groups, umesh->nb_groups))
+        // handled error
+        return success;
+  
+    // Write selectorOnMesh 
+    // FIXME(NMT) not implemented yet...
+    //if (!AH5_write_umesh_som_table(msh, AH5_GROUP_NAME(AH5_G_SELECTOR_ON_MESH), umesh->som_tables, umesh->nb_som_tables))
+    //    return AH5_FAILURE;
+
+    success = AH5_TRUE;
+    return success;
+}
+
+// Write mesh instance
+char AH5_write_msh_instance(hid_t file_id, const char *path, const AH5_msh_instance_t *msh_instance)
+{
+    char success = AH5_FALSE;
+    char msh_path[AH5_ABSOLUTE_PATH_LENGTH];
+  
+    if (AH5_path_valid(file_id, path))
+    {
+        strcpy(msh_path, path);
+        AH5_join_path(msh_path, msh_instance->path);
+        
+        if (msh_instance->type == MSH_UNSTRUCTURED)
+        {
+            success = AH5_write_umesh(file_id, msh_path, &msh_instance->data.unstructured);
+        }
+        else if (msh_instance->type == MSH_STRUCTURED)
+        {
+            success = AH5_write_smesh(file_id, msh_path, &msh_instance->data.structured);
+        }
+        else
+        {
+            AH5_print_err_inv_attr(AH5_C_MESH, path, AH5_A_TYPE);
+            success = AH5_FALSE;
+        }
+    }
+    else
+    {
+        AH5_print_err_path(AH5_C_MESH, path);
+        success = AH5_FALSE;
+    }
+    
+    return success;
+}
+
+// Write link between mesh
+char AH5_write_mlk_instance(hid_t file_id, const char *path, const AH5_mlk_instance_t *mlk_instance)
+{
+    char success = AH5_FALSE;
+  
+    AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED(AH5_C_MESH);
+  
+    return success;
+}
+
+// Write mesh group
+char AH5_write_msh_group(hid_t file_id, const char *path, const AH5_msh_group_t *msh_group)
+{
+    char success = AH5_TRUE;
+    int i;
+    hid_t grp;
+  
+    if (H5Lexists(file_id, AH5_C_MESH, H5P_DEFAULT) == AH5_TRUE)
+        grp = H5Gopen1(file_id, path);
+    else
+        grp = H5Gcreate1(file_id, path, 0);
+  
+    for (i = 0; i < msh_group->nb_msh_instances; i++)
+        success &= AH5_write_msh_instance(grp, path, msh_group->msh_instances + i);
+    
+    for (i = 0; i < msh_group->nb_mlk_instances; i++)
+        success &= AH5_write_mlk_instance(grp, path, msh_group->mlk_instances + i);
+    
+    return success;
+}
+
+// Write mesh categories 
+char AH5_write_mesh(hid_t file_id, const AH5_mesh_t *mesh)
+{
+  char success = AH5_TRUE;
+  int i;
+
+  for (i = 0; i < mesh->nb_groups; i++)
+  {
+      success &= AH5_write_msh_group(file_id, AH5_C_MESH, mesh->groups + i);
+  }
+
+  return success;
+}
+
 
 
 // Print structured mesh
-void AH5_print_smesh (const AH5_smesh_t *smesh, int space)
+void AH5_print_smesh(const AH5_smesh_t *smesh, int space)
 {
     hsize_t i;
 
@@ -991,7 +1207,7 @@ void AH5_print_smesh (const AH5_smesh_t *smesh, int space)
 
 
 // Print selectorOnMesh table in unstructured mesh
-void AH5_print_umesh_som_table (const AH5_usom_table_t *usom_table, int space)
+void AH5_print_umesh_som_table(const AH5_usom_table_t *usom_table, int space)
 {
     hsize_t k;
     char dim;
@@ -1044,7 +1260,7 @@ void AH5_print_umesh_som_table (const AH5_usom_table_t *usom_table, int space)
 
 
 // Print unstructured mesh
-void AH5_print_umesh (const AH5_umesh_t *umesh, int space)
+void AH5_print_umesh(const AH5_umesh_t *umesh, int space)
 {
     hsize_t i, offset = 0;
     int j, element_type;
@@ -1118,7 +1334,7 @@ void AH5_print_umesh (const AH5_umesh_t *umesh, int space)
 
 
 // Print mesh instance
-void AH5_print_msh_instance (const AH5_msh_instance_t *msh_instance, int space)
+void AH5_print_msh_instance(const AH5_msh_instance_t *msh_instance, int space)
 {
     printf("%*sInstance: %s\n", space, "", AH5_get_name_from_path(msh_instance->path));
     switch (msh_instance->type)
@@ -1136,7 +1352,7 @@ void AH5_print_msh_instance (const AH5_msh_instance_t *msh_instance, int space)
 
 
 // Print meshLink instance
-void AH5_print_mlk_instance (const AH5_mlk_instance_t *mlk_instance, int space)
+void AH5_print_mlk_instance(const AH5_mlk_instance_t *mlk_instance, int space)
 {
     printf("%*sMeshLink instance: %s\n", space, "", AH5_get_name_from_path(mlk_instance->path));
     AH5_print_str_attr(AH5_A_MESH1, mlk_instance->mesh1, space + 3);
@@ -1145,7 +1361,7 @@ void AH5_print_mlk_instance (const AH5_mlk_instance_t *mlk_instance, int space)
 
 
 // Print mesh group
-void AH5_print_msh_group (const AH5_msh_group_t *msh_group, int space)
+void AH5_print_msh_group(const AH5_msh_group_t *msh_group, int space)
 {
     hsize_t i;
 
@@ -1159,7 +1375,7 @@ void AH5_print_msh_group (const AH5_msh_group_t *msh_group, int space)
 
 
 // Print mesh category
-void AH5_print_mesh (const AH5_mesh_t *mesh)
+void AH5_print_mesh(const AH5_mesh_t *mesh)
 {
     hsize_t i;
 
@@ -1173,7 +1389,7 @@ void AH5_print_mesh (const AH5_mesh_t *mesh)
 
 
 // Free memory used by grouGgroup
-void AH5_free_groupgroup (AH5_groupgroup_t *groupgroup)
+void AH5_free_groupgroup(AH5_groupgroup_t *groupgroup)
 {
     if (groupgroup->path != NULL)
     {
@@ -1192,7 +1408,7 @@ void AH5_free_groupgroup (AH5_groupgroup_t *groupgroup)
 
 
 // Free memory used by structured mesh
-void AH5_free_smesh (AH5_smesh_t *smesh)
+void AH5_free_smesh(AH5_smesh_t *smesh)
 {
     hsize_t i;
 
@@ -1276,7 +1492,7 @@ void AH5_free_smesh (AH5_smesh_t *smesh)
 
 
 // Free memory used by unstructured mesh
-void AH5_free_umesh (AH5_umesh_t *umesh)
+void AH5_free_umesh(AH5_umesh_t *umesh)
 {
     hsize_t i;
 
@@ -1366,7 +1582,7 @@ void AH5_free_umesh (AH5_umesh_t *umesh)
 
 
 // Free memory used by mesh instance
-void AH5_free_msh_instance (AH5_msh_instance_t *msh_instance)
+void AH5_free_msh_instance(AH5_msh_instance_t *msh_instance)
 {
     if (msh_instance->path != NULL)
     {
@@ -1389,7 +1605,7 @@ void AH5_free_msh_instance (AH5_msh_instance_t *msh_instance)
 }
 
 
-void AH5_free_mlk_instance (AH5_mlk_instance_t *mlk_instance)
+void AH5_free_mlk_instance(AH5_mlk_instance_t *mlk_instance)
 {
     if (mlk_instance->path != NULL)
     {
@@ -1418,7 +1634,7 @@ void AH5_free_mlk_instance (AH5_mlk_instance_t *mlk_instance)
 
 
 // Free memory used by mesh group
-void AH5_free_msh_group (AH5_msh_group_t *msh_group)
+void AH5_free_msh_group(AH5_msh_group_t *msh_group)
 {
     hsize_t i;
 
@@ -1441,7 +1657,7 @@ void AH5_free_msh_group (AH5_msh_group_t *msh_group)
 
 
 // Free memory used by mesh category
-void AH5_free_mesh (AH5_mesh_t *mesh)
+void AH5_free_mesh(AH5_mesh_t *mesh)
 {
     hsize_t i;
 

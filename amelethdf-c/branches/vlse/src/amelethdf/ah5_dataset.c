@@ -102,6 +102,16 @@ char AH5_read_str_dataset(hid_t file_id, const char *path, const hsize_t mn, siz
     return success;
 }
 
+// Write 1D char dataset
+char AH5_write_char_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const char *wdata)
+{
+    hsize_t dims[1] = {len};
+    char success = AH5_FALSE;
+
+    if(H5LTmake_dataset_char(loc_id, dset_name, 1, dims, wdata) >= 0)
+        success = AH5_TRUE;
+    return success;
+}
 
 // Write 1D int dataset
 char AH5_write_int_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const int *wdata)
@@ -156,4 +166,43 @@ char AH5_write_str_dataset(hid_t loc_id, const char *dset_name, const hsize_t le
     H5Sclose(dataspace_id);
 
     return success;
+}
+
+
+char AH5_write_array(hid_t loc_id, const char *dset_name, hid_t input_datatype_id, hid_t write_datatype_id, const int rank, const hsize_t dims[], const void *wdata)
+{
+    char success = AH5_FALSE;
+    hid_t dataset_id, dataspace_id;
+  
+    dataspace_id = H5Screate_simple(rank, dims, NULL);
+    dataset_id = H5Dcreate(loc_id, dset_name, write_datatype_id, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    H5Dwrite(dataset_id, input_datatype_id, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
+    if (H5Dclose(dataset_id) >= 0)
+        success = AH5_TRUE;
+
+    return success;
+}
+
+char AH5_write_int_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const int *wdata)
+{
+    return AH5_write_array(loc_id, dset_name, H5T_NATIVE_INT, AH5_NATIVE_INT, rank, dims, wdata);
+}
+
+char AH5_write_flt_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const float *wdata)
+{
+    return AH5_write_array(loc_id, dset_name, H5T_NATIVE_FLOAT, AH5_NATIVE_FLOAT, rank, dims, wdata);
+}
+
+char AH5_write_cpx_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const AH5_complex_t *wdata)
+{
+    char success = AH5_FALSE;
+
+    // TO BE IMPLEMENTED...
+
+    return success;
+}
+
+char AH5_write_str_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], char *wdata)
+{
+    return AH5_write_array(loc_id, dset_name, H5T_NATIVE_FLOAT, AH5_NATIVE_FLOAT, rank, dims, wdata);
 }

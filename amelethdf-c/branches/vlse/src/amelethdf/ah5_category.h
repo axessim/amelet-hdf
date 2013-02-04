@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+// remove first char 
+#define AH5_GROUP_NAME(name) ((name) + 1)
+
 #define AH5_C_ELECTROMAGNETIC_SOURCE    "/electromagneticSource"
 #define AH5_C_EXCHANGE_SURFACE          "/exchangeSurface"
 #define AH5_C_EXTERNAL_ELEMENT          "/externalElement"
@@ -27,6 +30,9 @@ extern "C" {
 #define AH5_V_INVALID                   "INVALID"
 #define AH5_TRUE                        1
 #define AH5_FALSE                       0
+#define AH5_NATIVE_CHAR                 H5T_STD_I8LE   // NATIVE Amelet-HDF data type
+#define AH5_NATIVE_INT                  H5T_STD_I32LE
+#define AH5_NATIVE_FLOAT                H5T_IEEE_F32LE
 
 
 /* ah5_emsource.h */

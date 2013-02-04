@@ -12,10 +12,16 @@ extern "C" {
     char AH5_read_cpx_dataset(hid_t file_id, const char *path, const hsize_t mn, AH5_complex_t **rdata);
     char AH5_read_str_dataset(hid_t file_id, const char *path, hsize_t mn, size_t length, char ***rdata);
 
+    char AH5_write_char_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const char *wdata);
     char AH5_write_int_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const int *wdata);
     char AH5_write_flt_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const float *wdata);
     char AH5_write_cpx_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const AH5_complex_t *wdata);
     char AH5_write_str_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const size_t slen, char *wdata);
+
+    char AH5_write_int_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const int *wdata);
+    char AH5_write_flt_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const float *wdata);
+    char AH5_write_cpx_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const AH5_complex_t *wdata);
+    char AH5_write_str_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], char *wdata);
 
 #ifdef __cplusplus
 }

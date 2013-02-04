@@ -9,7 +9,7 @@ extern "C" {
 #include "ah5_dataset.h"
 #include "ah5_attribute.h"
 #include "ah5_c_fltype.h"
-#include "ah5_c_category.h"
+#include "ah5_category.h"
 #include "ah5_c_emsource.h"
 #include "ah5_c_exsurf.h"
 #include "ah5_c_extelt.h"

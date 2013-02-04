@@ -34,6 +34,11 @@ extern "C" {
     char AH5_read_str_attr(hid_t file_id, const char *path, char *attr_name, char **rdata);
     char AH5_read_opt_attrs(hid_t file_id, const char *path, AH5_opt_attrs_t *opt_attrs, char mandatory_attrs[][AH5_ATTR_LENGTH], size_t nb_mandatory_attrs);
 
+    char AH5_write_int_attr(hid_t file_id, const char *path, char *attr_name, const int wdata);
+    char AH5_write_flt_attr(hid_t file_id, const char *path, char *attr_name, const float wdata);
+    char AH5_write_cpx_attr(hid_t file_id, const char *path, char *attr_name, const AH5_complex_t *wdata);
+    char AH5_write_str_attr(hid_t file_id, const char *path, char *attr_name, const char *wdata);
+
     void AH5_print_int_attr(char *name, int value, int space);
     void AH5_print_flt_attr(char *name, float value, int space);
     void AH5_print_cpx_attr(char *name, AH5_complex_t value, int space);

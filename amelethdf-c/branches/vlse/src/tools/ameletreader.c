@@ -61,7 +61,7 @@ char *argv[];
     /* ################################################################################### */
 
     // Electromagnetic source
-    if (H5Lexists(file_id, AH5_C_ELECTROMAGNETIC_SOURCE, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_ELECTROMAGNETIC_SOURCE, H5P_DEFAULT) == AH5_TRUE)
     {
         printf("Reading electromagnetic sources... \n");
         if (AH5_read_electromagnetic_source(file_id, &em_source))
@@ -71,7 +71,7 @@ char *argv[];
     }
 
     // Exchange surface
-    if (H5Lexists(file_id, AH5_C_EXCHANGE_SURFACE, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_EXCHANGE_SURFACE, H5P_DEFAULT) == AH5_TRUE)
     {
         printf("Reading exchange surface... \n");
         if (AH5_read_exchange_surface(file_id, &exchange_surface))
@@ -81,7 +81,7 @@ char *argv[];
     }
 
     // External element
-    if (H5Lexists(file_id, AH5_C_EXTERNAL_ELEMENT, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_EXTERNAL_ELEMENT, H5P_DEFAULT) == AH5_TRUE)
     {
         printf("Reading external elements... \n");
         if (AH5_read_external_element(file_id, &external_element))
@@ -91,7 +91,7 @@ char *argv[];
     }
 
     // Global environment
-    if(H5Lexists(file_id, AH5_C_GLOBAL_ENVIRONMENT, H5P_DEFAULT) == TRUE)
+    if(H5Lexists(file_id, AH5_C_GLOBAL_ENVIRONMENT, H5P_DEFAULT) == AH5_TRUE)
     {
         printf("Reading global environment... \n");
         if (AH5_read_global_environment(file_id, &global_environment))
@@ -101,7 +101,7 @@ char *argv[];
     }
 
     // Label
-    if (H5Lexists(file_id, AH5_C_LABEL, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_LABEL, H5P_DEFAULT) == AH5_TRUE)
     {
         printf("Reading labels... \n");
         if (AH5_read_label(file_id, &label))
@@ -111,7 +111,7 @@ char *argv[];
     }
 
     // Link
-    if (H5Lexists(file_id, AH5_C_LINK, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_LINK, H5P_DEFAULT) == AH5_TRUE)
     {
         printf("Reading links... \n");
         if (AH5_read_link(file_id, &link))
@@ -121,7 +121,7 @@ char *argv[];
     }
 
     // Localization system
-    if(H5Lexists(file_id, AH5_C_LOCALIZATION_SYSTEM, H5P_DEFAULT) == TRUE)
+    if(H5Lexists(file_id, AH5_C_LOCALIZATION_SYSTEM, H5P_DEFAULT) == AH5_TRUE)
     {
         printf("Reading localization system... \n");
         if (AH5_read_localization_system(file_id, &localization_system))
@@ -131,7 +131,7 @@ char *argv[];
     }
 
     // Mesh
-    if (H5Lexists(file_id, AH5_C_MESH, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_MESH, H5P_DEFAULT) == AH5_TRUE)
     {
         printf("Reading meshes... \n");
         if (AH5_read_mesh(file_id, &mesh))
@@ -141,7 +141,7 @@ char *argv[];
     }
 
     // Output request
-    if (H5Lexists(file_id, AH5_C_OUTPUT_REQUEST, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_OUTPUT_REQUEST, H5P_DEFAULT) == AH5_TRUE)
     {
         printf("Reading ouput requests... \n");
         if (AH5_read_outputrequest(file_id, &outputrequest))
@@ -151,7 +151,7 @@ char *argv[];
     }
 
     // Physical model
-    if (H5Lexists(file_id, AH5_C_PHYSICAL_MODEL, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_PHYSICAL_MODEL, H5P_DEFAULT) == AH5_TRUE)
     {
         printf("Reading physical models... \n");
         if (AH5_read_physicalmodel(file_id, &physicalmodel))
@@ -161,7 +161,7 @@ char *argv[];
     }
 
    // Simulation
-    if(H5Lexists(file_id, AH5_C_SIMULATION, H5P_DEFAULT) == TRUE)
+    if(H5Lexists(file_id, AH5_C_SIMULATION, H5P_DEFAULT) == AH5_TRUE)
     {
         printf("Reading simulations... \n");
         if (AH5_read_simulation(file_id, &simulation))
@@ -178,77 +178,77 @@ char *argv[];
     /* ################################################################################### */
 
     // Electromagnetic source
-    if (H5Lexists(file_id, AH5_C_ELECTROMAGNETIC_SOURCE, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_ELECTROMAGNETIC_SOURCE, H5P_DEFAULT) == AH5_TRUE)
     {
         AH5_print_electromagnetic_source(&em_source);
         AH5_free_electromagnetic_source(&em_source);
     }
 
     // Exchange surface
-    if (H5Lexists(file_id, AH5_C_EXCHANGE_SURFACE, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_EXCHANGE_SURFACE, H5P_DEFAULT) == AH5_TRUE)
     {
         AH5_print_exchange_surface(&exchange_surface);
         AH5_free_exchange_surface(&exchange_surface);
     }
 
     // External element
-    if (H5Lexists(file_id, AH5_C_EXTERNAL_ELEMENT, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_EXTERNAL_ELEMENT, H5P_DEFAULT) == AH5_TRUE)
     {
         AH5_print_external_element(&external_element);
         AH5_free_external_element(&external_element);
     }
 
     // Global environment
-    if(H5Lexists(file_id, AH5_C_GLOBAL_ENVIRONMENT, H5P_DEFAULT) == TRUE)
+    if(H5Lexists(file_id, AH5_C_GLOBAL_ENVIRONMENT, H5P_DEFAULT) == AH5_TRUE)
     {
         AH5_print_global_environment(&global_environment);
         AH5_free_global_environment(&global_environment);
     }
 
     // Label
-    if (H5Lexists(file_id, AH5_C_LABEL, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_LABEL, H5P_DEFAULT) == AH5_TRUE)
     {
         AH5_print_label(&label);
         AH5_free_label(&label);
     }
 
     // Link
-    if (H5Lexists(file_id, AH5_C_LINK, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_LINK, H5P_DEFAULT) == AH5_TRUE)
     {
         AH5_print_link(&link);
         AH5_free_link(&link);
     }
 
     // Localization system
-    if(H5Lexists(file_id, AH5_C_LOCALIZATION_SYSTEM, H5P_DEFAULT) == TRUE)
+    if(H5Lexists(file_id, AH5_C_LOCALIZATION_SYSTEM, H5P_DEFAULT) == AH5_TRUE)
     {
         AH5_print_localization_system(&localization_system);
         AH5_free_localization_system(&localization_system);
     }
 
     // Mesh
-    if(H5Lexists(file_id, AH5_C_MESH, H5P_DEFAULT) == TRUE)
+    if(H5Lexists(file_id, AH5_C_MESH, H5P_DEFAULT) == AH5_TRUE)
     {
         AH5_print_mesh(&mesh);
         AH5_free_mesh(&mesh);
     }
 
     // Output request
-    if (H5Lexists(file_id, AH5_C_OUTPUT_REQUEST, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_OUTPUT_REQUEST, H5P_DEFAULT) == AH5_TRUE)
     {
         AH5_print_outputrequest(&outputrequest);
         AH5_free_outputrequest(&outputrequest);
     }
 
     // Physical model
-    if (H5Lexists(file_id, AH5_C_PHYSICAL_MODEL, H5P_DEFAULT) == TRUE)
+    if (H5Lexists(file_id, AH5_C_PHYSICAL_MODEL, H5P_DEFAULT) == AH5_TRUE)
     {
         AH5_print_physicalmodel(&physicalmodel);
         AH5_free_physicalmodel(&physicalmodel);
     }
 
     // Simulation
-    if(H5Lexists(file_id, AH5_C_SIMULATION, H5P_DEFAULT) == TRUE)
+    if(H5Lexists(file_id, AH5_C_SIMULATION, H5P_DEFAULT) == AH5_TRUE)
     {
         AH5_print_simulation(&simulation);
         AH5_free_simulation(&simulation);

@@ -104,6 +104,101 @@ char *AH5_trim_zeros(const char *version)
     return rdata;
 }
 
+
+/** Join path. Append to 'base' the new node 'name' and return 'base'
+ *
+ * Parameters:
+ *  - base: Pointer to the destination path, which should contain a C string,
+ *    and be large enough to contain the concatenated resulting path.
+ *  - head: C string to be appended. This should not overlap destination.
+ *
+ * Return:
+ *  base is returned.
+ *  
+ * Example:
+ *
+ *  "/base" + "name" -> "/base/name"
+ *  "base/" + "name" -> "base/name"
+ *  "./base" + "/name" -> "./base/name"
+ *  "" + "name" -> "name"
+ *  "base" + "" -> "base"
+ *
+ */
+char *AH5_join_path(char *base, const char *head)
+{
+    char *endbase = NULL;
+
+    if (head[0] == '\0')
+        return base;
+    if (base[0] == '\0')
+        return strcpy(base, head);
+
+    endbase = base + strlen(base);
+    while( isspace(*(--endbase)) && endbase != (base-1) );
+
+    if ((*endbase == '/' && head[0] != '/')
+        || (*endbase != '/' && head[0] == '/'))
+    {
+        strcat(AH5_trim_path(base), head);
+    }
+    else if ((*endbase == '/' && head[0] == '/'))
+    {
+        strcat(AH5_trim_path(base), head + 1);
+    }
+    else
+    {
+        strcat(AH5_trim_path(base), "/");
+        strcat(base, head);
+    }
+  
+    return base;
+}
+
+
+/** Remove white char and return; does not allocate new memory */
+char* AH5_trim_path(char* path)
+{
+    size_t len = 0;
+    char *frontp = path - 1;
+    char *endp = NULL;
+    
+    if( path == NULL )
+        return NULL;
+  
+    if( path[0] == '\0' )
+        return path;
+  
+    len = strlen(path);
+    endp = path + len;
+  
+    /* Move the front and back pointers to address the first non-whitespace
+     * characters from each end.
+     */
+    while( isspace(*(++frontp)) );
+    while( isspace(*(--endp)) && endp != frontp );
+    
+    if( path + len - 1 != endp )
+        *(endp + 1) = '\0';
+    else if( frontp != path &&  endp == frontp )
+        *path = '\0';
+    
+    /* Shift the string so that it starts at path so that if it's dynamically
+     * allocated, we can still free it on the returned pointer.  Note the reuse
+     * of endp to mean the front of the string buffer now.
+     */
+    endp = path;
+    if( frontp != path )
+    {
+        while( *frontp ) *endp++ = *frontp++;
+        *endp = '\0';
+    }
+  
+    return path;
+}
+
+
+
+
 char AH5_path_valid(hid_t loc_id, const char *path)
 {
     char *temp;
@@ -284,8 +379,14 @@ void AH5_print_err_inv_attr(const char *category, const char *path, const char *
     printf("\n***** ERROR(%s): Invalid attribute value in \"%s[@%s]\". *****\n\n", category, path, attr_name);
 }
 
+void AH5_print_err_func_not_implemented(const char *category, const char *func_name)
+{
+    printf("\n***** ERROR(%s): Function '%s' not implemented yet!\n\n *****\n\n", category, func_name);
+}
+
 void AH5_print_wrn_attr(const char *category, const char *path, const char *attr_name)
 {
     printf("\n***** WARNING(%s): Invalid attribute value in \"%s[@%s]\". *****\n\n", category, path, attr_name);
 }
+
 
