@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 // remove first char 
-#define AH5_GROUP_NAME(name) ((name) + 1)
+#define AH5_CATEGORY_NAME(name) ((name) + 1)
 
 #define AH5_C_ELECTROMAGNETIC_SOURCE    "/electromagneticSource"
 #define AH5_C_EXCHANGE_SURFACE          "/exchangeSurface"

@@ -108,6 +108,7 @@ char AH5_write_char_dataset(hid_t loc_id, const char *dset_name, const hsize_t l
     hsize_t dims[1] = {len};
     char success = AH5_FALSE;
 
+    // TODO: add check of loc_id using H5Oget_info()
     if(H5LTmake_dataset_char(loc_id, dset_name, 1, dims, wdata) >= 0)
         success = AH5_TRUE;
     return success;
@@ -119,6 +120,7 @@ char AH5_write_int_dataset(hid_t loc_id, const char *dset_name, const hsize_t le
     hsize_t dims[1] = {len};
     char success = AH5_FALSE;
 
+    // TODO: add check of loc_id using H5Oget_info()
     if(H5LTmake_dataset_int(loc_id, dset_name, 1, dims, wdata) >= 0)
         success = AH5_TRUE;
     return success;
@@ -131,6 +133,7 @@ char AH5_write_flt_dataset(hid_t loc_id, const char *dset_name, const hsize_t le
     hsize_t dims[1] = {len};
     char success = AH5_FALSE;
 
+    // TODO: add check of loc_id using H5Oget_info()
     if(H5LTmake_dataset_float(loc_id, dset_name, 1, dims, wdata) >= 0)
         success = AH5_TRUE;
     return success;
@@ -155,6 +158,7 @@ char AH5_write_str_dataset(hid_t loc_id, const char *dset_name, const hsize_t le
     hsize_t dims[2] = {len, slen};
     char success = AH5_FALSE;
 
+    // TODO: add check of loc_id using H5Oget_info()
     dataspace_id = H5Screate_simple(2, dims, NULL);
     atype = H5Tcopy(H5T_C_S1);
     H5Tset_size(atype, slen);
@@ -169,30 +173,39 @@ char AH5_write_str_dataset(hid_t loc_id, const char *dset_name, const hsize_t le
 }
 
 
-char AH5_write_array(hid_t loc_id, const char *dset_name, hid_t input_datatype_id, hid_t write_datatype_id, const int rank, const hsize_t dims[], const void *wdata)
+// Write nD int dataset
+char AH5_write_int_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const int *wdata)
 {
     char success = AH5_FALSE;
     hid_t dataset_id, dataspace_id;
-  
-    dataspace_id = H5Screate_simple(rank, dims, NULL);
-    dataset_id = H5Dcreate(loc_id, dset_name, write_datatype_id, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    H5Dwrite(dataset_id, input_datatype_id, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
-    if (H5Dclose(dataset_id) >= 0)
-        success = AH5_TRUE;
 
+    dataspace_id = H5Screate_simple(rank, dims, NULL);
+    dataset_id = H5Dcreate(loc_id, dset_name, AH5_NATIVE_INT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    if (H5Dwrite(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata))
+        success = AH5_TRUE;
+    H5Dclose(dataset_id);
+    H5Sclose(dataspace_id);
     return success;
 }
 
-char AH5_write_int_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const int *wdata)
-{
-    return AH5_write_array(loc_id, dset_name, H5T_NATIVE_INT, AH5_NATIVE_INT, rank, dims, wdata);
-}
 
+// Write nD float dataset
 char AH5_write_flt_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const float *wdata)
 {
-    return AH5_write_array(loc_id, dset_name, H5T_NATIVE_FLOAT, AH5_NATIVE_FLOAT, rank, dims, wdata);
+    char success = AH5_FALSE;
+    hid_t dataset_id, dataspace_id;
+
+    dataspace_id = H5Screate_simple(rank, dims, NULL);
+    dataset_id = H5Dcreate(loc_id, dset_name, AH5_NATIVE_FLOAT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    if (H5Dwrite(dataset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata))
+        success = AH5_TRUE;
+    H5Dclose(dataset_id);
+    H5Sclose(dataspace_id);
+    return success;
 }
 
+
+// Write nD complex float dataset
 char AH5_write_cpx_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const AH5_complex_t *wdata)
 {
     char success = AH5_FALSE;
@@ -202,7 +215,13 @@ char AH5_write_cpx_array(hid_t loc_id, const char *dset_name, const int rank, co
     return success;
 }
 
+
+// Write 1D string dataset
 char AH5_write_str_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], char *wdata)
 {
-    return AH5_write_array(loc_id, dset_name, H5T_NATIVE_FLOAT, AH5_NATIVE_FLOAT, rank, dims, wdata);
+    char success = AH5_FALSE;
+
+    // TO BE IMPLEMENTED...
+
+    return success;
 }

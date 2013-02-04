@@ -4,16 +4,16 @@
 // Set complex number
 AH5_complex_t AH5_set_complex(float real, float imag)
 {
-	AH5_complex_t rdata;
+    AH5_complex_t rdata;
 
 #ifndef _MSC_VER
-	rdata =  real + imag * _Complex_I;
+    rdata =  real + imag * _Complex_I;
 #else
-	rdata.re = real;
-	rdata.im = imag;
+    rdata.re = real;
+    rdata.im = imag;
 #endif /*__MSC_VER__*/
 
-	return rdata;
+    return rdata;
 }
 
 
@@ -29,7 +29,6 @@ AH5_complex_t AH5_set_complex(float real, float imag)
     AH5_TRUE = AH5_version_minimum("2", "2.5");
     AH5_TRUE = AH5_version_minimum("2.0.5.0", "2.1");
 */
-
 char AH5_version_minimum(const char *required_version, const char *sim_version)
 {
     char rdata = AH5_FALSE;
@@ -83,6 +82,8 @@ char AH5_version_minimum(const char *required_version, const char *sim_version)
     return rdata;
 }
 
+
+// Remove ".0" from the end; allocates new memory!!!
 char *AH5_trim_zeros(const char *version)
 {
     int i, number = 0;
@@ -114,7 +115,7 @@ char *AH5_trim_zeros(const char *version)
  *
  * Return:
  *  base is returned.
- *  
+ *
  * Example:
  *
  *  "/base" + "name" -> "/base/name"
@@ -134,10 +135,10 @@ char *AH5_join_path(char *base, const char *head)
         return strcpy(base, head);
 
     endbase = base + strlen(base);
-    while( isspace(*(--endbase)) && endbase != (base-1) );
+    while (isspace(*(--endbase)) && endbase != (base-1));
 
     if ((*endbase == '/' && head[0] != '/')
-        || (*endbase != '/' && head[0] == '/'))
+            || (*endbase != '/' && head[0] == '/'))
     {
         strcat(AH5_trim_path(base), head);
     }
@@ -150,55 +151,52 @@ char *AH5_join_path(char *base, const char *head)
         strcat(AH5_trim_path(base), "/");
         strcat(base, head);
     }
-  
     return base;
 }
 
 
-/** Remove white char and return; does not allocate new memory */
-char* AH5_trim_path(char* path)
+// Remove white char and return; does not allocate new memory
+char *AH5_trim_path(char *path)
 {
-    size_t len = 0;
     char *frontp = path - 1;
     char *endp = NULL;
-    
-    if( path == NULL )
+    size_t len = 0;
+
+    if (path == NULL)
         return NULL;
-  
-    if( path[0] == '\0' )
+
+    if (path[0] == '\0')
         return path;
-  
+
     len = strlen(path);
     endp = path + len;
-  
+
     /* Move the front and back pointers to address the first non-whitespace
      * characters from each end.
      */
-    while( isspace(*(++frontp)) );
-    while( isspace(*(--endp)) && endp != frontp );
-    
-    if( path + len - 1 != endp )
+    while (isspace(*(++frontp)));
+    while (isspace(*(--endp)) && endp != frontp);
+
+    if (path + len - 1 != endp)
         *(endp + 1) = '\0';
-    else if( frontp != path &&  endp == frontp )
+    else if (frontp != path &&  endp == frontp)
         *path = '\0';
-    
+
     /* Shift the string so that it starts at path so that if it's dynamically
      * allocated, we can still free it on the returned pointer.  Note the reuse
      * of endp to mean the front of the string buffer now.
      */
     endp = path;
-    if( frontp != path )
+    if (frontp != path)
     {
-        while( *frontp ) *endp++ = *frontp++;
+        while (*frontp) *endp++ = *frontp++;
         *endp = '\0';
     }
-  
     return path;
 }
 
 
-
-
+// Check for path validity
 char AH5_path_valid(hid_t loc_id, const char *path)
 {
     char *temp;
@@ -235,7 +233,8 @@ char AH5_path_valid(hid_t loc_id, const char *path)
     return AH5_TRUE;
 }
 
-// Add aelement to aset
+
+// Add element to aset; allocates new memory!!!
 AH5_set_t AH5_add_to_set(AH5_set_t aset, char *aelement)
 {
     hsize_t id = 0;
@@ -379,9 +378,9 @@ void AH5_print_err_inv_attr(const char *category, const char *path, const char *
     printf("\n***** ERROR(%s): Invalid attribute value in \"%s[@%s]\". *****\n\n", category, path, attr_name);
 }
 
-void AH5_print_err_func_not_implemented(const char *category, const char *func_name)
+void AH5_print_err_func_not_implemented(const char *category, const char *path, const char *func_name)
 {
-    printf("\n***** ERROR(%s): Function '%s' not implemented yet!\n\n *****\n\n", category, func_name);
+    printf("\n***** ERROR(%s): Problem in %s... function '%s' not implemented yet!\n\n *****\n\n", category, path, func_name);
 }
 
 void AH5_print_wrn_attr(const char *category, const char *path, const char *attr_name)
