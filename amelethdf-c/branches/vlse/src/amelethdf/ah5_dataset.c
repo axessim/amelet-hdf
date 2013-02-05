@@ -181,7 +181,7 @@ char AH5_write_int_array(hid_t loc_id, const char *dset_name, const int rank, co
 
     dataspace_id = H5Screate_simple(rank, dims, NULL);
     dataset_id = H5Dcreate(loc_id, dset_name, AH5_NATIVE_INT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    if (H5Dwrite(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata))
+    if (H5Dwrite(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata) >= 0)
         success = AH5_TRUE;
     H5Dclose(dataset_id);
     H5Sclose(dataspace_id);
@@ -197,7 +197,7 @@ char AH5_write_flt_array(hid_t loc_id, const char *dset_name, const int rank, co
 
     dataspace_id = H5Screate_simple(rank, dims, NULL);
     dataset_id = H5Dcreate(loc_id, dset_name, AH5_NATIVE_FLOAT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    if (H5Dwrite(dataset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata))
+    if (H5Dwrite(dataset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata) >= 0)
         success = AH5_TRUE;
     H5Dclose(dataset_id);
     H5Sclose(dataspace_id);

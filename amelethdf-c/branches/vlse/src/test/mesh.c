@@ -103,19 +103,19 @@ static char *test_write_umesh()
     AH5_free_umesh(&umesh);
 
     // Check if all the mesh parts are written.
-    mu_assert("Check nodes in file.",
+    mu_assert("Check 'mesh' nodes in file.",
               AH5_path_valid(file_id, "/mesh"));
-    mu_assert("Check nodes in file.",
+    mu_assert("Check '/mesh/nodes' nodes in file.",
               AH5_path_valid(file_id, "/mesh/nodes"));
-    mu_assert("Check nodes in file.",
+    mu_assert("Check '/mesh/elementNodes' nodes in file.",
               AH5_path_valid(file_id, "/mesh/elementNodes"));
-    mu_assert("Check nodes in file.",
+    mu_assert("Check '/mesh/elementTypes' nodes in file.",
               AH5_path_valid(file_id, "/mesh/elementTypes"));
-    mu_assert("Check nodes in file.",
+    mu_assert("Check '/mesh/groupGroup' nodes in file.",
               AH5_path_valid(file_id, "/mesh/groupGroup"));
-    mu_assert("Check nodes in file.",
+    mu_assert("Check '/mesh/group' nodes in file.",
               AH5_path_valid(file_id, "/mesh/group"));
-    mu_assert("Check nodes in file.",
+    mu_assert("Check '/mesh/group/name' nodes in file.",
               AH5_path_valid(file_id, "/mesh/group/name"));
 
     // Now read the mesh
