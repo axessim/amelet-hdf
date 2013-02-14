@@ -1,10 +1,6 @@
 #ifndef AH5_H
 #define AH5_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "ah5_general.h"
 #include "ah5_dataset.h"
 #include "ah5_attribute.h"
@@ -21,9 +17,5 @@ extern "C" {
 #include "ah5_c_outreq.h"
 #include "ah5_c_phmodel.h"
 #include "ah5_c_simulation.h"
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // AH5_H

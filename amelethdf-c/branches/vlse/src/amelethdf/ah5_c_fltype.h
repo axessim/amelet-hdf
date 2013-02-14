@@ -1,11 +1,12 @@
 #ifndef AH5_C_FLTYPE_H
 #define AH5_C_FLTYPE_H
 
+#include "ah5_config.h"
+#include "ah5_general.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "ah5_general.h"
 
     typedef enum _AH5_ft_class_t
     {
@@ -203,56 +204,56 @@ extern "C" {
         AH5_ft_data_t   data;
     } AH5_ft_t;
 
-    char AH5_read_ft_singleinteger (hid_t file_id, const char *path, AH5_singleinteger_t *singleinteger);
-    char AH5_read_ft_singlereal (hid_t file_id, const char *path, AH5_singlereal_t *singlereal);
-    char AH5_read_ft_singlecomplex (hid_t file_id, const char *path, AH5_singlecomplex_t *singlecomplex);
-    char AH5_read_ft_singlestring (hid_t file_id, const char *path, AH5_singlestring_t *singlestring);
-    char AH5_read_ft_vector (hid_t file_id, const char *path, AH5_vector_t *vector);
-    char AH5_read_ft_linearlistofreal1 (hid_t file_id, const char *path, AH5_linearlistofreal1_t *linearlistofreal1);
-    char AH5_read_ft_linearlistofreal2 (hid_t file_id, const char *path, AH5_linearlistofreal2_t *linearlistofreal2);
-    char AH5_read_ft_logarithmlistofreal (hid_t file_id, const char *path, AH5_logarithmlistofreal_t *logarithmlistofreal);
-    char AH5_read_ft_perdecadelistofreal (hid_t file_id, const char *path, AH5_perdecadelistofreal_t *perdecadelistofreal);
-    char AH5_read_ft_linearlistofinteger2 (hid_t file_id, const char *path, AH5_linearlistofinteger2_t *linearlistofinteger2);
-    char AH5_read_ft_rationalfunction (hid_t file_id, const char *path, AH5_rationalfunction_t *rationalfunction);
-    char AH5_read_ft_generalrationalfunction (hid_t file_id, const char *path, AH5_generalrationalfunction_t *generalrationalfunction);
-    char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rational);
-    char AH5_read_ft_dataset (hid_t file_id, const char *path, AH5_dataset_t *dataset);
-    char AH5_read_ft_arrayset (hid_t file_id, const char *path, AH5_arrayset_t *arrayset);
-    char AH5_read_floatingtype (hid_t file_id, const char *path, AH5_ft_t *floatingtype);
+    AH5_EXPORT char AH5_read_ft_singleinteger (hid_t file_id, const char *path, AH5_singleinteger_t *singleinteger);
+    AH5_EXPORT char AH5_read_ft_singlereal (hid_t file_id, const char *path, AH5_singlereal_t *singlereal);
+    AH5_EXPORT char AH5_read_ft_singlecomplex (hid_t file_id, const char *path, AH5_singlecomplex_t *singlecomplex);
+    AH5_EXPORT char AH5_read_ft_singlestring (hid_t file_id, const char *path, AH5_singlestring_t *singlestring);
+    AH5_EXPORT char AH5_read_ft_vector (hid_t file_id, const char *path, AH5_vector_t *vector);
+    AH5_EXPORT char AH5_read_ft_linearlistofreal1 (hid_t file_id, const char *path, AH5_linearlistofreal1_t *linearlistofreal1);
+    AH5_EXPORT char AH5_read_ft_linearlistofreal2 (hid_t file_id, const char *path, AH5_linearlistofreal2_t *linearlistofreal2);
+    AH5_EXPORT char AH5_read_ft_logarithmlistofreal (hid_t file_id, const char *path, AH5_logarithmlistofreal_t *logarithmlistofreal);
+    AH5_EXPORT char AH5_read_ft_perdecadelistofreal (hid_t file_id, const char *path, AH5_perdecadelistofreal_t *perdecadelistofreal);
+    AH5_EXPORT char AH5_read_ft_linearlistofinteger2 (hid_t file_id, const char *path, AH5_linearlistofinteger2_t *linearlistofinteger2);
+    AH5_EXPORT char AH5_read_ft_rationalfunction (hid_t file_id, const char *path, AH5_rationalfunction_t *rationalfunction);
+    AH5_EXPORT char AH5_read_ft_generalrationalfunction (hid_t file_id, const char *path, AH5_generalrationalfunction_t *generalrationalfunction);
+    AH5_EXPORT char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rational);
+    AH5_EXPORT char AH5_read_ft_dataset (hid_t file_id, const char *path, AH5_dataset_t *dataset);
+    AH5_EXPORT char AH5_read_ft_arrayset (hid_t file_id, const char *path, AH5_arrayset_t *arrayset);
+    AH5_EXPORT char AH5_read_floatingtype (hid_t file_id, const char *path, AH5_ft_t *floatingtype);
 
-    void AH5_print_ft_singleinteger (const AH5_singleinteger_t *singleinteger, int space);
-    void AH5_print_ft_singlereal (const AH5_singlereal_t *singlereal, int space);
-    void AH5_print_ft_singlecomplex (const AH5_singlecomplex_t *singlecomplex, int space);
-    void AH5_print_ft_singlestring (const AH5_singlestring_t *singlestring, int space);
-    void AH5_print_ft_vector (const AH5_vector_t *vector, int space);
-    void AH5_print_ft_linearlistofreal1 (const AH5_linearlistofreal1_t *linearlistofreal1, int space);
-    void AH5_print_ft_linearlistofreal2 (const AH5_linearlistofreal2_t *linearlistofreal2, int space);
-    void AH5_print_ft_logarithmlistofreal (const AH5_logarithmlistofreal_t *logarithmlistofreal, int space);
-    void AH5_print_ft_perdecadelistofreal (const AH5_perdecadelistofreal_t *perdecadelistofreal, int space);
-    void AH5_print_ft_linearlistofinteger2 (const AH5_linearlistofinteger2_t *linearlistofinteger2, int space);
-    void AH5_print_ft_rationalfunction (const AH5_rationalfunction_t *rationalfunction, int space);
-    void AH5_print_ft_generalrationalfunction (const AH5_generalrationalfunction_t *generalrationalfunction, int space);
-    void AH5_print_ft_rational (const AH5_rational_t *rational, int space);
-    void AH5_print_ft_dataset (const AH5_dataset_t *dataset, int space);
-    void AH5_print_ft_arrayset (const AH5_arrayset_t *arrayset, int space);
-    void AH5_print_floatingtype (const AH5_ft_t *floatingtype, int space);
+    AH5_EXPORT void AH5_print_ft_singleinteger (const AH5_singleinteger_t *singleinteger, int space);
+    AH5_EXPORT void AH5_print_ft_singlereal (const AH5_singlereal_t *singlereal, int space);
+    AH5_EXPORT void AH5_print_ft_singlecomplex (const AH5_singlecomplex_t *singlecomplex, int space);
+    AH5_EXPORT void AH5_print_ft_singlestring (const AH5_singlestring_t *singlestring, int space);
+    AH5_EXPORT void AH5_print_ft_vector (const AH5_vector_t *vector, int space);
+    AH5_EXPORT void AH5_print_ft_linearlistofreal1 (const AH5_linearlistofreal1_t *linearlistofreal1, int space);
+    AH5_EXPORT void AH5_print_ft_linearlistofreal2 (const AH5_linearlistofreal2_t *linearlistofreal2, int space);
+    AH5_EXPORT void AH5_print_ft_logarithmlistofreal (const AH5_logarithmlistofreal_t *logarithmlistofreal, int space);
+    AH5_EXPORT void AH5_print_ft_perdecadelistofreal (const AH5_perdecadelistofreal_t *perdecadelistofreal, int space);
+    AH5_EXPORT void AH5_print_ft_linearlistofinteger2 (const AH5_linearlistofinteger2_t *linearlistofinteger2, int space);
+    AH5_EXPORT void AH5_print_ft_rationalfunction (const AH5_rationalfunction_t *rationalfunction, int space);
+    AH5_EXPORT void AH5_print_ft_generalrationalfunction (const AH5_generalrationalfunction_t *generalrationalfunction, int space);
+    AH5_EXPORT void AH5_print_ft_rational (const AH5_rational_t *rational, int space);
+    AH5_EXPORT void AH5_print_ft_dataset (const AH5_dataset_t *dataset, int space);
+    AH5_EXPORT void AH5_print_ft_arrayset (const AH5_arrayset_t *arrayset, int space);
+    AH5_EXPORT void AH5_print_floatingtype (const AH5_ft_t *floatingtype, int space);
 
-    void AH5_free_ft_singleinteger (AH5_singleinteger_t *singleinteger);
-    void AH5_free_ft_singlereal (AH5_singlereal_t *singlereal);
-    void AH5_free_ft_singlecomplex (AH5_singlecomplex_t *singlecomplex);
-    void AH5_free_ft_singlestring (AH5_singlestring_t *singlestring);
-    void AH5_free_ft_vector (AH5_vector_t *vector);
-    void AH5_free_ft_linearlistofreal1 (AH5_linearlistofreal1_t *linearlistofreal1);
-    void AH5_free_ft_linearlistofreal2 (AH5_linearlistofreal2_t *linearlistofreal2);
-    void AH5_free_ft_logarithmlistofreal (AH5_logarithmlistofreal_t *logarithmlistofreal);
-    void AH5_free_ft_perdecadelistofreal (AH5_perdecadelistofreal_t *perdecadelistofreal);
-    void AH5_free_ft_linearlistofinteger2 (AH5_linearlistofinteger2_t *linearlistofinteger2);
-    void AH5_free_ft_rationalfunction (AH5_rationalfunction_t *rationalfunction);
-    void AH5_free_ft_generalrationalfunction (AH5_generalrationalfunction_t *generalrationalfunction);
-    void AH5_free_ft_rational (AH5_rational_t *rational);
-    void AH5_free_ft_dataset (AH5_dataset_t *dataset);
-    void AH5_free_ft_arrayset (AH5_arrayset_t *arrayset);
-    void AH5_free_floatingtype (AH5_ft_t *floatingtype);
+    AH5_EXPORT void AH5_free_ft_singleinteger (AH5_singleinteger_t *singleinteger);
+    AH5_EXPORT void AH5_free_ft_singlereal (AH5_singlereal_t *singlereal);
+    AH5_EXPORT void AH5_free_ft_singlecomplex (AH5_singlecomplex_t *singlecomplex);
+    AH5_EXPORT void AH5_free_ft_singlestring (AH5_singlestring_t *singlestring);
+    AH5_EXPORT void AH5_free_ft_vector (AH5_vector_t *vector);
+    AH5_EXPORT void AH5_free_ft_linearlistofreal1 (AH5_linearlistofreal1_t *linearlistofreal1);
+    AH5_EXPORT void AH5_free_ft_linearlistofreal2 (AH5_linearlistofreal2_t *linearlistofreal2);
+    AH5_EXPORT void AH5_free_ft_logarithmlistofreal (AH5_logarithmlistofreal_t *logarithmlistofreal);
+    AH5_EXPORT void AH5_free_ft_perdecadelistofreal (AH5_perdecadelistofreal_t *perdecadelistofreal);
+    AH5_EXPORT void AH5_free_ft_linearlistofinteger2 (AH5_linearlistofinteger2_t *linearlistofinteger2);
+    AH5_EXPORT void AH5_free_ft_rationalfunction (AH5_rationalfunction_t *rationalfunction);
+    AH5_EXPORT void AH5_free_ft_generalrationalfunction (AH5_generalrationalfunction_t *generalrationalfunction);
+    AH5_EXPORT void AH5_free_ft_rational (AH5_rational_t *rational);
+    AH5_EXPORT void AH5_free_ft_dataset (AH5_dataset_t *dataset);
+    AH5_EXPORT void AH5_free_ft_arrayset (AH5_arrayset_t *arrayset);
+    AH5_EXPORT void AH5_free_floatingtype (AH5_ft_t *floatingtype);
 
 #ifdef __cplusplus
 }

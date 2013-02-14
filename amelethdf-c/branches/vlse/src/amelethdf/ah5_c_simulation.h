@@ -1,11 +1,12 @@
 #ifndef AH5_C_SIMULATION_H
 #define AH5_C_SIMULATION_H
 
+#include "ah5_config.h"
+#include "ah5_general.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "ah5_general.h"
 
     typedef struct _AH5_sim_instance_t
     {
@@ -26,14 +27,14 @@ extern "C" {
         AH5_sim_instance_t *instances;
     } AH5_simulation_t;
 
-    char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t *sim_instance);
-    char AH5_read_simulation (hid_t file_id, AH5_simulation_t *simulation);
+    AH5_EXPORT char AH5_read_sim_instance (hid_t file_id, const char *path, AH5_sim_instance_t *sim_instance);
+    AH5_EXPORT char AH5_read_simulation (hid_t file_id, AH5_simulation_t *simulation);
 
-    void AH5_print_sim_instance (const AH5_sim_instance_t *sim_instance, int space);
-    void AH5_print_simulation (const AH5_simulation_t *simulation);
+    AH5_EXPORT void AH5_print_sim_instance (const AH5_sim_instance_t *sim_instance, int space);
+    AH5_EXPORT void AH5_print_simulation (const AH5_simulation_t *simulation);
 
-    void AH5_free_sim_instance (AH5_sim_instance_t *sim_instance);
-    void AH5_free_simulation (AH5_simulation_t *simulation);
+    AH5_EXPORT void AH5_free_sim_instance (AH5_sim_instance_t *sim_instance);
+    AH5_EXPORT void AH5_free_simulation (AH5_simulation_t *simulation);
 
 #ifdef __cplusplus
 }

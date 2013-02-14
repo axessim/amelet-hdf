@@ -1,11 +1,12 @@
 #ifndef AH5_C_EXSURF_H
 #define AH5_C_EXSURF_H
 
+#include "ah5_config.h"
+#include "ah5_c_fltype.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "ah5_c_fltype.h"
 
     typedef enum _AH5_exs_type_class_t
     {
@@ -37,14 +38,14 @@ extern "C" {
         AH5_exs_group_t *groups;
     } AH5_exchange_surface_t;
 
-    char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_group);
-    char AH5_read_exchange_surface (hid_t file_id, AH5_exchange_surface_t *exchange_surface);
+    AH5_EXPORT char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_group);
+    AH5_EXPORT char AH5_read_exchange_surface (hid_t file_id, AH5_exchange_surface_t *exchange_surface);
 
-    void AH5_print_exs_group (const AH5_exs_group_t *exs_group, int space);
-    void AH5_print_exchange_surface (const AH5_exchange_surface_t *exchange_surface);
+    AH5_EXPORT void AH5_print_exs_group (const AH5_exs_group_t *exs_group, int space);
+    AH5_EXPORT void AH5_print_exchange_surface (const AH5_exchange_surface_t *exchange_surface);
 
-    void AH5_free_exs_group (AH5_exs_group_t *exs_group);
-    void AH5_free_exchange_surface (AH5_exchange_surface_t *exchange_surface);
+    AH5_EXPORT void AH5_free_exs_group (AH5_exs_group_t *exs_group);
+    AH5_EXPORT void AH5_free_exchange_surface (AH5_exchange_surface_t *exchange_surface);
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include "ah5_config.h"
 #include "ah5_general.h"
 
     typedef union _AH5_value_t
@@ -28,24 +29,24 @@ extern "C" {
         AH5_attr_instance_t *instances;
     } AH5_opt_attrs_t;
 
-    char AH5_read_int_attr(hid_t file_id, const char *path, char *attr, int *rdata);
+    AH5_EXPORT char AH5_read_int_attr(hid_t file_id, const char *path, char *attr, int *rdata);
     char AH5_read_flt_attr(hid_t file_id, const char *path, char *attr_name, float *rdata);
-    char AH5_read_cpx_attr(hid_t file_id, const char *path, char *attr_name, AH5_complex_t *rdata);
-    char AH5_read_str_attr(hid_t file_id, const char *path, char *attr_name, char **rdata);
-    char AH5_read_opt_attrs(hid_t file_id, const char *path, AH5_opt_attrs_t *opt_attrs, char mandatory_attrs[][AH5_ATTR_LENGTH], size_t nb_mandatory_attrs);
+    AH5_EXPORT char AH5_read_cpx_attr(hid_t file_id, const char *path, char *attr_name, AH5_complex_t *rdata);
+    AH5_EXPORT char AH5_read_str_attr(hid_t file_id, const char *path, char *attr_name, char **rdata);
+    AH5_EXPORT char AH5_read_opt_attrs(hid_t file_id, const char *path, AH5_opt_attrs_t *opt_attrs, char mandatory_attrs[][AH5_ATTR_LENGTH], size_t nb_mandatory_attrs);
 
-    char AH5_write_int_attr(hid_t file_id, const char *path, char *attr_name, const int wdata);
-    char AH5_write_flt_attr(hid_t file_id, const char *path, char *attr_name, const float wdata);
-    char AH5_write_cpx_attr(hid_t file_id, const char *path, char *attr_name, const AH5_complex_t *wdata);
-    char AH5_write_str_attr(hid_t file_id, const char *path, char *attr_name, const char *wdata);
+    AH5_EXPORT char AH5_write_int_attr(hid_t file_id, const char *path, char *attr_name, const int wdata);
+    AH5_EXPORT char AH5_write_flt_attr(hid_t file_id, const char *path, char *attr_name, const float wdata);
+    AH5_EXPORT char AH5_write_cpx_attr(hid_t file_id, const char *path, char *attr_name, const AH5_complex_t *wdata);
+    AH5_EXPORT char AH5_write_str_attr(hid_t file_id, const char *path, char *attr_name, const char *wdata);
 
-    void AH5_print_int_attr(char *name, int value, int space);
-    void AH5_print_flt_attr(char *name, float value, int space);
-    void AH5_print_cpx_attr(char *name, AH5_complex_t value, int space);
-    void AH5_print_str_attr(char *name, char *value, int space);
-    void AH5_print_opt_attrs(const AH5_opt_attrs_t *opt_attrs, int space);
+    AH5_EXPORT void AH5_print_int_attr(char *name, int value, int space);
+    AH5_EXPORT void AH5_print_flt_attr(char *name, float value, int space);
+    AH5_EXPORT void AH5_print_cpx_attr(char *name, AH5_complex_t value, int space);
+    AH5_EXPORT void AH5_print_str_attr(char *name, char *value, int space);
+    AH5_EXPORT void AH5_print_opt_attrs(const AH5_opt_attrs_t *opt_attrs, int space);
 
-    void AH5_free_opt_attrs(AH5_opt_attrs_t *opt_attrs);
+    AH5_EXPORT void AH5_free_opt_attrs(AH5_opt_attrs_t *opt_attrs);
 
 
 #ifdef __cplusplus

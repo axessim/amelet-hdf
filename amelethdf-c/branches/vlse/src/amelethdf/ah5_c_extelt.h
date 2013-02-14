@@ -1,15 +1,16 @@
 #ifndef AH5_C_EXTELT_H
 #define AH5_C_EXTELT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+#include "ah5_config.h"
 #include "ah5_general.h"
 #ifndef _MSC_VER
 #include <unistd.h>
 #else
 #define R_OK 4
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 	typedef struct _AH5_eet_dataset_t
@@ -26,17 +27,17 @@ extern "C" {
 		AH5_eet_dataset_t *datasets;
 	} AH5_external_element_t;
 
-	char AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *eet_dataset);
-	char AH5_read_external_element (hid_t file_id, AH5_external_element_t *external_element);
+	AH5_EXPORT char AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *eet_dataset);
+	AH5_EXPORT char AH5_read_external_element (hid_t file_id, AH5_external_element_t *external_element);
 
-	void AH5_print_eet_dataset (const AH5_eet_dataset_t *eet_dataset, int space);
-	void AH5_print_external_element (const AH5_external_element_t *external_element);
+	AH5_EXPORT void AH5_print_eet_dataset (const AH5_eet_dataset_t *eet_dataset, int space);
+	AH5_EXPORT void AH5_print_external_element (const AH5_external_element_t *external_element);
 
-	void AH5_free_eet_dataset (AH5_eet_dataset_t *eet_dataset);
-	void AH5_free_external_element (AH5_external_element_t *external_element);
+	AH5_EXPORT void AH5_free_eet_dataset (AH5_eet_dataset_t *eet_dataset);
+	AH5_EXPORT void AH5_free_external_element (AH5_external_element_t *external_element);
 
-	char AH5_open_external_files (AH5_eet_dataset_t *eet_dataset);
-	char AH5_close_external_files (AH5_eet_dataset_t *eet_dataset);
+	AH5_EXPORT char AH5_open_external_files (AH5_eet_dataset_t *eet_dataset);
+	AH5_EXPORT char AH5_close_external_files (AH5_eet_dataset_t *eet_dataset);
 
 #ifdef __cplusplus
 }

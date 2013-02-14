@@ -1,11 +1,12 @@
 #ifndef AH5_C_LABEL_H
 #define AH5_C_LABEL_H
 
+#include "ah5_config.h"
+#include "ah5_general.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "ah5_general.h"
 
     typedef struct _AH5_lbl_dataset_t
     {
@@ -20,17 +21,17 @@ extern "C" {
         AH5_lbl_dataset_t *datasets;
     } AH5_label_t;
 
-    void AH5_init_lbl_dataset(AH5_lbl_dataset_t *lbl_dataset);
-    void AH5_init_label(AH5_label_t *label);
+    AH5_EXPORT void AH5_init_lbl_dataset(AH5_lbl_dataset_t *lbl_dataset);
+    AH5_EXPORT void AH5_init_label(AH5_label_t *label);
 
-    char AH5_read_lbl_dataset (hid_t file_id, const char *path, AH5_lbl_dataset_t *lbl_dataset);
-    char AH5_read_label (hid_t file_id, AH5_label_t *label);
+    AH5_EXPORT char AH5_read_lbl_dataset (hid_t file_id, const char *path, AH5_lbl_dataset_t *lbl_dataset);
+    AH5_EXPORT char AH5_read_label (hid_t file_id, AH5_label_t *label);
 
-    void AH5_print_lbl_dataset (const AH5_lbl_dataset_t *lbl_dataset, int space);
-    void AH5_print_label (const AH5_label_t *label);
+    AH5_EXPORT void AH5_print_lbl_dataset (const AH5_lbl_dataset_t *lbl_dataset, int space);
+    AH5_EXPORT void AH5_print_label (const AH5_label_t *label);
 
-    void AH5_free_lbl_dataset (AH5_lbl_dataset_t *lbl_dataset);
-    void AH5_free_label (AH5_label_t *label);
+    AH5_EXPORT void AH5_free_lbl_dataset (AH5_lbl_dataset_t *lbl_dataset);
+    AH5_EXPORT void AH5_free_label (AH5_label_t *label);
 
 #ifdef __cplusplus
 }
