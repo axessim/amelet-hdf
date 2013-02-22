@@ -15,8 +15,38 @@
 extern "C" {
 #endif
 
-  //TODO use configur define line AH5_SDT_CCOMPLEXE no _MSC_VER
-#ifndef _MSC_VER
+// See http://gcc.gnu.org/wiki/Visibility
+#if defined _WIN32 || defined __CYGWIN__
+# ifdef AMELETHDF_C_LIBRARY
+#  ifdef __GNUC__
+#   define AH5_PUBLIC __attribute__ ((dllexport))
+#  else
+#   define AH5_PUBLIC __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
+#  endif
+# else
+#  ifdef __GNUC__
+#   define AH5_PUBLIC __attribute__ ((dllimport))
+#  else
+#   define AH5_PUBLIC __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
+#  endif
+# endif
+#define AH5_LOCAL
+#else
+# if __GNUC__ >= 4
+#  define AH5_PUBLIC __attribute__ ((visibility ("default")))
+#  define AH5_LOCAL  __attribute__ ((visibility ("hidden")))
+# else
+#  define AH5_PUBLIC
+#  define AH5_LOCAL
+# endif
+#endif
+
+// A specific flag for the complexes.
+#if __STDC_VERSION__ >= 199901L
+# define AH5_SDT_CCOMPLEXE
+#endif
+
+#ifdef AH5_SDT_CCOMPLEXE
 #include <complex.h>
 #define AH5_complex_t complex float
 #else
@@ -28,7 +58,7 @@ extern "C" {
 
 #define creal(z) ((z).re)
 #define cimag(z) ((z).im)
-#endif /*__MSC_VER__*/
+#endif /*AH5_SDT_CCOMPLEXE*/
 
     AH5_complex_t AH5_set_complex(float real, float imag);
 
@@ -48,25 +78,25 @@ extern "C" {
     } AH5_set_t;
 
 
-    AH5_EXPORT char AH5_version_minimum(const char *required_version, const char *sim_version);
-    AH5_EXPORT char *AH5_trim_zeros(const char *version);
-    AH5_EXPORT char AH5_path_valid(hid_t file_id, const char *path);
-    AH5_EXPORT AH5_set_t AH5_add_to_set(AH5_set_t aset, char *aelement);
-    AH5_EXPORT int AH5_index_in_set(AH5_set_t aset, char *aelement, hsize_t *index);
-    AH5_EXPORT AH5_children_t AH5_read_children_name(hid_t file_id, const char *path);
+    AH5_PUBLIC char AH5_version_minimum(const char *required_version, const char *sim_version);
+    AH5_PUBLIC char *AH5_trim_zeros(const char *version);
+    AH5_PUBLIC char AH5_path_valid(hid_t file_id, const char *path);
+    AH5_PUBLIC AH5_set_t AH5_add_to_set(AH5_set_t aset, char *aelement);
+    AH5_PUBLIC int AH5_index_in_set(AH5_set_t aset, char *aelement, hsize_t *index);
+    AH5_PUBLIC AH5_children_t AH5_read_children_name(hid_t file_id, const char *path);
 
-    AH5_EXPORT char *AH5_get_name_from_path(const char *path);
-    AH5_EXPORT char *AH5_get_base_from_path(const char *path);
-    AH5_EXPORT char *AH5_join_path(char *base, const char *head);
-    AH5_EXPORT char* AH5_trim_path(char *path);
+    AH5_PUBLIC char *AH5_get_name_from_path(const char *path);
+    AH5_PUBLIC char *AH5_get_base_from_path(const char *path);
+    AH5_PUBLIC char *AH5_join_path(char *base, const char *head);
+    AH5_PUBLIC char* AH5_trim_path(char *path);
 
-    AH5_EXPORT void AH5_print_err_dset(const char *category, const char *path);
-    AH5_EXPORT void AH5_print_err_tble(const char *category, const char *path);
-    AH5_EXPORT void AH5_print_err_attr(const char *category, const char *path, const char *attr_name);
-    AH5_EXPORT void AH5_print_err_path(const char *category, const char *path);
-    AH5_EXPORT void AH5_print_err_inv_attr(const char *category, const char *path, const char *attr_name);
-    AH5_EXPORT void AH5_print_err_func_not_implemented(const char *category, const char *path, const char *func_name);
-    AH5_EXPORT void AH5_print_wrn_attr(const char *category, const char *path, const char *attr_name);
+    AH5_PUBLIC void AH5_print_err_dset(const char *category, const char *path);
+    AH5_PUBLIC void AH5_print_err_tble(const char *category, const char *path);
+    AH5_PUBLIC void AH5_print_err_attr(const char *category, const char *path, const char *attr_name);
+    AH5_PUBLIC void AH5_print_err_path(const char *category, const char *path);
+    AH5_PUBLIC void AH5_print_err_inv_attr(const char *category, const char *path, const char *attr_name);
+    AH5_PUBLIC void AH5_print_err_func_not_implemented(const char *category, const char *path, const char *func_name);
+    AH5_PUBLIC void AH5_print_wrn_attr(const char *category, const char *path, const char *attr_name);
 
 
 // Some helpers macros of manage error.

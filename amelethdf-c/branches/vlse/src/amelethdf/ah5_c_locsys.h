@@ -37,17 +37,17 @@ extern "C" {
         AH5_lsm_instance_t *instances;
     } AH5_localization_system_t;
 
-    AH5_EXPORT char AH5_read_lsm_transformation (hid_t file_id, const char *path, AH5_lsm_transf_t *lsm_transformation);
-    AH5_EXPORT char AH5_read_lsm_instance (hid_t file_id, const char *path, AH5_lsm_instance_t *lsm_instance);
-    AH5_EXPORT char AH5_read_localization_system (hid_t file_id, AH5_localization_system_t *localization_system);
+    AH5_PUBLIC char AH5_read_lsm_transformation (hid_t file_id, const char *path, AH5_lsm_transf_t *lsm_transformation);
+    AH5_PUBLIC char AH5_read_lsm_instance (hid_t file_id, const char *path, AH5_lsm_instance_t *lsm_instance);
+    AH5_PUBLIC char AH5_read_localization_system (hid_t file_id, AH5_localization_system_t *localization_system);
 
-    AH5_EXPORT void AH5_print_lsm_transformation (const AH5_lsm_transf_t *lsm_transformation, int space);
-    AH5_EXPORT void AH5_print_lsm_instance (const AH5_lsm_instance_t *lsm_instance, int space);
-    AH5_EXPORT void AH5_print_localization_system (const AH5_localization_system_t *localization_system);
+    AH5_PUBLIC void AH5_print_lsm_transformation (const AH5_lsm_transf_t *lsm_transformation, int space);
+    AH5_PUBLIC void AH5_print_lsm_instance (const AH5_lsm_instance_t *lsm_instance, int space);
+    AH5_PUBLIC void AH5_print_localization_system (const AH5_localization_system_t *localization_system);
 
-    AH5_EXPORT void AH5_free_lsm_transformation (AH5_lsm_transf_t *lsm_transformation);
-    AH5_EXPORT void AH5_free_lsm_instance (AH5_lsm_instance_t *lsm_instance);
-    AH5_EXPORT void AH5_free_localization_system (AH5_localization_system_t *localization_system);
+    AH5_PUBLIC void AH5_free_lsm_transformation (AH5_lsm_transf_t *lsm_transformation);
+    AH5_PUBLIC void AH5_free_lsm_instance (AH5_lsm_instance_t *lsm_instance);
+    AH5_PUBLIC void AH5_free_localization_system (AH5_localization_system_t *localization_system);
 
 #ifdef __cplusplus
 }

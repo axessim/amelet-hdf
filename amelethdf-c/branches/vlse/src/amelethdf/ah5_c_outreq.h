@@ -40,21 +40,21 @@ extern "C" {
         AH5_ort_group_t *groups;
     } AH5_outputrequest_t;
 
-    AH5_EXPORT void AH5_init_ort_instance (AH5_ort_instance_t *ort_instance);
-    AH5_EXPORT void AH5_init_ort_group (AH5_ort_group_t *ort_group);
-    AH5_EXPORT void AH5_init_outputrequest(AH5_outputrequest_t *outputrequest);
+    AH5_PUBLIC void AH5_init_ort_instance (AH5_ort_instance_t *ort_instance);
+    AH5_PUBLIC void AH5_init_ort_group (AH5_ort_group_t *ort_group);
+    AH5_PUBLIC void AH5_init_outputrequest(AH5_outputrequest_t *outputrequest);
 
-    AH5_EXPORT char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t *ort_instance);
-    AH5_EXPORT char AH5_read_ort_group (hid_t file_id, const char *path, AH5_ort_group_t *ort_group);
-    AH5_EXPORT char AH5_read_outputrequest (hid_t file_id, AH5_outputrequest_t *outputrequest);
+    AH5_PUBLIC char AH5_read_ort_instance (hid_t file_id, const char *path, AH5_ort_instance_t *ort_instance);
+    AH5_PUBLIC char AH5_read_ort_group (hid_t file_id, const char *path, AH5_ort_group_t *ort_group);
+    AH5_PUBLIC char AH5_read_outputrequest (hid_t file_id, AH5_outputrequest_t *outputrequest);
 
-    AH5_EXPORT void AH5_print_ort_instance (const AH5_ort_instance_t *ort_instance, int space);
-    AH5_EXPORT void AH5_print_ort_group (const AH5_ort_group_t *ort_group, int space);
-    AH5_EXPORT void AH5_print_outputrequest (const AH5_outputrequest_t *outputrequest);
+    AH5_PUBLIC void AH5_print_ort_instance (const AH5_ort_instance_t *ort_instance, int space);
+    AH5_PUBLIC void AH5_print_ort_group (const AH5_ort_group_t *ort_group, int space);
+    AH5_PUBLIC void AH5_print_outputrequest (const AH5_outputrequest_t *outputrequest);
 
-    AH5_EXPORT void AH5_free_ort_instance (AH5_ort_instance_t *ort_instance);
-    AH5_EXPORT void AH5_free_ort_group (AH5_ort_group_t *ort_group);
-    AH5_EXPORT void AH5_free_outputrequest (AH5_outputrequest_t *outputrequest);
+    AH5_PUBLIC void AH5_free_ort_instance (AH5_ort_instance_t *ort_instance);
+    AH5_PUBLIC void AH5_free_ort_group (AH5_ort_group_t *ort_group);
+    AH5_PUBLIC void AH5_free_outputrequest (AH5_outputrequest_t *outputrequest);
 
 #ifdef __cplusplus
 }

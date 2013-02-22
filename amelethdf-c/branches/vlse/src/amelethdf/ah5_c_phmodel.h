@@ -104,27 +104,27 @@ extern "C" {
         AH5_interface_instance_t *interface_instances;
     } AH5_physicalmodel_t;
 
-    AH5_EXPORT char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *material_prop);
-    AH5_EXPORT char AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_instance_t *volume_instance);
-    AH5_EXPORT char AH5_read_phm_surface_instance_tdl (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    AH5_EXPORT char AH5_read_phm_surface_instance_sibc (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    AH5_EXPORT char AH5_read_phm_surface_instance_zs (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    AH5_EXPORT char AH5_read_phm_surface_instance_zszt (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    AH5_EXPORT char AH5_read_phm_surface_instance_zszt2 (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    AH5_EXPORT char AH5_read_phm_surface_instance (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
-    AH5_EXPORT char AH5_read_phm_interface_instance (hid_t file_id, const char *path, AH5_interface_instance_t *interface_instance);
-    AH5_EXPORT char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel);
+    AH5_PUBLIC char AH5_read_phm_vimp (hid_t file_id, const char *path, AH5_material_prop_t *material_prop);
+    AH5_PUBLIC char AH5_read_phm_volume_instance (hid_t file_id, const char *path, AH5_volume_instance_t *volume_instance);
+    AH5_PUBLIC char AH5_read_phm_surface_instance_tdl (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    AH5_PUBLIC char AH5_read_phm_surface_instance_sibc (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    AH5_PUBLIC char AH5_read_phm_surface_instance_zs (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    AH5_PUBLIC char AH5_read_phm_surface_instance_zszt (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    AH5_PUBLIC char AH5_read_phm_surface_instance_zszt2 (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    AH5_PUBLIC char AH5_read_phm_surface_instance (hid_t file_id, const char *path, AH5_surface_instance_t *surface_instance);
+    AH5_PUBLIC char AH5_read_phm_interface_instance (hid_t file_id, const char *path, AH5_interface_instance_t *interface_instance);
+    AH5_PUBLIC char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel);
 
-    AH5_EXPORT void AH5_print_phm_volume_instance (const AH5_volume_instance_t *volume_instance, int space);
-    AH5_EXPORT void AH5_print_phm_surface_instance (const AH5_surface_instance_t *surface_instance, int space);
-    AH5_EXPORT void AH5_print_phm_interface_instance (const AH5_interface_instance_t *interface_instance, int space);
-    AH5_EXPORT void AH5_print_physicalmodel (const AH5_physicalmodel_t *physicalmodel);
+    AH5_PUBLIC void AH5_print_phm_volume_instance (const AH5_volume_instance_t *volume_instance, int space);
+    AH5_PUBLIC void AH5_print_phm_surface_instance (const AH5_surface_instance_t *surface_instance, int space);
+    AH5_PUBLIC void AH5_print_phm_interface_instance (const AH5_interface_instance_t *interface_instance, int space);
+    AH5_PUBLIC void AH5_print_physicalmodel (const AH5_physicalmodel_t *physicalmodel);
 
-    AH5_EXPORT void AH5_free_phm_vimp (AH5_material_prop_t *material_prop);
-    AH5_EXPORT void AH5_free_phm_volume_instance (AH5_volume_instance_t *volume_instance);
-    AH5_EXPORT void AH5_free_phm_surface_instance (AH5_surface_instance_t *surface_instance);
-    AH5_EXPORT void AH5_free_phm_interface_instance (AH5_interface_instance_t *interface_instance);
-    AH5_EXPORT void AH5_free_physicalmodel (AH5_physicalmodel_t *physicalmodel);
+    AH5_PUBLIC void AH5_free_phm_vimp (AH5_material_prop_t *material_prop);
+    AH5_PUBLIC void AH5_free_phm_volume_instance (AH5_volume_instance_t *volume_instance);
+    AH5_PUBLIC void AH5_free_phm_surface_instance (AH5_surface_instance_t *surface_instance);
+    AH5_PUBLIC void AH5_free_phm_interface_instance (AH5_interface_instance_t *interface_instance);
+    AH5_PUBLIC void AH5_free_physicalmodel (AH5_physicalmodel_t *physicalmodel);
 
 #ifdef __cplusplus
 }

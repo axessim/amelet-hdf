@@ -29,17 +29,17 @@ extern "C" {
         AH5_gle_instance_t *instances;
     } AH5_global_environment_t;
 
-    AH5_EXPORT void AH5_init_global_environment_instance (AH5_gle_instance_t *gle_instance);
-    AH5_EXPORT void AH5_init_global_environment (AH5_global_environment_t *global_environment);
+    AH5_PUBLIC void AH5_init_global_environment_instance (AH5_gle_instance_t *gle_instance);
+    AH5_PUBLIC void AH5_init_global_environment (AH5_global_environment_t *global_environment);
 
-    AH5_EXPORT char AH5_read_global_environment_instance (hid_t file_id, const char *path, AH5_gle_instance_t *gle_instance);
-    AH5_EXPORT char AH5_read_global_environment (hid_t file_id, AH5_global_environment_t *global_environment);
+    AH5_PUBLIC char AH5_read_global_environment_instance (hid_t file_id, const char *path, AH5_gle_instance_t *gle_instance);
+    AH5_PUBLIC char AH5_read_global_environment (hid_t file_id, AH5_global_environment_t *global_environment);
 
-    AH5_EXPORT void AH5_print_global_environment_instance (const AH5_gle_instance_t *gle_instance, int space);
-    AH5_EXPORT void AH5_print_global_environment (const AH5_global_environment_t *global_environment);
+    AH5_PUBLIC void AH5_print_global_environment_instance (const AH5_gle_instance_t *gle_instance, int space);
+    AH5_PUBLIC void AH5_print_global_environment (const AH5_global_environment_t *global_environment);
 
-    AH5_EXPORT void AH5_free_global_environment_instance (AH5_gle_instance_t *gle_instance);
-    AH5_EXPORT void AH5_free_global_environment (AH5_global_environment_t *global_environment);
+    AH5_PUBLIC void AH5_free_global_environment_instance (AH5_gle_instance_t *gle_instance);
+    AH5_PUBLIC void AH5_free_global_environment (AH5_global_environment_t *global_environment);
 
 #ifdef __cplusplus
 }

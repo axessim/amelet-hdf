@@ -151,29 +151,29 @@ extern "C" {
         AH5_sourceonmesh_t *sm_sources;
     } AH5_em_source_t;
 
-    AH5_EXPORT char AH5_read_els_planewave (hid_t file_id, const char *path, AH5_planewave_t *planewave);
-    AH5_EXPORT char AH5_read_els_sphericalwave (hid_t file_id, const char *path, AH5_sphericalwave_t *sphericalwave);
-    AH5_EXPORT char AH5_read_els_generator (hid_t file_id, const char *path, AH5_generator_t *generator);
-    AH5_EXPORT char AH5_read_els_dipole (hid_t file_id, const char *path, AH5_dipole_t *dipole);
-    AH5_EXPORT char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *antenna);
-    AH5_EXPORT char AH5_read_els_sourceonmesh (hid_t file_id, const char *path, AH5_sourceonmesh_t *sourceonmesh);
-    AH5_EXPORT char AH5_read_electromagnetic_source (hid_t file_id, AH5_em_source_t *em_source);
+    AH5_PUBLIC char AH5_read_els_planewave (hid_t file_id, const char *path, AH5_planewave_t *planewave);
+    AH5_PUBLIC char AH5_read_els_sphericalwave (hid_t file_id, const char *path, AH5_sphericalwave_t *sphericalwave);
+    AH5_PUBLIC char AH5_read_els_generator (hid_t file_id, const char *path, AH5_generator_t *generator);
+    AH5_PUBLIC char AH5_read_els_dipole (hid_t file_id, const char *path, AH5_dipole_t *dipole);
+    AH5_PUBLIC char AH5_read_els_antenna (hid_t file_id, const char *path, AH5_antenna_t *antenna);
+    AH5_PUBLIC char AH5_read_els_sourceonmesh (hid_t file_id, const char *path, AH5_sourceonmesh_t *sourceonmesh);
+    AH5_PUBLIC char AH5_read_electromagnetic_source (hid_t file_id, AH5_em_source_t *em_source);
 
-    AH5_EXPORT void AH5_print_els_planewave (const AH5_planewave_t *planewave, int space);
-    AH5_EXPORT void AH5_print_els_sphericalwave (const AH5_sphericalwave_t *sphericalwave, int space);
-    AH5_EXPORT void AH5_print_els_generator (const AH5_generator_t *generator, int space);
-    AH5_EXPORT void AH5_print_els_dipole (const AH5_dipole_t *dipole, int space);
-    AH5_EXPORT void AH5_print_els_antenna (const AH5_antenna_t *antenna, int space);
-    AH5_EXPORT void AH5_print_els_sourceonmesh (const AH5_sourceonmesh_t *sourceonmesh, int space);
-    AH5_EXPORT void AH5_print_electromagnetic_source (const AH5_em_source_t *em_source);
+    AH5_PUBLIC void AH5_print_els_planewave (const AH5_planewave_t *planewave, int space);
+    AH5_PUBLIC void AH5_print_els_sphericalwave (const AH5_sphericalwave_t *sphericalwave, int space);
+    AH5_PUBLIC void AH5_print_els_generator (const AH5_generator_t *generator, int space);
+    AH5_PUBLIC void AH5_print_els_dipole (const AH5_dipole_t *dipole, int space);
+    AH5_PUBLIC void AH5_print_els_antenna (const AH5_antenna_t *antenna, int space);
+    AH5_PUBLIC void AH5_print_els_sourceonmesh (const AH5_sourceonmesh_t *sourceonmesh, int space);
+    AH5_PUBLIC void AH5_print_electromagnetic_source (const AH5_em_source_t *em_source);
 
-    AH5_EXPORT void AH5_free_els_planewave (AH5_planewave_t *planewave);
-    AH5_EXPORT void AH5_free_els_sphericalwave (AH5_sphericalwave_t *sphericalwave);
-    AH5_EXPORT void AH5_free_els_generator (AH5_generator_t *generator);
-    AH5_EXPORT void AH5_free_els_dipole (AH5_dipole_t *dipole);
-    AH5_EXPORT void AH5_free_els_antenna (AH5_antenna_t *antenna);
-    AH5_EXPORT void AH5_free_els_sourceonmesh (AH5_sourceonmesh_t *sourceonmesh);
-    AH5_EXPORT void AH5_free_electromagnetic_source (AH5_em_source_t *em_source);
+    AH5_PUBLIC void AH5_free_els_planewave (AH5_planewave_t *planewave);
+    AH5_PUBLIC void AH5_free_els_sphericalwave (AH5_sphericalwave_t *sphericalwave);
+    AH5_PUBLIC void AH5_free_els_generator (AH5_generator_t *generator);
+    AH5_PUBLIC void AH5_free_els_dipole (AH5_dipole_t *dipole);
+    AH5_PUBLIC void AH5_free_els_antenna (AH5_antenna_t *antenna);
+    AH5_PUBLIC void AH5_free_els_sourceonmesh (AH5_sourceonmesh_t *sourceonmesh);
+    AH5_PUBLIC void AH5_free_electromagnetic_source (AH5_em_source_t *em_source);
 
 #ifdef __cplusplus
 }
