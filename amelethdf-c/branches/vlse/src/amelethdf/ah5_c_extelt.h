@@ -1,7 +1,6 @@
 #ifndef AH5_C_EXTELT_H
 #define AH5_C_EXTELT_H
 
-#include "ah5_config.h"
 #include "ah5_general.h"
 #ifndef _MSC_VER
 #include <unistd.h>

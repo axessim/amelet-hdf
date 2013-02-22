@@ -5,7 +5,6 @@
 extern "C" {
 #endif
 
-#include "ah5_config.h"
 #include "ah5_general.h"
 
     typedef union _AH5_value_t

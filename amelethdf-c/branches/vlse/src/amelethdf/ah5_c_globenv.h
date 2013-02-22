@@ -1,7 +1,6 @@
 #ifndef AH5_C_GLOBENV_H
 #define AH5_C_GLOBENV_H
 
-#include "ah5_config.h"
 #include "ah5_c_fltype.h"
 
 #ifdef __cplusplus

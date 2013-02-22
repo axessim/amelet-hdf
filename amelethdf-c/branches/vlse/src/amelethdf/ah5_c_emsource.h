@@ -2,7 +2,6 @@
 #define AH5_C_EMSOURCE_H
 
 
-#include "ah5_config.h"
 #include "ah5_c_fltype.h"
 
 #ifdef __cplusplus

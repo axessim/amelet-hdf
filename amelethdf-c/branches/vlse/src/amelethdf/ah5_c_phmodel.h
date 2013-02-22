@@ -1,7 +1,6 @@
 #ifndef AH5_C_PHMODEL_H
 #define AH5_C_PHMODEL_H
 
-#include "ah5_config.h"
 #include "ah5_c_fltype.h"
 
 #ifdef __cplusplus

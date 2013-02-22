@@ -1,7 +1,6 @@
 #ifndef AH5_C_LINK_H
 #define AH5_C_LINK_H
 
-#include "ah5_config.h"
 #include "ah5_general.h"
 #include "ah5_c_label.h"
 

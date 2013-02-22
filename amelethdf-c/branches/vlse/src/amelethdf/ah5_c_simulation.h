@@ -1,7 +1,6 @@
 #ifndef AH5_C_SIMULATION_H
 #define AH5_C_SIMULATION_H
 
-#include "ah5_config.h"
 #include "ah5_general.h"
 
 #ifdef __cplusplus
