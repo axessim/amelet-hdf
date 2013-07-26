@@ -7,7 +7,7 @@
 #define AH5_RETURN_IF_FAILED(status, ret) RETURN_IF_FAILED(AH5_FAILED(status), ret)
 #define HDF5_RETURN_IF_FAILED(status, ret) RETURN_IF_FAILED(HDF5_FAILED(status), ret)
 
-#include <ah5.h>
+#include "ah5.h"
 #include <mpi.h>
 
 #ifdef __cplusplus
@@ -488,3 +488,5 @@ extern "C" {
 #endif
 
 #endif
+
+
