@@ -181,20 +181,27 @@ extern "C" {
     AH5_PUBLIC char AH5_read_mlk_instance(hid_t file_id, const char *path, AH5_mlk_instance_t *mlk_instance);
     AH5_PUBLIC char AH5_read_msh_group(hid_t file_id, const char *path, AH5_msh_group_t *msh_group);
     AH5_PUBLIC char AH5_read_mesh(hid_t file_id, AH5_mesh_t *mesh);
-    
-    AH5_PUBLIC char AH5_write_groupgroup(hid_t file_id, const char *path, const AH5_groupgroup_t *groupgroup, int nb);
-    AH5_PUBLIC char AH5_write_smesh_axis(hid_t file_id, const char *path, const AH5_axis_t *axis);
-    AH5_PUBLIC char AH5_write_smsh_group(hid_t file_id, const char *path, const AH5_sgroup_t *sgroup);
-    AH5_PUBLIC char AH5_write_ssom_pie_table(hid_t file_id, const char *path, const AH5_ssom_pie_table_t *ssom_pie_table);
-    AH5_PUBLIC char AH5_write_smesh(hid_t file_id, const char *path, const AH5_smesh_t *smesh);
-    AH5_PUBLIC char AH5_write_umsh_group(hid_t file_id, const char *path, const AH5_ugroup_t *ugroup, int nb_grp);
-    AH5_PUBLIC char AH5_write_usom_pie_table(hid_t file_id, const char *path, const AH5_usom_pie_table_t *usom_pie_table);
-    AH5_PUBLIC char AH5_write_usom_ef_table(hid_t file_id, const char *path, const AH5_usom_ef_table_t *usom_ef_table);
-    AH5_PUBLIC char AH5_write_umesh_som_table(hid_t file_id, const char *path, const AH5_usom_table_t *usom_table, int nb_som);
-    AH5_PUBLIC char AH5_write_umesh(hid_t file_id, const char *path, const AH5_umesh_t *umesh);
-    AH5_PUBLIC char AH5_write_msh_instance(hid_t file_id, const char *path, const AH5_msh_instance_t *msh_instance);
-    AH5_PUBLIC char AH5_write_mlk_instance(hid_t file_id, const char *path, const AH5_mlk_instance_t *mlk_instance);
-    AH5_PUBLIC char AH5_write_msh_group(hid_t file_id, const char *path, const AH5_msh_group_t *msh_group);
+
+    // General notes about write functions.
+    //
+    // The data can be relatively named (data.path = the node name not the full path).
+    // In this case the 'file_id' must be the direct parent node.
+    //
+    // The 'file_id' can be the root node but in this case the furst data node's path must by the full node path.
+    //
+    AH5_PUBLIC char AH5_write_groupgroup(hid_t file_id, const AH5_groupgroup_t *groupgroup, int nb);
+    AH5_PUBLIC char AH5_write_smesh_axis(hid_t file_id, const AH5_axis_t *axis);
+    AH5_PUBLIC char AH5_write_smsh_group(hid_t file_id, const AH5_sgroup_t *sgroup);
+    AH5_PUBLIC char AH5_write_ssom_pie_table(hid_t file_id, const AH5_ssom_pie_table_t *ssom_pie_table);
+    AH5_PUBLIC char AH5_write_smesh(hid_t file_id, const AH5_smesh_t *smesh);
+    AH5_PUBLIC char AH5_write_umsh_group(hid_t file_id, const AH5_ugroup_t *ugroup, int nb_grp);
+    AH5_PUBLIC char AH5_write_usom_pie_table(hid_t file_id, const AH5_usom_pie_table_t *usom_pie_table);
+    AH5_PUBLIC char AH5_write_usom_ef_table(hid_t file_id, const AH5_usom_ef_table_t *usom_ef_table);
+    AH5_PUBLIC char AH5_write_umesh_som_table(hid_t file_id, const AH5_usom_table_t *usom_table, int nb_som);
+    AH5_PUBLIC char AH5_write_umesh(hid_t file_id, const AH5_umesh_t *umesh);
+    AH5_PUBLIC char AH5_write_msh_instance(hid_t file_id, const AH5_msh_instance_t *msh_instance);
+    AH5_PUBLIC char AH5_write_mlk_instance(hid_t file_id, const AH5_mlk_instance_t *mlk_instance);
+    AH5_PUBLIC char AH5_write_msh_group(hid_t file_id, const AH5_msh_group_t *msh_group);
     AH5_PUBLIC char AH5_write_mesh(hid_t file_id, const AH5_mesh_t *mesh);
 
     AH5_PUBLIC void AH5_print_smesh(const AH5_smesh_t *smesh, int space);

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "ah5.h"
+#include <ah5.h>
 
 int main(argc, argv)
 int argc;

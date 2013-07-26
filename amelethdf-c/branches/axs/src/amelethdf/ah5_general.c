@@ -325,7 +325,6 @@ AH5_children_t AH5_read_children_name(hid_t file_id, const char* path)
     return children;
 }
 
-
 // Get last part of a path; does not allocate new memory
 char *AH5_get_name_from_path(const char *path)
 {

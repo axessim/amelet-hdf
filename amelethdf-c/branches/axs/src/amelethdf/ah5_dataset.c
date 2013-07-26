@@ -152,24 +152,35 @@ char AH5_write_cpx_dataset(hid_t loc_id, const char *dset_name, const hsize_t le
 
 
 // Write 1D string dataset
+//
+// \param slen: string length with null char.
 char AH5_write_str_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const size_t slen, char *wdata)
 {
-    hid_t atype, dataset_id, dataspace_id;
-    hsize_t dims[2] = {len, slen};
     char success = AH5_FALSE;
+    herr_t hdf_rc;
+    hid_t filetype, memtype, space, dset;
+    hsize_t dims[1] = {len};
 
-    // TODO: add check of loc_id using H5Oget_info()
-    dataspace_id = H5Screate_simple(2, dims, NULL);//(1,len,NULL)
-    atype = H5Tcopy(H5T_C_S1);
-    H5Tset_size(atype, slen);
+    //TODO Check HDF5 return code.
 
-    dataset_id = H5Dcreate(loc_id, dset_name, atype, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    if (H5Dwrite(dataset_id, atype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata) >= 0)
-        success = AH5_TRUE;
-    H5Dclose(dataset_id);
-    H5Sclose(dataspace_id);
+    filetype = H5Tcopy(H5T_C_S1);
+    hdf_rc = H5Tset_size(filetype, slen);
+    memtype = H5Tcopy(H5T_C_S1);
+    hdf_rc = H5Tset_size(memtype, slen);
 
-    return success;
+    space = H5Screate_simple(1, dims, NULL);
+
+    dset = H5Dcreate(loc_id, dset_name, filetype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    hdf_rc = H5Dwrite(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata);
+
+    hdf_rc = H5Dclose(dset);
+    hdf_rc = H5Sclose(space);
+    hdf_rc = H5Tclose(filetype);
+    hdf_rc = H5Tclose(memtype);
+
+    success = (hdf_rc >= 0);
+
+     return success;
 }
 
 

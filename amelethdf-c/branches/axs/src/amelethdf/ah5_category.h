@@ -1,6 +1,8 @@
 #ifndef AH5_CATEGORY_H
 #define AH5_CATEGORY_H
 
+#include <hdf5.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
