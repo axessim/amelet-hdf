@@ -10,145 +10,6 @@ hid_t AH5_Get_cpx_type(){
   return cpxtyp;
 }
 
-char AH5_write_parray(hid_t loc_id, const char *dset_name,
-    const int rank, const hsize_t totaldims[], const hsize_t blockdims[],
-    const hsize_t start[], const hsize_t stride[], const hsize_t count[],
-    const hsize_t block[],
-    const void *wdata,  hid_t mem_type_id){
-  hid_t dataset_id;
-  hid_t dataspace_id;
-  hid_t memspace_id;
-  hid_t plist_id;
-  herr_t status;
-
-  /* Create a dataSet */
-
-  /* Create the data space */
-  dataspace_id = H5Screate_simple(rank, totaldims, NULL);
-
-  /* Create the memory space */
-  memspace_id = H5Screate_simple(rank, blockdims, NULL);
-
-
-  /* Creta data Set */
-  plist_id = H5Pcreate(H5P_DATASET_CREATE);
-
-  H5Pset_chunk(plist_id, rank, blockdims);
-
-  dataset_id = H5Dcreate(loc_id, dset_name,
-      mem_type_id, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-  H5Pclose(plist_id);
-  H5Sclose(dataspace_id);
-
-  /* Get data space */
-
-  dataspace_id = H5Dget_space(dataset_id);
-
-  /* Select the part to write */
-  status = H5Sselect_hyperslab(dataspace_id,
-      H5S_SELECT_SET,
-      start,
-      stride,
-      count,
-      block);
-
-  if(HDF5_FAILED(status)){
-
-    H5Pclose(plist_id);
-
-    H5Dclose(dataset_id);
-
-    H5Sclose(memspace_id);
-
-    H5Sclose(dataspace_id);
-
-    return AH5_FALSE;
-  }
-
-  /* Propertiess for collective write */
-  plist_id = H5Pcreate(H5P_DATASET_XFER);
-  H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
-
-
-  /* Write data */
-  status = H5Dwrite(dataset_id, mem_type_id,
-      memspace_id, dataspace_id, plist_id, wdata);
-
-
-  if(HDF5_FAILED(status)){
-
-    H5Pclose(plist_id);
-
-    H5Dclose(dataset_id);
-
-    H5Sclose(memspace_id);
-
-    H5Sclose(dataspace_id);
-
-    return AH5_FALSE;
-  }
-
-  H5Pclose(plist_id);
-
-  H5Dclose(dataset_id);
-
-  H5Sclose(memspace_id);
-
-  H5Sclose(dataspace_id);
-
-  return AH5_TRUE;
-}
-
-char AH5_write_int_parray(hid_t loc_id,
-    const char *dset_name,
-    const int rank,
-    const hsize_t totaldims[],
-    const hsize_t blockdims[],
-    const hsize_t start[],
-    const hsize_t stride[],
-    const hsize_t count[],
-    const hsize_t block[],
-    const int *wdata){
-  return AH5_write_parray(loc_id, dset_name,
-      rank, totaldims, blockdims, start, stride, count, block,
-      (void*)wdata, H5T_NATIVE_INT);
-}
-
-char AH5_write_flt_parray(hid_t loc_id,
-    const char *dset_name,
-    const int rank,
-    const hsize_t totaldims[],
-    const hsize_t blockdims[],
-    const hsize_t start[],
-    const hsize_t stride[],
-    const hsize_t count[],
-    const hsize_t block[],
-    const float *wdata){
-  return AH5_write_parray(loc_id, dset_name,
-      rank, totaldims, blockdims, start, stride, count, block,
-      (void*)wdata, H5T_NATIVE_FLOAT);
-}
-
-
-char AH5_write_str_parray(hid_t loc_id,
-    const char *dset_name,
-    const int rank,
-    const hsize_t totaldims[],
-    const hsize_t blockdims[],
-    const hsize_t slen,
-    const hsize_t start[],
-    const hsize_t stride[],
-    const hsize_t count[],
-    const hsize_t block[],
-    const char *wdata){
-  hid_t atype = H5Tcopy(H5T_C_S1);
-  H5Tset_size(atype, slen);
-
-  return AH5_write_parray(loc_id, dset_name,
-      rank, totaldims, blockdims, start, stride, count, block,
-      (void*)wdata, atype);
-}
-
 
 
 char AH5_create_earray(hid_t loc_id, const char* dset_name,
@@ -185,7 +46,6 @@ char AH5_create_earray(hid_t loc_id, const char* dset_name,
 
   return AH5_TRUE;
 }
-
 
 
 
@@ -850,6 +710,7 @@ void AH5_initialize_memory_mapping(AH5_MEMORY_MAPPING_t* mapping){
   mapping->block     = NULL;
 }
 
+
 char AH5_set_memory_mapping(
     AH5_MEMORY_MAPPING_t* mapping,
     hsize_t nb_dims,
@@ -910,6 +771,146 @@ char AH5_free_memory_mapping(AH5_MEMORY_MAPPING_t* mapping){
 }
 
 
+
+#ifdef AH5_WITH_MPI_
+char AH5_write_parray(hid_t loc_id, const char *dset_name,
+    const int rank, const hsize_t totaldims[], const hsize_t blockdims[],
+    const hsize_t start[], const hsize_t stride[], const hsize_t count[],
+    const hsize_t block[],
+    const void *wdata,  hid_t mem_type_id){
+  hid_t dataset_id;
+  hid_t dataspace_id;
+  hid_t memspace_id;
+  hid_t plist_id;
+  herr_t status;
+
+  /* Create a dataSet */
+
+  /* Create the data space */
+  dataspace_id = H5Screate_simple(rank, totaldims, NULL);
+
+  /* Create the memory space */
+  memspace_id = H5Screate_simple(rank, blockdims, NULL);
+
+
+  /* Creta data Set */
+  plist_id = H5Pcreate(H5P_DATASET_CREATE);
+
+  H5Pset_chunk(plist_id, rank, blockdims);
+
+  dataset_id = H5Dcreate(loc_id, dset_name,
+      mem_type_id, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Pclose(plist_id);
+  H5Sclose(dataspace_id);
+
+  /* Get data space */
+
+  dataspace_id = H5Dget_space(dataset_id);
+
+  /* Select the part to write */
+  status = H5Sselect_hyperslab(dataspace_id,
+      H5S_SELECT_SET,
+      start,
+      stride,
+      count,
+      block);
+
+  if(HDF5_FAILED(status)){
+
+    H5Pclose(plist_id);
+
+    H5Dclose(dataset_id);
+
+    H5Sclose(memspace_id);
+
+    H5Sclose(dataspace_id);
+
+    return AH5_FALSE;
+  }
+
+  /* Propertiess for collective write */
+  plist_id = H5Pcreate(H5P_DATASET_XFER);
+  H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+
+
+  /* Write data */
+  status = H5Dwrite(dataset_id, mem_type_id,
+      memspace_id, dataspace_id, plist_id, wdata);
+
+
+  if(HDF5_FAILED(status)){
+
+    H5Pclose(plist_id);
+
+    H5Dclose(dataset_id);
+
+    H5Sclose(memspace_id);
+
+    H5Sclose(dataspace_id);
+
+    return AH5_FALSE;
+  }
+
+  H5Pclose(plist_id);
+
+  H5Dclose(dataset_id);
+
+  H5Sclose(memspace_id);
+
+  H5Sclose(dataspace_id);
+
+  return AH5_TRUE;
+}
+
+char AH5_write_int_parray(hid_t loc_id,
+    const char *dset_name,
+    const int rank,
+    const hsize_t totaldims[],
+    const hsize_t blockdims[],
+    const hsize_t start[],
+    const hsize_t stride[],
+    const hsize_t count[],
+    const hsize_t block[],
+    const int *wdata){
+  return AH5_write_parray(loc_id, dset_name,
+      rank, totaldims, blockdims, start, stride, count, block,
+      (void*)wdata, H5T_NATIVE_INT);
+}
+
+char AH5_write_flt_parray(hid_t loc_id,
+    const char *dset_name,
+    const int rank,
+    const hsize_t totaldims[],
+    const hsize_t blockdims[],
+    const hsize_t start[],
+    const hsize_t stride[],
+    const hsize_t count[],
+    const hsize_t block[],
+    const float *wdata){
+  return AH5_write_parray(loc_id, dset_name,
+      rank, totaldims, blockdims, start, stride, count, block,
+      (void*)wdata, H5T_NATIVE_FLOAT);
+}
+
+
+char AH5_write_str_parray(hid_t loc_id,
+    const char *dset_name,
+    const int rank,
+    const hsize_t totaldims[],
+    const hsize_t blockdims[],
+    const hsize_t slen,
+    const hsize_t start[],
+    const hsize_t stride[],
+    const hsize_t count[],
+    const hsize_t block[],
+    const char *wdata){
+  hid_t atype = H5Tcopy(H5T_C_S1);
+  H5Tset_size(atype, slen);
+
+  return AH5_write_parray(loc_id, dset_name,
+      rank, totaldims, blockdims, start, stride, count, block,
+      (void*)wdata, atype);
+}
 
 
 
@@ -1189,4 +1190,4 @@ char AH5_create_cpx_PEarrayset(hid_t loc_id,
       nb_dims, dims, AH5_Get_cpx_type(),
       Earrayset);
 }
-
+#endif // End AH5_WITH_MPI_

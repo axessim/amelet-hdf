@@ -1,9 +1,22 @@
-#include <stdio.h>
 
-#include <mpi.h>
+
+
+#include "utest.h"
+#include <stdio.h>
 #include <hdf5.h>
-#include <utest.h>
-#include <ameletdataset_write.h>
+#include <ah5_edataset.h>
+
+#ifndef AH5_WITH_MPI_
+
+int main(int argc, char** argv){
+
+  printf("MPI extension is not enabled, test done.");
+
+  return EXIT_SUCCESS;
+}
+
+#else // AH5_WITH_MPI_
+#include <mpi.h>
 
 #define print(rank, ...) if((rank)==0)printf(__VA_ARGS__)
 
@@ -353,3 +366,6 @@ int main(int argc, char** argv){
 
   return EXIT_SUCCESS;
 }
+
+
+#endif // End AH5_WITH_MPI_

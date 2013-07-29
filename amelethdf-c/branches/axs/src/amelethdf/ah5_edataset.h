@@ -7,8 +7,12 @@
 #define AH5_RETURN_IF_FAILED(status, ret) RETURN_IF_FAILED(AH5_FAILED(status), ret)
 #define HDF5_RETURN_IF_FAILED(status, ret) RETURN_IF_FAILED(HDF5_FAILED(status), ret)
 
-#include "ah5.h"
+#ifdef AH5_WITH_MPI_
 #include <mpi.h>
+#endif
+
+#include "ah5_config.h"
+#include "ah5.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,6 +23,7 @@ extern "C" {
   }
   AH5_ACCESS_TYPE;
 
+  // Memory mapping for parallel write.
   typedef struct _AH5_MEMORY_MAPPING_t{
     hsize_t  nb_dims;
     hsize_t* blockdims;
@@ -63,41 +68,6 @@ extern "C" {
 
 
   AH5_PUBLIC hid_t AH5_Get_cpx_type();
-
-
-
-  /* Parallel write */
-  AH5_PUBLIC char AH5_write_parray(hid_t loc_id,
-      const char* dset_name,
-      const int rank,
-      const hsize_t totaldims[],
-      const hsize_t blockdims[],
-      const hsize_t start[],
-      const hsize_t stride[],
-      const hsize_t count[],
-      const hsize_t block[],
-      const void *wdata,
-      hid_t mem_type_id);
-
-  AH5_PUBLIC char AH5_write_int_parray(hid_t loc_id, const char *dset_name,
-      const int rank, const hsize_t totaldims[], const hsize_t blockdims[],
-      const hsize_t start[], const hsize_t stride[], const hsize_t count[],
-      const hsize_t block[],
-      const int *wdata);
-
-  AH5_PUBLIC char AH5_write_flt_parray(hid_t loc_id, const char *dset_name,
-      const int rank, const hsize_t totaldims[], const hsize_t blockdims[],
-      const hsize_t start[], const hsize_t stride[], const hsize_t count[],
-      const hsize_t block[],
-      const float *wdata);
-
-  AH5_PUBLIC char AH5_write_str_parray(hid_t loc_id, const char *dset_name,
-      const int rank, const hsize_t totaldims[], const hsize_t blockdims[],
-      const hsize_t slen,
-      const hsize_t start[], const hsize_t stride[], const hsize_t count[],
-      const hsize_t block[],
-      const char *wdata);
-
 
 
   /* Write extendible array
@@ -320,7 +290,8 @@ extern "C" {
   AH5_PUBLIC char AH5_free_Earrayset(AH5_Earrayset_t* Earrayset);
 
 
-  /* Memory mapping*/
+
+    /* Memory mapping*/
   AH5_PUBLIC void AH5_initialize_memory_mapping(AH5_MEMORY_MAPPING_t* mapping);
 
   AH5_PUBLIC char AH5_set_memory_mapping(
@@ -333,6 +304,43 @@ extern "C" {
       hsize_t block[]);
 
   AH5_PUBLIC char AH5_free_memory_mapping(AH5_MEMORY_MAPPING_t* mapping);
+
+
+
+//  Toot for write extending dataset with mpi.
+#ifdef AH5_WITH_MPI_
+
+  /* Parallel write (Base functions)*/
+  AH5_PUBLIC char AH5_write_parray(hid_t loc_id,
+      const char* dset_name,
+      const int rank,
+      const hsize_t totaldims[],
+      const hsize_t blockdims[],
+      const hsize_t start[],
+      const hsize_t stride[],
+      const hsize_t count[],
+      const hsize_t block[],
+      const void *wdata,
+      hid_t mem_type_id);
+
+  AH5_PUBLIC char AH5_write_int_parray(hid_t loc_id, const char *dset_name,
+      const int rank, const hsize_t totaldims[], const hsize_t blockdims[],
+      const hsize_t start[], const hsize_t stride[], const hsize_t count[],
+      const hsize_t block[],
+      const int *wdata);
+
+  AH5_PUBLIC char AH5_write_flt_parray(hid_t loc_id, const char *dset_name,
+      const int rank, const hsize_t totaldims[], const hsize_t blockdims[],
+      const hsize_t start[], const hsize_t stride[], const hsize_t count[],
+      const hsize_t block[],
+      const float *wdata);
+
+  AH5_PUBLIC char AH5_write_str_parray(hid_t loc_id, const char *dset_name,
+      const int rank, const hsize_t totaldims[], const hsize_t blockdims[],
+      const hsize_t slen,
+      const hsize_t start[], const hsize_t stride[], const hsize_t count[],
+      const hsize_t block[],
+      const char *wdata);
 
 
   /* Parallel extendible dataset*/
@@ -481,7 +489,7 @@ extern "C" {
       hsize_t block[],
       void* data,                   /* data to append*/
       void* dimdata);               /* data to append to extendible dim (can be NULL)*/
-
+#endif // End AH5_WITH_MPI_
 
 #ifdef __cplusplus
 }

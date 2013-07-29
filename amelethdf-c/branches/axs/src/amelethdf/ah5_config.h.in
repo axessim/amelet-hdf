@@ -1,0 +1,32 @@
+/**
+ * Configur file filled by compier tool.
+ */
+
+#define AH5_MPI_ENABME_ %(mpi_enable)d
+#if AH5_MPI_ENABLE_
+# define AH5_WITH_MPI_ 1
+#else
+# define AH5_WITHOUT_MPI_ 1
+#endif
+
+#if %(debug)d
+# define AH5__DEBUG 1
+#else
+# define AH5_NDEBUG 1
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

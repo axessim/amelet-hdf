@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include <utest.h>
-#include <ameletdataset_write.h>
+#include "utest.h"
+#include <ah5_edataset.h>
 
 
 char Verify(hid_t loc_id, const char* path, hsize_t size, int* ref){
