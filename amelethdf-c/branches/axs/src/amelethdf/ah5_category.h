@@ -2,12 +2,13 @@
 #define AH5_CATEGORY_H
 
 #include <hdf5.h>
+#include "ah5_config.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// remove first char 
+// remove first char
 #define AH5_CATEGORY_NAME(name) ((name) + 1)
 
 #define AH5_C_ELECTROMAGNETIC_SOURCE    "/electromagneticSource"

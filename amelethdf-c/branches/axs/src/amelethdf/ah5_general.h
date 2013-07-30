@@ -8,6 +8,7 @@
 #include <hdf5.h>
 #include <hdf5_hl.h>
 
+#include "ah5_config.h"
 #include "ah5_category.h"
 
 #ifdef __cplusplus
@@ -38,6 +39,14 @@ extern "C" {
 #  define AH5_PUBLIC
 #  define AH5_LOCAL
 # endif
+#endif
+
+// In this block the configur variables are used to define some status variables.
+#if AH5_MPI_ENABLE_
+# define AH5_WITH_MPI_ 1
+# error "with mpi"
+#else
+# define AH5_WITHOUT_MPI_ 1
 #endif
 
 // A specific flag for the complexes.

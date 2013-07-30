@@ -9,6 +9,7 @@
 
 #ifdef AH5_WITH_MPI_
 #include <mpi.h>
+#error "mpi pas bien!"
 #endif
 
 #include "ah5_config.h"

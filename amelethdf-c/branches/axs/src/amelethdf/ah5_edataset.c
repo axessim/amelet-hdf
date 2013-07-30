@@ -48,6 +48,22 @@ char AH5_create_earray(hid_t loc_id, const char* dset_name,
 }
 
 
+char AH5_extend_earray(hid_t dataset,
+    const int rank, hsize_t dims[], hsize_t extensiondims[]){
+  herr_t status;
+  int idim;
+
+  for(idim=0;idim<rank;idim++){
+    dims[idim] += extensiondims[idim];
+  }
+
+  status = H5Dset_extent(dataset, dims);
+
+  HDF5_RETURN_IF_FAILED(status, AH5_FALSE);
+
+  return AH5_TRUE;
+}
+
 
 char AH5_write_array_with_properties(hid_t dataset,
     const int rank, const hsize_t dims[], const hsize_t blockdims[],
@@ -121,46 +137,6 @@ char AH5_write_earray(hid_t dataset,
       rank, totaldims, blockdims, start, stride, count, block,
       data, mem_type_id, H5P_DEFAULT);
 }
-
-
-
-
-
-char AH5_write_pearray(hid_t dataset,
-    const int rank, const hsize_t dims[], const hsize_t blockdims[],
-    const hsize_t start[], const hsize_t stride[],
-    const hsize_t count[], const hsize_t block[],
-    const void *data, hid_t mem_type_id){
-  /* Properties for collective write */
-  hid_t properties;
-  properties= H5Pcreate(H5P_DATASET_XFER);
-  H5Pset_dxpl_mpio(properties, H5FD_MPIO_COLLECTIVE);
-
-  return AH5_write_array_with_properties(dataset,
-      rank, dims, blockdims, start, stride, count, block,
-      data, mem_type_id, properties);
-}
-
-
-
-char AH5_extend_earray(hid_t dataset,
-    const int rank, hsize_t dims[], hsize_t extensiondims[]){
-  herr_t status;
-  int idim;
-
-  for(idim=0;idim<rank;idim++){
-    dims[idim] += extensiondims[idim];
-  }
-
-  status = H5Dset_extent(dataset, dims);
-
-  HDF5_RETURN_IF_FAILED(status, AH5_FALSE);
-
-  return AH5_TRUE;
-}
-
-
-
 
 
 void AH5_initialize_Edataset(AH5_Edataset_t* Edataset){
@@ -370,6 +346,8 @@ char AH5_append_Edataset(AH5_Edataset_t* Edataset,
     free(offset);
   }
   else{
+//FIXME:
+#if AH5_WITH_MPI_
     Edataset->mapping.blockdims[Edataset->extendibledim] = sizeappend;
     Edataset->mapping.block[Edataset->extendibledim] = sizeappend;
     Edataset->mapping.start[Edataset->extendibledim] =
@@ -382,6 +360,10 @@ char AH5_append_Edataset(AH5_Edataset_t* Edataset,
         Edataset->mapping.block,
         data, Edataset->type_class),
         AH5_FALSE);
+#else
+      AH5_print_err_dset("Try to use MPI!", "");
+      return AH5_FALSE;
+#endif
   }
 
   return AH5_TRUE;
@@ -911,7 +893,6 @@ char AH5_write_str_parray(hid_t loc_id,
       rank, totaldims, blockdims, start, stride, count, block,
       (void*)wdata, atype);
 }
-
 
 
 char AH5_create_PEdataset(hid_t loc_id,
