@@ -42,10 +42,10 @@ extern "C" {
 
 // A specific flag for the complexes.
 #if __STDC_VERSION__ >= 199901L
-# define AH5_SDT_CCOMPLEXE
+# define AH5_SDT_CCOMPLEX
 #endif
 
-#ifdef AH5_SDT_CCOMPLEXE
+#ifdef AH5_SDT_CCOMPLEX
 #include <complex.h>
 #define AH5_complex_t complex float
 #else
@@ -57,7 +57,7 @@ extern "C" {
 
 #define creal(z) ((z).re)
 #define cimag(z) ((z).im)
-#endif /*AH5_SDT_CCOMPLEXE*/
+#endif /*AH5_SDT_CCOMPLEX*/
 
     AH5_complex_t AH5_set_complex(float real, float imag);
 
