@@ -248,20 +248,20 @@ if (platform.find("win") >= 0):
         machine = "x64"
 
     if (flavor == "debug"):
-        rootenv.Append(CCFLAGS="/D_WIN32 /W1 /Od /Zi /Oy- /Gm- /EHsc /MD /GS "
-                       "/fp:precise /Zc:wchar_t- /Zc:forScope /Gd",
-                       LINKFLAGS="/nologo /SUBSYSTEM:WINDOWS /NXCOMPAT /DYNAMICBASE")
+        rootenv.Append(CCFLAGS="/D_WIN32 /W1 /Od /Oy- /Gm- /EHsc /MTd /GS "
+                       "/fp:precise /Zc:wchar_t- /Zc:forScope /Gd /Zi",
+                       LINKFLAGS="/nologo /SUBSYSTEM:CONSOLE /NXCOMPAT /DYNAMICBASE")
 
     elif (flavor == "release"):
         rootenv.Append(
             CCFLAGS="/D_WIN32 /W1 /O2 /Oy- /Gm- /EHsc /MD /GS /fp:precise "
             "/Zc:wchar_t- /Zc:forScope /Gd",
-            LINKFLAGS = "/nologo /SUBSYSTEM:WINDOWS /NXCOMPAT /DYNAMICBASE")
+            LINKFLAGS = "/nologo /SUBSYSTEM:CONSOLE /NXCOMPAT /DYNAMICBASE")
 
     elif (flavor == "assert"):
         rootenv.Append(CCFLAGS="/nologo /W1 /WX- /O2 /Oy- /EHsc /MD /fp:precise "
                        "/Zc:wchar_t- /Zc:forScope /GS /Gm- /Gd",
-                       LINKFLAGS = "/nologo /SUBSYSTEM:WINDOWS /NXCOMPAT "
+                       LINKFLAGS = "/nologo /SUBSYSTEM:CONSOLE /NXCOMPAT "
                        "/DYNAMICBASE /MACHINE:%s")
     else:
         raise Exception("Unresolved flavor '%s' for platform '%s'!" 
@@ -317,7 +317,7 @@ libenv.AlwaysBuild(libenv.Command(os.path.join(include_tmp_path,
 libenv.Append(CPPPATH=[include_tmp_path,],)
 
 # specify the build directory
-libenv.VariantDir(builddir, ".", duplicate=0)
+#libenv.VariantDir(builddir, ".", duplicate=0)
 # add define like MUSTARDCORE_LIBRARY
 libenv.Append(CCFLAGS= cmd_line_define + 'AMELETHDF_C_LIBRARY')
 # build the module
@@ -332,11 +332,13 @@ libenv.Alias('all', lib)
 if (platform.find("win") >= 0):
     # The library runtime '.dll' are allayse install and the library '.lib' only
     # for lib install
-    env.Install(installbin, lib[0])
-    env.Install(installlib, lib[1:])
-    env.Alias('install', installbin)
-    env.Alias('install_lib', installbin)
-    env.Alias('install_lib', installlib)
+    installlib = os.path.join(installdir, "lib")
+    installbin = os.path.join(installdir, "bin")
+    libenv.Install(installbin, lib[0])
+    libenv.Install(installlib, lib[1:])
+    libenv.Alias('install', installbin)
+    libenv.Alias('install_lib', installbin)
+    libenv.Alias('install_lib', installlib)
 
 else:
     # The library and the runtime are same object '.so' in linux.
@@ -358,11 +360,12 @@ del libenv
 testenv = rootenv.Clone()
 installtest_dir = os.path.join(installdir, "tests")
 
-testenv.Append(LIBS=[lib],
+testenv.Append(LIBS=["amelethdfc"],
+               LIBPATH=[builddir],
                CPPPATH=[amelethdfc_inc,
                         include_tmp_path])
 # specify the build directory
-testenv.VariantDir(builddir, ".", duplicate=0)
+#testenv.VariantDir(builddir, ".", duplicate=0)
 
 testlst = map(lambda x: os.path.join(builddir, x),
               glob.glob(os.path.join(get_amelethdf_c_src_dir("test"), '*.c')))
@@ -382,12 +385,13 @@ del testenv
 toolsenv = rootenv.Clone()
 installtools_dir = os.path.join(installdir, "bin")
 
-toolsenv.Append(LIBS=[lib],
+toolsenv.Append(LIBS=["amelethdfc"],
+                LIBPATH=[builddir],
                 CPPPATH=[amelethdfc_inc,
                          include_tmp_path])
 
 # specify the build directory
-toolsenv.VariantDir(builddir, ".", duplicate=0)
+#toolsenv.VariantDir(builddir, ".", duplicate=0)
 
 testlst = map(lambda x: os.path.join(builddir, x),
               glob.glob(os.path.join(get_amelethdf_c_src_dir("tools"), '*.c')))
@@ -399,7 +403,7 @@ for testfile in testlst:
     pgm = toolsenv.Program(targetpath, source=testfile)
     toolsenv.Install(installtools_dir, pgm)
 toolsenv.Alias('install_tools', installtools_dir)
-
+del toolsenv
 
 
 

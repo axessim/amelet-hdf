@@ -60,6 +60,10 @@
 #ifndef _TESTS_TEST_H_
 #define _TESTS_TEST_H_
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <hdf5.h>
 #include <string.h>
 #include <stdlib.h>
