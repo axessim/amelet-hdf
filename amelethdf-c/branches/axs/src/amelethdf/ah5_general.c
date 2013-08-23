@@ -6,12 +6,12 @@ AH5_complex_t AH5_set_complex(float real, float imag)
 {
     AH5_complex_t rdata;
 
-#ifdef AH5_SDT_CCOMPLEXE
+#ifdef AH5_SDT_CCOMPLEX
     rdata =  real + imag * _Complex_I;
 #else
     rdata.re = real;
     rdata.im = imag;
-#endif /*AH5_SDT_CCOMPLEXE*/
+#endif /*AH5_SDT_CCOMPLEX*/
 
     return rdata;
 }

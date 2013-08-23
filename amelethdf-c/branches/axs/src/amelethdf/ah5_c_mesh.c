@@ -1018,7 +1018,7 @@ char AH5_write_umsh_group(hid_t loc_id, const AH5_ugroup_t *ugroup, int nb_ugrou
 
     for (i = 0; i < nb_ugroup; i++)
     {
-        if (ugroup->nb_groupelts > 0)
+        if (ugroup[i].nb_groupelts > 0)
         {
             basename = AH5_get_name_from_path(ugroup[i].path);
             if (AH5_write_int_dataset(grp, basename, ugroup[i].nb_groupelts, ugroup[i].groupelts))

@@ -32,8 +32,8 @@ extern "C" {
     typedef struct _AH5_sgroup_t
     {
         char            *path;
-        char            *type;
-        char            *entitytype;
+        char            *type;        //TODO Need a enum 
+        char            *entitytype;  //TODO Need a enum 
         hsize_t         dims[2];
         int             *elements;
         char            **normals;
@@ -55,8 +55,8 @@ extern "C" {
     typedef struct _AH5_ugroup_t
     {
         char            *path;
-        char            *type;
-        char            *entitytype;
+        char            *type;       //TODO Need a enum 
+        char            *entitytype; //TODO Need a enum 
         hsize_t         nb_groupelts;
         int             *groupelts;
     } AH5_ugroup_t;
@@ -96,6 +96,23 @@ extern "C" {
         AH5_usomx_t     data;
     } AH5_usom_table_t;
 
+    typedef enum _AH5_uelement_type_t
+    {
+        UELE_INVALID            = -1,
+        UELE_BAR2               = 1,
+        UELE_BAR3               = 2,
+        UELE_TRI3               = 11,
+        UELE_TRI6               = 12,
+        UELE_QUAD4              = 13,
+        UELE_QUAD8              = 14,
+        UELE_TETRA4             = 101,
+        UELE_PYRA5              = 102,
+        UELE_PENTA6             = 103,
+        UELE_HEXA8              = 104,
+        UELE_TETRA10            = 108,
+        UELE_HEXA20             = 109
+    } AH5_uelement_type_t;
+  
     typedef struct _AH5_umesh_t
     {
         hsize_t         nb_elementnodes;

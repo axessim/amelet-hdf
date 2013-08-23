@@ -1,46 +1,82 @@
 Compilation and installation:
 =============================
 
-Dependency
-----------
+Prerequisites
+-------------
 
-The only dependency is HDF5 in version 1.8.3.
-(see http://www.hdfgroup.org/HDF5/release/obtain5.html)
+This project requires:
+  * Scons cross-platform builder
+  * Reasonably conformant C compiler:
+    GCC 4.6 - Microsoft Visual C++ 2010 [Express] 32 or 64
+  * HDF5 Libraries [HEADERS and LIBRARIES] in version 1.8.3.  
+    (see http://www.hdfgroup.org/HDF5/release/obtain5.html)
+
+Basic installation
+------------------
+
+These are generic installation instructions.
+
+The 'scons' script attempts to guess correct values for various system-dependent
+variables used during compilation. Use help command for more details
+'--help'. It uses those values to create a valid compilation rulls. It may also
+create one or more '.h' files containing system-dependent definitions.
+
+The simplest way to compile this package is:
+
+ 'cd' to the directory containing the package's source code and type 'scons' to
+ configure and compile the package for your system.
+
+Installation names
+''''''''''''''''''
+
+By default, 'scons' will install the package's files in current directory
+'$PWD/bin', '$PWD/man', etc. You can specify an installation prefix other than
+'/usr/local' by giving 'scons' the option '--prefix=$PATH'.
+
+ scons --prefix=$PATH
+
+Build flavor
+''''''''''''
+
+The build flavor is used to define the kind of compilation 'release', 'debug' or
+'assert' corresponding to different compiler options. You can specify the flavor
+build by giving 'scons' the options '--flavor=$FLAVOR'.
+
+ scons --prefix=$PREFIX --flavor=$FLAVOR
+
+Build type and targets
+''''''''''''''''''''''
+
+The targets are used to choose the package's component it can be: library, tools
+and tests.
+
+ scons install 
+ scons install_lib
+ scons install_tests
+ soncs install_tools
 
 
-Compilation
------------
+Build directory and temporal data
+'''''''''''''''''''''''''''''''''
 
-cmake is used to compile Amelet-HDF tools.
+All temporal data are stored in 'tmp/$flavor' directory or can be define by
+'scons' option '--build-dir'.
 
-Just tape the following commands :
-
-cd somewhere
-mkdir build
-cd build
-ccmake path/to/amelet-hdf/directory
-> There must be a CMakeLists.txt file in this directory.
-> IMPORTANT : Answer the questions about HDF5.
-
-make
-make install
-
-All executable are in ./bin.
+ scons --build-dir=/tmp
 
 
-Alternative way:
+Optional Features
+-----------------
 
-cd somewhere
-mkdir build
-cd build
-cmake PATH/TO/SRC \
-      -DHDF5_DIR:STRING=PATH/TO/HDF5/share/cmake/hdf5 \
-      -DCMAKE_INSTALL_PREFIX:STRING=PATH/TO/INSTALL/DIR \
-      -DCMAKE_BUILD_TYPE:STRING=[DEBUG|MINSIZEREL|RELEASE|RELWITHDEBINFO] \
-      -DAH5_BUILD_SHARED_LIBS:BOOL=[T|F] \
-      -DAH5_BUILD_TESTING:BOOL=[T|F]
-make
-make test
-make install
+Some packages pay attention to '--enable-FEATURE' options to `scons', where
+FEATURE indicates an optional part of the package. They may also pay attention
+to '--with-PACKAGE' options, where PACKAGE is something like 'libz' or 'mpich'
+(for the paralle compilation).  The `README' should mention any `--enable-' and
+`--with-' options that the package recognizes.
 
-All executable are in PATH/TO/INSTALL/DIR.
+For packages that use some PACKAGE, 'scons' can usually find the PACKAGE include
+and library files automatically, but if it doesn't, you can use the 'scons'
+options `--PACKAGE-includes=DIR' and `--PACKAGE-libraries=DIR' to specify their
+locations.
+
+
