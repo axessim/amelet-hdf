@@ -216,10 +216,10 @@ static char* test_Edataset(hid_t hdf){
       3, H5S_UNLIMITED
   };
 
-  char status = AH5_create_Edataset(hdf, "e_array",
-      2, dims, H5T_NATIVE_INT, &v);
 
   AH5_initialize_Edataset(&v);
+  char status = AH5_create_Edataset(hdf, "e_array",
+      2, dims, H5T_NATIVE_INT, &v);
 
   
   mu_assert("Creation of Edataset failed.\n", status==AH5_TRUE);
@@ -360,37 +360,27 @@ int main(int argc, char** argv){
       H5P_DEFAULT);
 
   char* message = test_low_level(hdf);
-
   if(message != NULL){
     H5Fclose(hdf);
     printf("%s", message);
     return EXIT_FAILURE;
   }
-
 
   message = test_chararray(hdf);
-
   if(message != NULL){
     H5Fclose(hdf);
     printf("%s", message);
     return EXIT_FAILURE;
   }
-
-
-
-
 
   message = test_Edataset(hdf);
-
   if(message != NULL){
     H5Fclose(hdf);
     printf("%s", message);
     return EXIT_FAILURE;
   }
 
-
   message = test_Earrayset(hdf);
-
   if(message != NULL){
     H5Fclose(hdf);
     printf("%s", message);
@@ -398,7 +388,6 @@ int main(int argc, char** argv){
   }
 
   H5Fclose(hdf);
-
   printf("SUCCESS\n");
 
   return EXIT_SUCCESS;

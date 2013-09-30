@@ -8,7 +8,7 @@
 
 int main(int argc, char** argv){
 
-  printf("MPI extension is not enabled, test done.");
+  printf("MPI extension is not enabled, test done.\n");
 
   return EXIT_SUCCESS;
 }
