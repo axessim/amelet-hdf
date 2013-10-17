@@ -12,6 +12,8 @@ import fnmatch
 # Build flavor.
 CHOICE_FLAVOR = ('release', 'debug', 'assert')
 DEFAULT_FLAVOR = CHOICE_FLAVOR[0]
+CHOICE_PLATFORM = ('guessed', 'linux64', 'win64', 'win32')
+DEFAULT_PLATFORM = CHOICE_PLATFORM[0]
 
 AMELETHDF = "amelethdf"
 
@@ -41,12 +43,21 @@ AddOption('--enable-mpi',
           default=False,
           action='store_true',
           help="Enable compilation with MPI.")
+AddOption('--platform',
+          dest='platform',
+          default=DEFAULT_PLATFORM,
+          choices=CHOICE_PLATFORM,
+          help="build platform id (default: %(default)s)")
 
 #=============================================================================
 # Some functions to read command line options.
 #=============================================================================
 def guessed_platform():
     "Try to found the platform kind (linux32, linux64, win32, win64)"
+    ptform = GetOption("platform")
+    if ptform != 'guessed':
+        return ptform
+
     archi = platform.machine()
     if archi.endswith("64"):
         archi = "64"
@@ -293,6 +304,7 @@ else:
 
 
 
+
 #==============================================================================
 # Configure the library.
 #==============================================================================
@@ -352,6 +364,7 @@ else:
 add_headers(libenv, amelethdfc_inc, '*.h', installinc)
 libenv.Alias('install_lib', installinc)
 del libenv
+
 
 
 #===============================================================================
