@@ -209,6 +209,7 @@ static char* test_Edataset(hid_t hdf){
   int i, j, k, p, l;
 
   int* data;
+  char status;
 
   hsize_t size = 0;
 
@@ -216,12 +217,10 @@ static char* test_Edataset(hid_t hdf){
       3, H5S_UNLIMITED
   };
 
-
   AH5_initialize_Edataset(&v);
-  char status = AH5_create_Edataset(hdf, "e_array",
+  status = AH5_create_Edataset(hdf, "e_array",
       2, dims, H5T_NATIVE_INT, &v);
 
-  
   mu_assert("Creation of Edataset failed.\n", status==AH5_TRUE);
 
   status = AH5_set_attr_Edataset(&v,
