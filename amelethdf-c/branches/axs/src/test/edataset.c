@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "utest.h"
+#include <ah5.h>
 #include <ah5_edataset.h>
 
 
@@ -256,7 +257,7 @@ static char* test_Edataset(hid_t hdf){
 
   // Verify the written data
 
-  data = malloc(size * sizeof(int));
+  data = (int*)malloc(size * sizeof(int));
 
   l = 0;
   for(i=0;i<4;i++){

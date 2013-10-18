@@ -167,11 +167,11 @@ char AH5_create_PEorEdataset(hid_t loc_id,
 
   Edataset->parent        = loc_id;
   Edataset->nb_dims       = nb_dims;
-  Edataset->dims          = malloc(nb_dims * sizeof(hsize_t));
-  Edataset->type_class    = mem_type_id;
+  Edataset->dims          = (hsize_t*)malloc(nb_dims * sizeof(hsize_t));
+  Edataset->type_class    = H5Tget_class(mem_type_id);
   Edataset->access        = access;
 
-  Edataset->path = malloc(strlen(name));
+  Edataset->path = (char*)malloc(strlen(name)*sizeof(char));
   strcpy(Edataset->path, name);
 
   for(i=0;i<nb_dims;i++){
@@ -262,17 +262,17 @@ char AH5_set_attr_Edataset(AH5_Edataset_t* Edataset,
     const char* label){
 
   if(nature!=NULL){
-    Edataset->nature = malloc(strlen(nature));
+    Edataset->nature = (char*)malloc(strlen(nature)*sizeof(char));
     strcpy(Edataset->nature, nature);
   }
 
   if(unit!=NULL){
-    Edataset->unit = malloc(strlen(unit));
+    Edataset->unit = (char*)malloc(strlen(unit)*sizeof(char));
     strcpy(Edataset->unit, unit);
   }
 
   if(label!=NULL){
-    Edataset->label = malloc(strlen(label));
+    Edataset->label = (char*)malloc(strlen(label)*sizeof(char));
     strcpy(Edataset->label, label);
   }
 
@@ -290,7 +290,7 @@ char AH5_append_Edataset(AH5_Edataset_t* Edataset,
   hsize_t i;
 
 
-  extendibledims = malloc(Edataset->nb_dims * sizeof(hsize_t));
+  extendibledims = (hsize_t*)malloc(Edataset->nb_dims * sizeof(hsize_t));
 
   if(Edataset->created != AH5_TRUE){
 
@@ -324,9 +324,9 @@ char AH5_append_Edataset(AH5_Edataset_t* Edataset,
   free(extendibledims);
 
   if(Edataset->access == AH5_serie){
-    ones   = malloc(Edataset->nb_dims * sizeof(hsize_t));
-    offset = malloc(Edataset->nb_dims * sizeof(hsize_t));
-    block  = malloc(Edataset->nb_dims * sizeof(hsize_t));
+    ones   = (hsize_t*)malloc(Edataset->nb_dims * sizeof(hsize_t));
+    offset = (hsize_t*)malloc(Edataset->nb_dims * sizeof(hsize_t));
+    block  = (hsize_t*)malloc(Edataset->nb_dims * sizeof(hsize_t));
     for(i=0;i<Edataset->nb_dims;i++){
       ones[i]   = 1;
       offset[i] = 0;
@@ -381,6 +381,8 @@ char AH5_free_Edataset(AH5_Edataset_t* Edataset){
 
   if(Edataset->created == AH5_TRUE){
 
+	/*FIXME Write something in a function that is designed to release the 
+	  memory, this is a strange thing. */
     if(Edataset->nature != NULL){
       status = AH5_write_str_attr(Edataset->parent, Edataset->path,
           "physicalNature", Edataset->nature);
@@ -405,6 +407,7 @@ char AH5_free_Edataset(AH5_Edataset_t* Edataset){
 
   if(Edataset->path != NULL){
     free(Edataset->path);
+	Edataset->path = NULL;
   }
 
   Edataset->created = AH5_FALSE;

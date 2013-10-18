@@ -2,7 +2,7 @@
 #define AH5_CATEGORY_H
 
 #include <hdf5.h>
-#include "ah5_config.h"
+#include <ah5_config.h>
 
 #ifdef __cplusplus
 extern "C" {

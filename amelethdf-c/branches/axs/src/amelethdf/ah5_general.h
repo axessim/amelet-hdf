@@ -8,7 +8,7 @@
 #include <hdf5.h>
 #include <hdf5_hl.h>
 
-#include "ah5_config.h"
+#include <ah5_config.h>
 #include "ah5_category.h"
 
 #ifdef __cplusplus
