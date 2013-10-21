@@ -168,7 +168,8 @@ char AH5_create_PEorEdataset(hid_t loc_id,
   Edataset->parent        = loc_id;
   Edataset->nb_dims       = nb_dims;
   Edataset->dims          = (hsize_t*)malloc(nb_dims * sizeof(hsize_t));
-  Edataset->type_class    = H5Tget_class(mem_type_id);
+  Edataset->type_class    = mem_type_id;
+
   Edataset->access        = access;
 
   Edataset->path = (char*)malloc(strlen(name)*sizeof(char));
@@ -262,17 +263,17 @@ char AH5_set_attr_Edataset(AH5_Edataset_t* Edataset,
     const char* label){
 
   if(nature!=NULL){
-    Edataset->nature = (char*)malloc(strlen(nature)*sizeof(char));
+    Edataset->nature = (char*)malloc((strlen(nature)+1)*sizeof(char));
     strcpy(Edataset->nature, nature);
   }
 
   if(unit!=NULL){
-    Edataset->unit = (char*)malloc(strlen(unit)*sizeof(char));
+    Edataset->unit = (char*)malloc((strlen(unit)+1)*sizeof(char));
     strcpy(Edataset->unit, unit);
   }
 
   if(label!=NULL){
-    Edataset->label = (char*)malloc(strlen(label)*sizeof(char));
+    Edataset->label = (char*)malloc((strlen(label)+1)*sizeof(char));
     strcpy(Edataset->label, label);
   }
 
@@ -441,7 +442,7 @@ char AH5_create_Earrayset(hid_t loc_id,
 
   Earrayset->parent     = loc_id;
 
-  Earrayset->path = malloc(strlen(name));
+  Earrayset->path = (char*)malloc((strlen(name) + 1) * sizeof(char));
   strcpy(Earrayset->path, name);
 
   Earrayset->nb_dims    = nb_dims;
@@ -457,7 +458,7 @@ char AH5_create_Earrayset(hid_t loc_id,
   Earrayset->ds = H5Gcreate(Earrayset->loc,
       "ds", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-  Earrayset->dims = malloc(nb_dims * sizeof(AH5_Edataset_t));
+  Earrayset->dims = (AH5_Edataset_t*)malloc(nb_dims * sizeof(AH5_Edataset_t));
 
   for(i=0;i<nb_dims;i++){
     AH5_initialize_Edataset(Earrayset->dims + i);
@@ -675,9 +676,9 @@ char AH5_free_Earrayset(AH5_Earrayset_t* Earrayset){
 
   Earrayset->loc        = 0;
   Earrayset->parent     = 0;
-  if(Earrayset->path!=NULL){
-    free(Earrayset->path);
-  }
+  //if(Earrayset->path!=NULL){
+  //  free(Earrayset->path);
+  //}
   Earrayset->path       = NULL;
   Earrayset->nb_dims    = 0;
   Earrayset->type_class = H5T_NO_CLASS;
@@ -708,11 +709,11 @@ char AH5_set_memory_mapping(
 
   mapping->nb_dims = nb_dims;
 
-  mapping->blockdims = malloc(nb_dims * sizeof(hsize_t));
-  mapping->start     = malloc(nb_dims * sizeof(hsize_t));
-  mapping->stride    = malloc(nb_dims * sizeof(hsize_t));
-  mapping->count     = malloc(nb_dims * sizeof(hsize_t));
-  mapping->block     = malloc(nb_dims * sizeof(hsize_t));
+  mapping->blockdims = (hsize_t*)malloc(nb_dims * sizeof(hsize_t));
+  mapping->start     = (hsize_t*)malloc(nb_dims * sizeof(hsize_t));
+  mapping->stride    = (hsize_t*)malloc(nb_dims * sizeof(hsize_t));
+  mapping->count     = (hsize_t*)malloc(nb_dims * sizeof(hsize_t));
+  mapping->block     = (hsize_t*)malloc(nb_dims * sizeof(hsize_t));
 
   for(i=0;i<nb_dims;i++){
     mapping->blockdims[i] = blockdims[i];

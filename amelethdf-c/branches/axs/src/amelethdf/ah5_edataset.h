@@ -44,7 +44,7 @@ extern "C" {
     hsize_t              nb_dims;
     hsize_t              extendibledim;
     hsize_t*             dims;
-    H5T_class_t          type_class;
+    hid_t                type_class;
     char                 created;
     AH5_ACCESS_TYPE      access;
     AH5_MEMORY_MAPPING_t mapping;
@@ -63,7 +63,7 @@ extern "C" {
     hid_t           ds;
     int             nb_dims;
     AH5_Edataset_t* dims;
-    H5T_class_t     type_class;
+    hid_t           type_class;
   }
   AH5_Earrayset_t;
 
