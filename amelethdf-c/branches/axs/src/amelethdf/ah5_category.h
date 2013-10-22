@@ -22,6 +22,7 @@ extern "C" {
 #define AH5_C_OUTPUT_REQUEST            "/outputRequest"
 #define AH5_C_PHYSICAL_MODEL            "/physicalModel"
 #define AH5_C_SIMULATION                "/simulation"
+#define AH5_C_FLOATING_TYPE             "/floatingType"
 
 
 /* ah5_general.h */

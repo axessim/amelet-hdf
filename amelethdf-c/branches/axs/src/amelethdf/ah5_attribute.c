@@ -288,11 +288,12 @@ char AH5_write_flt_attr(hid_t loc_id, const char *path, char* attr_name, const f
 
 
 // Write complex attribute <attr_name> given by address <path>
-char AH5_write_cpx_attr(hid_t loc_id, const char* path, char* attr_name, const AH5_complex_t *wdata)
+char AH5_write_cpx_attr(hid_t loc_id, const char* path, char* attr_name, const AH5_complex_t wdata)
 {
     char success = AH5_FALSE;
 
     // TO BE IMPLEMENTED...
+    AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("attributes", path);
 
     return success;
 }
@@ -308,3 +309,36 @@ char AH5_write_str_attr(hid_t loc_id, const char *path, char *attr_name, const c
 
     return success;
 }
+
+// Write all optional attributes
+char AH5_write_opt_attrs(hid_t file_id, const char *path, AH5_opt_attrs_t *opt_attrs)
+{
+    char success = AH5_TRUE;
+
+    hsize_t i;
+
+    for (i = 0; i < opt_attrs->nb_instances && success; i++)
+    {
+      switch (opt_attrs->instances[i].type)
+      {
+        case H5T_INTEGER:
+          success = AH5_write_int_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.i);
+          break;
+        case H5T_FLOAT:
+          success = AH5_write_flt_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.f);
+          break;
+        case H5T_COMPOUND:
+          success = AH5_write_cpx_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.c);
+          break;
+        case H5T_STRING:
+          success = AH5_write_str_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.s);
+          break;
+        default:
+          success = AH5_FALSE;
+          break;
+      }
+    }
+  
+    return success;
+}
+

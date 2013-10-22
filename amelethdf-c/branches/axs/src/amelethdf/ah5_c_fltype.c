@@ -664,7 +664,7 @@ char AH5_read_floatingtype(hid_t file_id, const char *path, AH5_ft_t *floatingty
             else if (strcmp(buf, AH5_V_RATIONAL) == 0)
             {
                 floatingtype->type = FT_RATIONAL;
-                if (AH5_read_ft_rational (file_id, path, &(floatingtype->data.rational)))
+                if (AH5_read_ft_rational(file_id, path, &(floatingtype->data.rational)))
                     rdata = AH5_TRUE;
             }
             else if (strcmp(buf, AH5_V_DATASET) == 0)
@@ -695,8 +695,382 @@ char AH5_read_floatingtype(hid_t file_id, const char *path, AH5_ft_t *floatingty
 }
 
 
+/*******************************************************************************
+ * Write functions
+ ******************************************************************************/
+/** 
+ * Initialized the floatingType.
+ *
+ * This function have two main rules:
+ *  - check the floatingType's path
+ *  - and create the floatingType category if needed.
+ * 
+ * @param file_id 
+ * @param path 
+ * 
+ * @return AH5_TRUE if all ok else AH5_FALSE
+ */
+char AH5_init_floatingtype (hid_t file_id, const char* path)
+{
+  char success = AH5_FALSE;
+  char *path2;
+
+  if (path != NULL && !AH5_path_valid(file_id, path))
+  {
+    path2 = AH5_get_base_from_path(path);
+    
+    if (AH5_path_valid(file_id, path2))
+      success = AH5_TRUE;
+    else
+      if (strcmp(path2, AH5_C_FLOATING_TYPE) == 0)
+        success = H5Gcreate(file_id, AH5_C_FLOATING_TYPE, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT) >= 0;
+    
+    free(path2);
+  }
+  
+  return success;
+}
 
 
+char AH5_write_ft_singleinteger (hid_t file_id, AH5_singleinteger_t *singleinteger)
+{
+  char success = AH5_FALSE;
+
+  if (AH5_init_floatingtype(file_id, singleinteger->path))
+    if (H5Gcreate(file_id, singleinteger->path, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT) >= 0)
+      if (AH5_write_int_attr(file_id, singleinteger->path, AH5_A_VALUE, singleinteger->value))
+        if (AH5_write_str_attr(file_id, singleinteger->path, AH5_A_FLOATING_TYPE, AH5_V_SINGLE_INTEGER))
+          success = AH5_write_opt_attrs(file_id, singleinteger->path, &(singleinteger->opt_attrs));
+
+  if (!success)
+    AH5_print_err_dset("", singleinteger->path);
+  
+  return success;
+}
+
+char AH5_write_ft_singlereal (hid_t file_id, AH5_singlereal_t *singlereal)
+{
+  char success = AH5_FALSE;
+  
+  if (AH5_init_floatingtype(file_id, singlereal->path))
+    if (H5Gcreate(file_id, singlereal->path, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT) >= 0)
+      if (AH5_write_flt_attr(file_id, singlereal->path, AH5_A_VALUE, singlereal->value))
+        if (AH5_write_str_attr(file_id, singlereal->path, AH5_A_FLOATING_TYPE, AH5_V_SINGLE_REAL))
+          success = AH5_write_opt_attrs(file_id, singlereal->path, &(singlereal->opt_attrs));
+  
+  if (!success)
+    AH5_print_err_dset("", singlereal->path);
+  
+  return success;
+}
+
+char AH5_write_ft_singlecomplex (hid_t file_id, AH5_singlecomplex_t *singlecomplex)
+{
+  char success = AH5_FALSE;
+  
+  if (AH5_init_floatingtype(file_id, singlecomplex->path))
+    if (H5Gcreate(file_id, singlecomplex->path, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT) >= 0)
+      if (AH5_write_cpx_attr(file_id, singlecomplex->path, AH5_A_VALUE, singlecomplex->value))
+        if (AH5_write_str_attr(file_id, singlecomplex->path, AH5_A_FLOATING_TYPE, AH5_V_SINGLE_COMPLEX))
+          success = AH5_write_opt_attrs(file_id, singlecomplex->path, &(singlecomplex->opt_attrs));
+  
+  if (!success)
+    AH5_print_err_dset("", singlecomplex->path);
+  
+  return success;
+}
+
+char AH5_write_ft_singlestring (hid_t file_id, AH5_singlestring_t *singlestring)
+{
+  char success = AH5_FALSE;
+  
+  if (AH5_init_floatingtype(file_id, singlestring->path))
+    if (AH5_read_str_attr(file_id, singlestring->path, AH5_A_VALUE, singlestring->value))
+      if (AH5_write_str_attr(file_id, singlestring->path, AH5_A_FLOATING_TYPE, AH5_V_SINGLE_STRING))
+        success = AH5_write_opt_attrs(file_id, singlestring->path, &(singlestring->opt_attrs));
+  
+  if (!success)
+    AH5_print_err_dset("", singlestring->path);
+  
+  return success;
+}
+
+char AH5_write_ft_vector (hid_t file_id, AH5_vector_t *vector)
+{
+  char success = AH5_FALSE;
+
+  if (AH5_init_floatingtype(file_id, vector->path) && vector->nb_values > 0)
+  {
+    switch (vector->type_class)
+    {
+      case H5T_INTEGER:
+        if (AH5_write_int_dataset(file_id, vector->path, vector->nb_values, vector->values.i))
+          success = AH5_TRUE;
+        break;
+      case H5T_FLOAT:
+        if (AH5_write_flt_dataset(file_id, vector->path, vector->nb_values, vector->values.f))
+          success = AH5_TRUE;
+        break;
+      case H5T_COMPOUND:
+        if (AH5_write_cpx_dataset(file_id, vector->path, vector->nb_values, vector->values.c))
+          success = AH5_TRUE;
+        break;
+      case H5T_STRING:
+        if (AH5_write_str_dataset(file_id, vector->path, vector->nb_values, strlen(vector->values.s), vector->values.s))
+          success = AH5_TRUE;
+        break;
+      default:
+        break;
+    }
+  }
+
+  if (success)
+    success = AH5_write_str_attr(file_id, vector->path, AH5_A_FLOATING_TYPE, AH5_V_VECTOR);
+        
+  if (success)
+    success = AH5_write_opt_attrs(file_id, vector->path, &(vector->opt_attrs));
+
+  if (!success)
+    AH5_print_err_dset("", vector->path);
+  
+  return success;
+}
+
+char AH5_write_ft_linearlistofreal1 (hid_t file_id, AH5_linearlistofreal1_t *linearlistofreal1)
+{
+  char success = AH5_FALSE;
+
+  // TO BE IMPLEMENTED...
+  AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("FloatingType", linearlistofreal1->path);
+  
+  return success;
+}
+
+char AH5_write_ft_linearlistofreal2 (hid_t file_id, AH5_linearlistofreal2_t *linearlistofreal2)
+{
+  char success = AH5_FALSE;
+
+  // TO BE IMPLEMENTED...
+  AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("FloatingType", linearlistofreal2->path);
+  
+  return success;
+}
+
+char AH5_write_ft_logarithmlistofreal (hid_t file_id, AH5_logarithmlistofreal_t *logarithmlistofreal)
+{
+  char success = AH5_FALSE;
+
+  // TO BE IMPLEMENTED...
+  AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("FloatingType", logarithmlistofreal->path);
+
+  return success;
+}
+
+char AH5_write_ft_perdecadelistofreal (hid_t file_id, AH5_perdecadelistofreal_t *perdecadelistofreal)
+{
+  char success = AH5_FALSE;
+
+  // TO BE IMPLEMENTED...
+  AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("FloatingType", perdecadelistofreal->path);
+  
+  return success;
+}
+
+char AH5_write_ft_linearlistofinteger2 (hid_t file_id, AH5_linearlistofinteger2_t *linearlistofinteger2)
+{
+  char success = AH5_FALSE;
+
+  // TO BE IMPLEMENTED...
+  AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("FloatingType", linearlistofinteger2->path);
+  
+  return success;
+}
+
+char AH5_write_ft_rationalfunction (hid_t file_id, AH5_rationalfunction_t *rationalfunction)
+{
+  char success = AH5_FALSE;
+
+  // TO BE IMPLEMENTED...
+  AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("FloatingType", rationalfunction->path);
+  
+  return success;
+}
+
+char AH5_write_ft_generalrationalfunction (hid_t file_id, AH5_generalrationalfunction_t *generalrationalfunction)
+{
+  char success = AH5_FALSE;
+
+  // TO BE IMPLEMENTED...
+  AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("FloatingType", generalrationalfunction->path);
+  
+  return success;
+}
+
+char AH5_write_ft_rational (hid_t file_id, AH5_rational_t *rational)
+{
+  char success = AH5_FALSE;
+
+  // TO BE IMPLEMENTED...
+  AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("FloatingType", rational->path);
+  
+  return success;
+}
+
+char AH5_write_ft_dataset (hid_t file_id, AH5_dataset_t *dataset)
+{
+  char success = AH5_FALSE;
+  hsize_t total_size = 1;
+  int i;
+  
+  if (AH5_init_floatingtype(file_id, dataset->path) && dataset->nb_dims > 0)
+  {
+    switch (dataset->type_class)
+    {
+      for (i = 0; i < dataset->nb_dims; ++i)
+        total_size *= dataset->dims[i];
+      
+      case H5T_INTEGER:
+        if (AH5_write_int_array(file_id, dataset->path, dataset->nb_dims, dataset->dims, dataset->values.i))
+          success = AH5_TRUE;
+        break;
+      case H5T_FLOAT:
+        if (AH5_write_flt_array(file_id, dataset->path, dataset->nb_dims, dataset->dims, dataset->values.f))
+          success = AH5_TRUE;
+        break;
+      case H5T_COMPOUND:
+        if (AH5_write_cpx_array(file_id, dataset->path, dataset->nb_dims, dataset->dims, dataset->values.c))
+          success = AH5_TRUE;
+        break;
+      case H5T_STRING:
+        if (AH5_write_str_dataset(file_id, dataset->path, total_size, strlen(dataset->values.s), dataset->values.s))
+          success = AH5_TRUE;
+        break;
+      default:
+        break;
+    }
+  }
+  
+  if (success)
+    success = AH5_write_str_attr(file_id, dataset->path, AH5_A_FLOATING_TYPE, AH5_V_DATASET);
+              
+  if (success)
+    success = AH5_write_opt_attrs(file_id, dataset->path, &(dataset->opt_attrs));
+
+  if (!success)
+    AH5_print_err_dset("", dataset->path);
+  
+  return success;
+}
+
+char AH5_write_ft_arrayset (hid_t file_id, AH5_arrayset_t *arrayset)
+{
+  char success = AH5_FALSE;
+
+  char path2[AH5_ABSOLUTE_PATH_LENGTH], dimname[AH5_ABSOLUTE_PATH_LENGTH];
+  char *tmp, *tmp2;
+
+  unsigned int i;
+
+  /*
+    The data's path and dimensions' path are not directly use to ensure the
+    Amelet-HDF data file integrity. However, the initial path must not be
+    altered by the arrayset write function. Finally, in future version the path
+    could be checked to raise warning.
+  */
+
+  
+  if (AH5_init_floatingtype(file_id, arrayset->path) && arrayset->nb_dims > 0)
+  {
+    if (H5Gcreate(file_id, arrayset->path, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT) >= 0)
+    {
+      strcpy(path2, arrayset->path);
+      strcat(path2, AH5_G_DATA);
+      tmp = arrayset->data.path;
+      arrayset->data.path = path2;
+    
+      if (AH5_write_ft_dataset(file_id, &(arrayset->data)))
+      {
+        strcpy(path2, arrayset->path);
+        strcat(path2, AH5_G_DS);
+        if (H5Gcreate(file_id, path2, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT) >= 0)
+        {
+          success = AH5_TRUE;
+          for (i = 0; i < arrayset->nb_dims && success; ++i)
+          {
+            sprintf(dimname, "/dim%d", i + 1);
+            strcpy(path2, arrayset->path);
+            strcat(path2, AH5_G_DS);
+            strcat(path2, dimname);
+            tmp2 = arrayset->dims[i].path;
+            arrayset->dims[i].path = path2;
+            success = AH5_write_ft_vector(file_id, arrayset->dims + i);
+            arrayset->dims[i].path = tmp2;
+          }
+        }
+      }
+    
+      arrayset->data.path = tmp;
+    }
+  }
+
+  if (success)
+    success = AH5_write_str_attr(file_id, arrayset->path, AH5_A_FLOATING_TYPE, AH5_V_ARRAYSET);
+              
+  if (success)
+    success = AH5_write_opt_attrs(file_id, arrayset->path, &(arrayset->opt_attrs));
+
+  if (!success)
+    AH5_print_err_dset("", arrayset->path);
+  
+  return success;
+}
+
+char AH5_write_floatingtype (hid_t file_id, AH5_ft_t *floatingtype)
+{
+  char success = AH5_FALSE;
+
+  switch (floatingtype->type)
+  {
+    case FT_SINGLE_INTEGER:
+      return AH5_write_ft_singleinteger(file_id, &(floatingtype->data.singleinteger));
+    case FT_SINGLE_REAL:
+      return AH5_write_ft_singlereal(file_id, &(floatingtype->data.singlereal));
+    case FT_SINGLE_COMPLEX:
+      return AH5_write_ft_singlecomplex(file_id, &(floatingtype->data.singlecomplex));
+    case FT_SINGLE_STRING:
+      return AH5_write_ft_singlestring(file_id, &(floatingtype->data.singlestring));
+    case FT_VECTOR:
+      return AH5_write_ft_vector(file_id, &(floatingtype->data.vector));
+    case FT_LINEARLISTOFREAL1:
+      return AH5_write_ft_linearlistofreal1(file_id, &(floatingtype->data.linearlistofreal1));
+    case FT_LINEARLISTOFREAL2:
+      return AH5_write_ft_linearlistofreal2(file_id, &(floatingtype->data.linearlistofreal2));
+    case FT_LOGARITHMLISTOFREAL:
+      return AH5_write_ft_logarithmlistofreal(file_id, &(floatingtype->data.logarithmlistofreal));
+    case FT_PERDECADELISTOFREAL:
+      return AH5_write_ft_perdecadelistofreal(file_id, &(floatingtype->data.perdecadelistofreal));
+    case FT_LINEARLISTOFINTEGER2:
+      return AH5_write_ft_linearlistofinteger2(file_id, &(floatingtype->data.linearlistofinteger2));
+    case FT_RATIONAL_FUNCTION:
+      return AH5_write_ft_rationalfunction(file_id, &(floatingtype->data.rationalfunction));
+    case FT_GENERAL_RATIONAL_FUNCTION:
+      return AH5_write_ft_generalrationalfunction(file_id, &(floatingtype->data.generalrationalfunction));
+    case FT_RATIONAL:
+      return AH5_write_ft_rational(file_id, &(floatingtype->data.rational));
+    case FT_DATASET:
+      return AH5_write_ft_dataset(file_id, &(floatingtype->data.dataset));
+    case FT_ARRAYSET:
+      return AH5_write_ft_arrayset(file_id, &(floatingtype->data.arrayset));
+  }
+  
+  return success;
+}
+
+
+
+/*******************************************************************************
+ * Print functions
+ ******************************************************************************/
 // Print singleInteger
 void AH5_print_ft_singleinteger (const AH5_singleinteger_t *singleinteger, int space)
 {
@@ -998,7 +1372,9 @@ void AH5_print_floatingtype (const AH5_ft_t *floatingtype, int space)
 
 
 
-
+/*******************************************************************************
+ * Free functions
+ ******************************************************************************/
 // Free memory used by singleInteger
 void AH5_free_ft_singleinteger (AH5_singleinteger_t *singleinteger)
 {

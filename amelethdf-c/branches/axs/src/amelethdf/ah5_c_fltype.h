@@ -220,6 +220,24 @@ extern "C" {
     AH5_PUBLIC char AH5_read_ft_arrayset (hid_t file_id, const char *path, AH5_arrayset_t *arrayset);
     AH5_PUBLIC char AH5_read_floatingtype (hid_t file_id, const char *path, AH5_ft_t *floatingtype);
 
+  
+    AH5_PUBLIC char AH5_write_ft_singleinteger (hid_t file_id, AH5_singleinteger_t *singleinteger);
+    AH5_PUBLIC char AH5_write_ft_singlereal (hid_t file_id, AH5_singlereal_t *singlereal);
+    AH5_PUBLIC char AH5_write_ft_singlecomplex (hid_t file_id, AH5_singlecomplex_t *singlecomplex);
+    AH5_PUBLIC char AH5_write_ft_singlestring (hid_t file_id, AH5_singlestring_t *singlestring);
+    AH5_PUBLIC char AH5_write_ft_vector (hid_t file_id, AH5_vector_t *vector);
+    AH5_PUBLIC char AH5_write_ft_linearlistofreal1 (hid_t file_id, AH5_linearlistofreal1_t *linearlistofreal1);
+    AH5_PUBLIC char AH5_write_ft_linearlistofreal2 (hid_t file_id, AH5_linearlistofreal2_t *linearlistofreal2);
+    AH5_PUBLIC char AH5_write_ft_logarithmlistofreal (hid_t file_id, AH5_logarithmlistofreal_t *logarithmlistofreal);
+    AH5_PUBLIC char AH5_write_ft_perdecadelistofreal (hid_t file_id, AH5_perdecadelistofreal_t *perdecadelistofreal);
+    AH5_PUBLIC char AH5_write_ft_linearlistofinteger2 (hid_t file_id, AH5_linearlistofinteger2_t *linearlistofinteger2);
+    AH5_PUBLIC char AH5_write_ft_rationalfunction (hid_t file_id, AH5_rationalfunction_t *rationalfunction);
+    AH5_PUBLIC char AH5_write_ft_generalrationalfunction (hid_t file_id, AH5_generalrationalfunction_t *generalrationalfunction);
+    AH5_PUBLIC char AH5_write_ft_rational (hid_t file_id, AH5_rational_t *rational);
+    AH5_PUBLIC char AH5_write_ft_dataset (hid_t file_id, AH5_dataset_t *dataset);
+    AH5_PUBLIC char AH5_write_ft_arrayset (hid_t file_id, AH5_arrayset_t *arrayset);
+    AH5_PUBLIC char AH5_write_floatingtype (hid_t file_id, AH5_ft_t *floatingtype);
+
     AH5_PUBLIC void AH5_print_ft_singleinteger (const AH5_singleinteger_t *singleinteger, int space);
     AH5_PUBLIC void AH5_print_ft_singlereal (const AH5_singlereal_t *singlereal, int space);
     AH5_PUBLIC void AH5_print_ft_singlecomplex (const AH5_singlecomplex_t *singlecomplex, int space);

@@ -146,7 +146,8 @@ char AH5_write_cpx_dataset(hid_t loc_id, const char *dset_name, const hsize_t le
     char success = AH5_FALSE;
 
     // TO BE IMPLEMENTED...
-
+    AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("DataSet", dset_name);
+    
     return success;
 }
 
@@ -222,7 +223,8 @@ char AH5_write_cpx_array(hid_t loc_id, const char *dset_name, const int rank, co
     char success = AH5_FALSE;
 
     // TO BE IMPLEMENTED...
-
+    AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("Array", dset_name);
+    
     return success;
 }
 
@@ -233,6 +235,7 @@ char AH5_write_str_array(hid_t loc_id, const char *dset_name, const int rank, co
     char success = AH5_FALSE;
 
     // TO BE IMPLEMENTED...
-
+    AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("Array", dset_name);
+    
     return success;
 }

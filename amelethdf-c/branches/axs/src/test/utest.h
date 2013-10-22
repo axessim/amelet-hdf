@@ -67,6 +67,7 @@
 #include <hdf5.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 // Return value for success
 #define MU_FINISHED_WITHOUT_ERRORS NULL
@@ -75,16 +76,18 @@
 extern int tests_run;
 
 // Run the test suite fonction.
-#define mu_run_test(test) do { \
-        char *message = test(); \
-        tests_run++; \
-        if (message != 0) \
-        { \
-            printf("'%s' FAILD in test: ", #test); \
-            return message; \
-        } \
-        printf("'%s' OK\n", #test); \
-    } while (0)
+#define mu_run_test(test) do {                            \
+    printf("Start test block '%s'\n", #test);             \
+    char *message = test();                               \
+    tests_run++;                                          \
+    if (message != 0)                                     \
+    {                                                     \
+      printf("'%s' FAILED in test: ", #test);             \
+      return message;                                     \
+    }                                                     \
+    printf("Test block '%s' OK\n", #test);                \
+    printf("--------------------------------------\n");   \
+  } while (0)
 
 // Some macros for make unitaire tests. This macros are used inside
 // test suite fonction.
@@ -95,15 +98,31 @@ extern int tests_run;
 // mu_assert_equal(char* message, xxx val1, xxx val2)
 // mu_str_assert_equal(char* message, char* str1, char* str2)
 //
-#define mu_assert(message, test) do { \
-    if (!(test)) \
-        return message; \
-    } while (0)
+#define mu_assert(message, test) {    \
+  do {                                \
+    printf("run test '%s'", message); \
+    if (!(test)) {                    \
+      printf(" FAILED.\n");           \
+      return message;                 \
+    }                                 \
+    printf(" PAST.\n");               \
+  } while (0);                        \
+  }
 
 #define mu_assert_true(message, test) mu_assert((message), (test))
 #define mu_assert_false(message, test) mu_assert((message), !(test))
 
-#define mu_assert_equal(message, str1, str2) mu_assert(message, (str1 == str2))
+#define mu_assert_equal(message, str1, str2) mu_assert(message, (str1) == (str2))
+#define mu_assert_not_equal(message, str1, str2) mu_assert(message, (str1) != (str2))
+
+#define mu_assert_eq(message, str1, str2) mu_assert(message, (str1) == (str2))
+#define mu_assert_ne(message, str1, str2) mu_assert(message, (str1) != (str2))
+#define mu_assert_ge(message, str1, str2) mu_assert(message, (str1) >= (str2))
+#define mu_assert_gt(message, str1, str2) mu_assert(message, (str1) > (str2))
+#define mu_assert_le(message, str1, str2) mu_assert(message, (str1) <= (str2))
+#define mu_assert_lt(message, str1, str2) mu_assert(message, (str1) < (str2))
+#define mu_assert_close(message, str1, str2, tol) mu_assert(message, abs((str1) - (str2)) < (tol))
+
 
 #define mu_assert_str_equal(message, str1, str2) mu_assert(message, !strcmp(str1, str2))
 
