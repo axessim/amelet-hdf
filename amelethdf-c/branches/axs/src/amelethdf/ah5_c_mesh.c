@@ -1006,7 +1006,7 @@ char AH5_write_groupgroup(hid_t loc_id, const AH5_groupgroup_t *groupgroup, hsiz
 char AH5_write_umsh_group(hid_t loc_id, const AH5_ugroup_t *ugroup, hsize_t nb_ugroup)
 {
     char success = AH5_FALSE;
-    int i;
+    hsize_t i;
     hid_t grp;
     char *basename;
 

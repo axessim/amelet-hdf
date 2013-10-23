@@ -1,13 +1,14 @@
 #! /usr/env/scons
-# 
+#
 # Tool chain to build Amelet-HDF C library.
 #
 
 import os
-import sys
 import platform
 import glob
 import fnmatch
+
+from SCons.Script import Environment, GetOption, AddOption
 
 # Build flavor.
 CHOICE_FLAVOR = ('release', 'debug', 'assert')
@@ -49,6 +50,7 @@ AddOption('--platform',
           choices=CHOICE_PLATFORM,
           help="build platform id (default: %(default)s)")
 
+
 #=============================================================================
 # Some functions to read command line options.
 #=============================================================================
@@ -73,9 +75,11 @@ def guessed_platform():
         raise Exception("Insupported host system %s" % system)
     return system + archi
 
+
 def get_prefix():
     "Return the absolute path to the install directory."
     return os.path.abspath(os.path.realpath(GetOption("prefix")))
+
 
 def get_flavor():
     "Return the build flavor (one of CHOICE_FLAVOR) or die."
@@ -85,13 +89,16 @@ def get_flavor():
                         "" % (flavor, ", ".join(CHOICE_FLAVOR)))
     return flavor
 
+
 def get_mpi_enable():
     "Return True if MPI is enable."
     return GetOption("with_mpi")
 
+
 def get_root_dir():
     "Return the Amelethdf-c root directory."
     return os.getcwd()
+
 
 def get_hdf5_root():
     "Return the HDF5 root directory."
@@ -105,12 +112,14 @@ def get_hdf5_root():
         return ""
     return hdf5
 
+
 def get_hdf5_root_inc():
     "Return the HDF5 include directory."
     hdf5 = os.path.join(get_hdf5_root(), "include")
     if os.path.exists(hdf5):
         return hdf5
     return ""
+
 
 def get_hdf5_root_lib():
     "Return the HDF5 library directory."
@@ -119,6 +128,7 @@ def get_hdf5_root_lib():
         return hdf5
     return ""
 
+
 def get_build_dir():
     "Return a temporal directory for build."
     path = os.path.abspath(os.path.realpath(GetOption("build_dir")))
@@ -126,12 +136,15 @@ def get_build_dir():
         path = os.path.join(get_root_dir(), "tmp")
     return os.path.join(path, get_flavor())
 
+
 def get_amelethdf_c_src_dir(compoment_name="amelethdf"):
     "The source dirctory ('amelethdf', 'test', 'tools')"
     return os.path.join(get_root_dir(), "src", compoment_name)
 
+
 def get_amelethdf_c_include_dir():
     return os.path.join(get_root_dir(), "src", "amelethdf")
+
 
 def add_headers(env, parent, pattern, destdir, basedir="", recursive=False):
     "Add header."
@@ -144,6 +157,7 @@ def add_headers(env, parent, pattern, destdir, basedir="", recursive=False):
             add_headers(env, entrypath, pattern,
                         os.path.join(destdir, entry),
                         os.path.join(basedir, entry), recursive)
+
 
 #=============================================================================
 # some tools for build configur file.
@@ -163,7 +177,7 @@ class ConfigHBuilder:
     #else
     #define NDEBUG 1
     #endif
-    
+
     }}}
 
     Inspired from: http://scons.org/wiki/GenerateConfig
@@ -198,7 +212,7 @@ class ConfigHBuilder:
 
     def __call__(self, target, source, env):
         config_h_defines = self.get_config_h_defines()
-        
+
         self._pprint("Generating configure file with the following settings:")
 
         for a_target, a_source in zip(target, source):
@@ -212,8 +226,8 @@ class ConfigHBuilder:
 
 
 def get_config_installer(destdirs_alias):
-    """This function is define to be used as 'call' function of ConfigHBuilder to
-    install configure file. See also add_headers.
+    """This function is define to be used as 'call' function of ConfigHBuilder
+    to install configure file. See also add_headers.
     """
     def add_configures(target, source, env):
         for destdir, alias in destdirs_alias:
@@ -223,16 +237,16 @@ def get_config_installer(destdirs_alias):
     return add_configures
 
 
-#===============================================================================
+#=============================================================================
 # Configure global environ.
-#===============================================================================
+#=============================================================================
 # branch environ configuration for "flavor" and "platform".
 flavor = get_flavor()
-platform = guessed_platform()
+host_platform = guessed_platform()
 
-if platform.find("win") >= 0:
+if host_platform.find("win") >= 0:
     msvs_version = "10.0"
-    if platform.find("32") >=0:
+    if host_platform.find("32") >= 0:
         target_arch = "i386"
     else:
         target_arch = "amd64"
@@ -248,49 +262,54 @@ else:
 rootenv.SConsignFile()
 rootenv.Append(CPPPATH=[get_hdf5_root_inc()],
                LIBPATH=[get_hdf5_root_lib()])
-			   
 
-if (platform.find("win") >= 0):
+
+if (host_platform.find("win") >= 0):
     rootenv.Append(LIBS=["hdf5_hl", "hdf5", "zlib"])
-	
-	# unser win the lib and exe environs are different.
+
+    # unser win the lib and exe environs are different.
     rootlibenv = rootenv.Clone()
     rootexeenv = rootenv.Clone()
 
-    if platform == "win32":
+    if host_platform == "win32":
         machine = "X86"
     else:
         machine = "x64"
 
     if (flavor == "debug"):
-        rootlibenv.Append(CCFLAGS="/Zi /nologo /W3 /WX- /Od /D \"_WINDLL\" /D \"_MBCS\" /Gm /EHsc "
-                                  "/RTC1 /GS /fp:precise /Zc:wchar_t /Zc:forScope /Gd /errorReport:queue",
-                          LINKFLAGS="/TLBID:1 /DYNAMICBASE /NXCOMPAT /MACHINE:X64 /ERRORREPORT:QUEUE")
-						  
-        rootexeenv.Append(CCFLAGS="/Zi /nologo /W3 /WX- /Od /D \"_MBCS\" /Gm /EHsc /RTC1 /GS /fp:precise "
-                                  "/Zc:wchar_t /Zc:forScope /Gd /errorReport:queue",
-                          LINKFLAGS="/TLBID:1 /DYNAMICBASE /NXCOMPAT /MACHINE:X64 /ERRORREPORT:QUEUE")
-	
+        rootlibenv.Append(CCFLAGS="/Zi /nologo /W3 /WX- /Od /D \"_WINDLL\" /D "
+                          "\"_MBCS\" /Gm /EHsc /RTC1 /GS /fp:precise "
+                          "/Zc:wchar_t /Zc:forScope /Gd /errorReport:queue",
+                          LINKFLAGS="/TLBID:1 /DYNAMICBASE /NXCOMPAT "
+                          "/MACHINE:X64 /ERRORREPORT:QUEUE")
+
+        rootexeenv.Append(CCFLAGS="/Zi /nologo /W3 /WX- /Od /D \"_MBCS\" /Gm "
+                          "/EHsc /RTC1 /GS /fp:precise /Zc:wchar_t "
+                          "/Zc:forScope /Gd /errorReport:queue",
+                          LINKFLAGS="/TLBID:1 /DYNAMICBASE /NXCOMPAT "
+                          "/MACHINE:X64 /ERRORREPORT:QUEUE")
+
         rootenv.Append(CCFLAGS="/D_WIN32 /W1 /Od /Oy- /Gm- /EHsc /MTd /GS "
                        "/fp:precise /Zc:wchar_t- /Zc:forScope /Gd /Zi",
-                       LINKFLAGS="/nologo /NXCOMPAT /DYNAMICBASE /ERRORREPORT:QUEUE /MACHINE:X64")
+                       LINKFLAGS="/nologo /NXCOMPAT /DYNAMICBASE "
+                       "/ERRORREPORT:QUEUE /MACHINE:X64")
 
     elif (flavor == "release"):
         rootenv.Append(
             CCFLAGS="/D_WIN32 /W1 /O2 /Oy- /Gm- /EHsc /MD /GS /fp:precise "
             "/Zc:wchar_t- /Zc:forScope /Gd",
-            LINKFLAGS = "/nologo /SUBSYSTEM:CONSOLE /NXCOMPAT /DYNAMICBASE")
+            LINKFLAGS="/nologo /SUBSYSTEM:CONSOLE /NXCOMPAT /DYNAMICBASE")
 
     elif (flavor == "assert"):
-        rootenv.Append(CCFLAGS="/nologo /W1 /WX- /O2 /Oy- /EHsc /MD /fp:precise "
-                       "/Zc:wchar_t- /Zc:forScope /GS /Gm- /Gd",
-                       LINKFLAGS = "/nologo /SUBSYSTEM:CONSOLE /NXCOMPAT "
-                       "/DYNAMICBASE /MACHINE:%s")
+        rootenv.Append(CCFLAGS="/nologo /W1 /WX- /O2 /Oy- /EHsc /MD "
+                       "/fp:precise /Zc:wchar_t- /Zc:forScope /GS /Gm- /Gd",
+                       LINKFLAGS="/nologo /SUBSYSTEM:CONSOLE /NXCOMPAT"
+                       " /DYNAMICBASE /MACHINE:%s")
     else:
-        raise Exception("Unresolved flavor '%s' for platform '%s'!" 
-                        "" % (flavor, platform))
+        raise Exception("Unresolved flavor '%s' for platform '%s'!"
+                        "" % (flavor, host_platform))
 
-elif (platform.find("linux") >= 0):
+elif (host_platform.find("linux") >= 0):
     rootenv.Append(LIBS=["hdf5_hl", "hdf5", "libz"])
 
     if get_mpi_enable():
@@ -299,32 +318,30 @@ elif (platform.find("linux") >= 0):
 
     if (flavor == "debug"):
         rootenv.Append(CCFLAGS="-Wall -W -Wextra -g3 -std=gnu90 "
-        "-pedantic -D_DEBUG")
+                       "-pedantic -D_DEBUG")
     elif (flavor == "release"):
         rootenv.Append(CCFLAGS="-Wall -W -Wextra -ansi -O3 "
-        "-std=gnu90 -pedantic -DNDEBUG")
+                       "-std=gnu90 -pedantic -DNDEBUG")
     elif (flavor == "assert"):
         rootenv.Append(CCFLAGS="-Wall -W -Wextra -ansi -O2 -g "
-        "-std=gnu90 -pedantic -DNDEBUG")
+                       "-std=gnu90 -pedantic -DNDEBUG")
     else:
-        raise Exception("Unresolved flavor '%s' for platform '%s'!" 
-                        "" % (flavor, platform))
-						
-	# under linux the lib and exe environs are same.
-	rootlibenv = rootenv.Clone()
-	rootexeenv = rootenv.Clone()
+        raise Exception("Unresolved flavor '%s' for platform '%s'!"
+                        "" % (flavor, host_platform))
+
+    # under linux the lib and exe environs are same.
+    rootlibenv = rootenv.Clone()
+    rootexeenv = rootenv.Clone()
 
 else:
-    raise Exception("Unsupported platform '%s' yet!" % (platform))
+    raise Exception("Unsupported platform '%s' yet!" % (host_platform))
 
 
-
-
-#==============================================================================
+#=============================================================================
 # Configure the library.
-#==============================================================================
+#=============================================================================
 compoment_name = AMELETHDF + "c"
-targetpath =  os.path.join(get_build_dir(), compoment_name)
+targetpath = os.path.join(get_build_dir(), compoment_name)
 include_tmp_path = os.path.join(get_build_dir(), "include")
 installdir = get_prefix()
 installinc = os.path.join(installdir, "include")
@@ -332,16 +349,17 @@ builddir = get_build_dir()
 
 libenv = rootlibenv.Clone()
 # Define the configure file.
-config_h_build = ConfigHBuilder(call=get_config_installer([(installinc, 'install_lib'), 
-                                                           (builddir, 'all')]))
+config_h_build = ConfigHBuilder(
+    call=get_config_installer([(installinc, 'install_lib'),
+                               (builddir, 'all')]))
 config_h_build.add("mpi_enable", 1 if get_mpi_enable() else 0)
 config_h_build.add("debug", 1 if flavor == "debug" else 0)
 libenv.AlwaysBuild(libenv.Command(os.path.join(include_tmp_path,
                                                "ah5_config.h"),
-                                  os.path.join(get_amelethdf_c_src_dir(), 
+                                  os.path.join(get_amelethdf_c_src_dir(),
                                                "ah5_config.h.in"),
                                   config_h_build))
-libenv.Append(CPPPATH=[include_tmp_path,],)
+libenv.Append(CPPPATH=[include_tmp_path],)
 
 # specify the build directory
 #libenv.VariantDir(builddir, ".", duplicate=0)
@@ -349,16 +367,17 @@ libenv.Append(CPPPATH=[include_tmp_path,],)
 libenv.Append(CPPDEFINES=['AMELETHDF_C_LIBRARY'])
 # build the module
 srclst = map(lambda x: os.path.join(builddir, x),
-             glob.glob(os.path.join(get_amelethdf_c_src_dir(AMELETHDF), '*.c')))
+             glob.glob(os.path.join(get_amelethdf_c_src_dir(AMELETHDF),
+                                    '*.c')))
 
 lib = libenv.SharedLibrary(targetpath, source=srclst)
 amelethdfc_lib = lib
 amelethdfc_inc = get_amelethdf_c_include_dir()
 libenv.Alias('all', lib)
 
-if (platform.find("win") >= 0):
-    # The library runtime '.dll' are allayse install and the library '.lib' only
-    # for lib install
+if (host_platform.find("win") >= 0):
+    # The library runtime '.dll' are allayse install and the library
+    # '.lib' only for lib install
     installlib = os.path.join(installdir, "lib")
     installbin = os.path.join(installdir, "bin")
     libenv.Install(installbin, lib[0])
@@ -381,10 +400,9 @@ libenv.Alias('install_lib', installinc)
 del libenv
 
 
-
-#===============================================================================
+#=============================================================================
 # Configure tests.
-#===============================================================================
+#=============================================================================
 testenv = rootexeenv.Clone()
 installtest_dir = os.path.join(installdir, "tests")
 
@@ -407,9 +425,9 @@ for testfile in testlst:
 testenv.Alias('install_tests', installtest_dir)
 del testenv
 
-#===============================================================================
+#=============================================================================
 # Configure tools.
-#===============================================================================
+#=============================================================================
 toolsenv = rootenv.Clone()
 installtools_dir = os.path.join(installdir, "bin")
 
@@ -432,11 +450,3 @@ for testfile in testlst:
     toolsenv.Install(installtools_dir, pgm)
 toolsenv.Alias('install_tools', installtools_dir)
 del toolsenv
-
-
-
-
-
-
-
-

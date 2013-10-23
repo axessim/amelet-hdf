@@ -145,7 +145,7 @@ char* test_write_unstructured_mesh_group()
     ugrp.nb_groupelts = 0;
 
     mu_assert_false("Negative numbre of groups.",
-                    AH5_write_umsh_group(file_id, &ugrp, -1));
+                    AH5_write_umsh_group(file_id, &ugrp, 0));
     mu_assert_false("Empty group.",
                     AH5_write_umsh_group(file_id, &ugrp, 1));
 

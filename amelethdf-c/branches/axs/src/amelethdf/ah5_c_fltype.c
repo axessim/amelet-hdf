@@ -815,10 +815,10 @@ char AH5_write_ft_vector (hid_t file_id, AH5_vector_t *vector)
         if (AH5_write_cpx_dataset(file_id, vector->path, vector->nb_values, vector->values.c))
           success = AH5_TRUE;
         break;
-      //case H5T_STRING:
-      //  if (AH5_write_str_dataset(file_id, vector->path, vector->nb_values, strlen(vector->values.s), vector->values.s))
-      //    success = AH5_TRUE;
-      //  break;
+      case H5T_STRING:
+        if (AH5_write_str_dataset(file_id, vector->path, vector->nb_values, strlen(vector->values.s), vector->values.s))
+          success = AH5_TRUE;
+        break;
       default:
         break;
     }
@@ -941,10 +941,10 @@ char AH5_write_ft_dataset (hid_t file_id, AH5_dataset_t *dataset)
         if (AH5_write_cpx_array(file_id, dataset->path, dataset->nb_dims, dataset->dims, dataset->values.c))
           success = AH5_TRUE;
         break;
-      //case H5T_STRING:
-      //  if (AH5_write_str_dataset(file_id, dataset->path, total_size, strlen(dataset->values.s), dataset->values.s))
-      //    success = AH5_TRUE;
-      //  break;
+      case H5T_STRING:
+        if (AH5_write_str_dataset(file_id, dataset->path, total_size, strlen(dataset->values.s), dataset->values.s))
+          success = AH5_TRUE;
+        break;
       default:
         break;
     }
