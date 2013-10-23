@@ -1074,8 +1074,6 @@ char AH5_write_umesh(hid_t msh_id, const AH5_umesh_t *umesh)
 
     // Check umesh sanity first
     if (umesh == NULL
-        || umesh->elementnodes == NULL
-        || umesh->elementtypes == NULL
         || umesh->nodes == NULL)
         return success;
 

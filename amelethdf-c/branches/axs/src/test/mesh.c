@@ -241,6 +241,76 @@ char *test_write_umesh()
     return MU_FINISHED_WITHOUT_ERRORS;
 }
 
+
+//! Write an unstructured nodes mesh
+char *test_write_unstructured_nodes_mesh()
+{
+    AH5_umesh_t umesh;
+    hid_t file_id, loc_id;
+    int i;
+
+    // Build the nesh
+    // init nodes
+    umesh.nb_nodes[0] = 5;
+    umesh.nb_nodes[1] = 3;
+    umesh.nodes = (float*)malloc(umesh.nb_nodes[0]*umesh.nb_nodes[1]*sizeof(float));
+    for (i = 0; i < umesh.nb_nodes[0]*umesh.nb_nodes[1]; ++i)
+        umesh.nodes[i] = i;
+    // init element
+    umesh.nb_elementtypes = 0;
+    umesh.elementtypes = NULL;
+    umesh.nb_elementnodes = 0;
+    umesh.elementnodes = NULL;
+    // build group
+    umesh.nb_groups = 1;
+    umesh.groups = (AH5_ugroup_t*)malloc(umesh.nb_groups * sizeof(AH5_ugroup_t));
+    umesh.groups[0].path = (char*)malloc(5 * sizeof(char));
+    strcpy(umesh.groups[0].path, "name");
+    umesh.groups[0].type = (char*)malloc( 5 * sizeof(char));
+    strcpy(umesh.groups[0].type, "node");
+    umesh.groups[0].entitytype = NULL;
+    umesh.groups[0].nb_groupelts = 5;
+    umesh.groups[0].groupelts = (int*)malloc(umesh.groups[0].nb_groupelts * sizeof(int));
+    for (i = 0; i < umesh.groups[0].nb_groupelts; ++i)
+      umesh.groups[0].groupelts[i] = i;
+    // group of group
+    umesh.nb_groupgroups = 0;
+    umesh.groupgroups = NULL;
+    // selector on mesh
+    umesh.nb_som_tables = 0;
+    umesh.som_tables = NULL;
+
+    // Test on simple unstructured mesh
+    file_id = AH5_auto_test_file();
+
+    // Write the mesh into '/mesh' node.
+    loc_id = H5Gcreate(file_id, "/mesh", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    mu_assert("Write an simple umesh.",
+              AH5_write_umesh(loc_id, &umesh));
+
+    // Check if all the mesh parts are written.
+    mu_assert("Check 'nodes' nodes in file.",
+              AH5_path_valid(file_id, "/mesh/nodes"));
+    mu_assert("Check 'elementNodes' nodes in file.",
+              AH5_path_valid(file_id, "/mesh/elementNodes"));
+    mu_assert("Check 'elementTypes' nodes in file.",
+              AH5_path_valid(file_id, "/mesh/elementTypes"));
+    mu_assert("Check 'groupGroup' nodes in file.",
+              AH5_path_valid(file_id, "/mesh/groupGroup"));
+    mu_assert("Check 'group' nodes in file.",
+              AH5_path_valid(file_id, "/mesh/group"));
+    mu_assert("Check 'group/name' nodes in file.",
+              AH5_path_valid(file_id, "/mesh/group/name"));
+
+
+    // Close and release
+    AH5_free_umesh(&umesh);
+    AH5_close_test_file(file_id);
+
+    return MU_FINISHED_WITHOUT_ERRORS;
+}
+
+
 //! Check the mesh write function.
 char *test_write_mesh()
 {
@@ -333,6 +403,7 @@ char *all_tests()
     //FIXME: mu_run_test(test_write_groupgroup);
     mu_run_test(test_write_unstructured_mesh_group);
     mu_run_test(test_write_umesh);
+    mu_run_test(test_write_unstructured_nodes_mesh);
     mu_run_test(test_read_umesh);
     mu_run_test(test_write_mesh);
 
