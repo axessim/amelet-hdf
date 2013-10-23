@@ -74,16 +74,17 @@
 
 // The test suite counter.
 extern int tests_run;
+char *__message__;
 
 // Run the test suite fonction.
 #define mu_run_test(test) do {                            \
     printf("Start test block '%s'\n", #test);             \
-    char *message = test();                               \
+    __message__ = test();                                 \
     tests_run++;                                          \
-    if (message != 0)                                     \
+    if (__message__ != 0)                                 \
     {                                                     \
       printf("'%s' FAILED in test: ", #test);             \
-      return message;                                     \
+      return __message__;                                 \
     }                                                     \
     printf("Test block '%s' OK\n", #test);                \
     printf("--------------------------------------\n");   \
