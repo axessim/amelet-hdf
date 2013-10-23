@@ -71,7 +71,8 @@ char *test_write_ft_vector()
     mu_assert("Write vector.",
               AH5_write_ft_vector(file_id, &vector));
 
-    AH5_read_flt_dataset(file_id, "/floatingType/vector", nb_values, &fvalues);
+    mu_assert("Read float dataset for check.",
+              AH5_read_flt_dataset(file_id, "/floatingType/vector", nb_values, &fvalues));
     for (i = 0; i < nb_values; ++i)
       mu_assert_close("Test the written real values.",
                       fvalues[i], 0.3 * i, 1.e-4);
@@ -105,7 +106,7 @@ char *test_write_ft_dataset()
     ds.dims[1] = 2;
     ds.values.f = (float*)malloc(ds.dims[0]*ds.dims[1]*sizeof(float));
     for (i = 0; i < ds.dims[0]*ds.dims[1]; ++i)
-      ds.values.f[i] = 0.3 * i;
+      ds.values.f[i] = (float)0.3 * i;
 
     mu_assert("Write ds.",
               AH5_write_ft_dataset(file_id, &ds));
@@ -113,7 +114,7 @@ char *test_write_ft_dataset()
     AH5_read_flt_dataset(file_id, "/floatingType/dataset", ds.dims[0]*ds.dims[1], &fvalues);
     for (i = 0; i < ds.dims[0]*ds.dims[1]; ++i)
       mu_assert_close("Test the written real values.",
-                      fvalues[i], 0.3 * i, 1.e-4);
+                      fvalues[i], 0.3 * (float)i, 1.e-4);
 
     free(fvalues);
     

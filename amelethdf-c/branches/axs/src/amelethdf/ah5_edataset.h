@@ -41,7 +41,7 @@ extern "C" {
     hid_t                parent;
     char*                path;
     hid_t                dataset;
-    hsize_t              nb_dims;
+    int                  nb_dims;
     hsize_t              extendibledim;
     hsize_t*             dims;
     hid_t                type_class;
@@ -117,7 +117,7 @@ extern "C" {
   AH5_PUBLIC char AH5_create_PEorEdataset(
       hid_t loc_id,                 /* Parent*/
       const char* name,             /* name or path*/
-      hsize_t nb_dims,              /* number of dimensions*/
+      int nb_dims,                  /* number of dimensions*/
       hsize_t dims[],               /* size of dimensions, the extendible dim must be H5S_UNLIMITED*/
       hid_t mem_type_id,            /* data type*/
       AH5_Edataset_t* Edataset,     /* pointer to AH5_Edataset_t*/
@@ -127,7 +127,7 @@ extern "C" {
   AH5_PUBLIC char AH5_create_Edataset(
       hid_t loc_id,                 /* Parent*/
       const char* name,             /* name or path*/
-      hsize_t nb_dims,              /* number of dimensions*/
+      int nb_dims,                  /* number of dimensions*/
       hsize_t dims[],               /* size of dimensions, the extendible dim must be H5S_UNLIMITED*/
       hid_t mem_type_id,            /* data type*/
       AH5_Edataset_t* Edataset);    /* pointer to AH5_Edataset_t*/
@@ -135,14 +135,14 @@ extern "C" {
   AH5_PUBLIC char AH5_create_int_Edataset(
       hid_t loc_id,                 /* Parent*/
       const char* name,             /* name or path*/
-      hsize_t nb_dims,              /* number of dimensions*/
+      int nb_dims,                  /* number of dimensions*/
       hsize_t dims[],               /* size of dimensions, the extendible dim must be H5S_UNLIMITED*/
       AH5_Edataset_t* Edataset);    /* pointer to AH5_Edataset_t*/
 
   AH5_PUBLIC char AH5_create_flt_Edataset(
       hid_t loc_id,                 /* Parent*/
       const char* name,             /* name or path*/
-      hsize_t nb_dims,              /* number of dimensions*/
+      int nb_dims,                  /* number of dimensions*/
       hsize_t dims[],               /* size of dimensions, the extendible dim must be H5S_UNLIMITED*/
       AH5_Edataset_t* Edataset);    /* pointer to AH5_Edataset_t*/
 
@@ -150,7 +150,7 @@ extern "C" {
       hid_t loc_id,                 /* Parent*/
       const char* name,             /* name or path*/
       size_t strlength,             /* max length of the string*/
-      hsize_t nb_dims,              /* number of dimensions*/
+      int nb_dims,                  /* number of dimensions*/
       hsize_t dims[],               /* size of dimensions, the extendible dim must be H5S_UNLIMITED*/
       AH5_Edataset_t* Edataset);    /* pointer to AH5_Edataset_t*/
 
@@ -158,7 +158,7 @@ extern "C" {
   AH5_PUBLIC char AH5_create_cpx_Edataset(
       hid_t loc_id,                 /* Parent*/
       const char* name,             /* name or path*/
-      hsize_t nb_dims,              /* number of dimensions*/
+      int nb_dims,                  /* number of dimensions*/
       hsize_t dims[],               /* size of dimensions, the extendible dim must be H5S_UNLIMITED*/
       AH5_Edataset_t* Edataset);    /* pointer to AH5_Edataset_t*/
 
@@ -188,7 +188,7 @@ extern "C" {
   AH5_PUBLIC char AH5_create_Earrayset(
       hid_t loc_id,                 /* Parent*/
       const char* name,             /* name or path*/
-      hsize_t nb_dims,              /* number of dimensions*/
+      int nb_dims,                  /* number of dimensions*/
       hsize_t dims[],               /* size of dimensions, the extendible dim must be H5S_UNLIMITED*/
       hid_t mem_type_id,            /* data type*/
       AH5_Earrayset_t* Earrayset);  /* pointer to AH5_Earrayset_t*/
@@ -196,14 +196,14 @@ extern "C" {
   AH5_PUBLIC char AH5_create_int_Earrayset(
       hid_t loc_id,                 /* Parent*/
       const char* name,             /* name or path*/
-      hsize_t nb_dims,              /* number of dimensions*/
+      int nb_dims,                  /* number of dimensions*/
       hsize_t dims[],               /* size of dimensions, the extendible dim must be H5S_UNLIMITED*/
       AH5_Earrayset_t* Earrayset);  /* pointer to AH5_Earrayset_t*/
 
   AH5_PUBLIC char AH5_create_flt_Earrayset(
       hid_t loc_id,                 /* Parent*/
       const char* name,             /* name or path*/
-      hsize_t nb_dims,              /* number of dimensions*/
+      int nb_dims,                  /* number of dimensions*/
       hsize_t dims[],               /* size of dimensions, the extendible dim must be H5S_UNLIMITED*/
       AH5_Earrayset_t* Earrayset);  /* pointer to AH5_Earrayset_t*/
 
@@ -211,14 +211,14 @@ extern "C" {
       hid_t loc_id,                 /* Parent*/
       const char* name,             /* name or path*/
       size_t strlength,             /* Max length of the strings*/
-      hsize_t nb_dims,              /* number of dimensions*/
+      int nb_dims,                  /* number of dimensions*/
       hsize_t dims[],               /* size of dimensions, the extendible dim must be H5S_UNLIMITED*/
       AH5_Earrayset_t* Earrayset);  /* pointer to AH5_Earrayset_t*/
 
   AH5_PUBLIC char AH5_create_cpx_Earrayset(
       hid_t loc_id,                 /* Parent*/
       const char* name,             /* name or path*/
-      hsize_t nb_dims,              /* number of dimensions*/
+      int nb_dims,                  /* number of dimensions*/
       hsize_t dims[],               /* size of dimensions, the extendible dim must be H5S_UNLIMITED*/
       AH5_Earrayset_t* Earrayset);  /* pointer to AH5_Earrayset_t*/
 
@@ -234,7 +234,7 @@ extern "C" {
   AH5_PUBLIC char AH5_set_dim_Earrayset(
       AH5_Earrayset_t* Earrayset,   /* pointer to AH5_Earrayset_t*/
       int idim,                     /* dimension id in C (>=0)*/
-      hsize_t nb_dims,              /* Number of dimensions of the dataset*/
+      int nb_dims,                  /* Number of dimensions of the dataset*/
       hsize_t dims[],               /* Size of each dimension*/
       void* data,                   /* data (NULL for a void dataset)*/
       hid_t mem_type_id,            /* type*/
@@ -245,7 +245,7 @@ extern "C" {
   AH5_PUBLIC char AH5_set_int_dim_Earrayset(
       AH5_Earrayset_t* Earrayset,   /* pointer to AH5_Earrayset_t*/
       int idim,                     /* dimension id in C (>=0)*/
-      hsize_t nb_dims,              /* Number of dimensions of the dataset*/
+      int nb_dims,                  /* Number of dimensions of the dataset*/
       hsize_t dims[],               /* Size of each dimension*/
       void* data,                   /* data (NULL for a void dataset)*/
       const char* nature,           /* physicalNature*/
@@ -255,7 +255,7 @@ extern "C" {
   AH5_PUBLIC char AH5_set_flt_dim_Earrayset(
       AH5_Earrayset_t* Earrayset,   /* pointer to AH5_Earrayset_t*/
       int idim,                     /* dimension id in C (>=0)*/
-      hsize_t nb_dims,              /* Number of dimensions of the dataset*/
+      int nb_dims,                  /* Number of dimensions of the dataset*/
       hsize_t dims[],               /* Size of each dimension*/
       void* data,                   /* data (NULL for a void dataset)*/
       const char* nature,           /* physicalNature*/
@@ -265,7 +265,7 @@ extern "C" {
   AH5_PUBLIC char AH5_set_str_dim_Earrayset(
       AH5_Earrayset_t* Earrayset,   /* pointer to AH5_Earrayset_t*/
       int idim,                     /* dimension id in C (>=0)*/
-      hsize_t nb_dims,              /* Number of dimensions of the dataset*/
+      int nb_dims,                  /* Number of dimensions of the dataset*/
       hsize_t dims[],               /* Size of each dimension*/
       size_t strlength,             /* Max length of str */
       void* data,                   /* data (NULL for a void dataset)*/
@@ -276,7 +276,7 @@ extern "C" {
   AH5_PUBLIC char AH5_set_cpx_dim_Earrayset(
       AH5_Earrayset_t* Earrayset,   /* pointer to AH5_Earrayset_t*/
       int idim,                     /* dimension id in C (>=0)*/
-      hsize_t nb_dims,              /* Number of dimensions of the dataset*/
+      int nb_dims,                  /* Number of dimensions of the dataset*/
       hsize_t dims[],               /* Size of each dimension*/
       void* data,                   /* data (NULL for a void dataset)*/
       const char* nature,           /* physicalNature*/
@@ -298,7 +298,7 @@ extern "C" {
 
   AH5_PUBLIC char AH5_set_memory_mapping(
       AH5_MEMORY_MAPPING_t* mapping,
-      hsize_t nb_dims,
+      int nb_dims,
       hsize_t blockdims[],
       hsize_t start[],
       hsize_t stride[],

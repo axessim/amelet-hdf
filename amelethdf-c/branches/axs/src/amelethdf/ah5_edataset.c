@@ -158,7 +158,7 @@ void AH5_initialize_Edataset(AH5_Edataset_t* Edataset){
 
 char AH5_create_PEorEdataset(hid_t loc_id,
     const char* name,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     hid_t mem_type_id,
     AH5_Edataset_t* Edataset,
@@ -172,7 +172,7 @@ char AH5_create_PEorEdataset(hid_t loc_id,
 
   Edataset->access        = access;
 
-  Edataset->path = (char*)malloc(strlen(name)*sizeof(char));
+  Edataset->path = (char*)malloc((strlen(name)+1)*sizeof(char));
   strcpy(Edataset->path, name);
 
   for(i=0;i<nb_dims;i++){
@@ -190,7 +190,7 @@ char AH5_create_PEorEdataset(hid_t loc_id,
 
 char AH5_create_Edataset(hid_t loc_id,
     const char* name,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     hid_t mem_type_id,
     AH5_Edataset_t* Edataset){
@@ -202,7 +202,7 @@ char AH5_create_Edataset(hid_t loc_id,
 
 char AH5_create_int_Edataset(hid_t loc_id,
     const char* name,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     AH5_Edataset_t* Edataset){
   return AH5_create_Edataset(loc_id, name,
@@ -214,7 +214,7 @@ char AH5_create_int_Edataset(hid_t loc_id,
 
 char AH5_create_flt_Edataset(hid_t loc_id,
     const char* name,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     AH5_Edataset_t* Edataset){
   return AH5_create_Edataset(loc_id, name,
@@ -226,7 +226,7 @@ char AH5_create_flt_Edataset(hid_t loc_id,
 char AH5_create_str_Edataset(hid_t loc_id,
     const char* name,
     size_t strlength,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     AH5_Edataset_t* Edataset){
   hid_t strtype;
@@ -245,7 +245,7 @@ char AH5_create_str_Edataset(hid_t loc_id,
 
 char AH5_create_cpx_Edataset(hid_t loc_id,
     const char* name,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     AH5_Edataset_t* Edataset){
 
@@ -434,7 +434,7 @@ void AH5_initialize_Earrayset(AH5_Earrayset_t* Earrayset){
 
 char AH5_create_Earrayset(hid_t loc_id,
     const char* name,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     hid_t mem_type_id,
     AH5_Earrayset_t* Earrayset){
@@ -476,7 +476,7 @@ char AH5_create_Earrayset(hid_t loc_id,
 
 char AH5_create_int_Earrayset(hid_t loc_id,
     const char* name,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     AH5_Earrayset_t* Earrayset){
   return AH5_create_Earrayset(loc_id, name,
@@ -486,7 +486,7 @@ char AH5_create_int_Earrayset(hid_t loc_id,
 
 char AH5_create_flt_Earrayset(hid_t loc_id,
     const char* name,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     AH5_Earrayset_t* Earrayset){
   return AH5_create_Earrayset(loc_id, name,
@@ -498,7 +498,7 @@ char AH5_create_flt_Earrayset(hid_t loc_id,
 char AH5_create_str_Earrayset(hid_t loc_id,
     const char* name,
     size_t strlength,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     AH5_Earrayset_t* Earrayset){
   hid_t strtype;
@@ -514,7 +514,7 @@ char AH5_create_str_Earrayset(hid_t loc_id,
 
 char AH5_create_cpx_Earrayset(hid_t loc_id,
     const char* name,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     AH5_Earrayset_t* Earrayset){
   return AH5_create_Earrayset(loc_id, name,
@@ -535,7 +535,7 @@ char AH5_set_attr_Earrayset(AH5_Earrayset_t* Earrayset,
 
 char AH5_set_dim_Earrayset(AH5_Earrayset_t* Earrayset,
     int idim,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     void* data,
     hid_t mem_type_id,
@@ -576,7 +576,7 @@ char AH5_set_dim_Earrayset(AH5_Earrayset_t* Earrayset,
 
 char AH5_set_int_dim_Earrayset(AH5_Earrayset_t* Earrayset,
     int idim,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     void* data,
     const char* nature,
@@ -590,7 +590,7 @@ char AH5_set_int_dim_Earrayset(AH5_Earrayset_t* Earrayset,
 
 char AH5_set_flt_dim_Earrayset(AH5_Earrayset_t* Earrayset,
     int idim,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     void* data,
     const char* nature,
@@ -604,7 +604,7 @@ char AH5_set_flt_dim_Earrayset(AH5_Earrayset_t* Earrayset,
 
 char AH5_set_cpx_dim_Earrayset(AH5_Earrayset_t* Earrayset,
     int idim,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     void* data,
     const char* nature,
@@ -618,7 +618,7 @@ char AH5_set_cpx_dim_Earrayset(AH5_Earrayset_t* Earrayset,
 
 char AH5_set_str_dim_Earrayset(AH5_Earrayset_t* Earrayset,
     int idim,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t dims[],
     size_t strlength,
     void* data,
@@ -699,7 +699,7 @@ void AH5_initialize_memory_mapping(AH5_MEMORY_MAPPING_t* mapping){
 
 char AH5_set_memory_mapping(
     AH5_MEMORY_MAPPING_t* mapping,
-    hsize_t nb_dims,
+    int nb_dims,
     hsize_t blockdims[],
     hsize_t start[],
     hsize_t stride[],

@@ -17,7 +17,7 @@ extern "C" {
     typedef struct _AH5_ssom_pie_table_t
     {
         char            *path;
-        char            nb_dims;
+        hsize_t         nb_dims;
         hsize_t         nb_points;
         unsigned int    **elements;
         float           **vectors;
@@ -71,7 +71,7 @@ extern "C" {
 
     typedef struct _AH5_usom_pie_table_t
     {
-        char            nb_dims;
+        hsize_t         nb_dims;
         hsize_t         nb_points;
         int             *indices;
         float           **vectors;
@@ -206,15 +206,15 @@ extern "C" {
     //
     // The 'file_id' can be the root node but in this case the furst data node's path must by the full node path.
     //
-    AH5_PUBLIC char AH5_write_groupgroup(hid_t file_id, const AH5_groupgroup_t *groupgroup, int nb);
+    AH5_PUBLIC char AH5_write_groupgroup(hid_t file_id, const AH5_groupgroup_t *groupgroup, hsize_t nb);
     AH5_PUBLIC char AH5_write_smesh_axis(hid_t file_id, const AH5_axis_t *axis);
     AH5_PUBLIC char AH5_write_smsh_group(hid_t file_id, const AH5_sgroup_t *sgroup);
     AH5_PUBLIC char AH5_write_ssom_pie_table(hid_t file_id, const AH5_ssom_pie_table_t *ssom_pie_table);
     AH5_PUBLIC char AH5_write_smesh(hid_t file_id, const AH5_smesh_t *smesh);
-    AH5_PUBLIC char AH5_write_umsh_group(hid_t file_id, const AH5_ugroup_t *ugroup, int nb_grp);
+    AH5_PUBLIC char AH5_write_umsh_group(hid_t file_id, const AH5_ugroup_t *ugroup, hsize_t nb_grp);
     AH5_PUBLIC char AH5_write_usom_pie_table(hid_t file_id, const AH5_usom_pie_table_t *usom_pie_table);
     AH5_PUBLIC char AH5_write_usom_ef_table(hid_t file_id, const AH5_usom_ef_table_t *usom_ef_table);
-    AH5_PUBLIC char AH5_write_umesh_som_table(hid_t file_id, const AH5_usom_table_t *usom_table, int nb_som);
+    AH5_PUBLIC char AH5_write_umesh_som_table(hid_t file_id, const AH5_usom_table_t *usom_table, hsize_t nb_som);
     AH5_PUBLIC char AH5_write_umesh(hid_t file_id, const AH5_umesh_t *umesh);
     AH5_PUBLIC char AH5_write_msh_instance(hid_t file_id, const AH5_msh_instance_t *msh_instance);
     AH5_PUBLIC char AH5_write_mlk_instance(hid_t file_id, const AH5_mlk_instance_t *mlk_instance);

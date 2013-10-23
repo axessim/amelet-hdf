@@ -20,14 +20,12 @@ char Verify(hid_t loc_id, const char* path, hsize_t size, int* ref){
 
   
   for(i=0;i<size;i++){
-//    printf("%s %d %d\n", path, ref[i], data[i]);
+	//printf("%s %d %d\n", path, ref[i], data[i]);
 
     if(data[i] != ref[i]){
       status = AH5_FALSE;
     }
   }
-
-  free(data);
 
   return status;
 }
@@ -65,7 +63,7 @@ static char* test_low_level(hid_t hdf){
       H5T_NATIVE_INT,
       &dataset);                           // dataset
 
-  mu_assert("Creation of Earray failed.\n", status==AH5_TRUE);
+  mu_assert("Creation of Earray failed.", status==AH5_TRUE);
 
 
   // Extend dataset
@@ -82,17 +80,17 @@ static char* test_low_level(hid_t hdf){
     if(i!=0){
       status = AH5_extend_earray(dataset, 2, dims, extdims);
 
-      mu_assert("Extension of Earray failed.\n", status==AH5_TRUE);
+      mu_assert("Extension of Earray failed.", status==AH5_TRUE);
     }
 
-    mu_assert("Dims of Earray have not been updated.\n", dims[1]==i+1);
+    mu_assert("Dims of Earray have not been updated.", dims[1]==i+1);
 
 
     start[1] = i;
     status = AH5_write_earray(dataset, 2, dims,
         block, start, ones, ones, block, value, H5T_NATIVE_INT);
 
-    mu_assert("Write extension of Earray failed.\n", status==AH5_TRUE);
+    mu_assert("Write extension of Earray failed.", status==AH5_TRUE);
 
   }
 
@@ -102,11 +100,11 @@ static char* test_low_level(hid_t hdf){
 
   // Read the dataset we have just written
   size = dims[0] * dims[1];
-  data = malloc(size * sizeof(int));
+  data = (int*)malloc(size * sizeof(int));
 
   for(iu=0;iu<dims[0];iu++){
     for(iv=0;iv<dims[1];iv++){
-      i = iu * dims[1] + iv;
+      i = iu * (int)dims[1] + iv;
       data[i] = iv+2;
     }
   }
@@ -115,7 +113,7 @@ static char* test_low_level(hid_t hdf){
 
   free(data);
 
-  mu_assert("Error in the written data.\n", status==AH5_TRUE);
+  mu_assert("Error in the written data.", status==AH5_TRUE);
 
   return NULL;
 
@@ -154,7 +152,7 @@ static char* test_chararray(hid_t hdf){
       strtype,
       &dataset);                           // dataset
 
-  mu_assert("Creation of strEarray failed.\n", status==AH5_TRUE);
+  mu_assert("Creation of strEarray failed.", status==AH5_TRUE);
 
 
   initval = "coucou0""coucou1";
@@ -162,7 +160,7 @@ static char* test_chararray(hid_t hdf){
   status = AH5_write_earray(dataset, rank, dims,
       block, start, ones, ones, block, initval, strtype);
 
-  mu_assert("Write 0 extension of strEarray failed.\n", status==AH5_TRUE);
+  mu_assert("Write 0 extension of strEarray failed.", status==AH5_TRUE);
 
 
   // Extend dataset
@@ -176,7 +174,7 @@ static char* test_chararray(hid_t hdf){
 
     status = AH5_extend_earray(dataset, rank, dims, extdims);
 
-    mu_assert("Extension of strEarray failed.\n", status==AH5_TRUE);
+    mu_assert("Extension of strEarray failed.", status==AH5_TRUE);
 
 //    mu_assert("Dims of strEarray have not been updated.\n", dims[1]==i+1);
 
@@ -185,7 +183,7 @@ static char* test_chararray(hid_t hdf){
     status = AH5_write_earray(dataset, rank, dims,
         block, start, ones, ones, block, value, strtype);
 
-    mu_assert("Write extension of strEarray failed.\n", status==AH5_TRUE);
+    mu_assert("Write extension of strEarray failed.", status==AH5_TRUE);
 
   }
 
@@ -222,7 +220,7 @@ static char* test_Edataset(hid_t hdf){
   status = AH5_create_Edataset(hdf, "e_array",
       2, dims, H5T_NATIVE_INT, &v);
 
-  mu_assert("Creation of Edataset failed.\n", status==AH5_TRUE);
+  mu_assert("Creation of Edataset failed.", status==AH5_TRUE);
 
   status = AH5_set_attr_Edataset(&v,
       "mynature", "coucou", NULL);
@@ -231,7 +229,7 @@ static char* test_Edataset(hid_t hdf){
   
   for(i=0;i<4;i++){
 
-    data = malloc(3 * (i+1) * sizeof(int));
+    data = (int*)malloc(3 * (i+1) * sizeof(int));
 
     for(j=0;j<3*(i+1);j++){
       data[j] = i+1;
@@ -239,11 +237,11 @@ static char* test_Edataset(hid_t hdf){
 
     status = AH5_append_Edataset(&v, i+1, data);
 
-    mu_assert("Append to Edataset failed (method).\n", status==AH5_TRUE);
+    mu_assert("Append to Edataset failed (method).", status==AH5_TRUE);
 
     size += i+1;
 
-    mu_assert("Append to Edataset failed (update dims).\n", v.dims[1]==size);
+    mu_assert("Append to Edataset failed (update dims).", v.dims[1]==size);
 
     free(data);
   }
@@ -252,17 +250,16 @@ static char* test_Edataset(hid_t hdf){
 
   status = AH5_free_Edataset(&v);
 
-  mu_assert("Free of Edataset failed.\n", status==AH5_TRUE);
-
+  mu_assert("Free of Edataset failed.", status==AH5_TRUE);
 
   // Verify the written data
 
   data = (int*)malloc(size * sizeof(int));
-
+  
   l = 0;
-  for(i=0;i<4;i++){
-    for(j=0;j<i+1;j++){
-      for(k=0;k<3;k++){
+  for(i=0; i<4; i++){
+    for(j=0; j<i+1; j++){
+      for(k=0; k<3; k++){
         p = l + (size / 3) * k;
         data[p] = i+1;
       }
@@ -274,7 +271,7 @@ static char* test_Edataset(hid_t hdf){
 
   free(data);
 
-  mu_assert("Error in the written data.\n", status==AH5_TRUE);
+  mu_assert("Error in the written data.", status==AH5_TRUE);
 
   return NULL;
 }
@@ -313,7 +310,7 @@ static char* test_Earrayset(hid_t hdf){
   status = AH5_create_Earrayset(hdf, "extarrayset",
       2, dims, H5T_NATIVE_INT, &a);
 
-  mu_assert("Creation of Earrayset failed.\n", status==AH5_TRUE);
+  mu_assert("Creation of Earrayset failed.", status==AH5_TRUE);
 
   
 
@@ -321,7 +318,7 @@ static char* test_Earrayset(hid_t hdf){
       1, dims0, NULL, H5T_NATIVE_INT,
       NULL, NULL, NULL);
 
-  mu_assert("Set dim 0 of Earrayset failed.\n", status==AH5_TRUE);
+  mu_assert("Set dim 0 of Earrayset failed.", status==AH5_TRUE);
 
   
 
@@ -329,7 +326,7 @@ static char* test_Earrayset(hid_t hdf){
       1, dims1, datadim, H5T_NATIVE_INT,
       "coucou", NULL, NULL);
 
-  mu_assert("Set dim 1 of Earrayset failed.\n", status==AH5_TRUE);
+  mu_assert("Set dim 1 of Earrayset failed.", status==AH5_TRUE);
 
 
   // Extend
@@ -338,13 +335,13 @@ static char* test_Earrayset(hid_t hdf){
 
     status = AH5_append_Earrayset(&a, 1, appdata, &valdim);
 
-    mu_assert("Extension of Earrayset failed.\n", status==AH5_TRUE);
+    mu_assert("Extension of Earrayset failed.", status==AH5_TRUE);
   }
 
   // Free
   status = AH5_free_Earrayset(&a);
 
-  mu_assert("Free of Earrayset failed.\n", status==AH5_TRUE);
+  mu_assert("Free of Earrayset failed.", status==AH5_TRUE);
 
   return NULL;
 }

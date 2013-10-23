@@ -1,5 +1,12 @@
 #include "ah5_c_extelt.h"
 
+// for access function
+#ifdef _WIN32
+# include <io.h>
+# include <errno.h>
+#else
+# include <unistd.h>
+#endif
 
 // Read dataset in externalElement and open external files
 char AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *eet_dataset)

@@ -1,5 +1,6 @@
 #include "ah5_general.h"
 
+#include <ctype.h>
 
 // Set complex number
 AH5_complex_t AH5_set_complex(float real, float imag)
@@ -86,8 +87,9 @@ char AH5_version_minimum(const char *required_version, const char *sim_version)
 // Remove ".0" from the end; allocates new memory!!!
 char *AH5_trim_zeros(const char *version)
 {
-    int i, number = 0;
+    int number = 0;
     char *rdata;
+	size_t i;
 
     rdata = strdup(version);
 
@@ -200,7 +202,8 @@ char *AH5_trim_path(char *path)
 char AH5_path_valid(hid_t loc_id, const char *path)
 {
     char *temp;
-    int i, slashes = 0;
+    int slashes = 0;
+	size_t i;
 
     temp = strdup(path);
     for (i = strlen(path); i > 0; i--)
@@ -328,7 +331,7 @@ AH5_children_t AH5_read_children_name(hid_t file_id, const char* path)
 // Get last part of a path; does not allocate new memory
 char *AH5_get_name_from_path(const char *path)
 {
-    int i;
+    size_t i;
 
     for (i = strlen(path); i > -1; i--)
         if (path[i] == '/')
@@ -339,7 +342,7 @@ char *AH5_get_name_from_path(const char *path)
 // Get base part of a path; allocates new memory!
 char *AH5_get_base_from_path(const char *path)
 {
-    int i;
+    size_t i;
     char *rdata, *temp;
 
     temp = strdup(path);

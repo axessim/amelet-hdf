@@ -235,7 +235,7 @@ char AH5_read_ssom_pie_table(hid_t file_id, const char *path, AH5_ssom_pie_table
                 }
                 if (rdata)
                 {
-                    ssom_pie_table->nb_dims = nfields / 3;
+                    ssom_pie_table->nb_dims = nfields / (hsize_t)3;
                     ssom_pie_table->elements = (unsigned int **) malloc(nrecords * sizeof(unsigned int *));
                     ssom_pie_table->elements[0] = (unsigned int *) malloc(nrecords * 2 * ssom_pie_table->nb_dims * sizeof(unsigned int));
                     ssom_pie_table->vectors = (float **) malloc(nrecords * sizeof(float *));
@@ -967,7 +967,7 @@ char AH5_write_smesh(hid_t file_id, const AH5_smesh_t *smesh)
 }
 
 // Write groupGroup
-char AH5_write_groupgroup(hid_t loc_id, const AH5_groupgroup_t *groupgroup, int nb_ggrp)
+char AH5_write_groupgroup(hid_t loc_id, const AH5_groupgroup_t *groupgroup, hsize_t nb_ggrp)
 {
     char success = AH5_FALSE;
     hid_t grp;
@@ -1003,7 +1003,7 @@ char AH5_write_groupgroup(hid_t loc_id, const AH5_groupgroup_t *groupgroup, int 
 }
 
 // Write group in unstructured mesh
-char AH5_write_umsh_group(hid_t loc_id, const AH5_ugroup_t *ugroup, int nb_ugroup)
+char AH5_write_umsh_group(hid_t loc_id, const AH5_ugroup_t *ugroup, hsize_t nb_ugroup)
 {
     char success = AH5_FALSE;
     int i;
@@ -1056,7 +1056,7 @@ char AH5_write_usom_ef_table(hid_t file_id, const AH5_usom_ef_table_t *usom_ef_t
 }
 
 // Read selector on mesh (unstructured mesh)
-char AH5_write_umesh_som_table(hid_t file_id, const AH5_usom_table_t *usom_table, int nb_som)
+char AH5_write_umesh_som_table(hid_t file_id, const AH5_usom_table_t *usom_table, hsize_t nb_som)
 {
     char success = AH5_FALSE;
 
@@ -1069,8 +1069,6 @@ char AH5_write_umesh_som_table(hid_t file_id, const AH5_usom_table_t *usom_table
 char AH5_write_umesh(hid_t msh_id, const AH5_umesh_t *umesh)
 {
     char success = AH5_FALSE;
-
-    hsize_t dims1[1], dims2[2];
 
     // Check umesh sanity first
     if (umesh == NULL
@@ -1115,7 +1113,6 @@ char AH5_write_umesh(hid_t msh_id, const AH5_umesh_t *umesh)
 char AH5_write_msh_instance(hid_t loc_id, const AH5_msh_instance_t *msh_instance)
 {
     char success = AH5_FALSE;
-    char msh_path[AH5_ABSOLUTE_PATH_LENGTH];
     char *basename;
     hid_t msh_id;
 
@@ -1230,7 +1227,7 @@ void AH5_print_smesh(const AH5_smesh_t *smesh, int space)
 void AH5_print_umesh_som_table(const AH5_usom_table_t *usom_table, int space)
 {
     hsize_t k;
-    char dim;
+    hsize_t dim;
 
     switch (usom_table->type)
     {

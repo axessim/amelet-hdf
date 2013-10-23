@@ -356,7 +356,7 @@ char AH5_read_ft_generalrationalfunction (hid_t file_id, const char *path, AH5_g
                 }
     if (rdata)
     {
-        generalrationalfunction->nb_degrees = dims[0];
+        generalrationalfunction->nb_degrees = (int)dims[0];
         generalrationalfunction->path = strdup(path);
         AH5_read_opt_attrs(file_id, path, &(generalrationalfunction->opt_attrs), mandatory, sizeof(mandatory)/AH5_ATTR_LENGTH);
     }
@@ -382,7 +382,7 @@ char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rati
     strcpy(path2, path);
     strcat(path2, AH5_G_FUNCTION);
     children = AH5_read_children_name(file_id, path2);
-    rational->nb_functions = children.nb_children;
+    rational->nb_functions = (int)children.nb_children;
     if (children.nb_children > 0)
     {
         // Read rational/function until error
@@ -785,7 +785,7 @@ char AH5_write_ft_singlestring (hid_t file_id, AH5_singlestring_t *singlestring)
   char success = AH5_FALSE;
   
   if (AH5_init_floatingtype(file_id, singlestring->path))
-    if (AH5_read_str_attr(file_id, singlestring->path, AH5_A_VALUE, singlestring->value))
+    if (AH5_write_str_attr(file_id, singlestring->path, AH5_A_VALUE, singlestring->value))
       if (AH5_write_str_attr(file_id, singlestring->path, AH5_A_FLOATING_TYPE, AH5_V_SINGLE_STRING))
         success = AH5_write_opt_attrs(file_id, singlestring->path, &(singlestring->opt_attrs));
   
@@ -815,10 +815,10 @@ char AH5_write_ft_vector (hid_t file_id, AH5_vector_t *vector)
         if (AH5_write_cpx_dataset(file_id, vector->path, vector->nb_values, vector->values.c))
           success = AH5_TRUE;
         break;
-      case H5T_STRING:
-        if (AH5_write_str_dataset(file_id, vector->path, vector->nb_values, strlen(vector->values.s), vector->values.s))
-          success = AH5_TRUE;
-        break;
+      //case H5T_STRING:
+      //  if (AH5_write_str_dataset(file_id, vector->path, vector->nb_values, strlen(vector->values.s), vector->values.s))
+      //    success = AH5_TRUE;
+      //  break;
       default:
         break;
     }
@@ -941,10 +941,10 @@ char AH5_write_ft_dataset (hid_t file_id, AH5_dataset_t *dataset)
         if (AH5_write_cpx_array(file_id, dataset->path, dataset->nb_dims, dataset->dims, dataset->values.c))
           success = AH5_TRUE;
         break;
-      case H5T_STRING:
-        if (AH5_write_str_dataset(file_id, dataset->path, total_size, strlen(dataset->values.s), dataset->values.s))
-          success = AH5_TRUE;
-        break;
+      //case H5T_STRING:
+      //  if (AH5_write_str_dataset(file_id, dataset->path, total_size, strlen(dataset->values.s), dataset->values.s))
+      //    success = AH5_TRUE;
+      //  break;
       default:
         break;
     }

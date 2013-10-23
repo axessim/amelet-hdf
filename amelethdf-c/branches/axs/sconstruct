@@ -248,10 +248,14 @@ else:
 rootenv.SConsignFile()
 rootenv.Append(CPPPATH=[get_hdf5_root_inc()],
                LIBPATH=[get_hdf5_root_lib()])
+			   
 
 if (platform.find("win") >= 0):
-    cmd_line_define = "/D"
-    rootenv.Append(LIBS=["hdf5_hl", "hdf5"])
+    rootenv.Append(LIBS=["hdf5_hl", "hdf5", "zlib"])
+	
+	# unser win the lib and exe environs are different.
+    rootlibenv = rootenv.Clone()
+    rootexeenv = rootenv.Clone()
 
     if platform == "win32":
         machine = "X86"
@@ -259,9 +263,17 @@ if (platform.find("win") >= 0):
         machine = "x64"
 
     if (flavor == "debug"):
+        rootlibenv.Append(CCFLAGS="/Zi /nologo /W3 /WX- /Od /D \"_WINDLL\" /D \"_MBCS\" /Gm /EHsc "
+                                  "/RTC1 /GS /fp:precise /Zc:wchar_t /Zc:forScope /Gd /errorReport:queue",
+                          LINKFLAGS="/TLBID:1 /DYNAMICBASE /NXCOMPAT /MACHINE:X64 /ERRORREPORT:QUEUE")
+						  
+        rootexeenv.Append(CCFLAGS="/Zi /nologo /W3 /WX- /Od /D \"_MBCS\" /Gm /EHsc /RTC1 /GS /fp:precise "
+                                  "/Zc:wchar_t /Zc:forScope /Gd /errorReport:queue",
+                          LINKFLAGS="/TLBID:1 /DYNAMICBASE /NXCOMPAT /MACHINE:X64 /ERRORREPORT:QUEUE")
+	
         rootenv.Append(CCFLAGS="/D_WIN32 /W1 /Od /Oy- /Gm- /EHsc /MTd /GS "
                        "/fp:precise /Zc:wchar_t- /Zc:forScope /Gd /Zi",
-                       LINKFLAGS="/nologo /SUBSYSTEM:CONSOLE /NXCOMPAT /DYNAMICBASE")
+                       LINKFLAGS="/nologo /NXCOMPAT /DYNAMICBASE /ERRORREPORT:QUEUE /MACHINE:X64")
 
     elif (flavor == "release"):
         rootenv.Append(
@@ -279,7 +291,6 @@ if (platform.find("win") >= 0):
                         "" % (flavor, platform))
 
 elif (platform.find("linux") >= 0):
-    cmd_line_define = "-D"
     rootenv.Append(LIBS=["hdf5_hl", "hdf5", "libz"])
 
     if get_mpi_enable():
@@ -298,6 +309,10 @@ elif (platform.find("linux") >= 0):
     else:
         raise Exception("Unresolved flavor '%s' for platform '%s'!" 
                         "" % (flavor, platform))
+						
+	# under linux the lib and exe environs are same.
+	rootlibenv = rootenv.Clone()
+	rootexeenv = rootenv.Clone()
 
 else:
     raise Exception("Unsupported platform '%s' yet!" % (platform))
@@ -315,7 +330,7 @@ installdir = get_prefix()
 installinc = os.path.join(installdir, "include")
 builddir = get_build_dir()
 
-libenv = rootenv.Clone()
+libenv = rootlibenv.Clone()
 # Define the configure file.
 config_h_build = ConfigHBuilder(call=get_config_installer([(installinc, 'install_lib'), 
                                                            (builddir, 'all')]))
@@ -331,7 +346,7 @@ libenv.Append(CPPPATH=[include_tmp_path,],)
 # specify the build directory
 #libenv.VariantDir(builddir, ".", duplicate=0)
 # add define like MUSTARDCORE_LIBRARY
-libenv.Append(CCFLAGS= cmd_line_define + 'AMELETHDF_C_LIBRARY')
+libenv.Append(CPPDEFINES=['AMELETHDF_C_LIBRARY'])
 # build the module
 srclst = map(lambda x: os.path.join(builddir, x),
              glob.glob(os.path.join(get_amelethdf_c_src_dir(AMELETHDF), '*.c')))
@@ -370,7 +385,7 @@ del libenv
 #===============================================================================
 # Configure tests.
 #===============================================================================
-testenv = rootenv.Clone()
+testenv = rootexeenv.Clone()
 installtest_dir = os.path.join(installdir, "tests")
 
 testenv.Append(LIBS=["amelethdfc"],

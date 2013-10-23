@@ -1,6 +1,5 @@
 #include "ah5_dataset.h"
 
-
 // Read 1D int dataset
 char AH5_read_int_dataset(hid_t file_id, const char *path, const hsize_t mn, int **rdata)
 {
