@@ -281,18 +281,18 @@ if (host_platform.find("win") >= 0):
                           "\"_MBCS\" /Gm /EHsc /RTC1 /GS /fp:precise "
                           "/Zc:wchar_t /Zc:forScope /Gd /errorReport:queue",
                           LINKFLAGS="/TLBID:1 /DYNAMICBASE /NXCOMPAT "
-                          "/MACHINE:X64 /ERRORREPORT:QUEUE")
+                          "/MACHINE:%s /ERRORREPORT:QUEUE" % machine)
 
         rootexeenv.Append(CCFLAGS="/Zi /nologo /W3 /WX- /Od /D \"_MBCS\" /Gm "
                           "/EHsc /RTC1 /GS /fp:precise /Zc:wchar_t "
                           "/Zc:forScope /Gd /errorReport:queue",
                           LINKFLAGS="/TLBID:1 /DYNAMICBASE /NXCOMPAT "
-                          "/MACHINE:X64 /ERRORREPORT:QUEUE")
+                          "/MACHINE:%s /ERRORREPORT:QUEUE" % machine)
 
         rootenv.Append(CCFLAGS="/D_WIN32 /W1 /Od /Oy- /Gm- /EHsc /MTd /GS "
                        "/fp:precise /Zc:wchar_t- /Zc:forScope /Gd /Zi",
                        LINKFLAGS="/nologo /NXCOMPAT /DYNAMICBASE "
-                       "/ERRORREPORT:QUEUE /MACHINE:X64")
+                       "/ERRORREPORT:QUEUE /MACHINE:%s" % machine)
 
     elif (flavor == "release"):
         rootenv.Append(
@@ -304,7 +304,7 @@ if (host_platform.find("win") >= 0):
         rootenv.Append(CCFLAGS="/nologo /W1 /WX- /O2 /Oy- /EHsc /MD "
                        "/fp:precise /Zc:wchar_t- /Zc:forScope /GS /Gm- /Gd",
                        LINKFLAGS="/nologo /SUBSYSTEM:CONSOLE /NXCOMPAT"
-                       " /DYNAMICBASE /MACHINE:%s")
+                       " /DYNAMICBASE /MACHINE:%s" % machine)
     else:
         raise Exception("Unresolved flavor '%s' for platform '%s'!"
                         "" % (flavor, host_platform))
