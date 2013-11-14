@@ -106,6 +106,7 @@ char *AH5_trim_zeros(const char *version)
 }
 
 
+
 /** Join path. Append to 'base' the new node 'name' and return 'base'
  *
  * Parameters:
@@ -125,6 +126,7 @@ char *AH5_trim_zeros(const char *version)
  *  "base" + "" -> "base"
  *
  */
+/*
 char *AH5_join_path(char *base, const char *head)
 {
     char *endbase = NULL;
@@ -174,6 +176,7 @@ char *AH5_trim_path(char *path)
     /* Move the front and back pointers to address the first non-whitespace
      * characters from each end.
      */
+/*
     while (isspace(*(++frontp)));
     while (isspace(*(--endp)) && endp != frontp);
 
@@ -186,6 +189,7 @@ char *AH5_trim_path(char *path)
      * allocated, we can still free it on the returned pointer.  Note the reuse
      * of endp to mean the front of the string buffer now.
      */
+/*
     endp = path;
     if (frontp != path)
     {
@@ -194,7 +198,7 @@ char *AH5_trim_path(char *path)
     }
     return path;
 }
-
+*/
 
 // Check for path validity
 char AH5_path_valid(hid_t loc_id, const char *path)

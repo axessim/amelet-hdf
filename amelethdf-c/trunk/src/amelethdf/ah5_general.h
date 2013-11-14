@@ -86,8 +86,8 @@ extern "C" {
 
     AH5_PUBLIC char *AH5_get_name_from_path(const char *path);
     AH5_PUBLIC char *AH5_get_base_from_path(const char *path);
-    AH5_PUBLIC char *AH5_join_path(char *base, const char *head);
-    AH5_PUBLIC char* AH5_trim_path(char *path);
+//    AH5_PUBLIC char *AH5_join_path(char *base, const char *head);
+//    AH5_PUBLIC char* AH5_trim_path(char *path);
 
     AH5_PUBLIC void AH5_print_err_dset(const char *category, const char *path);
     AH5_PUBLIC void AH5_print_err_tble(const char *category, const char *path);
