@@ -16,6 +16,29 @@ AH5_complex_t AH5_set_complex(float real, float imag)
     return rdata;
 }
 
+hid_t AH5_H5Tcreate_cpx_memtype(void)
+{
+  hid_t cpx_memtype;
+
+  cpx_memtype = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
+  H5Tinsert(cpx_memtype, "r", 0, H5T_NATIVE_FLOAT);
+  H5Tinsert(cpx_memtype, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
+
+  return cpx_memtype;
+}
+
+hid_t AH5_H5Tcreate_cpx_filetype(void)
+{
+  hid_t cpx_filetype;
+
+  cpx_filetype = H5Tcreate(H5T_COMPOUND, H5Tget_size(AH5_NATIVE_FLOAT) * 2);
+  H5Tinsert(cpx_filetype, "r", 0, AH5_NATIVE_FLOAT);
+  H5Tinsert(cpx_filetype, "i", H5Tget_size(AH5_NATIVE_FLOAT), AH5_NATIVE_FLOAT);
+
+  return cpx_filetype;
+}
+
+
 
 /*
     AH5_FALSE = AH5_version_minimum("0.5", "0.1");

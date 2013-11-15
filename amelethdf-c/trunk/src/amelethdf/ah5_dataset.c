@@ -51,9 +51,8 @@ char AH5_read_cpx_dataset(hid_t file_id, const char *path, const hsize_t mn, AH5
 
     *rdata = (AH5_complex_t *) malloc(mn * sizeof(AH5_complex_t));
     buf = (float *) malloc(mn * 2 * sizeof(float));
-    type_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
-    H5Tinsert(type_id, "r", 0, H5T_NATIVE_FLOAT);
-    H5Tinsert(type_id, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
+    type_id = AH5_H5Tcreate_cpx_memtype();
+
     dset_id = H5Dopen(file_id, path, H5P_DEFAULT);
     if (H5Dread(dset_id, type_id, H5S_ALL, H5S_ALL, H5P_DEFAULT, *rdata) >= 0)
     {

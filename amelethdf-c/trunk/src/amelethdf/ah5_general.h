@@ -76,6 +76,8 @@ extern "C" {
         hsize_t         nb_values;
     } AH5_set_t;
 
+    AH5_PUBLIC hid_t AH5_H5Tcreate_cpx_memtype(void);
+    AH5_PUBLIC hid_t AH5_H5Tcreate_cpx_filetype(void);
 
     AH5_PUBLIC char AH5_version_minimum(const char *required_version, const char *sim_version);
     AH5_PUBLIC char *AH5_trim_zeros(const char *version);

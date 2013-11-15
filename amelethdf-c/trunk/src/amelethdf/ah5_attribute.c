@@ -42,9 +42,7 @@ char AH5_read_cpx_attr(hid_t loc_id, const char* path, char* attr_name, AH5_comp
         if (H5Aexists_by_name(loc_id, path, attr_name, H5P_DEFAULT) > 0)
         {
             attr_id = H5Aopen_by_name(loc_id, path, attr_name, H5P_DEFAULT, H5P_DEFAULT);
-            type_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
-            H5Tinsert(type_id, "r", 0, H5T_NATIVE_FLOAT);
-            H5Tinsert(type_id, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
+            type_id = AH5_H5Tcreate_cpx_memtype();
             if (H5Aread(attr_id, type_id, buf) >= 0)
             {
                 *rdata = AH5_set_complex(buf[0], buf[1]);
@@ -139,9 +137,7 @@ char AH5_read_opt_attrs(hid_t loc_id, const char *path, AH5_opt_attrs_t *opt_att
                     break;
                 case H5T_COMPOUND:
                     opt_attrs->instances[k].value.c = AH5_set_complex(0, 0);
-                    type_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
-                    H5Tinsert(type_id, "r", 0, H5T_NATIVE_FLOAT);
-                    H5Tinsert(type_id, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
+                    type_id = AH5_H5Tcreate_cpx_memtype();
                     if (H5Aread(attr_id, type_id, buf) >= 0)
                     {
                         opt_attrs->instances[k].value.c = AH5_set_complex(buf[0], buf[1]);
@@ -206,29 +202,23 @@ char AH5_write_flt_attr(hid_t loc_id, const char *path, char* attr_name, const f
 char AH5_write_cpx_attr(hid_t loc_id, const char* path, char* attr_name, const AH5_complex_t *wdata)
 {
     char success = AH5_FALSE;
-    hid_t attr_id, filetype, memtype, object_id, space;
+    hid_t attr_id, cpx_filetype, cpx_memtype, object_id, space;
     hsize_t dims[1] = {1};
 
-    memtype = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
-    H5Tinsert(memtype, "r", 0, H5T_NATIVE_FLOAT);
-    H5Tinsert(memtype, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
-
-    filetype = H5Tcreate(H5T_COMPOUND, H5Tget_size(AH5_NATIVE_FLOAT) * 2);
-    H5Tinsert(filetype, "r", 0, AH5_NATIVE_FLOAT);
-    H5Tinsert(filetype, "i", H5Tget_size(AH5_NATIVE_FLOAT), AH5_NATIVE_FLOAT);
-
+    cpx_memtype = AH5_H5Tcreate_cpx_memtype();
+    cpx_filetype = AH5_H5Tcreate_cpx_filetype();
     object_id = H5Oopen(loc_id, path, H5P_DEFAULT);
-
     space = H5Screate_simple (1, dims, NULL);
-    attr_id = H5Acreate(object_id, attr_name, filetype, space, H5P_DEFAULT, H5P_DEFAULT);
-    if (H5Awrite(attr_id, memtype, wdata) >= 0)
+
+    attr_id = H5Acreate(object_id, attr_name, cpx_filetype, space, H5P_DEFAULT, H5P_DEFAULT);
+    if (H5Awrite(attr_id, cpx_memtype, wdata) >= 0)
         success = AH5_TRUE;
 
     H5Aclose(attr_id);
     H5Sclose(space);
     H5Oclose(object_id);
-    H5Tclose(filetype);
-    H5Tclose(memtype);
+    H5Tclose(cpx_filetype);
+    H5Tclose(cpx_memtype);
 
     return success;
 }
