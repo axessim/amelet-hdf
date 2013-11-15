@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-// remove first char 
+// remove first char
 #define AH5_CATEGORY_NAME(name) ((name) + 1)
 
 #define AH5_C_ELECTROMAGNETIC_SOURCE    "/electromagneticSource"
@@ -33,6 +33,7 @@ extern "C" {
 #define AH5_NATIVE_CHAR                 H5T_STD_I8LE   // NATIVE Amelet-HDF data type
 #define AH5_NATIVE_INT                  H5T_STD_I32LE
 #define AH5_NATIVE_FLOAT                H5T_IEEE_F32LE
+#define AH5_NATIVE_STRING               H5T_FORTRAN_S1
 
 
 /* ah5_emsource.h */

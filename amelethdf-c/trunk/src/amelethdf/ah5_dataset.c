@@ -101,3 +101,102 @@ char AH5_read_str_dataset(hid_t file_id, const char *path, const hsize_t mn, siz
     return success;
 }
 
+
+
+// Write 1D int dataset
+char AH5_write_int_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const int *wdata)
+{
+    char success = AH5_FALSE;
+    hsize_t dims[1] = {len};
+    H5O_info_t info;
+
+    H5Oget_info(loc_id, &info);
+    if (info.type == H5O_TYPE_GROUP)
+        if (H5LTmake_dataset_int(loc_id, dset_name, 1, dims, wdata) >= 0)
+            success = AH5_TRUE;
+    return success;
+}
+
+
+// Write 1D float dataset
+char AH5_write_flt_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const float *wdata)
+{
+    char success = AH5_FALSE;
+    hsize_t dims[1] = {len};
+    H5O_info_t info;
+
+    H5Oget_info(loc_id, &info);
+    if (info.type == H5O_TYPE_GROUP)
+        if (H5LTmake_dataset_float(loc_id, dset_name, 1, dims, wdata) >= 0)
+            success = AH5_TRUE;
+    return success;
+}
+
+
+// Write 1D complex float dataset
+char AH5_write_cpx_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const AH5_complex_t *wdata)
+{
+    hid_t cpx_filetype, cpx_memtype, space, dset;
+    char success = AH5_FALSE;
+    hsize_t dims[1] = {len};
+    H5O_info_t info;
+
+    H5Oget_info(loc_id, &info);
+    if (info.type == H5O_TYPE_GROUP)
+    {
+        cpx_filetype = AH5_H5Tcreate_cpx_filetype();
+        cpx_memtype = AH5_H5Tcreate_cpx_memtype();
+        space = H5Screate_simple (1, dims, NULL);
+
+        if ((dset = H5Dcreate(loc_id, dset_name, cpx_filetype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >= 0)
+            if (H5Dwrite(dset, cpx_memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, wdata) >= 0)
+                success = AH5_TRUE;
+
+        H5Dclose(dset);
+        H5Sclose(space);
+        H5Tclose(cpx_memtype);
+        H5Tclose(cpx_filetype);
+    }
+
+    return success;
+}
+
+
+// Write 1D string dataset
+// wdata[len][slen]; param slen: string length with null char.
+// TODO Check HDF5 return code.
+char AH5_write_str_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const size_t slen, char **wdata)
+{
+    char success = AH5_FALSE;
+    hid_t filetype, memtype, space, dset;
+    hsize_t dims[1] = {len};
+    char *buf = NULL;
+    int k;
+
+    buf = (char *) malloc(len*(slen-1)+1*sizeof(char));
+    buf[0] = '\0';
+    for (k = 0; k < len; k++)
+        strcat(buf, wdata[k]);
+
+    filetype = H5Tcopy(AH5_NATIVE_STRING);
+    H5Tset_size(filetype, slen);
+    memtype = H5Tcopy(H5T_C_S1);
+    H5Tset_size(memtype, slen);
+    space = H5Screate_simple(1, dims, NULL);
+
+    if ((dset = H5Dcreate(loc_id, dset_name, filetype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT)) >= 0)
+        if (H5Dwrite(dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf) >= 0)
+            success = AH5_TRUE;
+
+    H5Dclose(dset);
+    H5Sclose(space);
+    H5Tclose(memtype);
+    H5Tclose(filetype);
+    free(buf);
+
+    return success;
+}
+
+
+
+

@@ -199,26 +199,26 @@ char AH5_write_flt_attr(hid_t loc_id, const char *path, char* attr_name, const f
 
 
 // Write complex attribute <attr_name> given by address <path>
-char AH5_write_cpx_attr(hid_t loc_id, const char* path, char* attr_name, const AH5_complex_t *wdata)
+char AH5_write_cpx_attr(hid_t loc_id, const char* path, char* attr_name, const AH5_complex_t wdata)
 {
     char success = AH5_FALSE;
     hid_t attr_id, cpx_filetype, cpx_memtype, object_id, space;
     hsize_t dims[1] = {1};
 
-    cpx_memtype = AH5_H5Tcreate_cpx_memtype();
     cpx_filetype = AH5_H5Tcreate_cpx_filetype();
-    object_id = H5Oopen(loc_id, path, H5P_DEFAULT);
+    cpx_memtype = AH5_H5Tcreate_cpx_memtype();
     space = H5Screate_simple (1, dims, NULL);
 
-    attr_id = H5Acreate(object_id, attr_name, cpx_filetype, space, H5P_DEFAULT, H5P_DEFAULT);
-    if (H5Awrite(attr_id, cpx_memtype, wdata) >= 0)
-        success = AH5_TRUE;
+    if ((object_id = H5Oopen(loc_id, path, H5P_DEFAULT)) >= 0)
+        if ((attr_id = H5Acreate(object_id, attr_name, cpx_filetype, space, H5P_DEFAULT, H5P_DEFAULT)) >= 0)
+            if (H5Awrite(attr_id, cpx_memtype, &wdata) >= 0)
+                success = AH5_TRUE;
 
     H5Aclose(attr_id);
-    H5Sclose(space);
     H5Oclose(object_id);
-    H5Tclose(cpx_filetype);
+    H5Sclose(space);
     H5Tclose(cpx_memtype);
+    H5Tclose(cpx_filetype);
 
     return success;
 }
@@ -255,7 +255,7 @@ char AH5_write_opt_attrs(hid_t file_id, const char *path, AH5_opt_attrs_t *opt_a
                 success = AH5_FALSE;
             break;
         case H5T_COMPOUND:
-            if (!AH5_write_cpx_attr(file_id, path, opt_attrs->instances[i].name, &(opt_attrs->instances[i].value.c)))
+            if (!AH5_write_cpx_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.c))
                 success = AH5_FALSE;
             break;
         case H5T_STRING:

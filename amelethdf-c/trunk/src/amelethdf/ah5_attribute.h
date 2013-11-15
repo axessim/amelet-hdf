@@ -36,7 +36,7 @@ extern "C" {
 
     AH5_PUBLIC char AH5_write_int_attr(hid_t file_id, const char *path, char *attr_name, const int wdata);
     AH5_PUBLIC char AH5_write_flt_attr(hid_t file_id, const char *path, char *attr_name, const float wdata);
-    AH5_PUBLIC char AH5_write_cpx_attr(hid_t file_id, const char *path, char *attr_name, const AH5_complex_t *wdata);
+    AH5_PUBLIC char AH5_write_cpx_attr(hid_t file_id, const char *path, char *attr_name, const AH5_complex_t wdata);
     AH5_PUBLIC char AH5_write_str_attr(hid_t file_id, const char *path, char *attr_name, const char *wdata);
     AH5_PUBLIC char AH5_write_opt_attrs(hid_t file_id, const char *path, AH5_opt_attrs_t *opt_attrs);
 
