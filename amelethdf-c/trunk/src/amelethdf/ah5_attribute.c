@@ -202,7 +202,7 @@ char AH5_write_flt_attr(hid_t loc_id, const char *path, char* attr_name, const f
 char AH5_write_cpx_attr(hid_t loc_id, const char* path, char* attr_name, const AH5_complex_t wdata)
 {
     char success = AH5_FALSE;
-    hid_t attr_id, cpx_filetype, cpx_memtype, object_id, space;
+    hid_t attr_id = 0, cpx_filetype, cpx_memtype, object_id, space;
     hsize_t dims[1] = {1};
 
     cpx_filetype = AH5_H5Tcreate_cpx_filetype();
