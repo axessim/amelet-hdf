@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "amelethdf_lib", "amelethdf_lib\amelethdf_lib.vcxproj", "{BE0D8BEE-C292-4241-A685-0CF7B52CF10C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_edataset", "test_edataset\test_edataset.vcxproj", "{2409D887-35C6-4675-AE38-274AE58A12DA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BE0D8BEE-C292-4241-A685-0CF7B52CF10C} = {BE0D8BEE-C292-4241-A685-0CF7B52CF10C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_floatinttype", "test_floatinttype\test_floatinttype.vcxproj", "{7B05DACC-BC83-42E0-AC5C-A22F35F100EC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BE0D8BEE-C292-4241-A685-0CF7B52CF10C} = {BE0D8BEE-C292-4241-A685-0CF7B52CF10C}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE0D8BEE-C292-4241-A685-0CF7B52CF10C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BE0D8BEE-C292-4241-A685-0CF7B52CF10C}.Debug|Win32.Build.0 = Debug|Win32
+		{BE0D8BEE-C292-4241-A685-0CF7B52CF10C}.Debug|x64.ActiveCfg = Debug|x64
+		{BE0D8BEE-C292-4241-A685-0CF7B52CF10C}.Debug|x64.Build.0 = Debug|x64
+		{BE0D8BEE-C292-4241-A685-0CF7B52CF10C}.Release|Win32.ActiveCfg = Release|Win32
+		{BE0D8BEE-C292-4241-A685-0CF7B52CF10C}.Release|Win32.Build.0 = Release|Win32
+		{BE0D8BEE-C292-4241-A685-0CF7B52CF10C}.Release|x64.ActiveCfg = Release|x64
+		{BE0D8BEE-C292-4241-A685-0CF7B52CF10C}.Release|x64.Build.0 = Release|x64
+		{2409D887-35C6-4675-AE38-274AE58A12DA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2409D887-35C6-4675-AE38-274AE58A12DA}.Debug|Win32.Build.0 = Debug|Win32
+		{2409D887-35C6-4675-AE38-274AE58A12DA}.Debug|x64.ActiveCfg = Debug|x64
+		{2409D887-35C6-4675-AE38-274AE58A12DA}.Release|Win32.ActiveCfg = Release|Win32
+		{2409D887-35C6-4675-AE38-274AE58A12DA}.Release|Win32.Build.0 = Release|Win32
+		{2409D887-35C6-4675-AE38-274AE58A12DA}.Release|x64.ActiveCfg = Release|Win32
+		{7B05DACC-BC83-42E0-AC5C-A22F35F100EC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7B05DACC-BC83-42E0-AC5C-A22F35F100EC}.Debug|Win32.Build.0 = Debug|Win32
+		{7B05DACC-BC83-42E0-AC5C-A22F35F100EC}.Debug|x64.ActiveCfg = Debug|x64
+		{7B05DACC-BC83-42E0-AC5C-A22F35F100EC}.Release|Win32.ActiveCfg = Release|Win32
+		{7B05DACC-BC83-42E0-AC5C-A22F35F100EC}.Release|Win32.Build.0 = Release|Win32
+		{7B05DACC-BC83-42E0-AC5C-A22F35F100EC}.Release|x64.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = amelethdfc_vs10.vsmdi
+	EndGlobalSection
+EndGlobal
