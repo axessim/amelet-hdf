@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="libah5" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="[Dynamic] Debug">
+				<Option output="../../build/bin/Debug/libah5-0" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-DBUILD_DLL" />
+				</Compiler>
+			</Target>
+			<Target title="[Dynamic] Release">
+				<Option output="../../build/bin/Release/libah5-0" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DBUILD_DLL" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="[Static] Debug">
+				<Option output="../../build/bin/Debug/ah5" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="../../build/obj/Debug/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-DBUILD_DLL" />
+				</Compiler>
+			</Target>
+			<Target title="[Static] Release">
+				<Option output="../../build/bin/Release/ah5" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="../../build/obj/Release/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DBUILD_DLL" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-DAMELETHDF_C_LIBRARY" />
+		</Compiler>
+		<Linker>
+			<Add option="-lhdf5 -lhdf5_hl" />
+		</Linker>
+		<Unit filename="../../src/amelethdf/ah5.h" />
+		<Unit filename="../../src/amelethdf/ah5_attribute.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_attribute.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_emsource.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_emsource.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_exsurf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_exsurf.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_extelt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_extelt.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_fltype.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_fltype.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_globenv.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_globenv.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_label.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_label.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_link.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_link.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_locsys.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_locsys.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_mesh.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_mesh.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_outreq.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_outreq.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_phmodel.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_phmodel.h" />
+		<Unit filename="../../src/amelethdf/ah5_c_simulation.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_c_simulation.h" />
+		<Unit filename="../../src/amelethdf/ah5_category.h" />
+		<Unit filename="../../src/amelethdf/ah5_dataset.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_dataset.h" />
+		<Unit filename="../../src/amelethdf/ah5_general.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/amelethdf/ah5_general.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
