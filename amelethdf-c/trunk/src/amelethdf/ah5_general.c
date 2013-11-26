@@ -116,7 +116,7 @@ char *AH5_trim_zeros(const char *version)
 
     while (1)
     {
-        for (i = strlen(rdata); i > -1; i--)
+        for (i = (int) strlen(rdata); i > -1; i--)
             if (rdata[i] == '.')
                 break;
         number = atoi(rdata + i + 1);
@@ -230,7 +230,7 @@ char AH5_path_valid(hid_t loc_id, const char *path)
     int i, slashes = 0;
 
     temp = strdup(path);
-    for (i = strlen(path); i > 0; i--)
+    for (i = (int) strlen(path); i > 0; i--)
         if (temp[i] == '/')
         {
             temp[i] = '\0';
@@ -358,7 +358,7 @@ char *AH5_get_name_from_path(const char *path)
 {
     int i;
 
-    for (i = strlen(path); i > -1; i--)
+    for (i = (int) strlen(path); i > -1; i--)
         if (path[i] == '/')
             break;
     return (char *) path + i + 1;
@@ -371,7 +371,7 @@ char *AH5_get_base_from_path(const char *path)
     char *rdata, *temp;
 
     temp = strdup(path);
-    for (i = strlen(temp); i > 0; i--)
+    for (i = (int) strlen(temp); i > 0; i--)
         if (temp[i] == '/')
             break;
     temp[i] = '\0';
