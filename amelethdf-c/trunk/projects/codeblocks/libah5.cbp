@@ -6,7 +6,7 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="[Dynamic] Debug">
+			<Target title="[dynamic] Debug">
 				<Option output="../../build/bin/Debug/libah5-0" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../build/obj/Debug/" />
 				<Option type="3" />
@@ -14,12 +14,13 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-Wextra" />
 					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add option="-DBUILD_DLL" />
 				</Compiler>
 			</Target>
-			<Target title="[Dynamic] Release">
+			<Target title="[dynamic] Release">
 				<Option output="../../build/bin/Release/libah5-0" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../build/obj/Release/" />
 				<Option type="3" />
@@ -28,6 +29,7 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-Wextra" />
 					<Add option="-Wall" />
 					<Add option="-DBUILD_DLL" />
 				</Compiler>
@@ -35,7 +37,7 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
-			<Target title="[Static] Debug">
+			<Target title="[static] Debug">
 				<Option output="../../build/bin/Debug/ah5" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="../../build/obj/Debug/" />
@@ -43,12 +45,13 @@
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
 				<Compiler>
+					<Add option="-Wextra" />
 					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add option="-DBUILD_DLL" />
 				</Compiler>
 			</Target>
-			<Target title="[Static] Release">
+			<Target title="[static] Release">
 				<Option output="../../build/bin/Release/ah5" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="../../build/obj/Release/" />
@@ -57,6 +60,7 @@
 				<Option createDefFile="1" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-Wextra" />
 					<Add option="-Wall" />
 					<Add option="-DBUILD_DLL" />
 				</Compiler>
