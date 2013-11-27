@@ -62,7 +62,7 @@ char AH5_read_label(hid_t file_id, AH5_label_t *label)
         label->nb_datasets = children.nb_children;
         if (children.nb_children > 0)
         {
-            label->datasets = (AH5_lbl_dataset_t *) malloc(children.nb_children * sizeof(AH5_lbl_dataset_t));
+			label->datasets = (AH5_lbl_dataset_t *) malloc((size_t) children.nb_children * sizeof(AH5_lbl_dataset_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path, AH5_C_LABEL);

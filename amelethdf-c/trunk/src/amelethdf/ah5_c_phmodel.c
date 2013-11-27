@@ -457,7 +457,7 @@ char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel)
         physicalmodel->nb_volume_instances = children.nb_children;
         if (children.nb_children > 0)
         {
-            physicalmodel->volume_instances = (AH5_volume_instance_t *) malloc(children.nb_children * sizeof(AH5_volume_instance_t));
+			physicalmodel->volume_instances = (AH5_volume_instance_t *) malloc((size_t) children.nb_children * sizeof(AH5_volume_instance_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path, AH5_C_PHYSICAL_MODEL);
@@ -476,7 +476,7 @@ char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel)
         physicalmodel->nb_surface_instances = children.nb_children;
         if (children.nb_children > 0)
         {
-            physicalmodel->surface_instances = (AH5_surface_instance_t *) malloc(children.nb_children * sizeof(AH5_surface_instance_t));
+			physicalmodel->surface_instances = (AH5_surface_instance_t *) malloc((size_t) children.nb_children * sizeof(AH5_surface_instance_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path, AH5_C_PHYSICAL_MODEL);
@@ -495,7 +495,7 @@ char AH5_read_physicalmodel (hid_t file_id, AH5_physicalmodel_t *physicalmodel)
         physicalmodel->nb_interface_instances = children.nb_children;
         if (children.nb_children > 0)
         {
-            physicalmodel->interface_instances = (AH5_interface_instance_t *) malloc(children.nb_children * sizeof(AH5_interface_instance_t));
+			physicalmodel->interface_instances = (AH5_interface_instance_t *) malloc((size_t) children.nb_children * sizeof(AH5_interface_instance_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path, AH5_C_PHYSICAL_MODEL);

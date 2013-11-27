@@ -85,7 +85,7 @@ char AH5_read_simulation (hid_t file_id, AH5_simulation_t *simulation)
         simulation->nb_instances = children.nb_children;
         if (children.nb_children > 0)
         {
-            simulation->instances = (AH5_sim_instance_t *) malloc(children.nb_children * sizeof(AH5_sim_instance_t));
+			simulation->instances = (AH5_sim_instance_t *) malloc((size_t) children.nb_children * sizeof(AH5_sim_instance_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path, AH5_C_SIMULATION);

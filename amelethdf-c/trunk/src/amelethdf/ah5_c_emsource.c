@@ -408,32 +408,32 @@ char AH5_read_electromagnetic_source (hid_t file_id, AH5_em_source_t *em_source)
                 if (strcmp(children.childnames[i], AH5_G_PLANE_WAVE) == 0)
                 {
                     em_source->nb_pw_sources = children2.nb_children;
-                    em_source->pw_sources = (AH5_planewave_t *) malloc(children2.nb_children * sizeof(AH5_planewave_t));
+					em_source->pw_sources = (AH5_planewave_t *) malloc((size_t) children2.nb_children * sizeof(AH5_planewave_t));
                 }
                 else if (strcmp(children.childnames[i], AH5_G_SPHERICAL_WAVE) == 0)
                 {
                     em_source->nb_sw_sources = children2.nb_children;
-                    em_source->sw_sources = (AH5_sphericalwave_t *) malloc(children2.nb_children * sizeof(AH5_sphericalwave_t));
+					em_source->sw_sources = (AH5_sphericalwave_t *) malloc((size_t) children2.nb_children * sizeof(AH5_sphericalwave_t));
                 }
                 else if (strcmp(children.childnames[i], AH5_G_GENERATOR) == 0)
                 {
                     em_source->nb_ge_sources = children2.nb_children;
-                    em_source->ge_sources = (AH5_generator_t *) malloc(children2.nb_children * sizeof(AH5_generator_t));
+					em_source->ge_sources = (AH5_generator_t *) malloc((size_t) children2.nb_children * sizeof(AH5_generator_t));
                 }
                 else if (strcmp(children.childnames[i], AH5_G_DIPOLE) == 0)
                 {
                     em_source->nb_di_sources = children2.nb_children;
-                    em_source->di_sources = (AH5_dipole_t *) malloc(children2.nb_children * sizeof(AH5_dipole_t));
+					em_source->di_sources = (AH5_dipole_t *) malloc((size_t) children2.nb_children * sizeof(AH5_dipole_t));
                 }
                 else if (strcmp(children.childnames[i], AH5_G_ANTENNA) == 0)
                 {
                     em_source->nb_an_sources = children2.nb_children;
-                    em_source->an_sources = (AH5_antenna_t *) malloc(children2.nb_children * sizeof(AH5_antenna_t));
+					em_source->an_sources = (AH5_antenna_t *) malloc((size_t) children2.nb_children * sizeof(AH5_antenna_t));
                 }
                 else if (strcmp(children.childnames[i], AH5_G_SOURCE_ON_MESH) == 0)
                 {
                     em_source->nb_sm_sources = children2.nb_children;
-                    em_source->sm_sources = (AH5_sourceonmesh_t *) malloc(children2.nb_children * sizeof(AH5_sourceonmesh_t));
+					em_source->sm_sources = (AH5_sourceonmesh_t *) malloc((size_t) children2.nb_children * sizeof(AH5_sourceonmesh_t));
                 }
                 if (children2.nb_children > 0)
                 {

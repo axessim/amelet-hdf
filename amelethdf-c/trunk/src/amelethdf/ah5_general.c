@@ -196,10 +196,9 @@ char *AH5_trim_path(char *path)
     len = strlen(path);
     endp = path + len;
 
-    /* Move the front and back pointers to address the first non-whitespace
-     * characters from each end.
-     */
-/*
+    // Move the front and back pointers to address the first non-whitespace
+    // characters from each end.
+
     while (isspace(*(++frontp)));
     while (isspace(*(--endp)) && endp != frontp);
 
@@ -208,11 +207,10 @@ char *AH5_trim_path(char *path)
     else if (frontp != path &&  endp == frontp)
         *path = '\0';
 
-    /* Shift the string so that it starts at path so that if it's dynamically
-     * allocated, we can still free it on the returned pointer.  Note the reuse
-     * of endp to mean the front of the string buffer now.
-     */
-/*
+    // Shift the string so that it starts at path so that if it's dynamically
+    // allocated, we can still free it on the returned pointer.  Note the reuse
+    // of endp to mean the front of the string buffer now.
+
     endp = path;
     if (frontp != path)
     {
@@ -319,7 +317,7 @@ AH5_children_t AH5_read_children_name(hid_t file_id, const char* path)
         H5Gget_info(group_id, &ginfo);
         if (ginfo.nlinks > 0)
         {
-            children.childnames = (char **) malloc(ginfo.nlinks * sizeof(char *));
+            children.childnames = (char **) malloc((size_t) ginfo.nlinks * sizeof(char *));
             for (i = 0; i < ginfo.nlinks; i++)
             {
                 size = H5Lget_name_by_idx(group_id, ".", H5_INDEX_NAME, H5_ITER_INC, i, NULL, 0, H5P_DEFAULT);

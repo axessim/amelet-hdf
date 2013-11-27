@@ -1,5 +1,12 @@
 #include "ah5_c_extelt.h"
 
+#ifdef _MSC_VER
+#define ACCESS _access
+#include <io.h>
+#else
+#define ACCESS access
+#endif
+
 
 // Read dataset in externalElement and open external files
 char AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *eet_dataset)
@@ -21,7 +28,7 @@ char AH5_read_eet_dataset (hid_t file_id, const char *path, AH5_eet_dataset_t *e
                         {
                             eet_dataset->nb_eed_items = dims[0];
                             rdata = AH5_TRUE;
-                            eet_dataset->file_id = (hid_t *) malloc(eet_dataset->nb_eed_items * sizeof(hid_t));
+							eet_dataset->file_id = (hid_t *) malloc((size_t) eet_dataset->nb_eed_items * sizeof(hid_t));
                             for (i = 0; i < eet_dataset->nb_eed_items; i++)
                                 eet_dataset->file_id[i] = -1;
                         }
@@ -54,7 +61,7 @@ char AH5_read_external_element (hid_t file_id, AH5_external_element_t *external_
         external_element->nb_datasets = children.nb_children;
         if (children.nb_children > 0)
         {
-            external_element->datasets = (AH5_eet_dataset_t *) malloc(children.nb_children * sizeof(AH5_eet_dataset_t));
+			external_element->datasets = (AH5_eet_dataset_t *) malloc((size_t) children.nb_children * sizeof(AH5_eet_dataset_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path, AH5_C_EXTERNAL_ELEMENT);
@@ -160,14 +167,14 @@ char AH5_open_external_files(AH5_eet_dataset_t *eet_dataset)
     char *name;
     hsize_t id = 0;
 
-    buf_id = (hid_t*) malloc(eet_dataset->nb_eed_items * sizeof(hid_t));  // temporary buffer containing file_id
-    buf.values = (char **) malloc(eet_dataset->nb_eed_items * sizeof(char*));  // temporary buffer containing paths
+	buf_id = (hid_t*) malloc((size_t) eet_dataset->nb_eed_items * sizeof(hid_t));  // temporary buffer containing file_id
+	buf.values = (char **) malloc((size_t) eet_dataset->nb_eed_items * sizeof(char*));  // temporary buffer containing paths
     for (i = 0; i < eet_dataset->nb_eed_items; i++)
     {
         name = eet_dataset->eed_items[AH5_EE_EXTERNAL_FILE_NAME(i)]; // copy of the pointer (shorter expression)
         if (!AH5_index_in_set(buf, name, &id))  // avoid multiple opening
         {
-            if (access(name, R_OK) != -1 )
+			if (ACCESS(name, R_OK) != -1)
             {
                 file_id = H5Fopen(name, H5F_ACC_RDONLY, H5P_DEFAULT);
             }

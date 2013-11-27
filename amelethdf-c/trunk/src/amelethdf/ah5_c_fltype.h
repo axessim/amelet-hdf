@@ -132,7 +132,7 @@ extern "C" {
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
-        int             nb_degrees;
+        hsize_t         nb_degrees;
         AH5_complex_t   *numerator;
         AH5_complex_t   *denominator;
     } AH5_generalrationalfunction_t;
@@ -153,7 +153,7 @@ extern "C" {
     {
         char            *path;
         AH5_opt_attrs_t opt_attrs;
-        int             nb_functions;
+        hsize_t         nb_functions;
         AH5_ftr_t       *functions;
         hsize_t         dims[2];
         char            **data;

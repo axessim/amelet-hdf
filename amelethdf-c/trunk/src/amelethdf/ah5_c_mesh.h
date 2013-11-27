@@ -17,7 +17,7 @@ extern "C" {
     typedef struct _AH5_ssom_pie_table_t
     {
         char            *path;
-        char            nb_dims;
+        hsize_t         nb_dims;
         hsize_t         nb_points;
         unsigned int    **elements;
         float           **vectors;

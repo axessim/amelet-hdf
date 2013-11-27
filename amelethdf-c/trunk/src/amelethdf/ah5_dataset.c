@@ -7,7 +7,7 @@ char AH5_read_int_dataset(hid_t file_id, const char *path, const hsize_t mn, int
     char success = AH5_FALSE;
     hid_t dset_id;
 
-    *rdata = (int *) malloc(mn * sizeof(int));
+    *rdata = (int *) malloc((size_t) mn * sizeof(int));
     dset_id = H5Dopen(file_id, path, H5P_DEFAULT);
     if (H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, *rdata) >= 0)
         success = AH5_TRUE;
@@ -27,7 +27,7 @@ char AH5_read_flt_dataset(hid_t file_id, const char *path, const hsize_t mn, flo
     char success = AH5_FALSE;
     hid_t dset_id;
 
-    *rdata = (float *) malloc(mn * sizeof(float));
+    *rdata = (float *) malloc((size_t) mn * sizeof(float));
     dset_id = H5Dopen(file_id, path, H5P_DEFAULT);
     if (H5Dread(dset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, *rdata) >= 0)
         success = AH5_TRUE;
@@ -49,8 +49,8 @@ char AH5_read_cpx_dataset(hid_t file_id, const char *path, const hsize_t mn, AH5
     hsize_t i;
     float *buf;
 
-    *rdata = (AH5_complex_t *) malloc(mn * sizeof(AH5_complex_t));
-    buf = (float *) malloc(mn * 2 * sizeof(float));
+    *rdata = (AH5_complex_t *) malloc((size_t) mn * sizeof(AH5_complex_t));
+    buf = (float *) malloc((size_t) mn * 2 * sizeof(float));
     type_id = AH5_H5Tcreate_cpx_memtype();
 
     dset_id = H5Dopen(file_id, path, H5P_DEFAULT);
@@ -82,8 +82,8 @@ char AH5_read_str_dataset(hid_t file_id, const char *path, const hsize_t mn, siz
     length++; // make a space for the null terminator
     dset_id = H5Dopen(file_id, path, H5P_DEFAULT);
 
-    *rdata = (char **) malloc(mn * sizeof(char*));
-    **rdata = (char *) malloc(mn * length * sizeof(char));
+    *rdata = (char **) malloc((size_t) mn * sizeof(char*));
+    **rdata = (char *) malloc((size_t) mn * length * sizeof(char));
     for (i = 1; i < mn; i++)
         rdata[0][i] = rdata[0][0] + i * length;
     memtype = H5Tcopy(H5T_C_S1);
@@ -169,11 +169,10 @@ char AH5_write_str_dataset(hid_t loc_id, const char *dset_name, const hsize_t le
 {
     char success = AH5_FALSE;
     hid_t filetype, memtype, space, dset;
-    hsize_t dims[1] = {len};
+    hsize_t dims[1] = {len}, k;
     char *buf = NULL;
-    int k;
 
-    buf = (char *) malloc(len*(slen-1)+1*sizeof(char));
+    buf = (char *) malloc((size_t) len*(slen-1)+1 * sizeof(char));
     buf[0] = '\0';
     for (k = 0; k < len; k++)
         strcat(buf, wdata[k]);

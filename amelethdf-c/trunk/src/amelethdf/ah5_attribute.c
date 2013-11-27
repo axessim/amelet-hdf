@@ -108,7 +108,7 @@ char AH5_read_opt_attrs(hid_t loc_id, const char *path, AH5_opt_attrs_t *opt_att
         H5Oget_info_by_name(loc_id, path, &object_info, H5P_DEFAULT);
         opt_attrs->nb_instances = object_info.num_attrs - nb_present_mandatory_attrs;
         if (opt_attrs->nb_instances > 0)
-            opt_attrs->instances = (AH5_attr_instance_t *) malloc (opt_attrs->nb_instances * sizeof(AH5_attr_instance_t));
+            opt_attrs->instances = (AH5_attr_instance_t *) malloc ((size_t) opt_attrs->nb_instances * sizeof(AH5_attr_instance_t));
         for (i = 0; i < object_info.num_attrs; i++)
         {
             is_mandatory = AH5_FALSE;
@@ -229,8 +229,8 @@ char AH5_write_str_attr(hid_t loc_id, const char *path, char *attr_name, const c
 {
     char success = AH5_FALSE;
 
-    if (H5LTset_attribute_string(loc_id, path, attr_name, wdata) >= 0);
-    success = AH5_TRUE;
+    if (H5LTset_attribute_string(loc_id, path, attr_name, wdata) >= 0)
+        success = AH5_TRUE;
 
     return success;
 }

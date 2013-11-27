@@ -277,20 +277,20 @@ char AH5_read_ft_rationalfunction (hid_t file_id, const char *path, AH5_rational
     if (H5TBget_table_info(file_id, path, &nfields, &(rationalfunction->nb_types)) >= 0)
         if (nfields == 4 && rationalfunction->nb_types > 0)
         {
-            field_names = (char **) malloc(nfields * sizeof(char *));
-            field_names[0] = (char *) malloc(AH5_TABLE_FIELD_NAME_LENGTH * nfields * sizeof(char));
+            field_names = (char **) malloc((size_t) nfields * sizeof(char *));
+			field_names[0] = (char *) malloc((size_t) nfields * AH5_TABLE_FIELD_NAME_LENGTH * sizeof(char));
             for (i = 0; i < nfields; i++)
                 field_names[i] = field_names[0] + i * AH5_TABLE_FIELD_NAME_LENGTH;
-            field_sizes = (size_t *) malloc(sizeof(size_t *) * nfields);
-            field_offsets = (size_t *) malloc(sizeof(size_t *) * nfields);
+			field_sizes = (size_t *) malloc((size_t ) nfields * sizeof(size_t *));
+			field_offsets = (size_t *) malloc((size_t) nfields * sizeof(size_t *));
 
             if (H5TBget_field_info(file_id, path, field_names, field_sizes, field_offsets, &type_size) >= 0)
                 if (strcmp(field_names[0], AH5_F_TYPE) == 0 && strcmp(field_names[1], AH5_F_A) == 0 && strcmp(field_names[2], AH5_F_B) == 0 && strcmp(field_names[3], AH5_F_F) == 0)
                 {
-                    rationalfunction->types = (int *) malloc(rationalfunction->nb_types * sizeof(int));
-                    rationalfunction->a = (float *) malloc(rationalfunction->nb_types * sizeof(float));
-                    rationalfunction->b = (float *) malloc(rationalfunction->nb_types * sizeof(float));
-                    rationalfunction->f = (float *) malloc(rationalfunction->nb_types * sizeof(float));
+                    rationalfunction->types = (int *) malloc((size_t) rationalfunction->nb_types * sizeof(int));
+                    rationalfunction->a = (float *) malloc((size_t) rationalfunction->nb_types * sizeof(float));
+                    rationalfunction->b = (float *) malloc((size_t) rationalfunction->nb_types * sizeof(float));
+                    rationalfunction->f = (float *) malloc((size_t) rationalfunction->nb_types * sizeof(float));
                     if (H5TBread_fields_index(file_id, path, 1, &type, 0, rationalfunction->nb_types, sizeof(int), field_offsets, field_sizes, rationalfunction->types) >= 0
                             && H5TBread_fields_index(file_id, path, 1, &a, 0, rationalfunction->nb_types, sizeof(float), field_offsets, field_sizes, rationalfunction->a) >= 0
                             && H5TBread_fields_index(file_id, path, 1, &b, 0, rationalfunction->nb_types, sizeof(float), field_offsets, field_sizes, rationalfunction->b) >= 0
@@ -336,8 +336,8 @@ char AH5_read_ft_generalrationalfunction (hid_t file_id, const char *path, AH5_g
             if (H5LTget_dataset_info(file_id, path, dims, &type_class, &length) >= 0)
                 if (dims[0] > 0 && dims[1] == 2 && type_class == H5T_COMPOUND)
                 {
-                    generalrationalfunction->numerator = (AH5_complex_t *) malloc(dims[0] * sizeof(AH5_complex_t));
-                    generalrationalfunction->denominator = (AH5_complex_t *) malloc(dims[0] * sizeof(AH5_complex_t));
+                    generalrationalfunction->numerator = (AH5_complex_t *) malloc((size_t) dims[0] * sizeof(AH5_complex_t));
+					generalrationalfunction->denominator = (AH5_complex_t *) malloc((size_t) dims[0] * sizeof(AH5_complex_t));
                     if (AH5_read_cpx_dataset(file_id, path, dims[0] * dims[1], &(buf)))
                     {
                         for (i = 0; i < dims[0]; i++)
@@ -386,7 +386,7 @@ char AH5_read_ft_rational (hid_t file_id, const char *path, AH5_rational_t *rati
     if (children.nb_children > 0)
     {
         // Read rational/function until error
-        rational->functions = (AH5_ftr_t *) malloc(children.nb_children * sizeof(AH5_ftr_t));
+        rational->functions = (AH5_ftr_t *) malloc((size_t) children.nb_children * sizeof(AH5_ftr_t));
         for (i = 0; i < children.nb_children; i++)
         {
             if (!invalid)
@@ -542,7 +542,7 @@ char AH5_read_ft_arrayset (hid_t file_id, const char *path, AH5_arrayset_t *arra
         strcat(path2, AH5_G_DS);
         children = AH5_read_children_name(file_id, path2);
         arrayset->nb_dims = children.nb_children;
-        arrayset->dims = (AH5_vector_t *) malloc(children.nb_children * sizeof(AH5_vector_t));
+        arrayset->dims = (AH5_vector_t *) malloc((size_t) children.nb_children * sizeof(AH5_vector_t));
         for (i = 0; i < children.nb_children; i++)
         {
             if (!invalid)
@@ -826,11 +826,11 @@ void AH5_print_ft_rationalfunction (const AH5_rationalfunction_t *rationalfuncti
 // Print generalRationalFunction
 void AH5_print_ft_generalrationalfunction (const AH5_generalrationalfunction_t *generalrationalfunction, int space)
 {
-    int i;
+    hsize_t i;
 
-    printf("%*s-%s [%i]:\n", space, "", AH5_get_name_from_path(generalrationalfunction->path), generalrationalfunction->nb_degrees);
+    printf("%*s-%s [%lu]:\n", space, "", AH5_get_name_from_path(generalrationalfunction->path), (long unsigned) generalrationalfunction->nb_degrees);
     for (i = 0; i < generalrationalfunction->nb_degrees; i++)
-        printf("%*s-degree %i: numerator=%g%+gi, denominator=%g%+gi\n", space + 3, "", i, creal(generalrationalfunction->numerator[i]), cimag(generalrationalfunction->numerator[i]), creal(generalrationalfunction->denominator[i]), cimag(generalrationalfunction->denominator[i]));
+        printf("%*s-degree %lu: numerator=%g%+gi, denominator=%g%+gi\n", space + 3, "", (long unsigned) i, creal(generalrationalfunction->numerator[i]), cimag(generalrationalfunction->numerator[i]), creal(generalrationalfunction->denominator[i]), cimag(generalrationalfunction->denominator[i]));
     AH5_print_opt_attrs(&(generalrationalfunction->opt_attrs), space + 3);
 }
 
@@ -838,8 +838,7 @@ void AH5_print_ft_generalrationalfunction (const AH5_generalrationalfunction_t *
 // Print rational
 void AH5_print_ft_rational (const AH5_rational_t *rational, int space)
 {
-    hsize_t i, total;
-    int j;
+    hsize_t i, j, total;
 
     printf("%*s-%s:\n", space, "", AH5_get_name_from_path(rational->path));
     AH5_print_opt_attrs(&(rational->opt_attrs), space + 3);
@@ -1220,7 +1219,7 @@ void AH5_free_ft_generalrationalfunction (AH5_generalrationalfunction_t *general
 // Free memory used by rational
 void AH5_free_ft_rational (AH5_rational_t *rational)
 {
-    int j;
+    hsize_t j;
 
     if (rational->path != NULL)
     {
