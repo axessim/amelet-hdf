@@ -179,8 +179,9 @@ char AH5_write_int_attr(hid_t loc_id, const char *path, char* attr_name, const i
 {
     char success = AH5_FALSE;
 
-    if (H5LTset_attribute_int(loc_id, path, attr_name, &wdata, 1) >= 0)
-        success = AH5_TRUE;
+    if (AH5_path_valid(loc_id, path))
+        if (H5LTset_attribute_int(loc_id, path, attr_name, &wdata, 1) >= 0)
+            success = AH5_TRUE;
 
     return success;
 }
@@ -191,8 +192,9 @@ char AH5_write_flt_attr(hid_t loc_id, const char *path, char* attr_name, const f
 {
     char success = AH5_FALSE;
 
-    if (H5LTset_attribute_float(loc_id, path, attr_name, &wdata, 1) >= 0)
-        success = AH5_TRUE;
+    if (AH5_path_valid(loc_id, path))
+        if (H5LTset_attribute_float(loc_id, path, attr_name, &wdata, 1) >= 0)
+            success = AH5_TRUE;
 
     return success;
 }
@@ -209,13 +211,22 @@ char AH5_write_cpx_attr(hid_t loc_id, const char* path, char* attr_name, const A
     cpx_memtype = AH5_H5Tcreate_cpx_memtype();
     space = H5Screate_simple (1, dims, NULL);
 
-    if ((object_id = H5Oopen(loc_id, path, H5P_DEFAULT)) >= 0)
-        if ((attr_id = H5Acreate(object_id, attr_name, cpx_filetype, space, H5P_DEFAULT, H5P_DEFAULT)) >= 0)
-            if (H5Awrite(attr_id, cpx_memtype, &wdata) >= 0)
-                success = AH5_TRUE;
+    if (AH5_path_valid(loc_id, path))
+    {
+        if ((object_id = H5Oopen(loc_id, path, H5P_DEFAULT)) >= 0)
+        {
+            if ((attr_id = H5Acreate(object_id, attr_name, cpx_filetype, space, H5P_DEFAULT, H5P_DEFAULT)) >= 0)
+            {
+                if (H5Awrite(attr_id, cpx_memtype, &wdata) >= 0)
+                {
+                    success = AH5_TRUE;
+                }
+                H5Aclose(attr_id);
+            }
+            H5Oclose(object_id);
+        }
+    }
 
-    H5Aclose(attr_id);
-    H5Oclose(object_id);
     H5Sclose(space);
     H5Tclose(cpx_memtype);
     H5Tclose(cpx_filetype);
@@ -229,8 +240,10 @@ char AH5_write_str_attr(hid_t loc_id, const char *path, char *attr_name, const c
 {
     char success = AH5_FALSE;
 
-    if (H5LTset_attribute_string(loc_id, path, attr_name, wdata) >= 0)
-        success = AH5_TRUE;
+    if (AH5_path_valid(loc_id, path))
+        if (strlen(wdata) < AH5_ATTR_LENGTH)
+            if (H5LTset_attribute_string(loc_id, path, attr_name, wdata) >= 0)
+                success = AH5_TRUE;
 
     return success;
 }

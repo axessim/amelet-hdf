@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../../build/bin/Debug/test" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../build/obj/Debug/" />
+				<Option object_output="../../build/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add directory="../../build/bin/Debug" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="../../build/bin/Release/test" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../build/obj/Release/" />
+				<Option object_output="../../build/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add directory="../../build/bin/Release" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="../../src/amelethdf" />
+		</Compiler>
+		<Linker>
+			<Add option="-lhdf5_hl -lhdf5 -lah5" />
+		</Linker>
+		<Unit filename="../../src/test/filecopy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/test/test.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/test/test.h" />
+		<Unit filename="../../src/test/tst_attribute.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/test/utest.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

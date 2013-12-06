@@ -60,7 +60,7 @@ extern "C" {
 #define cimag(z) ((z).im)
 #endif /*AH5_STD_CCOMPLEX*/
 
-    AH5_complex_t AH5_set_complex(float real, float imag);
+    AH5_PUBLIC AH5_complex_t AH5_set_complex(float real, float imag);
 
 #include "ah5_attribute.h"
 #include "ah5_dataset.h"

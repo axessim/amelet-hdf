@@ -18,24 +18,24 @@ AH5_complex_t AH5_set_complex(float real, float imag)
 
 hid_t AH5_H5Tcreate_cpx_memtype(void)
 {
-  hid_t cpx_memtype;
+    hid_t cpx_memtype;
 
-  cpx_memtype = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
-  H5Tinsert(cpx_memtype, "r", 0, H5T_NATIVE_FLOAT);
-  H5Tinsert(cpx_memtype, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
+    cpx_memtype = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
+    H5Tinsert(cpx_memtype, "r", 0, H5T_NATIVE_FLOAT);
+    H5Tinsert(cpx_memtype, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
 
-  return cpx_memtype;
+    return cpx_memtype;
 }
 
 hid_t AH5_H5Tcreate_cpx_filetype(void)
 {
-  hid_t cpx_filetype;
+    hid_t cpx_filetype;
 
-  cpx_filetype = H5Tcreate(H5T_COMPOUND, H5Tget_size(AH5_NATIVE_FLOAT) * 2);
-  H5Tinsert(cpx_filetype, "r", 0, AH5_NATIVE_FLOAT);
-  H5Tinsert(cpx_filetype, "i", H5Tget_size(AH5_NATIVE_FLOAT), AH5_NATIVE_FLOAT);
+    cpx_filetype = H5Tcreate(H5T_COMPOUND, H5Tget_size(AH5_NATIVE_FLOAT) * 2);
+    H5Tinsert(cpx_filetype, "r", 0, AH5_NATIVE_FLOAT);
+    H5Tinsert(cpx_filetype, "i", H5Tget_size(AH5_NATIVE_FLOAT), AH5_NATIVE_FLOAT);
 
-  return cpx_filetype;
+    return cpx_filetype;
 }
 
 
@@ -225,20 +225,49 @@ char *AH5_trim_path(char *path)
 char AH5_path_valid(hid_t loc_id, const char *path)
 {
     char *temp;
-    int i, slashes = 0;
+    int i, len, slashes = 0;
+
+    len = (int) strlen(path);
+    if (len >= AH5_ABSOLUTE_PATH_LENGTH)
+        return AH5_FALSE;
 
     temp = strdup(path);
     for (i = (int) strlen(path); i > 0; i--)
+    {
         if (temp[i] == '/')
         {
+            if ((len - i) > AH5_ELEMENT_NAME_LENGTH)
+            {
+                free(temp);
+                return AH5_FALSE;
+            }
+            len = i;
             temp[i] = '\0';
             slashes++;  /* count number of slashes excluding the first one */
         }
+    }
 
-    if(H5Lexists(loc_id, temp, H5P_DEFAULT) != AH5_TRUE)
+    if ((len + 1) > AH5_ELEMENT_NAME_LENGTH)
     {
         free(temp);
         return AH5_FALSE;
+    }
+
+    if (strcmp(path, ".") == 0)
+    {
+        if (!H5Iis_valid(loc_id))
+        {
+            free(temp);
+            return AH5_FALSE;
+        }
+    }
+    else
+    {
+        if(H5Lexists(loc_id, temp, H5P_DEFAULT) != AH5_TRUE)
+        {
+            free(temp);
+            return AH5_FALSE;
+        }
     }
 
     i = 1;
