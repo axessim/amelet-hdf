@@ -280,6 +280,36 @@ char AH5_set_attr_Edataset(AH5_Edataset_t* Edataset,
   return AH5_TRUE;
 }
 
+
+char AH5_write_attr_Edataset(AH5_Edataset_t* Edataset){
+  char status;
+
+  if(Edataset->created == AH5_FALSE){
+    return AH5_FALSE;
+  }
+  if(Edataset->nature != NULL){
+    status = AH5_write_str_attr(Edataset->parent, Edataset->path,
+                                "physicalNature", Edataset->nature);
+    AH5_RETURN_IF_FAILED(status, status);
+  }
+
+  if(Edataset->unit != NULL){
+    status = AH5_write_str_attr(Edataset->parent, Edataset->path,
+                                "unit", Edataset->unit);
+    AH5_RETURN_IF_FAILED(status, status);
+  }
+
+  if(Edataset->label != NULL){
+    status = AH5_write_str_attr(Edataset->parent, Edataset->path,
+                                "label", Edataset->label);
+    AH5_RETURN_IF_FAILED(status, status);
+  }
+
+
+  return AH5_TRUE;
+}
+
+
 char AH5_append_Edataset(AH5_Edataset_t* Edataset,
     hsize_t sizeappend,
     void* data){
@@ -380,35 +410,9 @@ char AH5_free_Edataset(AH5_Edataset_t* Edataset){
     Edataset->dims = NULL;
   }
 
-  if(Edataset->created == AH5_TRUE){
-
-	/*FIXME Write something in a function that is designed to release the 
-	  memory, this is a strange thing. */
-    if(Edataset->nature != NULL){
-      status = AH5_write_str_attr(Edataset->parent, Edataset->path,
-          "physicalNature", Edataset->nature);
-      AH5_RETURN_IF_FAILED(status, status);
-    }
-
-    if(Edataset->unit != NULL){
-      status = AH5_write_str_attr(Edataset->parent, Edataset->path,
-          "unit", Edataset->unit);
-      AH5_RETURN_IF_FAILED(status, status);
-    }
-
-    if(Edataset->label != NULL){
-      status = AH5_write_str_attr(Edataset->parent, Edataset->path,
-          "label", Edataset->label);
-      AH5_RETURN_IF_FAILED(status, status);
-    }
-
-    HDF5_RETURN_IF_FAILED(H5Dclose(Edataset->dataset),
-        AH5_FALSE);
-  }
-
   if(Edataset->path != NULL){
     free(Edataset->path);
-	Edataset->path = NULL;
+        Edataset->path = NULL;
   }
 
   Edataset->created = AH5_FALSE;

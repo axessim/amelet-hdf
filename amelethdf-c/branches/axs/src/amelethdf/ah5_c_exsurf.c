@@ -61,7 +61,7 @@ char AH5_read_exs_group (hid_t file_id, const char *path, AH5_exs_group_t *exs_g
         exs_group->nb_instances = children.nb_children;
         if (children.nb_children > 0)
         {
-            exs_group->instances = (AH5_arrayset_t *) malloc(children.nb_children * sizeof(AH5_arrayset_t));
+			exs_group->instances = (AH5_arrayset_t *) malloc((size_t) children.nb_children * sizeof(AH5_arrayset_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path2, path);
@@ -100,7 +100,7 @@ char AH5_read_exchange_surface (hid_t file_id, AH5_exchange_surface_t *exchange_
         exchange_surface->nb_groups = children.nb_children;
         if (children.nb_children > 0)
         {
-            exchange_surface->groups = (AH5_exs_group_t *) malloc(children.nb_children * sizeof(AH5_exs_group_t));
+			exchange_surface->groups = (AH5_exs_group_t *) malloc((size_t) children.nb_children * sizeof(AH5_exs_group_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path, AH5_C_EXCHANGE_SURFACE);

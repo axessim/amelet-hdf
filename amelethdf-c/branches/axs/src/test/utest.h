@@ -99,16 +99,23 @@ char *__message__;
 // mu_assert_equal(char* message, xxx val1, xxx val2)
 // mu_str_assert_equal(char* message, char* str1, char* str2)
 //
-#define mu_assert(message, test) {    \
-  do {                                \
-    printf("run test '%s'", message); \
-    if (!(test)) {                    \
-      printf(" FAILED.\n");           \
-      return message;                 \
-    }                                 \
-    printf(" PAST.\n");               \
-  } while (0);                        \
-  }
+#define MU_ASSERT_WITH_MSG(message, test, errormsg, ...) do {       \
+    if (!(test)) {                                                  \
+      printf("Test %s:%d '%s' ", __FILE__, __LINE__, message);      \
+      if ((errormsg) != NULL)                                       \
+        printf(errormsg, __VA_ARGS__);                              \
+      printf(" FAILED.\n");                                         \
+      return message;                                               \
+    }                                                               \
+  } while (0)
+
+#define mu_assert(message, test) do {                                   \
+    if (!(test)) {                                                      \
+      printf("Test %s:%d '%s' FAILED.\n", __FILE__, __LINE__, message); \
+      return message;                                                   \
+    }                                                                   \
+  } while (0)
+
 
 #define mu_assert_true(message, test) mu_assert((message), (test))
 #define mu_assert_false(message, test) mu_assert((message), !(test))
@@ -116,7 +123,10 @@ char *__message__;
 #define mu_assert_equal(message, str1, str2) mu_assert(message, (str1) == (str2))
 #define mu_assert_not_equal(message, str1, str2) mu_assert(message, (str1) != (str2))
 
-#define mu_assert_eq(message, str1, str2) mu_assert(message, (str1) == (str2))
+#define mu_assert_eq(message, str1, str2)                               \
+  MU_ASSERT_WITH_MSG(message, (str1) == (str2), "(0x%x == 0x%x)", str1, str2)
+#define mu_assert_eqf(message, str1, str2)                               \
+  MU_ASSERT_WITH_MSG(message, (str1) == (str2), "(%e == %e)", str1, str2)
 #define mu_assert_ne(message, str1, str2) mu_assert(message, (str1) != (str2))
 #define mu_assert_ge(message, str1, str2) mu_assert(message, (str1) >= (str2))
 #define mu_assert_gt(message, str1, str2) mu_assert(message, (str1) > (str2))
@@ -124,34 +134,17 @@ char *__message__;
 #define mu_assert_lt(message, str1, str2) mu_assert(message, (str1) < (str2))
 #define mu_assert_close(message, str1, str2, tol) mu_assert(message, abs((str1) - (str2)) < (tol))
 
-
 #define mu_assert_str_equal(message, str1, str2) mu_assert(message, !strcmp(str1, str2))
 
-
-
-
-
-
 //! A simple function to allocate a new string.
-char* new_string(char *src)  {
+inline char* new_string(char *src)  {
     char *dst = malloc((strlen(src) + 1) * sizeof(char));
     strcpy(dst, src);
     return dst;
 }
 
-
-
-
-
-
-// Tools to build test file.
-//
-// XXX(nmt):
-// For the moment, a hard file is build. In next version I would like worked in
-// memory or cleaned the working directory.
-
 //! Build a test file from file name and the extension.
-hid_t AH5_build_test_file_from_name(const char* name, const char* ext)  {
+inline hid_t AH5_build_test_file_from_name(const char* name, const char* ext)  {
   char *file_name;
   hid_t file_id;
   file_name = (char*)malloc((strlen(name) + strlen(ext) + 1)* sizeof(char));
@@ -160,6 +153,26 @@ hid_t AH5_build_test_file_from_name(const char* name, const char* ext)  {
   file_id = H5Fcreate((file_name), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   free(file_name);
   return file_id;
+}
+
+//! copy from disk
+inline void filecopy(const char *input, const char *output)
+{
+    signed char buf[100];
+    void *pb = (void *) buf;
+    FILE *fpi, *fpo;
+    size_t n;
+
+    fpi = fopen(input, "rb");
+    fpo = fopen(output, "wb");
+
+    if (fpi && fpo)
+    {
+        while ((n = fread(pb, sizeof(char), 100, fpi)))
+            fwrite(pb, sizeof(char), n, fpo);
+    }
+    fclose(fpi);
+    fclose(fpo);
 }
 
 //! Used the test suite fonction name to build the test file.

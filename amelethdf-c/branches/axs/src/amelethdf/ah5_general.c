@@ -17,6 +17,29 @@ AH5_complex_t AH5_set_complex(float real, float imag)
     return rdata;
 }
 
+hid_t AH5_H5Tcreate_cpx_memtype(void)
+{
+    hid_t cpx_memtype;
+
+    cpx_memtype = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
+    H5Tinsert(cpx_memtype, "r", 0, H5T_NATIVE_FLOAT);
+    H5Tinsert(cpx_memtype, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
+
+    return cpx_memtype;
+}
+
+hid_t AH5_H5Tcreate_cpx_filetype(void)
+{
+    hid_t cpx_filetype;
+
+    cpx_filetype = H5Tcreate(H5T_COMPOUND, H5Tget_size(AH5_NATIVE_FLOAT) * 2);
+    H5Tinsert(cpx_filetype, "r", 0, AH5_NATIVE_FLOAT);
+    H5Tinsert(cpx_filetype, "i", H5Tget_size(AH5_NATIVE_FLOAT), AH5_NATIVE_FLOAT);
+
+    return cpx_filetype;
+}
+
+
 
 /*
     AH5_FALSE = AH5_version_minimum("0.5", "0.1");
@@ -94,7 +117,7 @@ char *AH5_trim_zeros(const char *version)
 
     while (1)
     {
-        for (i = strlen(rdata); i > -1; i--)
+        for (i = (int) strlen(rdata); i > -1; i--)
             if (rdata[i] == '.')
                 break;
         number = atoi(rdata + i + 1);
@@ -105,6 +128,7 @@ char *AH5_trim_zeros(const char *version)
     }
     return rdata;
 }
+
 
 
 /** Join path. Append to 'base' the new node 'name' and return 'base'
@@ -172,9 +196,9 @@ char *AH5_trim_path(char *path)
     len = strlen(path);
     endp = path + len;
 
-    /* Move the front and back pointers to address the first non-whitespace
-     * characters from each end.
-     */
+    // Move the front and back pointers to address the first non-whitespace
+    // characters from each end.
+
     while (isspace(*(++frontp)));
     while (isspace(*(--endp)) && endp != frontp);
 
@@ -183,10 +207,10 @@ char *AH5_trim_path(char *path)
     else if (frontp != path &&  endp == frontp)
         *path = '\0';
 
-    /* Shift the string so that it starts at path so that if it's dynamically
-     * allocated, we can still free it on the returned pointer.  Note the reuse
-     * of endp to mean the front of the string buffer now.
-     */
+    // Shift the string so that it starts at path so that if it's dynamically
+    // allocated, we can still free it on the returned pointer.  Note the reuse
+    // of endp to mean the front of the string buffer now.
+
     endp = path;
     if (frontp != path)
     {
@@ -201,20 +225,49 @@ char *AH5_trim_path(char *path)
 char AH5_path_valid(hid_t loc_id, const char *path)
 {
     char *temp;
-    int i, slashes = 0;
+    int i, len, slashes = 0;
+
+    len = (int) strlen(path);
+    if (len >= AH5_ABSOLUTE_PATH_LENGTH)
+        return AH5_FALSE;
 
     temp = strdup(path);
-    for (i = strlen(path); i > 0; i--)
+    for (i = (int) strlen(path); i > 0; i--)
+    {
         if (temp[i] == '/')
         {
+            if ((len - i) > AH5_ELEMENT_NAME_LENGTH)
+            {
+                free(temp);
+                return AH5_FALSE;
+            }
+            len = i;
             temp[i] = '\0';
             slashes++;  /* count number of slashes excluding the first one */
         }
+    }
 
-    if(H5Lexists(loc_id, temp, H5P_DEFAULT) != AH5_TRUE)
+    if ((len + 1) > AH5_ELEMENT_NAME_LENGTH)
     {
         free(temp);
         return AH5_FALSE;
+    }
+
+    if (strcmp(path, ".") == 0)
+    {
+        if (!H5Iis_valid(loc_id))
+        {
+            free(temp);
+            return AH5_FALSE;
+        }
+    }
+    else
+    {
+        if(H5Lexists(loc_id, temp, H5P_DEFAULT) != AH5_TRUE)
+        {
+            free(temp);
+            return AH5_FALSE;
+        }
     }
 
     i = 1;
@@ -293,7 +346,7 @@ AH5_children_t AH5_read_children_name(hid_t file_id, const char* path)
         H5Gget_info(group_id, &ginfo);
         if (ginfo.nlinks > 0)
         {
-            children.childnames = (char **) malloc(ginfo.nlinks * sizeof(char *));
+            children.childnames = (char **) malloc((size_t) ginfo.nlinks * sizeof(char *));
             for (i = 0; i < ginfo.nlinks; i++)
             {
                 size = H5Lget_name_by_idx(group_id, ".", H5_INDEX_NAME, H5_ITER_INC, i, NULL, 0, H5P_DEFAULT);
@@ -326,12 +379,13 @@ AH5_children_t AH5_read_children_name(hid_t file_id, const char* path)
     return children;
 }
 
+
 // Get last part of a path; does not allocate new memory
 char *AH5_get_name_from_path(const char *path)
 {
     int i;
 
-    for (i = strlen(path); i > -1; i--)
+    for (i = (int) strlen(path); i > -1; i--)
         if (path[i] == '/')
             break;
     return (char *) path + i + 1;
@@ -344,7 +398,7 @@ char *AH5_get_base_from_path(const char *path)
     char *rdata, *temp;
 
     temp = strdup(path);
-    for (i = strlen(temp); i > 0; i--)
+    for (i = (int) strlen(temp); i > 0; i--)
         if (temp[i] == '/')
             break;
     temp[i] = '\0';

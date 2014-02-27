@@ -115,7 +115,7 @@ char AH5_read_ort_group (hid_t file_id, const char *path, AH5_ort_group_t *ort_g
         ort_group->nb_instances = children.nb_children;
         if (children.nb_children > 0)
         {
-            ort_group->instances = (AH5_ort_instance_t *) malloc(children.nb_children * sizeof(AH5_ort_instance_t));
+			ort_group->instances = (AH5_ort_instance_t *) malloc((size_t) children.nb_children * sizeof(AH5_ort_instance_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path2, path);
@@ -150,7 +150,7 @@ char AH5_read_outputrequest(hid_t file_id, AH5_outputrequest_t *outputrequest)
         outputrequest->nb_groups = children.nb_children;
         if (children.nb_children > 0)
         {
-            outputrequest->groups = (AH5_ort_group_t *) malloc(children.nb_children * sizeof(AH5_ort_group_t));
+			outputrequest->groups = (AH5_ort_group_t *) malloc((size_t) children.nb_children * sizeof(AH5_ort_group_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path, AH5_C_OUTPUT_REQUEST);

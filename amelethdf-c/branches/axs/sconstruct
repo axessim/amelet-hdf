@@ -1,4 +1,5 @@
-#! /usr/env/scons
+#! /usr/bin/env/ scons
+# -*- mode:python; coding:utf-8; -*-
 #
 # Tool chain to build Amelet-HDF C library.
 #
@@ -422,6 +423,7 @@ for testfile in testlst:
     targetpath = os.path.join(builddir, name)
     pgm = testenv.Program(targetpath, source=testfile)
     testenv.Install(installtest_dir, pgm)
+
 testenv.Alias('install_tests', installtest_dir)
 del testenv
 

@@ -178,12 +178,12 @@ char AH5_read_ssom_pie_table(hid_t file_id, const char *path, AH5_ssom_pie_table
         if (H5TBget_table_info(file_id, path, &nfields, &nrecords) >= 0)
             if ((nfields == 3 || nfields == 6 || nfields == 9) && nrecords > 0)
             {
-                field_names = (char **) malloc(nfields * sizeof(char *));
-                field_names[0] = (char *) malloc(AH5_TABLE_FIELD_NAME_LENGTH * nfields * sizeof(char));
+                field_names = (char **) malloc((size_t) nfields * sizeof(char *));
+				field_names[0] = (char *) malloc((size_t) nfields * AH5_TABLE_FIELD_NAME_LENGTH * sizeof(char));
                 for (i = 0; i < nfields; i++)
                     field_names[i] = field_names[0] + i * AH5_TABLE_FIELD_NAME_LENGTH;
-                field_sizes = (size_t *) malloc(sizeof(size_t *) * nfields);
-                field_offsets = (size_t *) malloc(sizeof(size_t *) * nfields);
+				field_sizes = (size_t *) malloc((size_t) nfields * sizeof(size_t *));
+				field_offsets = (size_t *) malloc((size_t) nfields * sizeof(size_t *));
 
                 if (H5TBget_field_info(file_id, path, field_names, field_sizes, field_offsets, &type_size) >= 0)
                 {
@@ -235,20 +235,20 @@ char AH5_read_ssom_pie_table(hid_t file_id, const char *path, AH5_ssom_pie_table
                 }
                 if (rdata)
                 {
-                    ssom_pie_table->nb_dims = nfields / (hsize_t)3;
-                    ssom_pie_table->elements = (unsigned int **) malloc(nrecords * sizeof(unsigned int *));
-                    ssom_pie_table->elements[0] = (unsigned int *) malloc(nrecords * 2 * ssom_pie_table->nb_dims * sizeof(unsigned int));
-                    ssom_pie_table->vectors = (float **) malloc(nrecords * sizeof(float *));
-                    ssom_pie_table->vectors[0] = (float *) malloc(nrecords * ssom_pie_table->nb_dims * sizeof(float));
+                    ssom_pie_table->nb_dims = nfields / 3;
+                    ssom_pie_table->elements = (unsigned int **) malloc((size_t) nrecords * sizeof(unsigned int *));
+					ssom_pie_table->elements[0] = (unsigned int *) malloc((size_t) (nrecords * ssom_pie_table->nb_dims) * 2 * sizeof(unsigned int));
+                    ssom_pie_table->vectors = (float **) malloc((size_t) nrecords * sizeof(float *));
+                    ssom_pie_table->vectors[0] = (float *) malloc((size_t) (nrecords*ssom_pie_table->nb_dims) * sizeof(float));
                     for (i = 1; i < nrecords; i++)
                     {
                         ssom_pie_table->elements[i] = ssom_pie_table->elements[0] + i * 2 * ssom_pie_table->nb_dims;
                         ssom_pie_table->vectors[i] = ssom_pie_table->vectors[0] + i * ssom_pie_table->nb_dims;
                     }
 
-                    if (H5TBread_fields_index(file_id, path, ssom_pie_table->nb_dims*2, field_index1, 0, nrecords, ssom_pie_table->nb_dims*2*sizeof(int), field_offsets, field_sizes, ssom_pie_table->elements[0]) < 0
+                    if (H5TBread_fields_index(file_id, path, ssom_pie_table->nb_dims*2, field_index1, 0, nrecords, (size_t) ssom_pie_table->nb_dims*2*sizeof(int), field_offsets, field_sizes, ssom_pie_table->elements[0]) < 0
                             ||
-                            H5TBread_fields_index(file_id, path, ssom_pie_table->nb_dims, field_index2, 0, nrecords, ssom_pie_table->nb_dims*sizeof(float), field_offsets, field_sizes, ssom_pie_table->vectors[0]) < 0)
+							H5TBread_fields_index(file_id, path, ssom_pie_table->nb_dims, field_index2, 0, nrecords, (size_t) ssom_pie_table->nb_dims*sizeof(float), field_offsets, field_sizes, ssom_pie_table->vectors[0]) < 0)
                     {
                         free(ssom_pie_table->elements[0]);
                         free(ssom_pie_table->elements);
@@ -318,7 +318,7 @@ char AH5_read_smesh(hid_t file_id, const char* path, AH5_smesh_t *smesh)
         smesh->nb_groups = children.nb_children;
         if (children.nb_children > 0)
         {
-            smesh->groups = (AH5_sgroup_t *) malloc(children.nb_children * sizeof(AH5_sgroup_t));
+            smesh->groups = (AH5_sgroup_t *) malloc((size_t) children.nb_children * sizeof(AH5_sgroup_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path3, path2);
@@ -337,7 +337,7 @@ char AH5_read_smesh(hid_t file_id, const char* path, AH5_smesh_t *smesh)
         smesh->nb_groupgroups = children.nb_children;
         if (children.nb_children > 0)
         {
-            smesh->groupgroups = (AH5_groupgroup_t *) malloc(children.nb_children * sizeof(AH5_groupgroup_t));
+            smesh->groupgroups = (AH5_groupgroup_t *) malloc((size_t) children.nb_children * sizeof(AH5_groupgroup_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path3, path2);
@@ -356,7 +356,7 @@ char AH5_read_smesh(hid_t file_id, const char* path, AH5_smesh_t *smesh)
         smesh->nb_som_tables = children.nb_children;
         if (children.nb_children > 0)
         {
-            smesh->som_tables = (AH5_ssom_pie_table_t *) malloc(children.nb_children * sizeof(AH5_ssom_pie_table_t));
+            smesh->som_tables = (AH5_ssom_pie_table_t *) malloc((size_t) children.nb_children * sizeof(AH5_ssom_pie_table_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 success = AH5_FALSE;
@@ -454,24 +454,24 @@ char AH5_read_usom_pie_table(hid_t file_id, const char *path, AH5_usom_pie_table
         if (H5TBget_table_info(file_id, path, &nfields, &nrecords) >= 0)
             if (nfields >= 2 && nfields <=4 && nrecords > 0)
             {
-                field_names = (char **) malloc(nfields * sizeof(char *));
-                field_names[0] = (char *) malloc(AH5_TABLE_FIELD_NAME_LENGTH * nfields * sizeof(char));
+                field_names = (char **) malloc((size_t) nfields * sizeof(char *));
+				field_names[0] = (char *) malloc((size_t) nfields * AH5_TABLE_FIELD_NAME_LENGTH * sizeof(char));
                 for (i = 0; i < nfields; i++)
                     field_names[i] = field_names[0] + i * AH5_TABLE_FIELD_NAME_LENGTH;
-                field_sizes = (size_t *) malloc(sizeof(size_t *) * nfields);
-                field_offsets = (size_t *) malloc(sizeof(size_t *) * nfields);
+				field_sizes = (size_t *) malloc((size_t) nfields * sizeof(size_t *));
+				field_offsets = (size_t *) malloc((size_t) nfields * sizeof(size_t *));
 
                 if (H5TBget_field_info(file_id, path, field_names, field_sizes, field_offsets, &type_size) >= 0)
                     if (strcmp(field_names[0], "index") == 0)
                     {
-                        usom_pie_table->indices = (int *) malloc(nrecords * sizeof(int));
-                        usom_pie_table->vectors = (float **) malloc(nrecords * sizeof(float *));
-                        usom_pie_table->vectors[0] = (float *) malloc(nrecords * (nfields - 1) * sizeof(float));
+                        usom_pie_table->indices = (int *) malloc((size_t) nrecords * sizeof(int));
+                        usom_pie_table->vectors = (float **) malloc((size_t) nrecords * sizeof(float *));
+                        usom_pie_table->vectors[0] = (float *) malloc((size_t) (nrecords*(nfields-1)) * sizeof(float));
                         for (i = 1; i < nrecords; i++)
                             usom_pie_table->vectors[i] = usom_pie_table->vectors[0] + i * (nfields - 1);
                         if (H5TBread_fields_index(file_id, path, 1, field_index1, 0, nrecords, sizeof(int), field_offsets, field_sizes, usom_pie_table->indices) < 0
                                 ||
-                                H5TBread_fields_index(file_id, path, (nfields - 1), field_index2, 0, nrecords, (nfields - 1) * sizeof(float), field_offsets, field_sizes, usom_pie_table->vectors[0]) < 0)
+								H5TBread_fields_index(file_id, path, (nfields - 1), field_index2, 0, nrecords, (size_t) (nfields-1)*sizeof(float), field_offsets, field_sizes, usom_pie_table->vectors[0]) < 0)
                         {
                             free(usom_pie_table->vectors[0]);
                             free(usom_pie_table->vectors);
@@ -628,7 +628,7 @@ char AH5_read_umesh(hid_t file_id, const char* path, AH5_umesh_t *umesh)
                     if (H5LTget_dataset_info(file_id, path2, &(umesh->nb_elementtypes), &type_class, &length) >= 0)
                         if (type_class == H5T_INTEGER && length == 1)
                         {
-                            umesh->elementtypes = (char *) malloc((umesh->nb_elementtypes * sizeof(char)));
+                            umesh->elementtypes = (char *) malloc((size_t) umesh->nb_elementtypes * sizeof(char));
                             dset_id = H5Dopen(file_id, path2, H5P_DEFAULT);
                             if (H5Dread(dset_id, H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, H5P_DEFAULT, umesh->elementtypes) >= 0)
                                 success = AH5_TRUE;
@@ -674,7 +674,7 @@ char AH5_read_umesh(hid_t file_id, const char* path, AH5_umesh_t *umesh)
         umesh->nb_groupgroups = children.nb_children;
         if (children.nb_children > 0)
         {
-            umesh->groupgroups = (AH5_groupgroup_t *) malloc(children.nb_children * sizeof(AH5_groupgroup_t));
+            umesh->groupgroups = (AH5_groupgroup_t *) malloc((size_t) children.nb_children * sizeof(AH5_groupgroup_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path3, path2);
@@ -693,7 +693,7 @@ char AH5_read_umesh(hid_t file_id, const char* path, AH5_umesh_t *umesh)
         umesh->nb_groups = children.nb_children;
         if (children.nb_children > 0)
         {
-            umesh->groups = (AH5_ugroup_t *) malloc(children.nb_children * sizeof(AH5_ugroup_t));
+            umesh->groups = (AH5_ugroup_t *) malloc((size_t) children.nb_children * sizeof(AH5_ugroup_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path3, path2);
@@ -712,7 +712,7 @@ char AH5_read_umesh(hid_t file_id, const char* path, AH5_umesh_t *umesh)
         umesh->nb_som_tables = children.nb_children;
         if (children.nb_children > 0)
         {
-            umesh->som_tables = (AH5_usom_table_t *) malloc(children.nb_children * sizeof(AH5_usom_table_t));
+            umesh->som_tables = (AH5_usom_table_t *) malloc((size_t) children.nb_children * sizeof(AH5_usom_table_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path3, path2);
@@ -878,7 +878,7 @@ char AH5_read_msh_group(hid_t file_id, const char *path, AH5_msh_group_t *msh_gr
                 msh_group->nb_msh_instances--;    // do not count /meshLink
         if (children.nb_children > 0)
         {
-            msh_group->msh_instances = (AH5_msh_instance_t *) malloc(msh_group->nb_msh_instances * sizeof(AH5_msh_instance_t));
+            msh_group->msh_instances = (AH5_msh_instance_t *) malloc((size_t) msh_group->nb_msh_instances * sizeof(AH5_msh_instance_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 if (strcmp(children.childnames[i], AH5_G_MESH_LINK) != 0)
@@ -899,7 +899,7 @@ char AH5_read_msh_group(hid_t file_id, const char *path, AH5_msh_group_t *msh_gr
         msh_group->nb_mlk_instances = children.nb_children;
         if (children.nb_children > 0)
         {
-            msh_group->mlk_instances = (AH5_mlk_instance_t *) malloc(children.nb_children * sizeof(AH5_mlk_instance_t));
+            msh_group->mlk_instances = (AH5_mlk_instance_t *) malloc((size_t) children.nb_children * sizeof(AH5_mlk_instance_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path3, path2);
@@ -935,7 +935,7 @@ char AH5_read_mesh(hid_t file_id, AH5_mesh_t *mesh)
         mesh->nb_groups = children.nb_children;
         if (children.nb_children > 0)
         {
-            mesh->groups = (AH5_msh_group_t *) malloc(children.nb_children * sizeof(AH5_msh_group_t));
+            mesh->groups = (AH5_msh_group_t *) malloc((size_t) children.nb_children * sizeof(AH5_msh_group_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path, AH5_C_MESH);
@@ -1227,7 +1227,7 @@ void AH5_print_smesh(const AH5_smesh_t *smesh, int space)
 void AH5_print_umesh_som_table(const AH5_usom_table_t *usom_table, int space)
 {
     hsize_t k;
-    hsize_t dim;
+    char dim;
 
     switch (usom_table->type)
     {

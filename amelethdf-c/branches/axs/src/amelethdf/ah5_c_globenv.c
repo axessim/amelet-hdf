@@ -81,7 +81,7 @@ char AH5_read_global_environment (hid_t file_id, AH5_global_environment_t *globa
         global_environment->nb_instances = children.nb_children;
         if (children.nb_children > 0)
         {
-            global_environment->instances = (AH5_gle_instance_t *) malloc(children.nb_children * sizeof(AH5_gle_instance_t));
+			global_environment->instances = (AH5_gle_instance_t *) malloc((size_t) children.nb_children * sizeof(AH5_gle_instance_t));
             for (i = 0; i < children.nb_children; i++)
             {
                 strcpy(path, AH5_C_GLOBAL_ENVIRONMENT);

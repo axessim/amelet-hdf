@@ -42,9 +42,7 @@ char AH5_read_cpx_attr(hid_t loc_id, const char* path, char* attr_name, AH5_comp
         if (H5Aexists_by_name(loc_id, path, attr_name, H5P_DEFAULT) > 0)
         {
             attr_id = H5Aopen_by_name(loc_id, path, attr_name, H5P_DEFAULT, H5P_DEFAULT);
-            type_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
-            H5Tinsert(type_id, "r", 0, H5T_NATIVE_FLOAT);
-            H5Tinsert(type_id, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
+            type_id = AH5_H5Tcreate_cpx_memtype();
             if (H5Aread(attr_id, type_id, buf) >= 0)
             {
                 *rdata = AH5_set_complex(buf[0], buf[1]);
@@ -110,7 +108,7 @@ char AH5_read_opt_attrs(hid_t loc_id, const char *path, AH5_opt_attrs_t *opt_att
         H5Oget_info_by_name(loc_id, path, &object_info, H5P_DEFAULT);
         opt_attrs->nb_instances = object_info.num_attrs - nb_present_mandatory_attrs;
         if (opt_attrs->nb_instances > 0)
-            opt_attrs->instances = (AH5_attr_instance_t *) malloc (opt_attrs->nb_instances * sizeof(AH5_attr_instance_t));
+            opt_attrs->instances = (AH5_attr_instance_t *) malloc ((size_t) opt_attrs->nb_instances * sizeof(AH5_attr_instance_t));
         for (i = 0; i < object_info.num_attrs; i++)
         {
             is_mandatory = AH5_FALSE;
@@ -139,12 +137,10 @@ char AH5_read_opt_attrs(hid_t loc_id, const char *path, AH5_opt_attrs_t *opt_att
                     break;
                 case H5T_COMPOUND:
                     opt_attrs->instances[k].value.c = AH5_set_complex(0, 0);
-                    type_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(H5T_NATIVE_FLOAT) * 2);
-                    H5Tinsert(type_id, "r", 0, H5T_NATIVE_FLOAT);
-                    H5Tinsert(type_id, "i", H5Tget_size(H5T_NATIVE_FLOAT), H5T_NATIVE_FLOAT);
+                    type_id = AH5_H5Tcreate_cpx_memtype();
                     if (H5Aread(attr_id, type_id, buf) >= 0)
                     {
-						opt_attrs->instances[k].value.c = AH5_set_complex(buf[0], buf[1]);
+                        opt_attrs->instances[k].value.c = AH5_set_complex(buf[0], buf[1]);
                         success = AH5_TRUE;
                     }
                     H5Tclose(type_id);
@@ -175,6 +171,118 @@ char AH5_read_opt_attrs(hid_t loc_id, const char *path, AH5_opt_attrs_t *opt_att
     }
     return success;
 }
+
+
+
+// Write int attribute <attr_name> given by address <path>
+char AH5_write_int_attr(hid_t loc_id, const char *path, char* attr_name, const int wdata)
+{
+    char success = AH5_FALSE;
+
+    if (AH5_path_valid(loc_id, path))
+        if (H5LTset_attribute_int(loc_id, path, attr_name, &wdata, 1) >= 0)
+            success = AH5_TRUE;
+
+    return success;
+}
+
+
+// Write float attribute <attr_name> given by address <path>
+char AH5_write_flt_attr(hid_t loc_id, const char *path, char* attr_name, const float wdata)
+{
+    char success = AH5_FALSE;
+
+    if (AH5_path_valid(loc_id, path))
+        if (H5LTset_attribute_float(loc_id, path, attr_name, &wdata, 1) >= 0)
+            success = AH5_TRUE;
+
+    return success;
+}
+
+
+// Write complex attribute <attr_name> given by address <path>
+char AH5_write_cpx_attr(hid_t loc_id, const char* path, char* attr_name, const AH5_complex_t wdata)
+{
+    char success = AH5_FALSE;
+    hid_t attr_id = 0, cpx_filetype, cpx_memtype, object_id, space;
+    hsize_t dims[1] = {1};
+
+    cpx_filetype = AH5_H5Tcreate_cpx_filetype();
+    cpx_memtype = AH5_H5Tcreate_cpx_memtype();
+    space = H5Screate_simple (1, dims, NULL);
+
+    if (AH5_path_valid(loc_id, path))
+    {
+        if ((object_id = H5Oopen(loc_id, path, H5P_DEFAULT)) >= 0)
+        {
+            if ((attr_id = H5Acreate(object_id, attr_name, cpx_filetype, space, H5P_DEFAULT, H5P_DEFAULT)) >= 0)
+            {
+                if (H5Awrite(attr_id, cpx_memtype, &wdata) >= 0)
+                {
+                    success = AH5_TRUE;
+                }
+                H5Aclose(attr_id);
+            }
+            H5Oclose(object_id);
+        }
+    }
+
+    H5Sclose(space);
+    H5Tclose(cpx_memtype);
+    H5Tclose(cpx_filetype);
+
+    return success;
+}
+
+
+// Write string attribute <attr_name> given by address <path>
+char AH5_write_str_attr(hid_t loc_id, const char *path, char *attr_name, const char *wdata)
+{
+    char success = AH5_FALSE;
+
+    if (AH5_path_valid(loc_id, path))
+        if (strlen(wdata) < AH5_ATTR_LENGTH)
+            if (H5LTset_attribute_string(loc_id, path, attr_name, wdata) >= 0)
+                success = AH5_TRUE;
+
+    return success;
+}
+
+
+// Write all optional attributes
+char AH5_write_opt_attrs(hid_t file_id, const char *path, AH5_opt_attrs_t *opt_attrs)
+{
+    char success = AH5_TRUE;
+    hsize_t i;
+
+    for (i = 0; i < opt_attrs->nb_instances && success; i++)
+    {
+        switch (opt_attrs->instances[i].type)
+        {
+        case H5T_INTEGER:
+            if (!AH5_write_int_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.i))
+                success = AH5_FALSE;
+            break;
+        case H5T_FLOAT:
+            if (!AH5_write_flt_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.f))
+                success = AH5_FALSE;
+            break;
+        case H5T_COMPOUND:
+            if (!AH5_write_cpx_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.c))
+                success = AH5_FALSE;
+            break;
+        case H5T_STRING:
+            if (!AH5_write_str_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.s))
+                success = AH5_FALSE;
+            break;
+        default:
+            success = AH5_FALSE;
+            break;
+        }
+    }
+    return success;
+}
+
 
 
 // Print integer attribute
@@ -234,6 +342,7 @@ void AH5_print_opt_attrs(const AH5_opt_attrs_t *opt_attrs, int space)
 }
 
 
+
 // Free memory used by optional attributes
 void AH5_free_opt_attrs(AH5_opt_attrs_t *opt_attrs)
 {
@@ -263,82 +372,4 @@ void AH5_free_opt_attrs(AH5_opt_attrs_t *opt_attrs)
 }
 
 
-// Write int attribute <attr_name> given by address <path>
-char AH5_write_int_attr(hid_t loc_id, const char *path, char* attr_name, const int wdata)
-{
-    char success = AH5_FALSE;
-
-    if (H5LTset_attribute_int(loc_id, path, attr_name, &wdata, 1) >= 0)
-        success = AH5_TRUE;
-
-    return success;
-}
-
-
-// Write float attribute <attr_name> given by address <path>
-char AH5_write_flt_attr(hid_t loc_id, const char *path, char* attr_name, const float wdata)
-{
-    char success = AH5_FALSE;
-
-    if (H5LTset_attribute_float(loc_id, path, attr_name, &wdata, 1) >= 0)
-        success = AH5_TRUE;
-
-    return success;
-}
-
-
-// Write complex attribute <attr_name> given by address <path>
-char AH5_write_cpx_attr(hid_t loc_id, const char* path, char* attr_name, const AH5_complex_t wdata)
-{
-    char success = AH5_FALSE;
-
-    // TO BE IMPLEMENTED...
-    AH5_PRINT_ERR_FUNC_NOT_IMPLEMENTED("attributes", path);
-
-    return success;
-}
-
-
-// Write string attribute <attr_name> given by address <path>
-char AH5_write_str_attr(hid_t loc_id, const char *path, char *attr_name, const char *wdata)
-{
-    char success = AH5_FALSE;
-
-    if (H5LTset_attribute_string(loc_id, path, attr_name, wdata) >= 0);
-        success = AH5_TRUE;
-
-    return success;
-}
-
-// Write all optional attributes
-char AH5_write_opt_attrs(hid_t file_id, const char *path, AH5_opt_attrs_t *opt_attrs)
-{
-    char success = AH5_TRUE;
-
-    hsize_t i;
-
-    for (i = 0; i < opt_attrs->nb_instances && success; i++)
-    {
-      switch (opt_attrs->instances[i].type)
-      {
-        case H5T_INTEGER:
-          success = AH5_write_int_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.i);
-          break;
-        case H5T_FLOAT:
-          success = AH5_write_flt_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.f);
-          break;
-        case H5T_COMPOUND:
-          success = AH5_write_cpx_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.c);
-          break;
-        case H5T_STRING:
-          success = AH5_write_str_attr(file_id, path, opt_attrs->instances[i].name, opt_attrs->instances[i].value.s);
-          break;
-        default:
-          success = AH5_FALSE;
-          break;
-      }
-    }
-  
-    return success;
-}
 

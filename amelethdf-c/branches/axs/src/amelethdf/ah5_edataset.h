@@ -172,6 +172,10 @@ extern "C" {
       const char* unit,             /* unit*/
       const char* label);           /* label*/
 
+  /* The dataset must have ever been created yet. */
+  AH5_PUBLIC char AH5_write_attr_Edataset(
+      AH5_Edataset_t* Edataset);     /* pointer to AH5_Edataset_t*/
+
   AH5_PUBLIC char AH5_append_Edataset(
       AH5_Edataset_t* Edataset,     /* pointer to AH5_Edataset_t*/
       hsize_t sizeappend,           /* number of dim to append*/

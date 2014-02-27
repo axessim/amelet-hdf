@@ -52,6 +52,7 @@ extern "C" {
 // A specific flag for the complexes.
 #if __STDC_VERSION__ >= 199901L
 # define AH5_SDT_CCOMPLEX
+# define ACCESS _acess
 #endif
 
 #ifdef AH5_SDT_CCOMPLEX
@@ -66,9 +67,9 @@ extern "C" {
 
 #define creal(z) ((z).re)
 #define cimag(z) ((z).im)
-#endif /*AH5_SDT_CCOMPLEX*/
+#endif /*AH5_STD_CCOMPLEX*/
 
-    AH5_complex_t AH5_set_complex(float real, float imag);
+    AH5_PUBLIC AH5_complex_t AH5_set_complex(float real, float imag);
 
 #include "ah5_attribute.h"
 #include "ah5_dataset.h"
@@ -85,6 +86,8 @@ extern "C" {
         hsize_t         nb_values;
     } AH5_set_t;
 
+    AH5_PUBLIC hid_t AH5_H5Tcreate_cpx_memtype(void);
+    AH5_PUBLIC hid_t AH5_H5Tcreate_cpx_filetype(void);
 
     AH5_PUBLIC char AH5_version_minimum(const char *required_version, const char *sim_version);
     AH5_PUBLIC char *AH5_trim_zeros(const char *version);

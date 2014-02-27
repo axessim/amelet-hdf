@@ -16,7 +16,7 @@ extern "C" {
     AH5_PUBLIC char AH5_write_int_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const int *wdata);
     AH5_PUBLIC char AH5_write_flt_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const float *wdata);
     AH5_PUBLIC char AH5_write_cpx_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const AH5_complex_t *wdata);
-    AH5_PUBLIC char AH5_write_str_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const size_t slen, char *wdata);
+    AH5_PUBLIC char AH5_write_str_dataset(hid_t loc_id, const char *dset_name, const hsize_t len, const size_t slen, char **wdata);
 
     AH5_PUBLIC char AH5_write_int_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const int *wdata);
     AH5_PUBLIC char AH5_write_flt_array(hid_t loc_id, const char *dset_name, const int rank, const hsize_t dims[], const float *wdata);

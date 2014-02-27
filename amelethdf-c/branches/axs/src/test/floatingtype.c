@@ -133,7 +133,7 @@ char *test_write_ft_arrayset()
     char **svalues;
 
     AH5_arrayset_t array, dataonmesh;
-    char meshpath[1][34] = {"/mesh/gmesh/umesh/group/groupname"};
+    char *meshpath = "/mesh/gmesh/umesh/group/groupname";
     
     // Write a simple mesh test.
     file_id = AH5_auto_test_file();
@@ -189,7 +189,7 @@ char *test_write_ft_arrayset()
     dataonmesh.dims[0].nb_values = 1;
     dataonmesh.dims[0].opt_attrs.nb_instances = 0;
     dataonmesh.dims[0].type_class = H5T_STRING;
-    dataonmesh.dims[0].values.s = meshpath;
+    dataonmesh.dims[0].values.s = &meshpath;
     
     dataonmesh.dims[1].nb_values = 2;
     dataonmesh.dims[1].opt_attrs.nb_instances = 0;
@@ -220,9 +220,9 @@ char *test_write_ft_arrayset()
       mu_assert_close("Test the written real values.",
                       fvalues[i], 0.3 * i, 1.e-4);
     
-    AH5_read_str_dataset(file_id, "/floatingType/dataonmesh/ds/dim1", 1, strlen(meshpath[0]), &svalues);
+    AH5_read_str_dataset(file_id, "/floatingType/dataonmesh/ds/dim1", 1, strlen(meshpath), &svalues);
     mu_assert_str_equal("Test the written string dims.",
-        *svalues, meshpath[0]);
+                        *svalues, meshpath);
     
     free(fvalues);
     
