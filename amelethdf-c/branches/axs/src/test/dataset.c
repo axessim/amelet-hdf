@@ -22,8 +22,7 @@ char *test_write_string_dataset()
     hsize_t dims[1] = {DIM0};
     int ndims, i, j;
     /*char wdata[DIM0][SDIM] =*/
-    char **wdata = (char *[]){"Parting",
-                              "is such",
+    char *wdata[] = {"Parting", "is such",
                               "sweet  ",
                               "sorrow."};
     char **rdata;

@@ -137,14 +137,14 @@ char *__message__;
 #define mu_assert_str_equal(message, str1, str2) mu_assert(message, !strcmp(str1, str2))
 
 //! A simple function to allocate a new string.
-inline char* new_string(char *src)  {
+__inline char* new_string(char *src)  {
     char *dst = malloc((strlen(src) + 1) * sizeof(char));
     strcpy(dst, src);
     return dst;
 }
 
 //! Build a test file from file name and the extension.
-inline hid_t AH5_build_test_file_from_name(const char* name, const char* ext)  {
+__inline hid_t AH5_build_test_file_from_name(const char* name, const char* ext)  {
   char *file_name;
   hid_t file_id;
   file_name = (char*)malloc((strlen(name) + strlen(ext) + 1)* sizeof(char));
@@ -156,7 +156,7 @@ inline hid_t AH5_build_test_file_from_name(const char* name, const char* ext)  {
 }
 
 //! copy from disk
-inline void filecopy(const char *input, const char *output)
+__inline void filecopy(const char *input, const char *output)
 {
     signed char buf[100];
     void *pb = (void *) buf;
