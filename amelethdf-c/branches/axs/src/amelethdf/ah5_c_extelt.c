@@ -1,6 +1,5 @@
 #include "ah5_c_extelt.h"
 
-// for access function
 #ifdef _WIN32
 #include <io.h>
 #define ACCESS _access
