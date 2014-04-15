@@ -1,1 +1,8 @@
 
+mardi 15 avril 2014
+-------------------
+
+ - Start height level Amelet-HDF library 'libamelethdf_hl' and <ahh5.h>.
+
+ - Introduces experimental module in Amelet-HDF <ah5_exp.h> for not released
+   Amelet-HDF specification or implementation.
