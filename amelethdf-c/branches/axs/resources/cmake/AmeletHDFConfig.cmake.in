@@ -9,7 +9,7 @@ set(AMELETHDF_INCLUDE_DIRS "@AMELETHDF_EXPORT_INCLUDE_DIRS@")
 set(AMELETHDF_LIBRARY_DIRS "@AMELETHDF_EXPORT_LIBRARY_DIRS@")
  
 # Our library dependencies (contains definitions for IMPORTED targets)
-include("@CMAKE_INSTALL_PREFIX@/@AMELETHDF_CMAKE_DIR@/AmeletHDFLibraryDepends.cmake")
+include("@AMELETHDF_CMAKE_DIR_ABS@/AmeletHDFLibraryDepends.cmake")
  
 # These are IMPORTED targets created by AxesSignLibraryDepends.cmake
 set(AMELETHDF_LIBRARIES @AMELETHDF_EXPORT_LIBRARIES@)

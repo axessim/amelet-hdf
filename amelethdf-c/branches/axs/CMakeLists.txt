@@ -12,6 +12,7 @@ MESSAGE( STATUS "Configuration is ${CMAKE_BUILD_TYPE}")
 SITE_NAME(HOST_NAME)
 
 OPTION(AMELETHDF_ENABLE_MPI "Enable MPI support" OFF)
+OPTION(AMELETHDF_BUILD_DOCS "Build Amelet-HDF docs" ON)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/resources/cmake") # For custom cmake modules
 include(DoxygenTarget)
@@ -125,14 +126,16 @@ SET(AMELETHDF_HL_TESTS_LINK_LIBS amelethdfc_hl ${AMELETHDF_HL_DEP_LINK_LIBS})
 #-------------------------------------------------------------
 # 
 #-------------------------------------------------------------
-SET(DOXY_SOURCES_DIRS 
-  "${PROJECT_SOURCE_DIR}/src/amelethdf ${PROJECT_SOURCE_DIR}/hl/src")
-SET(DOXY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/docs)
-add_doxygen(${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
-INSTALL(DIRECTORY ${PROJECT_BINARY_DIR}/docs/html 
-  DESTINATION ${INSTALL_DATA_DIR}/amelethdf)
-INSTALL(DIRECTORY ${PROJECT_BINARY_DIR}/docs/latex 
-  DESTINATION ${INSTALL_DATA_DIR}/amelethdf)
+IF (AMELETHDF_BUILD_DOCS)
+  SET(DOXY_SOURCES_DIRS 
+    "${PROJECT_SOURCE_DIR}/src/amelethdf ${PROJECT_SOURCE_DIR}/hl/src")
+  SET(DOXY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/docs)
+  add_doxygen(${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
+  INSTALL(DIRECTORY ${PROJECT_BINARY_DIR}/docs/html 
+    DESTINATION ${INSTALL_DATA_DIR}/amelethdf)
+  INSTALL(DIRECTORY ${PROJECT_BINARY_DIR}/docs/latex 
+    DESTINATION ${INSTALL_DATA_DIR}/amelethdf)
+ENDIF (AMELETHDF_BUILD_DOCS)
 
 #-------------------------------------------------------------
 # Walk sub dir
@@ -145,6 +148,7 @@ ADD_SUBDIRECTORY(hl)
 #-------------------------------------------------------------
 ## CMAKE CONFIGURE FILE into build-tree
 set(AMELETHDF_CMAKE_DIR ${PROJECT_BINARY_DIR})
+set(AMELETHDF_CMAKE_DIR_ABS ${AMELETHDF_CMAKE_DIR})                # The absolute path
 set(AMELETHDF_EXPORT_INCLUDE_DIRS ${AMELETHDF_HL_INCLUDE_DIRS})
 set(AMELETHDF_EXPORT_LIBRARY_DIRS 
   ${PROJECT_BINARY_DIR}/src/amelethdf
@@ -166,6 +170,7 @@ configure_file(resources/cmake/AmeletHDFConfigVersion.cmake.in
 ## CMAKE CONFIGURE FILE into install-tree
 set(AMELETHDF_INCLUDE_DIRS "${INSTALL_INCLUDE_DIR}")
 set(AMELETHDF_CMAKE_DIR "${INSTALL_INCLUDE_DIR}/cmake/amelethdf")
+set(AMELETHDF_CMAKE_DIR_ABS "${CMAKE_INSTALL_PREFIX}/${AMELETHDF_CMAKE_DIR}")
 set(AMELETHDF_EXPORT_LIBRARY_DIRS "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIB_DIR}")
 # Install the export set for use with the install-tree
 install(EXPORT AmeletHDFLibraryDepends
