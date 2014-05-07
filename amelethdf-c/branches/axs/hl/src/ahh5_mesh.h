@@ -13,6 +13,8 @@
 
 #include <ah5_c_mesh.h>
 
+#include "ahh5_config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,7 +29,7 @@ extern "C" {
    *
    * @return
    */
-  char ahh5_axis_build_linspace(AH5_axis_t *axis, float start, float step, int size);
+  AHH5_PUBLIC char ahh5_axis_build_linspace(AH5_axis_t *axis, float start, float step, int size);
 
 #ifdef __cplusplus
 }

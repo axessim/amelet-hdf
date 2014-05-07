@@ -91,7 +91,7 @@ void AHH5_load_polygonal_path(
     nb_nodes = low->polygontypes[polygon_id * 2 + 1];
     path->nb_nodes = nb_nodes;
 
-    path->nodes_index = (AH5_index_t)malloc(nb_nodes * sizeof(AH5_index_t));
+    path->nodes_index = (AH5_index_t*)malloc(nb_nodes * sizeof(AH5_index_t));
 
     for (k = 0; k < nb_nodes; ++k)
       path->nodes_index[k] = low->polygonnodes[polygon_nodes_offsets[polygon_id] + k];
@@ -119,7 +119,7 @@ char AHH5_interpret_cmesh(AHH5_cmesh_t *height, AH5_cmesh_t *low)
 
   height->nb_nodes[0] = low->nb_nodes[0];
   height->nb_nodes[1] = low->nb_nodes[1];
-  nb_nodes = height->nb_nodes[0] * height->nb_nodes[1];
+  nb_nodes = (AH5_index_t)(height->nb_nodes[0] * height->nb_nodes[1]);
   height->nodes = (float *)malloc(nb_nodes * sizeof(float));
   memcpy(height->nodes, low->nodes, nb_nodes * sizeof(float));
 
@@ -169,11 +169,13 @@ char AHH5_interpret_cmesh(AHH5_cmesh_t *height, AH5_cmesh_t *low)
 
   free(polygon_nodes_offsets);
   free(regions_index);
+  
+  return 1;
 }
 
 char AHH5_dump_cmesh(AH5_cmesh_t *low, AHH5_cmesh_t *height)
 {
-
+  return 1;
 }
 
 int AHH5_intersection_cmp(const AHH5_intersection_t *a, const AHH5_intersection_t *b)
@@ -190,5 +192,5 @@ int AHH5_intersection_cmp(const AHH5_intersection_t *a, const AHH5_intersection_
   if (a->type != b->type)
     return a->type - b->type;
 
-  return a->polygon - b->polygon;
+  return (int)(a->polygon - b->polygon);
 }

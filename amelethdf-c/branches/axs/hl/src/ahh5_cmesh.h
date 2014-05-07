@@ -13,6 +13,8 @@
 
 #include <ah5_exp_cmesh.h>
 
+#include "ahh5_config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -111,7 +113,7 @@ extern "C" {
    *
    * @return true if success.
    */
-  char AHH5_interpret_cmesh(AHH5_cmesh_t *height, AH5_cmesh_t *low);
+  AHH5_PUBLIC char AHH5_interpret_cmesh(AHH5_cmesh_t *height, AH5_cmesh_t *low);
 
   /**
    * Dump into low level API the given height level conform mesh.
@@ -121,15 +123,15 @@ extern "C" {
    *
    * @return true if success.
    */
-  char AHH5_dump_cmesh(AH5_cmesh_t *low, AHH5_cmesh_t *height);
+  AHH5_PUBLIC char AHH5_dump_cmesh(AH5_cmesh_t *low, AHH5_cmesh_t *height);
 
-  char AHH5_read_cmesh(hid_t file_id, const char *path, AHH5_cmesh_t *cmesh);
+  AHH5_PUBLIC char AHH5_read_cmesh(hid_t file_id, const char *path, AHH5_cmesh_t *cmesh);
 
-  char AHH5_write_cmesh(hid_t file_id, AHH5_cmesh_t *cmesh);
+  AHH5_PUBLIC char AHH5_write_cmesh(hid_t file_id, AHH5_cmesh_t *cmesh);
 
-  void AHH5_print_cmesh(const AHH5_cmesh_t *cmesh, int space);
+  AHH5_PUBLIC void AHH5_print_cmesh(const AHH5_cmesh_t *cmesh, int space);
 
-  void AHH5_free_cmesh(AHH5_cmesh_t *cmesh);
+  AHH5_PUBLIC void AHH5_free_cmesh(AHH5_cmesh_t *cmesh);
 
   // Some tools functions
   /**
@@ -142,7 +144,7 @@ extern "C" {
    *
    * @return b - a as a integer.
    */
-  int AHH5_intersection_cmp(const AHH5_intersection_t *a, const AHH5_intersection_t *b);
+  AHH5_PUBLIC int AHH5_intersection_cmp(const AHH5_intersection_t *a, const AHH5_intersection_t *b);
 
 #ifdef __cplusplus
 }

@@ -153,7 +153,7 @@ extern "C" {
    *
    * @return true is success.
    */
-  char AH5_read_cmsh_group(hid_t file_id, const char *path, AH5_cgroup_t *cgroup);
+  AH5_PUBLIC char AH5_read_cmsh_group(hid_t file_id, const char *path, AH5_cgroup_t *cgroup);
 
   /**
    * Read the conform mesh at given location (file_id, path).
@@ -164,7 +164,7 @@ extern "C" {
    *
    * @return true is success.
    */
-  char AH5_read_cmesh(hid_t file_id, const char *path, AH5_cmesh_t *cmesh);
+  AH5_PUBLIC char AH5_read_cmesh(hid_t file_id, const char *path, AH5_cmesh_t *cmesh);
 
   /**
    * Write conform mesh groups.
@@ -175,7 +175,7 @@ extern "C" {
    *
    * @return true is success.
    */
-  char AH5_write_cmsh_group(hid_t file_id, AH5_cgroup_t *cgroup, int nb_grp);
+  AH5_PUBLIC char AH5_write_cmsh_group(hid_t file_id, AH5_cgroup_t *cgroup, int nb_grp);
 
   /**
    * Write conform mesh.
@@ -185,7 +185,7 @@ extern "C" {
    *
    * @return true is success.
    */
-  char AH5_write_cmesh(hid_t file_id, AH5_cmesh_t *cmesh);
+  AH5_PUBLIC char AH5_write_cmesh(hid_t file_id, AH5_cmesh_t *cmesh);
 
   /**
    * Print in standard output the given conform mesh 'space' white space at
@@ -194,14 +194,14 @@ extern "C" {
    * @param cmesh the conform nesh
    * @param space the number of white space at right.
    */
-  void AH5_print_cmesh(const AH5_cmesh_t *cmesh, int space);
+  AH5_PUBLIC void AH5_print_cmesh(const AH5_cmesh_t *cmesh, int space);
 
   /**
    * Free memory
    *
    * @param cmesh
    */
-  void AH5_free_cmesh(AH5_cmesh_t *cmesh);
+  AH5_PUBLIC void AH5_free_cmesh(AH5_cmesh_t *cmesh);
 
   // Some tools functions
   /**
@@ -214,7 +214,7 @@ extern "C" {
    *
    * @return b - a as a integer.
    */
-  int AH5_intersection_cmp(const AH5_intersection_t *a, const AH5_intersection_t *b);
+  AH5_PUBLIC int AH5_intersection_cmp(const AH5_intersection_t *a, const AH5_intersection_t *b);
 
   /**
    * Sort the intersection into lexical order (cell index, normal, type, polygon
@@ -224,7 +224,7 @@ extern "C" {
    *
    * @return true if success.
    */
-  char AH5_cmesh_sort_intersection(AH5_cmesh_t *cmesh);
+  AH5_PUBLIC char AH5_cmesh_sort_intersection(AH5_cmesh_t *cmesh);
 
   /**
    * Compute the offset tables for read polygon and region in arbitrary order.
@@ -239,9 +239,10 @@ extern "C" {
    *
    * @return true if success.
    */
-  char AH5_cmesh_compute_offset(const AH5_cmesh_t *cmesh,
-                                hsize_t *polygon_nodes_offsets,
-                                hsize_t *regions_index);
+  AH5_PUBLIC char AH5_cmesh_compute_offset(
+	const AH5_cmesh_t *cmesh,
+    hsize_t *polygon_nodes_offsets,
+    hsize_t *regions_index);
 
 #ifdef __cplusplus
 }

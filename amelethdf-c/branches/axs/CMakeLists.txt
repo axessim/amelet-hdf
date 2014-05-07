@@ -1,6 +1,6 @@
 # Top level CMakeList.txt file
 
-cmake_minimum_required (VERSION 2.6 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR)
 ENABLE_TESTING()
 
 PROJECT(AMELETHDF)
@@ -14,23 +14,23 @@ SITE_NAME(HOST_NAME)
 OPTION(AMELETHDF_ENABLE_MPI "Enable MPI support" OFF)
 OPTION(AMELETHDF_BUILD_DOCS "Build Amelet-HDF docs" ON)
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/resources/cmake") # For custom cmake modules
-include(DoxygenTarget)
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/resources/cmake") # For custom cmake modules
+INCLUDE(DoxygenTarget)
 
 #-------------------------------------------------------------
 # Configu install-tree
 #-------------------------------------------------------------
 # Offer the user the choice of overriding the installation directories
-set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
+SET(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
 IF (WIN32)
-  set(INSTALL_ARCHIVE_DIR lib/static CACHE PATH "Installation directory for libraries")
+  SET(INSTALL_ARCHIVE_DIR lib/static CACHE PATH "Installation directory for libraries")
 ELSE ()
-  set(INSTALL_ARCHIVE_DIR lib CACHE PATH "Installation directory for libraries")
+  SET(INSTALL_ARCHIVE_DIR lib CACHE PATH "Installation directory for libraries")
 ENDIF ()
-set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
-set(INSTALL_INCLUDE_DIR include CACHE PATH
+SET(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
+SET(INSTALL_INCLUDE_DIR include CACHE PATH
   "Installation directory for header files")
-set(INSTALL_DATA_DIR share CACHE PATH
+SET(INSTALL_DATA_DIR share CACHE PATH
   "Installation directory for data files")
 
 #-------------------------------------------------------------
@@ -76,22 +76,39 @@ ENDIF()
 #-------------------------------------------------------------
 # Configure compilateur
 #-------------------------------------------------------------
-set(GCC_COMPILE_FLAGS          "-Wall -W -Wextra -std=gnu90")
-set(GCC_DEBUG_COMPILE_FLAGS    "-g3 -D_DEBUG")
-set(GCC_RELEASE_COMPILE_FLAGS  "-O3 -g0 -DNDEBUG")
+# Compileur configurqtion for GCC
+SET(GCC_COMPILE_FLAGS          "-Wall -W -Wextra -std=gnu90")
+SET(GCC_DEBUG_COMPILE_FLAGS    "-g3 -D_DEBUG")
+SET(GCC_RELEASE_COMPILE_FLAGS  "-O3 -g0 -DNDEBUG")
+SET(GCC_LINKER_FLAGS           "")
+SET(GCC_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage")
+SET(GCC_COVERAGE_LINK_FLAGS    "-lgcov")
 
-set(GCC_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage")
-set(GCC_COVERAGE_LINK_FLAGS    "-lgcov")
+# Compileur configurqtion for MSVC10
+SET(VS_COMPILE_FLAGS           "/D_WIN32 /GS /fp:precise /Zc:wchar_t- /Zc:forScope /Gd")
+SET(VS_DEBUG_COMPILE_FLAGS     "/Zi /nologo /W3 /WX- /Od /Oy- /Gm- /EHsc /MDd")
+SET(VS_RELEASE_COMPILE_FLAGS   "/W3 /O2 /Oy- /Gm- /EHsc /MD")
+SET(VS_LINKER_FLAGS            "")
 
-set(CMAKE_C_FLAGS         "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}")
-set(CMAKE_C_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_DEBUG_COMPILE_FLAGS}")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${GCC_RELEASE_COMPILE_FLAGS}")
-# SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINK_FLAGS}" )
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  SET(CMAKE_C_FLAGS         "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}")
+  SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_DEBUG_COMPILE_FLAGS}")
+  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${GCC_RELEASE_COMPILE_FLAGS}")
+  # SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINKER_FLAGS}" )
+ELSEIF (MSVC10)
+  SET(CMAKE_C_FLAGS         "${CMAKE_CXX_FLAGS} ${VS_COMPILE_FLAGS}")
+  SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG} ${VS_DEBUG_COMPILE_FLAGS}")
+  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VS_RELEASE_COMPILE_FLAGS}")
+  # SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${VS_LINKER_FLAGS}" )
+ELSE (MSVC10)
+  MESSAGE( STATUS "Unsupported compiler defaut configuration is used!")
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+
 
 #-------------------------------------------------------------
 # Generat configure file
 #-------------------------------------------------------------
-string(COMPARE EQUAL "${CMAKE_BUILD_TYPE}" "DEBUG" AMELETHDF_DEBUG)
+STRING(COMPARE EQUAL "${CMAKE_BUILD_TYPE}" "DEBUG" AMELETHDF_DEBUG)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/src/amelethdf/ah5_config.h.cmake 
   ${CMAKE_CURRENT_BINARY_DIR}/src/amelethdf/ah5_config.h)
 
@@ -110,8 +127,7 @@ SET(AMELETHDF_HL_DEP_INCLUDE_DIRS
   ${AMELETHDF_HL_DEP_INCLUDE_DIRS})
 SET(AMELETHDF_HL_DEP_LINK_LIBS 
   amelethdfc 
-  ${AMELETHDF_DEP_LINK_LIBS} 
-  ${AMELETHDF_HL_DEP_LINK_LIBS})
+  ${AMELETHDF_DEP_LINK_LIBS})
 SET(AMELETHDF_HL_DEP_LINK_LIBS_DIRS 
   ${AMELETHDF_DEP_LINK_LIBS_DIRS} 
   ${AMELETHDF_HL_DEP_LINK_LIBS_DIRS})
@@ -130,7 +146,7 @@ IF (AMELETHDF_BUILD_DOCS)
   SET(DOXY_SOURCES_DIRS 
     "${PROJECT_SOURCE_DIR}/src/amelethdf ${PROJECT_SOURCE_DIR}/hl/src")
   SET(DOXY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/docs)
-  add_doxygen(${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
+  ADD_DOXYGEN(${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in)
   INSTALL(DIRECTORY ${PROJECT_BINARY_DIR}/docs/html 
     DESTINATION ${INSTALL_DATA_DIR}/amelethdf)
   INSTALL(DIRECTORY ${PROJECT_BINARY_DIR}/docs/latex 
@@ -146,46 +162,42 @@ ADD_SUBDIRECTORY(hl)
 #-------------------------------------------------------------
 # create a AmeletHDFConfig.cmake file and co.
 #-------------------------------------------------------------
-## CMAKE CONFIGURE FILE into build-tree
-set(AMELETHDF_CMAKE_DIR ${PROJECT_BINARY_DIR})
-set(AMELETHDF_CMAKE_DIR_ABS ${AMELETHDF_CMAKE_DIR})                # The absolute path
-set(AMELETHDF_EXPORT_INCLUDE_DIRS ${AMELETHDF_HL_INCLUDE_DIRS})
-set(AMELETHDF_EXPORT_LIBRARY_DIRS 
+# CMAKE CONFIGURE FILE into build-tree
+SET(AMELETHDF_CMAKE_DIR ${PROJECT_BINARY_DIR})
+SET(AMELETHDF_CMAKE_DIR_ABS ${AMELETHDF_CMAKE_DIR})                # The absolute path
+SET(AMELETHDF_EXPORT_INCLUDE_DIRS ${AMELETHDF_HL_INCLUDE_DIRS})
+SET(AMELETHDF_EXPORT_LIBRARY_DIRS 
   ${PROJECT_BINARY_DIR}/src/amelethdf
   ${PROJECT_BINARY_DIR}/hl/src)
-set(AMELETHDF_EXPORT_LIBRARIES amelethdfc_hl amelethdfc hdf5_hl hdf5)
+SET(AMELETHDF_EXPORT_LIBRARIES amelethdfc_hl amelethdfc hdf5_hl hdf5)
 
 # Add all targets to the build-tree export set
-export(TARGETS amelethdfc amelethdfc_hl 
+EXPORT(TARGETS amelethdfc amelethdfc_hl 
   FILE "${AMELETHDF_CMAKE_DIR}/AmeletHDFLibraryDepends.cmake")
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
-export(PACKAGE AmeletHDF)
+EXPORT(PACKAGE AmeletHDF)
 # Create a AxesSignConfig.cmake file for the use from the build tree
-configure_file(resources/cmake/AmeletHDFConfig.cmake.in
+CONFIGURE_FILE(resources/cmake/AmeletHDFConfig.cmake.in
   "${AMELETHDF_CMAKE_DIR}/AmeletHDFConfig.cmake" @ONLY)
-configure_file(resources/cmake/AmeletHDFConfigVersion.cmake.in
+CONFIGURE_FILE(resources/cmake/AmeletHDFConfigVersion.cmake.in
   "${AMELETHDF_CMAKE_DIR}/AmeletHDFConfigVersion.cmake" @ONLY)
 
 ## CMAKE CONFIGURE FILE into install-tree
-set(AMELETHDF_INCLUDE_DIRS "${INSTALL_INCLUDE_DIR}")
-set(AMELETHDF_CMAKE_DIR "${INSTALL_INCLUDE_DIR}/cmake/amelethdf")
-set(AMELETHDF_CMAKE_DIR_ABS "${CMAKE_INSTALL_PREFIX}/${AMELETHDF_CMAKE_DIR}")
-set(AMELETHDF_EXPORT_LIBRARY_DIRS "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIB_DIR}")
+SET(AMELETHDF_INCLUDE_DIRS "${INSTALL_INCLUDE_DIR}")
+SET(AMELETHDF_CMAKE_DIR "${INSTALL_INCLUDE_DIR}/cmake/amelethdf")
+SET(AMELETHDF_CMAKE_DIR_ABS "${CMAKE_INSTALL_PREFIX}/${AMELETHDF_CMAKE_DIR}")
+SET(AMELETHDF_EXPORT_LIBRARY_DIRS "${CMAKE_INSTALL_PREFIX}/${INSTALL_LIB_DIR}")
 # Install the export set for use with the install-tree
-install(EXPORT AmeletHDFLibraryDepends
-  DESTINATION "${AMELETHDF_CMAKE_DIR}"
-  COMPONENT dev)
-install(EXPORT AmeletHDFHLLibraryDepends
-  DESTINATION "${AMELETHDF_CMAKE_DIR}"
-  COMPONENT dev)
+INSTALL(EXPORT AmeletHDFLibraryDepends
+  DESTINATION "${AMELETHDF_CMAKE_DIR}")
 # Create a AxesSignConfig.cmake file for the use from the install tree
 # and install it
-configure_file(resources/cmake/AmeletHDFConfig.cmake.in
+CONFIGURE_FILE(resources/cmake/AmeletHDFConfig.cmake.in
   "${PROJECT_BINARY_DIR}/InstallFiles/AmeletHDFConfig.cmake" @ONLY)
-configure_file(resources/cmake/AmeletHDFConfigVersion.cmake.in
+CONFIGURE_FILE(resources/cmake/AmeletHDFConfigVersion.cmake.in
   "${PROJECT_BINARY_DIR}/InstallFiles/AmeletHDFConfigVersion.cmake" @ONLY)
-install(FILES
+INSTALL(FILES
   "${PROJECT_BINARY_DIR}/InstallFiles/AmeletHDFConfig.cmake"
   "${PROJECT_BINARY_DIR}/InstallFiles/AmeletHDFConfigVersion.cmake"
   DESTINATION "${AMELETHDF_CMAKE_DIR}" 

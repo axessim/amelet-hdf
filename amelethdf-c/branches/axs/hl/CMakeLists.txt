@@ -1,5 +1,7 @@
-# amelethdf/hl//src/CMakeList.txt file
+# amelethdf/hl/src/CMakeList.txt file
 
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(tools)
-ADD_SUBDIRECTORY(test)
+IF (UNIX)
+  ADD_SUBDIRECTORY(test)
+ENDIF (UNIX)
