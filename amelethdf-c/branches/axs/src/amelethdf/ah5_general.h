@@ -86,6 +86,18 @@ extern "C" {
         hsize_t         nb_values;
     } AH5_set_t;
 
+    /** 
+     * Create a Amelet-HDF file and set entry point if not null.
+     * 
+     * @param name name of the file to access.
+     * @param flags file access flags (see H5Fcreate)
+     * @param entry_point the Amelet-HDF entry point if NULL it is ignored.
+     * 
+     * @return Returns a file identifier if successful; otherwise returns a
+     * negative value.
+     */
+    AH5_PUBLIC hid_t AH5_create(const char *name, unsigned flags, const char *entry_point);
+
     AH5_PUBLIC hid_t AH5_H5Tcreate_cpx_memtype(void);
     AH5_PUBLIC hid_t AH5_H5Tcreate_cpx_filetype(void);
 

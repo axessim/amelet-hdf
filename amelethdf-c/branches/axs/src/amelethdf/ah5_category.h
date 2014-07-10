@@ -8,6 +8,11 @@
 extern "C" {
 #endif
 
+#define AH5_A_FORMAT                    "FORMAT"
+#define AH5_FORMAT                      "AMELETHDF"
+#define AH5_A_VERSION                   "AMELETHDF_FORMAT_VERSION"
+#define AH5_DEFAULT_VERSION             "1.6.4"
+  
 // remove first char
 #define AH5_CATEGORY_NAME(name) ((name) + 1)
 

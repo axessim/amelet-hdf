@@ -2,6 +2,20 @@
 
 #include <ctype.h>
 
+hid_t AH5_create(const char *name, unsigned flags, const char *entry_point)
+{
+  hid_t file_id;
+  file_id = H5Fcreate(name, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+
+  AH5_write_str_attr(file_id, ".", AH5_A_FORMAT, AH5_FORMAT);
+  AH5_write_str_attr(file_id, ".", AH5_A_VERSION, AH5_DEFAULT_VERSION);
+
+  if (entry_point)
+    AH5_write_str_attr(file_id, ".", AH5_A_ENTRY_POINT, entry_point);
+  
+  return file_id;
+}
+
 // Set complex number
 AH5_complex_t AH5_set_complex(float real, float imag)
 {
@@ -342,7 +356,7 @@ AH5_children_t AH5_read_children_name(hid_t file_id, const char* path)
     */
     if (AH5_path_valid(file_id, path) || strcmp(path, "/") == 0)
     {
-        group_id = H5Gopen1(file_id, path);
+        group_id = H5Gopen(file_id, path, H5P_DEFAULT);
         H5Gget_info(group_id, &ginfo);
         if (ginfo.nlinks > 0)
         {
