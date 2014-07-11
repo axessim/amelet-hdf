@@ -5,10 +5,10 @@
 hid_t AH5_create(const char *name, unsigned flags, const char *entry_point)
 {
   hid_t file_id;
-  file_id = H5Fcreate(name, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  file_id = H5Fcreate(name, flags, H5P_DEFAULT, H5P_DEFAULT);
 
-  AH5_write_str_attr(file_id, ".", AH5_A_FORMAT, AH5_FORMAT);
-  AH5_write_str_attr(file_id, ".", AH5_A_VERSION, AH5_DEFAULT_VERSION);
+  AH5_write_str_attr(file_id, ".", AH5_FILE_A_FORMAT, AH5_FILE_FORMAT);
+  AH5_write_str_attr(file_id, ".", AH5_FILE_A_VERSION, AH5_FILE_DEFAULT_VERSION);
 
   if (entry_point)
     AH5_write_str_attr(file_id, ".", AH5_A_ENTRY_POINT, entry_point);

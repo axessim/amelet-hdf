@@ -31,7 +31,7 @@ int AH5_intersection_cmp(const AH5_intersection_t *a, const AH5_intersection_t *
 char AH5_cmesh_sort_intersection(AH5_cmesh_t *cmesh)
 {
   qsort(cmesh->intersections, cmesh->nb_intersections,
-        sizeof(AH5_intersection_t), AH5_intersection_cmp);
+        sizeof(AH5_intersection_t), (__compar_fn_t)AH5_intersection_cmp);
   return AH5_TRUE;
 }
 
@@ -60,6 +60,111 @@ char AH5_cmesh_compute_offset(const AH5_cmesh_t *cmesh,
 
       if (cmesh->polygontypes[i * 2] == POLY_THROUGH)
         regions_index[i] = count++;
+    }
+  }
+}
+
+void AH5_free_cmesh(AH5_cmesh_t *cmesh)
+{
+  int i;
+  
+  if (cmesh)
+  {
+    AH5_free_cartesian_grid(&(cmesh->grid));
+
+    if (cmesh->intersections)
+    {
+      for (i = 0; i < cmesh->nb_intersections; ++i)
+        AH5_free_intersection(cmesh->intersections + i);
+      free(cmesh->intersections);
+      cmesh->intersections = NULL;
+    }
+    cmesh->nb_intersections = 0;
+
+    if (cmesh->nodes)
+    {
+      free(cmesh->nodes);
+      cmesh->nodes = NULL;
+    }
+    cmesh->nb_nodes[0] = 0;
+    cmesh->nb_nodes[0] = 0;
+
+    if (cmesh->polygontypes)
+    {
+      free(cmesh->polygontypes);
+      cmesh->polygontypes = NULL;
+    }
+    cmesh->nb_polygontypes[0] = 0;
+    cmesh->nb_polygontypes[0] = 0;
+
+    if (cmesh->polygonnodes)
+    {
+      free(cmesh->polygonnodes);
+      cmesh->polygonnodes = NULL;
+    }
+    cmesh->nb_polygonnodes = 0;
+
+    if (cmesh->regions)
+    {
+      for (i = 0; i < cmesh->nb_regions; ++i)
+        AH5_free_region(cmesh->regions + i);
+      free(cmesh->regions);
+      cmesh->regions = NULL;
+    }
+    cmesh->nb_regions = 0;
+
+    if (cmesh->groups)
+    {
+      for (i = 0; i < cmesh->nb_groups; ++i)
+        AH5_free_cgroup(cmesh->groups + i);
+      free(cmesh->groups);
+      cmesh->groups = NULL;
+    }
+    cmesh->nb_groups = 0;
+
+    if (cmesh->groupgroups)
+    {
+      for (i = 0; i < cmesh->nb_groupgroups; ++i)
+        AH5_free_groupgroup(cmesh->groupgroups + i);
+      free(cmesh->groupgroups);
+      cmesh->groupgroups = NULL;
+    }
+    cmesh->nb_groupgroups = 0;
+  }
+}
+
+void AH5_free_intersection(AH5_intersection_t *intersection)
+{
+  /*no memory allocated*/
+}
+
+void AH5_free_cartesian_grid(AH5_cartesian_grid_t *grid)
+{
+  /*no memory allocated*/
+}
+
+void AH5_free_region(AH5_region_t *region)
+{
+  /*no memory allocated*/
+}
+
+void AH5_free_cgroup(AH5_cgroup_t *group)
+{
+  int i;
+  
+  if (group)
+  {
+    if (group->path)
+    {
+      free(group->path);
+      group->path = NULL;
+    }
+
+    if (group->groupelts)
+    {
+      free(group->groupelts);
+      group->groupelts = NULL;
+      group->nb_groupelts = 0;
     }
   }
 }

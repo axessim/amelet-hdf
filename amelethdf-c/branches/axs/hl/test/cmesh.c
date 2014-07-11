@@ -329,6 +329,9 @@ static char *test_interpret_cmesh()
   mu_assert("Interpret conform mesh.",
             AHH5_interpret_cmesh(&cmesh_hl, &cmesh));
 
+  /* Print */
+  AHH5_print_cmesh(&cmesh_hl, 0);
+
   mu_assert_eq("The number of group.",
                cmesh_hl.nb_groups, 5);
   mu_assert_eq("The number of groupgroups.",
@@ -412,7 +415,6 @@ static char *test_interpret_cmesh()
   mu_assert_eq("Intersections [1] polygon region area.",
                cmesh_hl.intersections[1].polygon->region->area, (float)0.1);
   
-
   mu_assert_eq("Intersections [14] type.",
                cmesh_hl.intersections[14].type, INTER_FREE);
   mu_assert_eq("Intersections [14] i.",
@@ -430,7 +432,57 @@ static char *test_interpret_cmesh()
                AHH5_BACKWARD_POLYGONAL_PATH);
   mu_assert_eq("Intersections [14] polygon region",
                cmesh_hl.intersections[14].polygon->region, NULL);
+
+  /*release memory*/
+  AHH5_free_cmesh(&cmesh_hl);
   
+  return NULL;
+}
+
+static char *test_intersection()
+{
+  AHH5_intersection_t a, b;
+
+  a.index[0] = 0;
+  a.index[1] = 0;
+  a.index[2] = 0;
+  a.normal = 0;
+  a.type = 0;
+  a.polygon = NULL;
+
+  b.index[0] = 0;
+  b.index[1] = 0;
+  b.index[2] = 0;
+  b.normal = 0;
+  b.type = 0;
+  b.polygon = NULL;
+
+  mu_assert_eq("cmp", AHH5_intersection_cmp(&a, &b), 0);
+  
+  a.index[0] = 1;
+  mu_assert_gt("cmp", AHH5_intersection_cmp(&a, &b), 0);
+  mu_assert_lt("cmp", AHH5_intersection_cmp(&b, &a), 0);
+
+  a.index[0] = 0;
+  a.index[1] = 1;
+  mu_assert_gt("cmp", AHH5_intersection_cmp(&a, &b), 0);
+  mu_assert_lt("cmp", AHH5_intersection_cmp(&b, &a), 0);
+
+  a.index[1] = 0;
+  a.normal = 1;
+  mu_assert_gt("cmp", AHH5_intersection_cmp(&a, &b), 0);
+  mu_assert_lt("cmp", AHH5_intersection_cmp(&b, &a), 0);
+
+  a.normal = 0;
+  a.type = 1;
+  mu_assert_gt("cmp", AHH5_intersection_cmp(&a, &b), 0);
+  mu_assert_lt("cmp", AHH5_intersection_cmp(&b, &a), 0);
+
+  a.type = 0;
+  a.polygon = (AHH5_polygon_t*)1;
+  mu_assert_gt("cmp", AHH5_intersection_cmp(&a, &b), 0);
+  mu_assert_lt("cmp", AHH5_intersection_cmp(&b, &a), 0);
+
   return NULL;
 }
 
@@ -440,6 +492,7 @@ static char *all_tests()
   mu_run_test(test_sort_intersection);
   mu_run_test(test_compute_offset);
   mu_run_test(test_interpret_cmesh);
+  mu_run_test(test_intersection);
 
   return NULL; // And do not forget to return NULL at end to say success.
 }

@@ -118,6 +118,11 @@ char *__message__;
     }                                                                   \
   } while (0)
 
+#define mu_check(message, test)  do {                                   \
+    if (!(test)) {                                                      \
+      printf("Test %s:%d '%s' FAILED.\n", __FILE__, __LINE__, message); \
+    }                                                                   \
+  } while (0)
 
 #define mu_assert_true(message, test) mu_assert((message), (test))
 #define mu_assert_false(message, test) mu_assert((message), !(test))
@@ -126,15 +131,22 @@ char *__message__;
 #define mu_assert_not_equal(message, str1, str2) mu_assert(message, (str1) != (str2))
 
 #define mu_assert_eq(message, str1, str2)                               \
-  MU_ASSERT_WITH_MSG(message, (str1) == (str2), "(0x%x == 0x%x)", str1, str2)
-#define mu_assert_eqf(message, str1, str2)                               \
-  MU_ASSERT_WITH_MSG(message, (str1) == (str2), "(%e == %e)", str1, str2)
-#define mu_assert_ne(message, str1, str2) mu_assert(message, (str1) != (str2))
-#define mu_assert_ge(message, str1, str2) mu_assert(message, (str1) >= (str2))
-#define mu_assert_gt(message, str1, str2) mu_assert(message, (str1) > (str2))
-#define mu_assert_le(message, str1, str2) mu_assert(message, (str1) <= (str2))
-#define mu_assert_lt(message, str1, str2) mu_assert(message, (str1) < (str2))
-#define mu_assert_close(message, str1, str2, tol) mu_assert(message, abs((str1) - (str2)) < (tol))
+  MU_ASSERT_WITH_MSG(message, (str1 == str2), "(0x%x == 0x%x)", (unsigned int)str1, (unsigned int)str2)
+#define mu_assert_eq_ptr(message, str1, str2)                               \
+  MU_ASSERT_WITH_MSG(message, (str1 == str2), "(0x%p == 0x%p)", str1, str2)
+#define mu_assert_eqf(message, str1, str2)                              \
+  MU_ASSERT_WITH_MSG(message, (str1 == str2), "(%e == %e)", str1, str2)
+#define mu_assert_ne(message, str1, str2) mu_assert(message, (str1 != str2))
+#define mu_assert_ge(message, str1, str2) mu_assert(message, (str1 >= str2))
+#define mu_assert_gt(message, str1, str2) mu_assert(message, (str1 > str2))
+#define mu_assert_le(message, str1, str2) mu_assert(message, (str1 <= str2))
+#define mu_assert_lt(message, str1, str2) mu_assert(message, (str1 < str2))
+#define mu_assert_approx_equal(message, str1, str2, tol)                \
+  MU_ASSERT_WITH_MSG(message, fabs((str1) - (str2)) < (tol),            \
+                     "|%e - %e|{%e} < %e", str1, str2, fabs((str1) - (str2)), tol)
+#define mu_assert_close(message, str1, str2, tol) \
+  MU_ASSERT_WITH_MSG(message, fabs((str1) - (str2)) < (tol),    \
+                     "|%e - %e|{%e} < %e", (str1), (str2), fabs((str1) - (str2)), (tol))
 
 #define mu_assert_str_equal(message, str1, str2) mu_assert(message, !strcmp(str1, str2))
 

@@ -13,4 +13,3 @@ FOREACH (test_file ${tests_src})
 
   ADD_TEST (${test_exec} "${EXECUTABLE_OUTPUT_PATH}/${test_exec}")
 ENDFOREACH (test_file)
-

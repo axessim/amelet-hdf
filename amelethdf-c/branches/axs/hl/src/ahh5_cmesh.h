@@ -118,8 +118,8 @@ extern "C" {
   /**
    * Dump into low level API the given height level conform mesh.
    *
-   * @param height the height level cmesh.
-   * @param low The low level cmesh.
+   * @param[in] height the height level cmesh.
+   * @param[out] low The low level cmesh.
    *
    * @return true if success.
    */
@@ -129,9 +129,75 @@ extern "C" {
 
   AHH5_PUBLIC char AHH5_write_cmesh(hid_t file_id, AHH5_cmesh_t *cmesh);
 
+  AHH5_PUBLIC void AHH5_free_cmesh(AHH5_cmesh_t *cmesh);
+  AHH5_PUBLIC void AHH5_free_intersection(AHH5_intersection_t *intersection);
+  AHH5_PUBLIC void AHH5_free_polygon(AHH5_polygon_t *polygon);
+  AHH5_PUBLIC void AHH5_free_region(AHH5_region_t *region);
+  AHH5_PUBLIC void AHH5_free_polygonal_path(AHH5_polygonal_path_t *path);
+  
+  /** 
+   * Print the given conform mesh into the standard output.
+   * 
+   * @param cmesh[in] a valid conform mesh instance.
+   * @param space[in] the space indent level.
+   */
   AHH5_PUBLIC void AHH5_print_cmesh(const AHH5_cmesh_t *cmesh, int space);
 
-  AHH5_PUBLIC void AHH5_free_cmesh(AHH5_cmesh_t *cmesh);
+  /** 
+   * Print the given intersection into the standard output.
+   *
+   * If the conform mesh if given the intersection path's nodes are display, in
+   * other case the node's index is display.
+   * 
+   * @param intersection[in] a valid intersection instance.
+   * @param space[in] the space indent level.
+   * @param cmesh[in] a valid conform mesh instance or NULL
+   */
+  AHH5_PUBLIC void AHH5_print_intersection(
+      const AHH5_intersection_t *intersection, int space,
+      const AHH5_cmesh_t *cmesh);
+
+  /** 
+   * Print the given polygon into the standard output.
+   *
+   * If the conform mesh if given the intersection path's nodes are display, in
+   * other case the node's index is display.
+   *
+   * @param polygon[in] a valid polygon instance.
+   * @param space[in] the space indent level.
+   * @param cmesh[in] a valid conform mesh instance or NULL
+   */
+  AHH5_PUBLIC void AHH5_print_polygon(
+      const AHH5_polygon_t *polygon, int space,
+      const AHH5_cmesh_t *cmesh);
+
+  /** 
+   * Print the given polygon into the standard output.
+   *
+   * If the conform mesh if given the intersection path's nodes are display, in
+   * other case the node's index is display.
+   * 
+   * @param region [in] a valid region instance.
+   * @param space[in] the space indent level.
+   * @param cmesh[in] a valid conform mesh instance or NULL
+   */
+  AHH5_PUBLIC void AHH5_print_region(
+      const AHH5_region_t *region, int space,
+      const AHH5_cmesh_t *cmesh);
+
+  /** 
+   * Print the given polygonal path into the standard output.
+   *
+   * If the conform mesh if given the intersection path's nodes are display, in
+   * other case the node's index is display.
+   * 
+   * @param path[in] a valid polygonal path instance.
+   * @param space[in] the space indent level.
+   * @param cmesh[in] a valid conform mesh instance or NULL
+   */
+  AHH5_PUBLIC void AHH5_print_polygonal_path(
+      const AHH5_polygonal_path_t *path, int space,
+      const AHH5_cmesh_t *cmesh);
 
   // Some tools functions
   /**
@@ -144,7 +210,8 @@ extern "C" {
    *
    * @return b - a as a integer.
    */
-  AHH5_PUBLIC int AHH5_intersection_cmp(const AHH5_intersection_t *a, const AHH5_intersection_t *b);
+  AHH5_PUBLIC int AHH5_intersection_cmp(
+      const AHH5_intersection_t *a, const AHH5_intersection_t *b);
 
 #ifdef __cplusplus
 }

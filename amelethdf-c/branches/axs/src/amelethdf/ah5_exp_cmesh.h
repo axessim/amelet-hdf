@@ -202,6 +202,10 @@ extern "C" {
    * @param cmesh
    */
   AH5_PUBLIC void AH5_free_cmesh(AH5_cmesh_t *cmesh);
+  AH5_PUBLIC void AH5_free_intersection(AH5_intersection_t *intersection);
+  AH5_PUBLIC void AH5_free_region(AH5_region_t *region);
+  AH5_PUBLIC void AH5_free_cartesian_grid(AH5_cartesian_grid_t *grid);
+  AH5_PUBLIC void AH5_free_cgroup(AH5_cgroup_t *group);
 
   // Some tools functions
   /**

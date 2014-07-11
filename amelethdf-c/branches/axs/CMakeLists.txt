@@ -16,6 +16,7 @@ OPTION(AMELETHDF_BUILD_DOCS "Build Amelet-HDF docs" ON)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/resources/cmake") # For custom cmake modules
 INCLUDE(DoxygenTarget)
+INCLUDE(CodeCoverage)
 
 #-------------------------------------------------------------
 # Configu install-tree
@@ -91,14 +92,14 @@ SET(VS_RELEASE_COMPILE_FLAGS   "/W3 /O2 /Oy- /Gm- /EHsc /MD")
 SET(VS_LINKER_FLAGS            "")
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-  SET(CMAKE_C_FLAGS         "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}")
-  SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_DEBUG_COMPILE_FLAGS}")
-  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${GCC_RELEASE_COMPILE_FLAGS}")
-  # SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINKER_FLAGS}" )
+  SET(CMAKE_C_FLAGS          "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}")
+  SET(CMAKE_C_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_DEBUG_COMPILE_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
+  SET(CMAKE_C_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} ${GCC_RELEASE_COMPILE_FLAGS}")
+  SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINKER_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
 ELSEIF (MSVC10)
-  SET(CMAKE_C_FLAGS         "${CMAKE_CXX_FLAGS} ${VS_COMPILE_FLAGS}")
-  SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG} ${VS_DEBUG_COMPILE_FLAGS}")
-  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${VS_RELEASE_COMPILE_FLAGS}")
+  SET(CMAKE_C_FLAGS          "${CMAKE_CXX_FLAGS} ${VS_COMPILE_FLAGS}")
+  SET(CMAKE_C_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG} ${VS_DEBUG_COMPILE_FLAGS}")
+  SET(CMAKE_C_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE} ${VS_RELEASE_COMPILE_FLAGS}")
   # SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${VS_LINKER_FLAGS}" )
 ELSE (MSVC10)
   MESSAGE( STATUS "Unsupported compiler defaut configuration is used!")
@@ -158,6 +159,11 @@ ENDIF (AMELETHDF_BUILD_DOCS)
 #-------------------------------------------------------------
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(hl)
+
+#-------------------------------------------------------------
+# Coverage
+#-------------------------------------------------------------
+SETUP_TARGET_FOR_COVERAGE(coverage ctest coverage)
 
 #-------------------------------------------------------------
 # create a AmeletHDFConfig.cmake file and co.
