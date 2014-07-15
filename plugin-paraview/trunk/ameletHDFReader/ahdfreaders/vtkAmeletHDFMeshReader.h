@@ -9,20 +9,15 @@ extern "C" {
 }
 #endif
 #include "vtkUnstructuredGrid.h"
+#include "ah5.h"
 
 
 
 class vtkAmeletHDFMeshReader
 {
 public:
-    virtual int readUmesh(hid_t loc_id, char *name, vtkUnstructuredGrid *ugrid);
-    virtual int readSmesh(hid_t loc_id, char *name, vtkUnstructuredGrid *sgrid);
-    virtual int readUgrp(hid_t loc_id, char *name, vtkUnstructuredGrid *ugrid, char* groupname);
-    virtual int readUgrpgrp(hid_t loc_id, char *name, vtkUnstructuredGrid *ugrid, char* groupname);
-    virtual int readSgrp(hid_t loc_id, char *name, vtkUnstructuredGrid *sgrid, char* groupname);
-    virtual int readSgrpgrp(hid_t loc_id, char *name, vtkUnstructuredGrid *sgrid, char* groupname);
-    virtual int readSSom(hid_t meshId, char *name, vtkUnstructuredGrid *sgrid, char* somname);
-    virtual int readUSom(hid_t meshId, char *name, vtkUnstructuredGrid *sgrid, char* somname);
+    virtual int readUmesh(hid_t loc_id, AH5_umesh_t umesh, vtkUnstructuredGrid *ugrid);
+    virtual int readSmesh(hid_t loc_id, AH5_smesh_t smesh, vtkUnstructuredGrid *sgrid);
 
 };
 #endif /* __VTKvtkAmeletHDFMeshReader_H_  */

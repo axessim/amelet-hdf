@@ -14,14 +14,11 @@
 #include <vtkFloatArray.h>
 #include <vtkStringArray.h>
 #include <vtkIntArray.h>
-#include <vtkstd/string>
+
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "amelethdf.h"
-#include "arrayset.h"
-#include "vector.h"
 #include <sstream>
 
 class vtkAmeletHDFDataReader

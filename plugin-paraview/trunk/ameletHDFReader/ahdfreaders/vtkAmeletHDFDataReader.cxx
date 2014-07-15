@@ -7,18 +7,13 @@
 
 #include "vtkAmeletHDFDataReader.h"
 
-extern "C" {
-    #include "amelethdf.h"
-    #include "arrayset.h"
-    #include "hdfpath.h"
-}
 
 #define TRUE            1
 #define FALSE           0
 
 int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
 {
-    vtkFloatArray *array;
+/*    vtkFloatArray *array;
     vtkIntArray *iarray;
     arrayset_t ars;
     children_t child;
@@ -152,6 +147,6 @@ int vtkAmeletHDFDataReader::readData(hid_t file_id, vtkTable *table)
     }
    
     if(child.nbchild>1) free(child.childnames[0]);
-        free(child.childnames);
+        free(child.childnames);*/
     return 1;
 }

@@ -26,9 +26,9 @@
 #include "ahdfreaders/vtkAmeletHDFMeshReader.h"
 #include "ahdfreaders/vtkAmeletHDFDataReader.h"
 #include <sys/stat.h>
-#include <vtkstd/vector>
 #include <algorithm>
 #include <vtkTable.h>
+#include "ah5.h"
 
 /**
 * @class vtkAmeletHDFReader vtkAmeletHDFReader.h PathToHeader/vtkAmeletHDFReader.h
