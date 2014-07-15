@@ -13,10 +13,13 @@ SITE_NAME(HOST_NAME)
 
 OPTION(AMELETHDF_ENABLE_MPI "Enable MPI support" OFF)
 OPTION(AMELETHDF_BUILD_DOCS "Build Amelet-HDF docs" ON)
+OPTION(AMELETHDF_ENABLE_COVERAGE "Enable coverage" OFF)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/resources/cmake") # For custom cmake modules
 INCLUDE(DoxygenTarget)
-INCLUDE(CodeCoverage)
+IF (AMELETHDF_ENABLE_COVERAGE)
+  INCLUDE(CodeCoverage)
+ENDIF ()
 
 #-------------------------------------------------------------
 # Configu install-tree
@@ -163,7 +166,11 @@ ADD_SUBDIRECTORY(hl)
 #-------------------------------------------------------------
 # Coverage
 #-------------------------------------------------------------
-SETUP_TARGET_FOR_COVERAGE(coverage ctest coverage)
+IF (AMELETHDF_ENABLE_COVERAGE)
+  IF (CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "Coverage")
+    SETUP_TARGET_FOR_COVERAGE(coverage ctest coverage)
+  ENDIF ()
+ENDIF ()
 
 #-------------------------------------------------------------
 # create a AmeletHDFConfig.cmake file and co.
