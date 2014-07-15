@@ -11,6 +11,10 @@
 #include "ah5_exp_cmesh.h"
 #include "ah5_exp_algo.h"
 
+#if !__GNUC__
+# define __compar_fn_t int (*)(const void* p1, const void* p2)
+#endif
+
 int AH5_intersection_cmp(const AH5_intersection_t *a, const AH5_intersection_t *b)
 {
   int i;
@@ -67,7 +71,7 @@ char AH5_cmesh_compute_offset(const AH5_cmesh_t *cmesh,
 void AH5_free_cmesh(AH5_cmesh_t *cmesh)
 {
   int i;
-  
+
   if (cmesh)
   {
     AH5_free_cartesian_grid(&(cmesh->grid));
@@ -150,8 +154,6 @@ void AH5_free_region(AH5_region_t *region)
 
 void AH5_free_cgroup(AH5_cgroup_t *group)
 {
-  int i;
-  
   if (group)
   {
     if (group->path)
