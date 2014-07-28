@@ -54,7 +54,8 @@ char AH5_read_cpx_dataset(hid_t file_id, const char *path, const hsize_t mn, AH5
     type_id = AH5_H5Tcreate_cpx_memtype();
 
     dset_id = H5Dopen(file_id, path, H5P_DEFAULT);
-    if (H5Dread(dset_id, type_id, H5S_ALL, H5S_ALL, H5P_DEFAULT, *rdata) >= 0)
+
+    if (H5Dread(dset_id, type_id, H5S_ALL, H5S_ALL, H5P_DEFAULT, buf) >= 0)
     {
         success = AH5_TRUE;
         for (i = 0; i < mn; i++)
