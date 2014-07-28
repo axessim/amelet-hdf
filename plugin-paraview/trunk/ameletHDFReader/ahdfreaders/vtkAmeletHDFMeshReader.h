@@ -16,8 +16,12 @@ extern "C" {
 class vtkAmeletHDFMeshReader
 {
 public:
-    virtual int readUmesh(hid_t loc_id, AH5_umesh_t umesh, vtkUnstructuredGrid *ugrid);
-    virtual int readSmesh(hid_t loc_id, AH5_smesh_t smesh, vtkUnstructuredGrid *sgrid);
-
+    virtual int readUmesh(AH5_umesh_t umesh, vtkUnstructuredGrid *ugrid);
+    virtual int readSmesh(AH5_smesh_t smesh, vtkUnstructuredGrid *sgrid);
+    virtual int mergeVtkGrid(vtkUnstructuredGrid *gridtemp, vtkUnstructuredGrid *grid);
+    virtual int extractUmshGroup(AH5_msh_instance_t *msh_i, const char * path, AH5_umesh_t *ugroup);
+    virtual int extractSmshGroup(AH5_msh_instance_t *msh_i, const char * path, AH5_smesh_t *sgroup);
+    virtual int extractGroupGroup(AH5_msh_instance_t *msh_i, const char * path, vtkUnstructuredGrid *grid);
+    virtual int readMeshGroup(hid_t loc_id, const char* path, vtkUnstructuredGrid *grid);
 };
 #endif /* __VTKvtkAmeletHDFMeshReader_H_  */

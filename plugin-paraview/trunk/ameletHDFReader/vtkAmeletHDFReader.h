@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #include <algorithm>
 #include <vtkTable.h>
+#include <vtkCell.h>
 #include "ah5.h"
 
 /**
@@ -91,6 +92,9 @@ class VTK_EXPORT vtkAmeletHDFReader : public vtkMultiBlockDataSetAlgorithm
     int ActualTimeStep;
     int NumberOfTimeSteps;
     int TimeStepRange[2];
+//BTX
+    double *TimeStepValues;
+//ETX
 
 
     virtual int FillInputPortInformation(int, vtkInformation *info);
@@ -110,11 +114,6 @@ class VTK_EXPORT vtkAmeletHDFReader : public vtkMultiBlockDataSetAlgorithm
   private:
     vtkAmeletHDFReader(const vtkAmeletHDFReader&); // Not implemented.
     void operator=(const vtkAmeletHDFReader&); // Not implemented.
-//BTX
-      // Hide this variable declaration from bin/vtkWrapClientServer. If omitted, we'd get a
-      // *** SYNTAX ERROR found in parsing the header file vtkFooReader.h ***
-    vtkstd::vector<double> TimeStepValues;
-//ETX
 };
 #endif /* __VTKvtkAmeletHDFReader_H_  */
 
