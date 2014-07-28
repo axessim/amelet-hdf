@@ -57,14 +57,13 @@ extern "C" {
 
 #ifdef AH5_SDT_CCOMPLEX
 #include <complex.h>
-#define AH5_complex_t complex float
+    typedef complex AH5_complex_t;
 #else
     typedef struct _AH5_complex_t
     {
         float			re;
         float			im;
     } AH5_complex_t;
-
 #define creal(z) ((z).re)
 #define cimag(z) ((z).im)
 #endif /*AH5_STD_CCOMPLEX*/

@@ -23,8 +23,8 @@ char *test_write_string_dataset()
     int ndims, i, j;
     /*char wdata[DIM0][SDIM] =*/
     char *wdata[] = {"Parting", "is such",
-                              "sweet  ",
-                              "sorrow."};
+                     "sweet  ",
+                     "sorrow."};
     char **rdata;
 
     // Write a simple mesh test.

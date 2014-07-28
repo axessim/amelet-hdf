@@ -10,7 +10,7 @@
  * /conform_mesh.h5
  * `-- mesh/
  *     `-- $gmesh/
- *         `-- 4cmesh[@type=conform]/
+ *         `-- $cmesh[@type=conform]/
  *             +-- cartesianGrid/
  *             |   +-- x[]
  *             |   +-- y[]
@@ -71,7 +71,8 @@ extern "C" {
     INTER_INVALID       = -1,
     INTER_FILL          = 1,
     INTER_FREE          = 2,
-    INTER_STRUCTURED    = 3
+    INTER_STRUCTURED    = 3,
+    INTER_USER_TYPE     = 4
   } AH5_intersection_type_t;
 
   typedef struct
@@ -91,13 +92,16 @@ extern "C" {
   typedef enum
   {
     POLY_INVALID       = -1,/**Not valid polygon.*/
-    POLY_THROUGH       = 1, /**The two ends nodes are in the quad edges.*/
-    POLY_FIRST         = 2, /**Only the first node is in the quad edges, the
+    POLY_FIRST         = 1, /**Only the first node is in the quad edges, the
                              * other nodes are inside.*/
-    POLY_LAST          = 3, /**Only the last node is in the quad edges, the
+    POLY_LAST          = 2, /**Only the last node is in the quad edges, the
                              * other nodes are inside*/
-    POLY_INSIDE        = 4, /**All the node are inside the quad.*/
-    POLY_CTHROUGH      = 5  /**Close the through path.*/
+    POLY_INSIDE        = 3, /**All the node are inside the quad.*/
+    POLY_HOLE          = 4, /**All the node are inside the quad and it is close*/
+    
+    POLY_THROUGH       = 5, /**The two ends nodes are in the quad edges.*/
+    POLY_CTHROUGH      = 6, /**Close the through path.*/
+    POLY_CLOSE         = 7  /**The polygon is close and caring by the quad's edges*/
   } AH5_polygon_type_t;
 
   /**

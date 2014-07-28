@@ -62,8 +62,13 @@ char AH5_cmesh_compute_offset(const AH5_cmesh_t *cmesh,
     {
       regions_index[i] = -1;
 
-      if (cmesh->polygontypes[i * 2] == POLY_THROUGH)
-        regions_index[i] = count++;
+      switch (cmesh->polygontypes[i * 2])
+      {
+        case POLY_THROUGH:
+        case POLY_CLOSE:
+          regions_index[i] = count++;
+          break;
+      }
     }
   }
 }

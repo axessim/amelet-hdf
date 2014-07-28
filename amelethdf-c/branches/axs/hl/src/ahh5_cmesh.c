@@ -177,6 +177,7 @@ char AHH5_interpret_cmesh(AHH5_cmesh_t *height, AH5_cmesh_t *low)
 
         height->intersections[i].polygon->region = NULL;
 
+        /*Load the intersection who pass through the quad and make two simple region. */
         if (height->intersections[i].polygon->path.type == POLY_THROUGH)
         {
           height->intersections[i].polygon->region
@@ -186,6 +187,17 @@ char AHH5_interpret_cmesh(AHH5_cmesh_t *height, AH5_cmesh_t *low)
           AHH5_load_polygonal_path(&(height->intersections[i].polygon->region->path),
                                    low->regions[regions_index[abs(polygon_id)]].polygon_id,
                                    low, polygon_nodes_offsets);
+        }
+
+        /*Load the intersections who make a complex intersection.*/
+        if (height->intersections[i].polygon->path.type == POLY_CLOSE)
+        {
+          height->intersections[i].polygon->region
+              = (AHH5_region_t *)malloc(sizeof(AHH5_region_t));
+          height->intersections[i].polygon->region->area
+              = low->regions[regions_index[abs(polygon_id)]].area;
+          height->intersections[i].polygon->region->path = (AHH5_polygonal_path_t){
+            height->intersections[i].polygon->path.type, 0, NULL, 0};
         }
       }
     }
@@ -325,7 +337,7 @@ void AHH5_print_polygonal_path(
     const AHH5_cmesh_t *cmesh)
 {
   int i;
-  printf("%*s-polygonal path: %lu %lu\n", space, "",
+  printf("%*s-polygonal path: type=%lu, orientation=%lu\n", space, "",
          (unsigned long) path->type, (unsigned long) path->orientation);
   printf("%*s nb nodes: %lu", space + 2, "", path->nb_nodes);
 
