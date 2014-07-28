@@ -30,7 +30,7 @@ extern "C" {
    * \scriptstyle(A_1, A_2, \dots, A_n) called its vertices so that the curve
    * consists of the line segments connecting the consecutive vertices.
    *
-   * In this context the polygonal path must insed a quad edges inclued.
+   * In this context the polygonal path must insert a quad's edges.
    *
    */
   typedef struct _AHH5_polygonal_path_t
