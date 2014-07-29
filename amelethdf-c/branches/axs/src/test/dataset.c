@@ -39,7 +39,8 @@ char *test_write_complex_dataset()
     cplx[1].re=10.5;
     cplx[1].im=20.5;
 
-    mu_assert("Write complex dataset.",	AH5_write_cpx_dataset(file_id,"dataset_name", 2, cplx));
+    mu_assert("Write complex dataset.",	
+              AH5_write_cpx_dataset(file_id,"dataset_name", 2, cplx));
     // Test the written data using hdf5 API.
     int rank;
 
