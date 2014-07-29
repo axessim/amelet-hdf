@@ -31,6 +31,13 @@ char *test_write_complex_dataset()
     size_t sdim;
     hsize_t dims[1] = {2};
     int ndims, i, j;
+    int rank;
+    size_t type_size;
+    float * buf;
+    hid_t real_id_type;
+    herr_t status;
+    hsize_t *newdims;
+
     AH5_complex_t cplx[2];
 
     file_id = AH5_auto_test_file();
@@ -42,14 +49,6 @@ char *test_write_complex_dataset()
     mu_assert("Write complex dataset.",	
               AH5_write_cpx_dataset(file_id,"dataset_name", 2, cplx));
     // Test the written data using hdf5 API.
-    int rank;
-
-    int length;
-    size_t type_size;
-    float * buf;
-    hid_t real_id_type;
-    herr_t status;
-    hsize_t *newdims;
 
     real_id_type = create_type_id(H5T_NATIVE_FLOAT);
     status = H5LTget_dataset_ndims(file_id, "dataset_name", &rank);
@@ -70,7 +69,6 @@ char *test_write_complex_dataset()
         j = j + 2;
     }
     free(buf);
-    free(newdims);
 
 
     return MU_FINISHED_WITHOUT_ERRORS;
@@ -78,23 +76,23 @@ char *test_write_complex_dataset()
 char *test_read_complex_dataset()
 {
 
-	int i,rank = 1;
+    int i,rank = 1;
     hsize_t dims[1];
-	hid_t dataspace_id, dset_id, dtr_id, dti_id, file_id;
-	size_t type_size;
-	hid_t type_id;
-	herr_t status, status_2;
-	float *real_part, *imag_part;
-	const char* path = "dataset_name";
-	AH5_complex_t cplx[2];
-	AH5_complex_t * rdata;
+    hid_t dataspace_id, dset_id, dtr_id, dti_id, file_id;
+    size_t type_size;
+    hid_t type_id;
+    herr_t status, status_2;
+    float *real_part, *imag_part;
+    const char* path = "dataset_name";
+    AH5_complex_t cplx[2];
+    AH5_complex_t * rdata;
 
-	file_id = AH5_auto_test_file();
+    file_id = AH5_auto_test_file();
 
-	cplx[0].re=10.;
-	cplx[0].im=20.;
-	cplx[1].re=10.5;
-	cplx[1].im=20.5;
+    cplx[0].re=10.;
+    cplx[0].im=20.;
+    cplx[1].re=10.5;
+    cplx[1].im=20.5;
     //first write complex array set with hdf5 lib
 	real_part = (float *)malloc(2 * sizeof(float));
     imag_part = (float *)malloc(2 * sizeof(float));
