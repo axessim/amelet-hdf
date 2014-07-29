@@ -1,6 +1,8 @@
 #ifndef AH5_C_FLTYPE_H
 #define AH5_C_FLTYPE_H
 
+#include <hdf5.h>
+
 #include "ah5_general.h"
 
 #ifdef __cplusplus

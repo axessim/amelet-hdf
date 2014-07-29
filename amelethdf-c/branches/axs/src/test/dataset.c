@@ -12,7 +12,7 @@ int tests_run = 0;
 hid_t create_type_id(hid_t real_or_double)
 {
     hid_t type_id;
-    hsize_t type_size, two_type_size;
+    hid_t type_size, two_type_size;
     herr_t status;
 
     type_size = H5Tget_size(real_or_double);
@@ -27,22 +27,19 @@ hid_t create_type_id(hid_t real_or_double)
 // Data extracted from http://www.hdfgroup.org/ftp/HDF5/examples/examples-by-api/hdf5-examples/1_8/C/H5T/h5ex_t_string.c
 char *test_write_complex_dataset()
 {
-	hid_t file_id, filetype, memtype, space, dset;
-	size_t sdim;
-	hsize_t dims[1] = {2};
-	int ndims, i, j;
-	AH5_complex_t cplx[2];
+    hid_t file_id, filetype, memtype, space, dset;
+    size_t sdim;
+    hsize_t dims[1] = {2};
+    int ndims, i, j;
+    AH5_complex_t cplx[2];
 
+    file_id = AH5_auto_test_file();
+    cplx[0].re=10.;
+    cplx[0].im=20.;
+    cplx[1].re=10.5;
+    cplx[1].im=20.5;
 
-	file_id = AH5_auto_test_file();
-
-	cplx[0].re=10.;
-	cplx[0].im=20.;
-	cplx[1].re=10.5;
-	cplx[1].im=20.5;
-
-    mu_assert("Write complex dataset.",
-    		AH5_write_cpx_dataset(file_id,"dataset_name", 2, cplx));
+    mu_assert("Write complex dataset.",	AH5_write_cpx_dataset(file_id,"dataset_name", 2, cplx));
     // Test the written data using hdf5 API.
     int rank;
 
