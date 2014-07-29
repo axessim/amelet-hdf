@@ -32,6 +32,7 @@ char *test_write_complex_dataset()
     hsize_t dims[1] = {2};
     int ndims, i, j;
     int rank;
+    int length;
     size_t type_size;
     float * buf;
     hid_t real_id_type;
