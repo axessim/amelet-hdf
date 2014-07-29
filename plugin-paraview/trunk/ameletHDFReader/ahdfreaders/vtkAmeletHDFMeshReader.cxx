@@ -29,8 +29,6 @@ using namespace vtkstd;
 
 int vtkAmeletHDFMeshReader::readUmesh( AH5_umesh_t umesh, vtkUnstructuredGrid *ugrid)
 {
-    std::cout<<"Read umesh"<<std::endl;
-    //std::cout<<"=========="<<std::endl;
 
     int idel;
     float xyz[3];
@@ -184,14 +182,13 @@ int vtkAmeletHDFMeshReader::readUmesh( AH5_umesh_t umesh, vtkUnstructuredGrid *u
     
     ugrid->GetCellData()->AddArray(groupId);
     groupId->Delete();
-    std::cout<<"Read umesh end"<<std::endl;
+
     return 1;
 }
 
 int vtkAmeletHDFMeshReader::readSmesh(AH5_smesh_t smesh, vtkUnstructuredGrid *sgrid)
 {
-    //std::cout<<"Read smesh"<<std::endl;
-    //std::cout<<"=========="<<std::endl;
+
     vector<bool> ptexist;
     int idptexist;
 
@@ -852,7 +849,6 @@ int vtkAmeletHDFMeshReader::extractSmshGroup(AH5_msh_instance_t *msh_i, const ch
     		sgroup->groups = (AH5_sgroup_t *) malloc ((size_t) sizeof(AH5_sgroup_t));
     		sgroup->groups[0].dims[0]=msh_i->data.structured.groups[i].dims[0];
     		sgroup->groups[0].dims[1]=msh_i->data.structured.groups[i].dims[1];
-    		std::cout<<sgroup->groups[0].dims[0]<<" , "<<sgroup->groups[0].dims[1]<<std::endl;
     		sgroup->groups[0].elements = (int *) malloc((size_t) sgroup->groups[0].dims[0]*sgroup->groups[0].dims[1]*sizeof(int));
     		for(int j=0;j<sgroup->groups[0].dims[0]*sgroup->groups[0].dims[1];j++)
     			sgroup->groups[0].elements[j]=msh_i->data.structured.groups[i].elements[j];
@@ -1069,10 +1065,6 @@ int vtkAmeletHDFMeshReader::readMeshGroup(hid_t loc_id, const char* path, vtkUns
     AH5_umesh_t ugroup;
     AH5_smesh_t sgroup;
 
-    std::cout<<"[vtkAmeletHDFMeshReader::readMeshGroup] BEGIN"<<std::endl;
-
-
-
     base = AH5_get_base_from_path(path);
     grp = AH5_get_name_from_path(base);
     mesh_instance = AH5_get_base_from_path(base);
@@ -1107,6 +1099,6 @@ int vtkAmeletHDFMeshReader::readMeshGroup(hid_t loc_id, const char* path, vtkUns
     	  	nbelt = readSSom( &msh_i,path, grid);
     	}
     AH5_free_msh_instance(&msh_i);
-    std::cout<<"[vtkAmeletHDFMeshReader::readMeshGroup] END"<<std::endl;
+
 	return nbelt;
 }

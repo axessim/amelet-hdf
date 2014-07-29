@@ -585,7 +585,7 @@ int vtkAmeletHDFReader::RequestData( vtkInformation *request,
   hid_t file_id, loc_id;
   herr_t status;
   char* entryPoint = NULL;
-  std::cout<<"[vtkAmeletHDFReader::RequestData] BEGIN"<<std::endl;
+
   // get the info objects
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::GetData(outInfo);
@@ -699,7 +699,7 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
                                            vtkInformationVector **vtkNotUsed(inputVector),
                                            vtkInformationVector *outputVector)
 {
-	std::cout<<"[vtkAmeletHDFReader::RequestInformation] BEGIN"<<std::endl;
+
 	vtkInformation* outInfo = outputVector->GetInformationObject(0);
 	int dataType=0;
 	char* entryPoint = NULL;
@@ -726,9 +726,9 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
     	TimeStepMode = false;
     	const char * path=".";
     	AH5_read_str_attr(file_id, path, AH5_A_ENTRY_POINT, &entryPoint);
-        std::cout<<"entrypoint="<<entryPoint<<std::endl;
+
     	AH5_read_floatingtype(file_id,entryPoint, &floatingtype);
-    	std::cout<<"End read ft"<<std::endl;
+
         for(int i=0;i<floatingtype.data.arrayset.nb_dims;i++)
         {
 
@@ -763,7 +763,7 @@ int vtkAmeletHDFReader::RequestInformation(vtkInformation *vtkNotUsed(request),
 
 
     if (dataType==0) return 0;
-    std::cout<<"[vtkAmeletHDFReader::RequestInformation] END"<<std::endl;
+
 	return 1;
 }
 
