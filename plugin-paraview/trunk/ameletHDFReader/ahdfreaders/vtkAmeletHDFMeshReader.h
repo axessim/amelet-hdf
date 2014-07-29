@@ -22,6 +22,8 @@ public:
     virtual int extractUmshGroup(AH5_msh_instance_t *msh_i, const char * path, AH5_umesh_t *ugroup);
     virtual int extractSmshGroup(AH5_msh_instance_t *msh_i, const char * path, AH5_smesh_t *sgroup);
     virtual int extractGroupGroup(AH5_msh_instance_t *msh_i, const char * path, vtkUnstructuredGrid *grid);
+    virtual int readUSom( AH5_msh_instance_t *msh_i, const char * path, vtkUnstructuredGrid *grid);
+    virtual int readSSom( AH5_msh_instance_t *msh_i, const char * path, vtkUnstructuredGrid *grid);
     virtual int readMeshGroup(hid_t loc_id, const char* path, vtkUnstructuredGrid *grid);
 };
 #endif /* __VTKvtkAmeletHDFMeshReader_H_  */

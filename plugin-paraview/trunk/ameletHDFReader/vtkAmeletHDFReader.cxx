@@ -283,8 +283,7 @@ int vtkAmeletHDFReader::ReadDataOnMesh(hid_t file_id, vtkMultiBlockDataSet *outp
 				}
 	}
 	int nbelt = 0;
-	for (int i=0;i<nbdataarray;i++)
-			std::cout<<"dataname ["<<i<<"] = "<<dataname[i]<<std::endl;
+
 	nbelt = ahdfmesh.readMeshGroup(file_id,ft.data.arrayset.dims[meshentitydim].values.s[0],grid);
 
 	int offset = 0;

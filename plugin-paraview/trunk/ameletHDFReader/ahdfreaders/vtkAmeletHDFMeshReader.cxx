@@ -926,6 +926,137 @@ int vtkAmeletHDFMeshReader::extractGroupGroup(AH5_msh_instance_t *msh_i, const c
     gridtemp->Delete();
 	return nbelt;
 }
+
+int vtkAmeletHDFMeshReader::readUSom( AH5_msh_instance_t *msh_i, const char * path, vtkUnstructuredGrid *grid)
+{
+	int idel;
+	int nbelt=-1;
+    float xyz[3];
+    vtkPoints *points = vtkPoints::New();
+    int nb_nodes = msh_i->data.unstructured.nb_nodes[0];
+    for (int i=0 ;i<nb_nodes;i++)
+    {
+	    for (int j=0;j<msh_i->data.unstructured.nb_nodes[1];j++)
+	    {
+		    xyz[j]= msh_i->data.unstructured.nodes[i*msh_i->data.unstructured.nb_nodes[1]+j];
+	    }
+        points->InsertNextPoint(xyz);
+    }
+    grid->SetPoints(points);
+    points->Delete();
+
+    for(int j=0;j<msh_i->data.unstructured.nb_som_tables;j++)
+    {
+    	if(strcmp(msh_i->data.unstructured.som_tables[j].path,path)==0)
+    	{
+    		if(msh_i->data.unstructured.som_tables[j].type==SOM_POINT_IN_ELEMENT)
+    		{
+    			nbelt = msh_i->data.unstructured.som_tables[j].data.pie.nb_points;
+    			for(int k=0;k<msh_i->data.unstructured.som_tables[j].data.pie.nb_points;k++)
+    			{
+    			    int idnode=0;
+    			    for(int i=0; i<msh_i->data.unstructured.nb_elementtypes;i++)
+    			    {
+    			      	if((msh_i->data.unstructured.elementtypes[i]==1) ||(msh_i->data.unstructured.elementtypes[i]==2))
+    			       	{
+    			       		vtkLine * linecell = vtkLine::New();
+    			       		linecell->GetPointIds()->SetId(0,msh_i->data.unstructured.elementnodes[idnode]);
+    			       		linecell->GetPointIds()->SetId(1,msh_i->data.unstructured.elementnodes[idnode+1]);
+    			       		if(msh_i->data.unstructured.som_tables[j].data.pie.indices[k]==i)
+    			       		    grid->InsertNextCell(linecell->GetCellType(),linecell->GetPointIds());
+    			            linecell->Delete();
+    			       		idnode=idnode+2;
+    			            if(msh_i->data.unstructured.elementtypes[i]==2) idnode=idnode+1;
+    			       	}
+    			       	else if((msh_i->data.unstructured.elementtypes[i]==11) || (msh_i->data.unstructured.elementtypes[i]==12))
+    			       	{
+    			       		vtkTriangle * tricell = vtkTriangle::New();
+    			       		tricell->GetPointIds()->SetId(0,msh_i->data.unstructured.elementnodes[idnode]);
+    			       		tricell->GetPointIds()->SetId(1,msh_i->data.unstructured.elementnodes[idnode+1]);
+    			       		tricell->GetPointIds()->SetId(2,msh_i->data.unstructured.elementnodes[idnode+2]);
+    			       		if(msh_i->data.unstructured.som_tables[j].data.pie.indices[k]==i)
+         			       		grid->InsertNextCell(tricell->GetCellType(),tricell->GetPointIds());
+    			            tricell->Delete();
+    			       		idnode=idnode+3;
+    			            if(msh_i->data.unstructured.elementtypes[i]==12) idnode=idnode+3;
+    			       	}
+    			       	else if((msh_i->data.unstructured.elementtypes[i]==13) || (msh_i->data.unstructured.elementtypes[i]==14))
+    			       	{
+    			       		vtkQuad * quadcell = vtkQuad::New();
+    			       		quadcell->GetPointIds()->SetId(0,msh_i->data.unstructured.elementnodes[idnode]);
+    			       		quadcell->GetPointIds()->SetId(1,msh_i->data.unstructured.elementnodes[idnode+1]);
+    			       		quadcell->GetPointIds()->SetId(2,msh_i->data.unstructured.elementnodes[idnode+2]);
+    			       		quadcell->GetPointIds()->SetId(3,msh_i->data.unstructured.elementnodes[idnode+3]);
+    			       		if(msh_i->data.unstructured.som_tables[j].data.pie.indices[k]==i)
+    			       		    grid->InsertNextCell(quadcell->GetCellType(),quadcell->GetPointIds());
+    			            quadcell->Delete();
+    			       		idnode=idnode+4;
+    			            if(msh_i->data.unstructured.elementtypes[i]==14) idnode=idnode+4;
+    			       	}
+    			       	else if(msh_i->data.unstructured.elementtypes[i]==101)
+    			       	{
+    			       		vtkTetra * tetracell = vtkTetra::New();
+    			       		tetracell->GetPointIds()->SetId(0,msh_i->data.unstructured.elementnodes[idnode]);
+    			       		tetracell->GetPointIds()->SetId(1,msh_i->data.unstructured.elementnodes[idnode+1]);
+    			       		tetracell->GetPointIds()->SetId(2,msh_i->data.unstructured.elementnodes[idnode+2]);
+    			       		tetracell->GetPointIds()->SetId(3,msh_i->data.unstructured.elementnodes[idnode+3]);
+    			       		if(msh_i->data.unstructured.som_tables[j].data.pie.indices[k]==i)
+    			       		    grid->InsertNextCell(tetracell->GetCellType(),tetracell->GetPointIds());
+    			            tetracell->Delete();
+    			       		idnode=idnode+4;
+    			       	}
+    			       	else if(msh_i->data.unstructured.elementtypes[i]==104)
+		       	       	{
+		       	       		vtkHexahedron * hexacell = vtkHexahedron::New();
+		       	       		hexacell->GetPointIds()->SetId(0,msh_i->data.unstructured.elementnodes[idnode]);
+		       	       		hexacell->GetPointIds()->SetId(1,msh_i->data.unstructured.elementnodes[idnode+1]);
+		       	       		hexacell->GetPointIds()->SetId(2,msh_i->data.unstructured.elementnodes[idnode+2]);
+		       	       		hexacell->GetPointIds()->SetId(3,msh_i->data.unstructured.elementnodes[idnode+3]);
+		       	       		hexacell->GetPointIds()->SetId(4,msh_i->data.unstructured.elementnodes[idnode+4]);
+		       	       		hexacell->GetPointIds()->SetId(5,msh_i->data.unstructured.elementnodes[idnode+5]);
+		       	       		hexacell->GetPointIds()->SetId(6,msh_i->data.unstructured.elementnodes[idnode+6]);
+		       	       		hexacell->GetPointIds()->SetId(7,msh_i->data.unstructured.elementnodes[idnode+7]);
+    			       		if(msh_i->data.unstructured.som_tables[j].data.pie.indices[k]==i)
+   			       	       		grid->InsertNextCell(hexacell->GetCellType(),hexacell->GetPointIds());
+		       	            hexacell->Delete();
+		       	       		idnode=idnode+8;
+		       	       	}
+    			    }
+    			}
+    		}
+    	}
+    }
+	return nbelt;
+}
+
+int vtkAmeletHDFMeshReader::readSSom( AH5_msh_instance_t *msh_i, const char * path, vtkUnstructuredGrid *grid)
+{
+	int nbelt = -1;
+	vtkPoints *points = vtkPoints::New();
+	float xyz[3];
+
+	for(int j=0;msh_i->data.structured.nb_som_tables;j++)
+	{
+		if(strcmp(msh_i->data.structured.som_tables[j].path,path)==0)
+		{
+			for(int i=0;i<msh_i->data.structured.som_tables[j].nb_points;i++)
+			{
+				xyz[0]=msh_i->data.structured.x.nodes[msh_i->data.structured.som_tables[j].elements[i][0]];
+				xyz[1]=msh_i->data.structured.x.nodes[msh_i->data.structured.som_tables[j].elements[i][1]];
+				xyz[2]=msh_i->data.structured.x.nodes[msh_i->data.structured.som_tables[j].elements[i][2]];
+				points->InsertNextPoint(xyz);
+				vtkVertex *vertexcell = vtkVertex::New();
+				vertexcell->GetPointIds()->SetId(0,i);
+				grid->InsertNextCell(vertexcell->GetCellType(),vertexcell->GetPointIds());
+			    vertexcell->Delete();
+			}
+            nbelt = msh_i->data.structured.som_tables[j].nb_points;
+		}
+	}
+	return nbelt;
+}
+
+
 int vtkAmeletHDFMeshReader::readMeshGroup(hid_t loc_id, const char* path, vtkUnstructuredGrid *grid)
 {
 
@@ -966,6 +1097,15 @@ int vtkAmeletHDFMeshReader::readMeshGroup(hid_t loc_id, const char* path, vtkUns
     }
     else if(strcmp(grp,"groupGroup")==0)
     	nbelt = extractGroupGroup(&msh_i,path,grid);
+    else if(strcmp(grp,"selectorOnMesh")==0)
+        if(msh_i.type==MSH_UNSTRUCTURED)
+    	{
+    	    nbelt = readUSom( &msh_i,path, grid);
+    	}
+    	else if(msh_i.type==MSH_STRUCTURED)
+    	{
+    	  	nbelt = readSSom( &msh_i,path, grid);
+    	}
     AH5_free_msh_instance(&msh_i);
     std::cout<<"[vtkAmeletHDFMeshReader::readMeshGroup] END"<<std::endl;
 	return nbelt;
