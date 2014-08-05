@@ -73,6 +73,69 @@ char AH5_cmesh_compute_offset(const AH5_cmesh_t *cmesh,
   }
 }
 
+
+char AH5_init_intersection(AH5_intersection_t *inter, AH5_intersection_type_t type, AH5_index_t i, AH5_index_t j, AH5_index_t k, char normal, AH5_index_t polygon_id)
+{
+  if (!inter)
+    return AH5_FALSE;
+
+  inter->type = type;
+  inter->polygon_id = polygon_id;
+  inter->normal = normal;
+  inter->index[i] = i;
+  inter->index[j] = j;
+  inter->index[k] = k;
+  return AH5_TRUE;
+}
+
+char AH5_init_region(AH5_region_t *region, float area, AH5_index_t polygon_id)
+{
+  if (!region)
+    return AH5_FALSE;
+
+  region->area = area;
+  region->polygon_id = polygon_id;
+
+  return AH5_TRUE;
+}
+
+char AH5_init_conform_group(AH5_cgroup_t *group, const char *path, const char *type, const char *entitytype, hsize_t nb_groupelts, const AH5_index_t *groupelts)
+{
+  if (!group)
+    return AH5_FALSE;
+
+  group->path = NULL;
+  if (path)
+  {
+    group->path = (char*)malloc(sizeof(char) * (strlen(path)+1));
+    strcpy(group->path, path);
+  }
+
+  group->type = NULL;
+  if (type)
+  {
+    group->type = (char*)malloc(sizeof(char) * (strlen(type)+1));
+    strcpy(group->type, type);
+  }
+
+  group->entitytype = NULL;
+  if (entitytype)
+  {
+    group->entitytype = (char*)malloc(sizeof(char) * (strlen(entitytype)+1));
+    strcpy(group->entitytype, entitytype);
+  }
+
+  group->groupelts = NULL;
+  group->nb_groupelts = 0;
+  if (groupelts && nb_groupelts)
+  {
+    group->groupelts = (AH5_index_t*)malloc(sizeof(AH5_index_t) * nb_groupelts);
+    memcpy(group->groupelts, groupelts, sizeof(AH5_index_t) * nb_groupelts);
+  }
+
+  return AH5_TRUE;
+}
+
 void AH5_free_cmesh(AH5_cmesh_t *cmesh)
 {
   int i;

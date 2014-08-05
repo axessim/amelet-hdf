@@ -98,7 +98,7 @@ extern "C" {
                              * other nodes are inside*/
     POLY_INSIDE        = 3, /**All the node are inside the quad.*/
     POLY_HOLE          = 4, /**All the node are inside the quad and it is close*/
-    
+
     POLY_THROUGH       = 5, /**The two ends nodes are in the quad edges.*/
     POLY_CTHROUGH      = 6, /**Close the through path.*/
     POLY_CLOSE         = 7  /**The polygon is close and caring by the quad's edges*/
@@ -147,6 +147,40 @@ extern "C" {
     hsize_t              nb_groupgroups;
     AH5_groupgroup_t     *groupgroups;
   } AH5_cmesh_t;
+
+  /**
+   * Initialized intersection
+   *
+   * @param[inout] inter a valid intersection instance
+   * @param type the intersection type (Fill, Free, Structured ...)
+   * @param index the index under the grid (i, j, k)
+   * @param normal the quad index (0=x, 1=y, 2=z)
+   * @param polygon_id the polygon index under the conform mesh polygons list
+   *
+   * @return true is success.
+   **/
+  AH5_PUBLIC char AH5_init_intersection(AH5_intersection_t *inter, AH5_intersection_type_t type, AH5_index_t i, AH5_index_t j, AH5_index_t k, char normal, AH5_index_t polygon_id);
+
+  /**
+   * Initialized region
+   *
+   * @param[inout] region a valid region instance
+   * @param area The region area define by the close polygon.
+   * @param polygon_id Define the polygon who close the area
+   **/
+  AH5_PUBLIC char AH5_init_region(AH5_region_t *region, float area, AH5_index_t polygon_id);
+
+  /**
+   * Initialized conform group
+   *
+   * @param[inout] group a valid group instance
+   * @param path the group mesh path
+   * @param type the type (node or element)
+   * @param entitytype the element type (edge, face, volume)
+   * @param nb_groupelts the number of elements
+   * @param groupelts the elements array
+   **/
+  AH5_PUBLIC char AH5_init_conform_group(AH5_cgroup_t *group, const char *path, const char *type, const char *entitytype, hsize_t nb_groupelts, const AH5_index_t *groupelts);
 
   /**
    * Read conform mesh group at given location (file_id, path).
@@ -248,7 +282,7 @@ extern "C" {
    * @return true if success.
    */
   AH5_PUBLIC char AH5_cmesh_compute_offset(
-	const AH5_cmesh_t *cmesh,
+        const AH5_cmesh_t *cmesh,
     hsize_t *polygon_nodes_offsets,
     hsize_t *regions_index);
 

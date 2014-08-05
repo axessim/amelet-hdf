@@ -7,7 +7,7 @@
 #define AH5_RETURN_IF_FAILED(status, ret) RETURN_IF_FAILED(AH5_FAILED(status), ret)
 #define HDF5_RETURN_IF_FAILED(status, ret) RETURN_IF_FAILED(HDF5_FAILED(status), ret)
 
-#include <ah5_config.h>
+#include "ah5_config.h"
 #include "ah5.h"
 
 #ifdef AH5_WITH_MPI_

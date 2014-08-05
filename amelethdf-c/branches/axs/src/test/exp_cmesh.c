@@ -14,35 +14,35 @@ static char *test_sort_intersection()
   int i;
   AH5_cmesh_t cmesh;
   AH5_intersection_t inters[10];
-  inters[9] = (AH5_intersection_t){INTER_FILL,       {2, 5, 7}, 0, 6};
-  inters[8] = (AH5_intersection_t){INTER_FILL,       {2, 6, 7}, 0, 5};
-  inters[7] = (AH5_intersection_t){INTER_FILL,       {2, 6, 8}, 0, 5};
-  inters[6] = (AH5_intersection_t){INTER_FILL,       {2, 6, 8}, 0, 5};
-  inters[5] = (AH5_intersection_t){INTER_FILL,       {2, 6, 8}, 0, 5};
-  inters[4] = (AH5_intersection_t){INTER_STRUCTURED, {2, 6, 8}, 0, 5};
-  inters[3] = (AH5_intersection_t){INTER_FILL,       {2, 6, 8}, 1, 5};
-  inters[2] = (AH5_intersection_t){INTER_FREE,       {2, 6, 8}, 1, 5};
-  inters[1] = (AH5_intersection_t){INTER_FREE,       {2, 6, 8}, 1, 6};
-  inters[0] = (AH5_intersection_t){INTER_STRUCTURED, {2, 6, 8}, 1, 5};
+  AH5_init_intersection(inters + 9, INTER_FILL,       2, 5, 7, 0, 6);
+  AH5_init_intersection(inters + 8, INTER_FILL,       2, 6, 7, 0, 5);
+  AH5_init_intersection(inters + 7, INTER_FILL,       2, 6, 8, 0, 5);
+  AH5_init_intersection(inters + 6, INTER_FILL,       2, 6, 8, 0, 5);
+  AH5_init_intersection(inters + 5, INTER_FILL,       2, 6, 8, 0, 5);
+  AH5_init_intersection(inters + 4, INTER_STRUCTURED, 2, 6, 8, 0, 5);
+  AH5_init_intersection(inters + 3, INTER_FILL,       2, 6, 8, 1, 5);
+  AH5_init_intersection(inters + 2, INTER_FREE,       2, 6, 8, 1, 5);
+  AH5_init_intersection(inters + 1, INTER_FREE,       2, 6, 8, 1, 6);
+  AH5_init_intersection(inters + 0, INTER_STRUCTURED, 2, 6, 8, 1, 5);
 
   cmesh.nb_intersections = 10;
   cmesh.intersections = (AH5_intersection_t *)malloc(cmesh.nb_intersections
                         * sizeof(AH5_intersection_t));
 
-  cmesh.intersections[0] = (AH5_intersection_t){INTER_FREE, {2, 6, 8}, 1, 5};
-  cmesh.intersections[1] = (AH5_intersection_t){INTER_FILL, {2, 6, 8}, 0, 5};
-  cmesh.intersections[2] = (AH5_intersection_t){INTER_STRUCTURED, {2, 6, 8}, 0, 5};
-  cmesh.intersections[3] = (AH5_intersection_t){INTER_FILL, {2, 5, 7}, 0, 6};
-  cmesh.intersections[4] = (AH5_intersection_t){INTER_STRUCTURED, {2, 6, 8}, 1, 5};
-  cmesh.intersections[5] = (AH5_intersection_t){INTER_FREE, {2, 6, 8}, 1, 6};
-  cmesh.intersections[6] = (AH5_intersection_t){INTER_FILL, {2, 6, 7}, 0, 5};
-  cmesh.intersections[7] = (AH5_intersection_t){INTER_FILL, {2, 6, 8}, 1, 5};
-  cmesh.intersections[8] = (AH5_intersection_t){INTER_FILL, {2, 6, 8}, 0, 5};
-  cmesh.intersections[9] = (AH5_intersection_t){INTER_FILL, {2, 6, 8}, 0, 5};
+  AH5_init_intersection(cmesh.intersections + 0, INTER_FREE, 2, 6, 8, 1, 5);
+  AH5_init_intersection(cmesh.intersections + 1, INTER_FILL, 2, 6, 8, 0, 5);
+  AH5_init_intersection(cmesh.intersections + 2, INTER_STRUCTURED, 2, 6, 8, 0, 5);
+  AH5_init_intersection(cmesh.intersections + 3, INTER_FILL, 2, 5, 7, 0, 6);
+  AH5_init_intersection(cmesh.intersections + 4, INTER_STRUCTURED, 2, 6, 8, 1, 5);
+  AH5_init_intersection(cmesh.intersections + 5, INTER_FREE, 2, 6, 8, 1, 6);
+  AH5_init_intersection(cmesh.intersections + 6, INTER_FILL, 2, 6, 7, 0, 5);
+  AH5_init_intersection(cmesh.intersections + 7, INTER_FILL, 2, 6, 8, 1, 5);
+  AH5_init_intersection(cmesh.intersections + 8, INTER_FILL, 2, 6, 8, 0, 5);
+  AH5_init_intersection(cmesh.intersections + 9, INTER_FILL, 2, 6, 8, 0, 5);
 
   mu_assert("Sort intersection",
             AH5_cmesh_sort_intersection(&cmesh));
-  
+
 
   for (i = 0; i < 10; ++i)
   {
@@ -145,7 +145,8 @@ static char *test_free_cmesh()
 {
   AH5_cmesh_t cmesh;
   int i;
-  
+  AH5_index_t groupelts[] = {0, 1, 2, 3, 4, 5, 6, 7};
+
   /* Build the grid */
   cmesh.grid.x.nb_nodes = 3;
   cmesh.grid.x.nodes = (float*)malloc(cmesh.grid.x.nb_nodes * sizeof(float));
@@ -163,26 +164,26 @@ static char *test_free_cmesh()
       (AH5_intersection_t*)malloc(
           cmesh.nb_intersections * sizeof(AH5_intersection_t));
   /* map 1 */
-  cmesh.intersections[ 0] = (AH5_intersection_t){INTER_FREE, {2,1,3}, 2, 0};
-  cmesh.intersections[ 1] = (AH5_intersection_t){INTER_FREE, {2,2,3}, 2, 1};
-  cmesh.intersections[ 2] = (AH5_intersection_t){INTER_FREE, {3,2,3}, 2, 2};
-  cmesh.intersections[ 3] = (AH5_intersection_t){INTER_FREE, {3,3,3}, 2, 3};
-  cmesh.intersections[ 4] = (AH5_intersection_t){INTER_FREE, {4,3,3}, 2, 4};
+  AH5_init_intersection(cmesh.intersections + 0, INTER_FREE, 2,1,3, 2, 0);
+  AH5_init_intersection(cmesh.intersections + 1, INTER_FREE, 2,2,3, 2, 1);
+  AH5_init_intersection(cmesh.intersections + 2, INTER_FREE, 3,2,3, 2, 2);
+  AH5_init_intersection(cmesh.intersections + 3, INTER_FREE, 3,3,3, 2, 3);
+  AH5_init_intersection(cmesh.intersections + 4, INTER_FREE, 4,3,3, 2, 4);
   /**/
-  cmesh.intersections[ 5] = (AH5_intersection_t){INTER_FREE, {2,2,3}, 2, 1};
-  cmesh.intersections[ 6] = (AH5_intersection_t){INTER_FREE, {3,2,3}, 2, 2};
-  cmesh.intersections[ 7] = (AH5_intersection_t){INTER_FREE, {3,3,3}, 2, 3};
+  AH5_init_intersection(cmesh.intersections + 5, INTER_FREE, 2,2,3, 2, 1);
+  AH5_init_intersection(cmesh.intersections + 6, INTER_FREE, 3,2,3, 2, 2);
+  AH5_init_intersection(cmesh.intersections + 7, INTER_FREE, 3,3,3, 2, 3);
   /* map 2 */
-  cmesh.intersections[ 8] = (AH5_intersection_t){INTER_FREE, {3,1,3}, 2, 5};
-  cmesh.intersections[ 9] = (AH5_intersection_t){INTER_FREE, {3,2,3}, 2, 6};
-  cmesh.intersections[10] = (AH5_intersection_t){INTER_FREE, {4,2,3}, 2, 7};
-  cmesh.intersections[11] = (AH5_intersection_t){INTER_FREE, {4,3,3}, 2, 8};
+  AH5_init_intersection(cmesh.intersections + 8, INTER_FREE, 3,1,3, 2, 5);
+  AH5_init_intersection(cmesh.intersections + 9, INTER_FREE, 3,2,3, 2, 6);
+  AH5_init_intersection(cmesh.intersections + 10, INTER_FREE, 4,2,3, 2, 7);
+  AH5_init_intersection(cmesh.intersections + 11, INTER_FREE, 4,3,3, 2, 8);
   /**/
-  cmesh.intersections[12] = (AH5_intersection_t){INTER_FREE, {3,2,3}, 2, 6};
-  cmesh.intersections[13] = (AH5_intersection_t){INTER_FREE, {4,2,3}, 2, 7};
+  AH5_init_intersection(cmesh.intersections + 12, INTER_FREE, 3,2,3, 2, 6);
+  AH5_init_intersection(cmesh.intersections + 13, INTER_FREE, 4,2,3, 2, 7);
   /**/
   /* map 3 */
-  cmesh.intersections[14] = (AH5_intersection_t){INTER_FREE, {1,3,3}, 2, -9};
+  AH5_init_intersection(cmesh.intersections + 14, INTER_FREE, 1,3,3, 2, -9);
   /* Build polygons */
   cmesh.nb_polygontypes[0] = 19;
   cmesh.nb_polygontypes[1] = 2;
@@ -192,7 +193,7 @@ static char *test_free_cmesh()
   cmesh.nb_polygonnodes = 42;
   cmesh.polygonnodes = (AH5_index_t*)malloc(cmesh.nb_polygonnodes
                                             * sizeof(AH5_index_t));
-  
+
   /* Build regions */
   cmesh.nb_regions = 10;
   cmesh.regions =
@@ -200,19 +201,19 @@ static char *test_free_cmesh()
           cmesh.nb_polygontypes[0]
           * cmesh.nb_polygontypes[1]
           * sizeof(AH5_region_t));
-  cmesh.regions[0] = (AH5_region_t){0.1, 10};
-  cmesh.regions[1] = (AH5_region_t){0.2, 12};
-  cmesh.regions[2] = (AH5_region_t){0.3, 14};
-  
-  cmesh.regions[3] = (AH5_region_t){0.1, 11};
-  cmesh.regions[4] = (AH5_region_t){0.2, 13};
-  cmesh.regions[5] = (AH5_region_t){0.3, 15};
-  
-  cmesh.regions[6] = (AH5_region_t){0.4, 16};
-  cmesh.regions[7] = (AH5_region_t){ 0.5, 18};
-  
-  cmesh.regions[8] = (AH5_region_t){0.4, 17};
-  cmesh.regions[9] = (AH5_region_t){0.5, 19};
+  AH5_init_region(cmesh.regions + 0, 0.1, 10);
+  AH5_init_region(cmesh.regions + 1, 0.2, 12);
+  AH5_init_region(cmesh.regions + 2, 0.3, 14);
+
+  AH5_init_region(cmesh.regions + 3, 0.1, 11);
+  AH5_init_region(cmesh.regions + 4, 0.2, 13);
+  AH5_init_region(cmesh.regions + 5, 0.3, 15);
+
+  AH5_init_region(cmesh.regions + 6, 0.4, 16);
+  AH5_init_region(cmesh.regions + 7, 0.5, 18);
+
+  AH5_init_region(cmesh.regions + 8, 0.4, 17);
+  AH5_init_region(cmesh.regions + 9, 0.5, 19);
 
   /* The groups */
   cmesh.nb_groupgroups = 0;
@@ -221,11 +222,7 @@ static char *test_free_cmesh()
   cmesh.groups =
       (AH5_cgroup_t*)malloc(
           cmesh.nb_groups * sizeof(AH5_cgroup_t));
-  cmesh.groups[0] = (AH5_cgroup_t){NULL, "face", "PEC", 8, NULL};
-  cmesh.groups[0].path = (char*)malloc(10 * sizeof(char));
-  cmesh.groups[0].groupelts = (AH5_index_t*)malloc(cmesh.groups[0].nb_groupelts
-                                                   * sizeof(AH5_index_t));
-
+  AH5_init_conform_group(cmesh.groups + 0, "path_name", "element", "face", 8, groupelts);
   AH5_free_cmesh(&cmesh);
   AH5_free_cmesh(NULL);
 
