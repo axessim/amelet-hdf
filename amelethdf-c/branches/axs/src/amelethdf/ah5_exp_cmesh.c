@@ -82,9 +82,9 @@ char AH5_init_intersection(AH5_intersection_t *inter, AH5_intersection_type_t ty
   inter->type = type;
   inter->polygon_id = polygon_id;
   inter->normal = normal;
-  inter->index[i] = i;
-  inter->index[j] = j;
-  inter->index[k] = k;
+  inter->index[0] = i;
+  inter->index[1] = j;
+  inter->index[2] = k;
   return AH5_TRUE;
 }
 

@@ -144,7 +144,6 @@ static char *test_compute_offset()
 static char *test_free_cmesh()
 {
   AH5_cmesh_t cmesh;
-  int i;
   AH5_index_t groupelts[] = {0, 1, 2, 3, 4, 5, 6, 7};
 
   /* Build the grid */
@@ -223,6 +222,7 @@ static char *test_free_cmesh()
       (AH5_cgroup_t*)malloc(
           cmesh.nb_groups * sizeof(AH5_cgroup_t));
   AH5_init_conform_group(cmesh.groups + 0, "path_name", "element", "face", 8, groupelts);
+
   AH5_free_cmesh(&cmesh);
   AH5_free_cmesh(NULL);
 

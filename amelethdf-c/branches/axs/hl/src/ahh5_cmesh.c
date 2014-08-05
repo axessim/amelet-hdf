@@ -300,7 +300,7 @@ void AHH5_print_intersection(
     const AHH5_intersection_t *intersection, int space,
     const AHH5_cmesh_t *cmesh)
 {
-  printf("%*s-intersection: %lu, index [%lu, %lu, %lu], normal %lu\n", space, "",
+  printf("%*s-intersection: type=%lu, index=[%lu, %lu, %lu], normal=%lu\n", space, "",
          (unsigned long) intersection->type,
          (unsigned long) intersection->index[0],
          (unsigned long) intersection->index[1],
