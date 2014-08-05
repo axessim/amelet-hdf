@@ -104,7 +104,23 @@ extern "C" {
     AH5_groupgroup_t     *groupgroups;
   } AHH5_cmesh_t;
 
-
+  /** 
+   * Initialized polygon path
+   * 
+   * @param poly[inout] a valid polygon path
+   * @param nb_nodes the number of nodes
+   * @param nodes_index the nodes index array
+   * @param orientation the way to walk under the path (forward or backward)
+   * 
+   * @return true if success.
+   */
+  AHH5_PUBLIC char AHH5_init_polygonal_path(
+      AHH5_polygonal_path_t *poly,
+      AH5_polygon_type_t type,
+      hsize_t nb_nodes,
+      const AH5_index_t *nodes_index,
+      int orientation);
+  
   /**
    * Interpret the low level conform mesh to height level api.
    *

@@ -64,6 +64,30 @@ AH5_axis_t *AH5_axis_copy(AH5_axis_t *dst, const AH5_axis_t *src)
   return dst;
 }
 
+char AHH5_init_polygonal_path(
+    AHH5_polygonal_path_t *poly,
+    AH5_polygon_type_t type,
+    hsize_t nb_nodes,
+    const AH5_index_t *nodes_index,
+    int orientation)
+{
+  if (!poly)
+    return AH5_FALSE;
+
+  poly->type = type;
+  poly->orientation = orientation;
+  
+  poly->nb_nodes = 0;
+  poly->nodes_index = NULL;
+  if (nodes_index && nb_nodes)
+  {
+    poly->nb_nodes = nb_nodes;
+    poly->nodes_index = (AH5_index_t*)malloc(nb_nodes * sizeof(AH5_index_t));
+    memcpy(poly->nodes_index, nodes_index, nb_nodes * sizeof(AH5_index_t));
+  }
+
+  return AH5_TRUE;
+}
 
 /**
  * Load polygonal path.
@@ -196,8 +220,9 @@ char AHH5_interpret_cmesh(AHH5_cmesh_t *height, AH5_cmesh_t *low)
               = (AHH5_region_t *)malloc(sizeof(AHH5_region_t));
           height->intersections[i].polygon->region->area
               = low->regions[regions_index[abs(polygon_id)]].area;
-          height->intersections[i].polygon->region->path = (AHH5_polygonal_path_t){
-            height->intersections[i].polygon->path.type, 0, NULL, 0};
+          AHH5_init_polygonal_path(
+              &(height->intersections[i].polygon->region->path),
+              height->intersections[i].polygon->path.type, 0, NULL, 0);
         }
       }
     }

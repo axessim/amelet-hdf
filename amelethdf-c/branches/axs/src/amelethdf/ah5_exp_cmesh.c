@@ -129,6 +129,7 @@ char AH5_init_conform_group(AH5_cgroup_t *group, const char *path, const char *t
   group->nb_groupelts = 0;
   if (groupelts && nb_groupelts)
   {
+    group->nb_groupelts = nb_groupelts;
     group->groupelts = (AH5_index_t*)malloc(sizeof(AH5_index_t) * nb_groupelts);
     memcpy(group->groupelts, groupelts, sizeof(AH5_index_t) * nb_groupelts);
   }
