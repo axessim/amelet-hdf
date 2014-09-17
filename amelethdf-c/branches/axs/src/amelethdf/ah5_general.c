@@ -2,16 +2,47 @@
 
 #include <ctype.h>
 
+
+/** 
+ * Write string attribute in given node.
+ * 
+ * @param loc_id valid HDF5 node instance
+ * @param attr_name the attribute name
+ * @param wdata the attribute value
+ * 
+ * @return return success status
+ */
+char AH5_write_str_root_attr(hid_t loc_id, char *attr_name, const char *wdata)
+{
+  char success = AH5_FALSE;
+
+  hid_t aid, atype, attr;
+  
+  
+  aid  = H5Screate(H5S_SCALAR);
+  atype = H5Tcopy(H5T_C_S1);
+  H5Tset_size(atype, strlen(wdata));
+  attr = H5Acreate1(loc_id, attr_name, atype, aid, H5P_DEFAULT);
+
+  if (H5Awrite(attr, atype, wdata) >= 0)
+    if (H5Sclose(aid) >= 0)
+      if (H5Aclose(attr) >= 0)
+        success = AH5_TRUE;
+  
+  return success;
+}
+
+    
 hid_t AH5_create(const char *name, unsigned flags, const char *entry_point)
 {
   hid_t file_id;
   file_id = H5Fcreate(name, flags, H5P_DEFAULT, H5P_DEFAULT);
 
-  AH5_write_str_attr(file_id, ".", AH5_FILE_A_FORMAT, AH5_FILE_FORMAT);
-  AH5_write_str_attr(file_id, ".", AH5_FILE_A_VERSION, AH5_FILE_DEFAULT_VERSION);
+  AH5_write_str_root_attr(file_id, AH5_FILE_A_FORMAT, AH5_FILE_FORMAT);
+  AH5_write_str_root_attr(file_id, AH5_FILE_A_VERSION, AH5_FILE_DEFAULT_VERSION);
 
   if (entry_point)
-    AH5_write_str_attr(file_id, ".", AH5_A_ENTRY_POINT, entry_point);
+    AH5_write_str_root_attr(file_id, AH5_A_ENTRY_POINT, entry_point);
   
   return file_id;
 }
