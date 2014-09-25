@@ -115,6 +115,9 @@ ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 STRING(COMPARE EQUAL "${CMAKE_BUILD_TYPE}" "DEBUG" AMELETHDF_DEBUG)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/src/amelethdf/ah5_config.h.cmake 
   ${CMAKE_CURRENT_BINARY_DIR}/src/amelethdf/ah5_config.h)
+INSTALL(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/src/amelethdf/ah5_config.h"
+  DESTINATION "include")
 
 # Define the Amelet-HDF tools and test dependance.
 SET(AMELETHDF_TOOLS_LINK_LIBS amelethdfc ${AMELETHDF_DEP_LINK_LIBS})
