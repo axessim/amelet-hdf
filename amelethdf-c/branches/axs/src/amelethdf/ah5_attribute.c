@@ -241,9 +241,8 @@ char AH5_write_str_attr(hid_t loc_id, const char *path, char *attr_name, const c
     char success = AH5_FALSE;
 
     if (AH5_path_valid(loc_id, path))
-        if (strlen(wdata) < AH5_ATTR_LENGTH)
-            if (H5LTset_attribute_string(loc_id, path, attr_name, wdata) >= 0)
-                success = AH5_TRUE;
+        if (H5LTset_attribute_string(loc_id, path, attr_name, wdata) >= 0)
+            success = AH5_TRUE;
 
     return success;
 }
