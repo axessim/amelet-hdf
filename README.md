@@ -31,8 +31,8 @@ collaborative simulation environment. To achieve this objective, CuToo:
 
 * Manage computation workflow
 * Provide knowledge management capabilities
-* Manage authentication and permissions
-* Handle remote visualization
+* Manage authentications and permissions
+* Handle remote visualizations
 
 CGNS, SILO and MED specifications give a standard way of describing physical
 models, mesh definition and many physical concepts. Software tool that can
